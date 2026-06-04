@@ -1,0 +1,94 @@
+:root {
+  font-size: 13px;
+  --p-primary-color: #00b4b5;
+  --button-info-background: #00b4b5;
+}
+
+html,body {
+  height: 100vh;
+  margin: 0;
+}
+
+.p-disabled{
+  background-color:var(--gray-100) !important;
+  color: var(--gray-500) !important;
+}
+
+.p-inputtext:disabled {
+  background-color:var(--gray-200) !important;
+}
+
+.p-button:disabled{
+  background-color:var(--gray-100) !important;
+  color:var(--gray-500) !important;
+}
+
+.p-button {
+  font-size: 1rem;
+}
+
+.p-autocomplete > .p-inputtext{
+  width: 100% !important;
+}
+
+.p-menubar{
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  padding-right: 1.5rem !important;
+  background-color: #00b4c5 !important;
+  border-radius: 0;
+  height: auto;
+}
+
+.p-menubar .p-menubar-root-list > .p-menubar-item {
+  padding: 0;
+}
+
+.p-menubar .p-menubar-root-list > .p-menubar-item > .p-menubar-item-content {
+  background-color: #00b4c5;
+}
+
+.p-menubar .p-menubar-root-list > .p-menubar-item > .p-menubar-item-content > .p-menubar-item-link {
+  padding: 0.5rem;
+  margin: 0;
+}
+
+.p-menubar .p-menubar-root-list > .p-menubar-item > .p-menubar-item-content > .p-menubar-item-link > .p-menubar-item-label {
+  padding: 0 !important;
+  color: white !important;
+  font-weight: 500 !important;
+}
+
+.p-menubar .p-menubar-root-list > .p-menubar-item > .p-menubar-item-content > .p-menubar-item-link > .p-icon.p-menubar-submenu-icon {
+  display: none !important;
+}
+
+.p-menubar .p-menubar-root-list > .p-menubar-item .p-menubar-item-active > .p-menubar-item-content{
+  background-color: #0096a4;
+  border-radius: 0 !important;
+}
+
+.p-menubar .p-menubar-root-list > .p-menubar-item > .p-menubar-item-content:hover{
+  background-color: #0096a4;
+  border-radius: 0 !important;
+}
+
+.p-menubar .p-menubar-root-list > .p-menubar-item .p-menubar-item-active > .p-menubar-item-content{
+  background-color: #0096a4 !important;
+  border-radius: 0 !important;
+}
+
+.p-menubar .p-submenu-list {
+  border-radius: 0px;
+  /* box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px; */
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+  margin-left: 1px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.p-menubar  .p-menubar-root-list > .p-menubar-item > .p-submenu-list > .p-menuitem > .p-menuitem-content > .p-menuitem-link > .p-submenu-icon.p-icon, .p-menuitem-text  {
+  color: black !important;
+}
+
+
