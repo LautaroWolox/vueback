@@ -24,7 +24,7 @@ RUN npm run build
 # --- FASE 2: El "Producto Final" (Final Stage) ---
 # Usamos una imagen de Nginx súper ligera y segura (no corre como root).
 # FROM nginxinc/nginx-unprivileged:stable-alpine
-FROM quay-registry-quay-quay-registry.apps.ocp4-mh.cloudteco.com.ar/devops/nginxinc/nginx-unprivileged AS build
+FROM quay-registry-quay-quay-registry.apps.ocp4-mh.cloudteco.com.ar/devops/nginxinc/nginx-unprivileged:latest
 
 # Eliminamos la configuración por defecto de Nginx.
 RUN rm /etc/nginx/conf.d/default.conf
