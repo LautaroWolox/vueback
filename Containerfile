@@ -1,7 +1,7 @@
 # --- FASE 1: La "Fábrica" (Build Stage) ---
 # Usamos una imagen de Node para construir nuestro proyecto Vue.
 # FROM node:20-alpine AS build
-FROM quay-registry-quay-quay-registry.apps.ocp4-mh.cloudteco.com.ar/devops/nodejs-22 AS build
+FROM quay-registry-quay-quay-registry.apps.ocp4-mh.cloudteco.com.ar/devops/nodejs-22:10.0 AS build
 
 # Establecemos el directorio de trabajo dentro del contenedor.
 WORKDIR /app
