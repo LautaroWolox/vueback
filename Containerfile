@@ -16,14 +16,6 @@ RUN npm ci
 # Copiamos el resto del código fuente de la aplicación.
 COPY . .
 
-# AGREGO VARIABLES PARA PROBAR 
-# Variables de entorno para Vite
-RUN cat <<EOF > .env.production
-VITE_FM_MV_URL=https://nginx-proxy-pctrl-nginx-dev.apps.ocp4-rh.cloudteco.com.ar/pc
-VITE_ORIGIN=https://nginx-proxy-pctrl-nginx-dev.apps.ocp4-rh.cloudteco.com.ar
-VITE_ALLOWED_HOSTS=nginx-proxy-pctrl-nginx-dev.apps.ocp4-rh.cloudteco.com.ar
-VITE_PARAMETER1=90a787b45618cce82e9668aa23d9e15d6ae319aa6f9ef0fe5bacaf74b23e7ef4
-EOF
 
 # Ejecutamos el script de build de Vue (definido en tu package.json).
 # Esto generará la carpeta 'dist' con los archivos estáticos.
