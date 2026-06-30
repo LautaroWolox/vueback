@@ -32,7 +32,7 @@ FROM quay-registry-quay-quay-registry.apps.ocp4-mh.cloudteco.com.ar/devops/nginx
 # RUN rm /etc/nginx/conf.d/default.conf
 
 
-# Copiamos nuestra propia configuración de Nginx (la crearemos a continuación).
+# Copiamos nuestra propia configuración de Nginx (la crearemos a continuación)
 # COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copiamos los archivos estáticos generados en la fase 1 a la carpeta que Nginx sirve.
