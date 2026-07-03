@@ -38,7 +38,7 @@ const top = screenHeight / 6;
 
 
 const handleMessage = (event) => {
-  const origins = new Set([import.meta.env.VITE_ORIGIN]);
+  const origins = new Set([import.meta.env.VITE_ORIGIN,window.location.origin]);
   let autenticado = false;
   let usrObj = {};
   if (!origins.has(event.origin)) return
