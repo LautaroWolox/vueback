@@ -67,7 +67,7 @@ const handleMessage = (event) => {
 }
 
 const ingresar = () => {
-  popupWindow.value = window.open(window.location.origin + '/pc/llamado.html','LoginPopup',`width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`)
+  popupWindow.value = window.open('/pc/llamado.html','LoginPopup',`width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`)
 }
 
 onMounted(() => {
