@@ -27,7 +27,7 @@ const routes = [
   {
     path: '/login2fa.html',
     name: 'login2fa',
-    alias: '/',
+    alias: ['/', '/index.html'],
     component: () => import('../views/Login2faView.vue')
   },
   {
