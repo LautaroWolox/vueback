@@ -38,9 +38,16 @@ const top = screenHeight / 6;
 
 
 const handleMessage = (event) => {
+  console.log('HANDLE MESSAGE ENTERED', event.origin, event.data)
+  const origins = new Set([import.meta.env.VITE_ORIGIN])
+  console.log('allowed origins', [...origins])
+  if (!origins.has(event.origin)) {
+    console.log('origin rejected')
+    return
+  }
+  console.log('origin accepted')
   console.log('event.origin:', event.origin)
   console.log('VITE_ORIGIN:', import.meta.env.VITE_ORIGIN)
-  const origins = new Set([import.meta.env.VITE_ORIGIN]);
   let autenticado = false;
   let usrObj = {};
   if (!origins.has(event.origin)) return
