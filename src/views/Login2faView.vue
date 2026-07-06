@@ -28,7 +28,7 @@ import { useAuthStore } from '@/store/auth';
 const urlBase = import.meta.env.VITE_FM_MV_URL;
 const router = useRouter()
 const authStore = useAuthStore();
-const popupWindow = ref(null)
+let popupWindow = null;
 const screenWidth = window.screen.width;
 const screenHeight = window.screen.height;
 const width = screenWidth / 1.5;
@@ -38,6 +38,8 @@ const top = screenHeight / 6;
 
 
 const handleMessage = (event) => {
+  console.log('event.origin:', event.origin)
+  console.log('VITE_ORIGIN:', import.meta.env.VITE_ORIGIN)
   const origins = new Set([import.meta.env.VITE_ORIGIN]);
   let autenticado = false;
   let usrObj = {};
@@ -58,16 +60,20 @@ const handleMessage = (event) => {
       })
     router.push({ name: 'main'})
     window.removeEventListener('message', handleMessage)
-    if (popupWindow.value) {
-      popupWindow.value.close()
-      popupWindow.value = null
+    if (popupWindow) {
+      popupWindow.close()
+      popupWindow = null
     }
   }
   
 }
 
 const ingresar = () => {
-  popupWindow.value = window.open(window.location.origin + '/pc/llamado.html','LoginPopup',`width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`)
+  popupWindow = window.open(
+    `${window.location.origin}/pc/llamado.html`,
+    'LoginPopup',
+    `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+  )
 }
 
 onMounted(() => {
