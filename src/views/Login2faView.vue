@@ -86,9 +86,9 @@ const ingresar = () => {
 /* onMounted(() => {
   window.removeEventListener('message', handleMessage)
   window.addEventListener('message', handleMessage)
-}) */
+}) 
+onBeforeUnmount(() => window.removeEventListener('message', handleMessage)) */
 
-//onBeforeUnmount(() => window.removeEventListener('message', handleMessage))
 </script>
 
 <style scoped>

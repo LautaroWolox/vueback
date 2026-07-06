@@ -18,7 +18,7 @@ const debugMessageListener = (event) => {
   console.log('MAIN CAPTURE RECEIVED MESSAGE', event.origin, event.data)
 }
 
-window.addEventListener('message', debugMessageListener, true)
+window.addEventListener('message', handleLoginMessage, true)
 
 
 const pinia = createPinia();
