@@ -38,7 +38,7 @@ const top = screenHeight / 6;
 
 
 const handleMessage = (event) => {
-  const origins = new Set([import.meta.env.VITE_ORIGIN,window.location.origin]);
+  const origins = new Set([import.meta.env.VITE_ORIGIN]);
   let autenticado = false;
   let usrObj = {};
   if (!origins.has(event.origin)) return
@@ -67,7 +67,7 @@ const handleMessage = (event) => {
 }
 
 const ingresar = () => {
-  popupWindow.value = window.open('/pc/llamado.html','LoginPopup',`width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`)
+  popupWindow.value = window.open(window.location.origin + '/pc/llamado.html','LoginPopup',`width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`)
 }
 
 onMounted(() => {
