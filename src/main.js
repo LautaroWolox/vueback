@@ -15,10 +15,11 @@ import router from './router';
 import { strings } from './strings.js'
 
 const debugMessageListener = (event) => {
-  console.log('MAIN.JS RECEIVED MESSAGE', event.origin, event.data)
+  console.log('MAIN CAPTURE RECEIVED MESSAGE', event.origin, event.data)
 }
 
-window.addEventListener('message', debugMessageListener)
+window.addEventListener('message', debugMessageListener, true)
+
 
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedState);
