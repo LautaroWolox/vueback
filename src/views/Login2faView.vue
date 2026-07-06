@@ -20,7 +20,7 @@
 
 <script setup>
 import Button from 'primevue/button';
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, onBeforeMount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/store/auth';
 
@@ -83,11 +83,12 @@ const ingresar = () => {
   )
 }
 
-onMounted(() => {
+/* onMounted(() => {
   window.removeEventListener('message', handleMessage)
   window.addEventListener('message', handleMessage)
-})
-onBeforeUnmount(() => window.removeEventListener('message', handleMessage))
+}) */
+
+//onBeforeUnmount(() => window.removeEventListener('message', handleMessage))
 </script>
 
 <style scoped>
