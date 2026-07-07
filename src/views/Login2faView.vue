@@ -39,15 +39,18 @@ let popupWindow = null
 let loginTimer = null
 
 const checkLoginStatus = async () => {
+  console.log("Entró a checkLoginStatus")
   const { data, error, response } = await useFetch('/pc/userData.html', {
     credentials: 'include',
   }).get().json()
+  console.log("Login status = " + response.value?.status)
   if (response.value?.status === 403 || response.value?.status === 401) {
     return false
   }
   if (error.value || !data.value?.autenticado) {
     return false
   }
+  console.log("Login status = " + response.value?.status)
   authStore.setPerfil({
     autenticado: data.value.autenticado,
     rutas: data.value.rutas,
@@ -55,7 +58,8 @@ const checkLoginStatus = async () => {
     email: data.value.email,
     legajo: data.value.legajo,
   })
-  router.push({ name: 'main' })
+  console.log("después the llamar a Pinia, antes de abrir main")
+  router.push({ name: 'main' })  // no mandar debajo del cierre del popup porque trae problemas
   if (popupWindow) {
     popupWindow.close()
     popupWindow = null
@@ -64,6 +68,7 @@ const checkLoginStatus = async () => {
 }
 
 const startLoginPolling = () => {
+  console.log("entré a startLoginPolling")
   let attempts = 0
   const maxAttempts = 120
   loginTimer = setInterval(async () => {
@@ -82,9 +87,10 @@ const ingresar = async () => {
     'LoginPopup',
     `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
   )
+  console.log("Antes de empezar polling")
   setTimeout(() => {
     startLoginPolling();
-  }, 30000);   // 30 segundos de espera para que java expire cookie e invalide sesión
+  }, 10000);   // 10 segundos de espera para que java expire cookie e invalide sesión
 }
 
 
