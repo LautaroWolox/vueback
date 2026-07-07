@@ -14,13 +14,6 @@ import App from './App.vue';
 import router from './router';
 import { strings } from './strings.js'
 
-const debugMessageListener = (event) => {
-  console.log('MAIN CAPTURE RECEIVED MESSAGE', event.origin, event.data)
-}
-
-window.addEventListener('message', handleLoginMessage, true)
-
-
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedState);
 const app = createApp(App)
