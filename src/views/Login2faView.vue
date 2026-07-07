@@ -20,15 +20,14 @@
 
 <script setup>
 import Button from 'primevue/button';
-import { ref, onMounted, onBeforeUnmount, onBeforeMount } from 'vue'
+import { onBeforeUnmount,ref } from 'vue'
+import { useFetch } from '@vueuse/core'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/store/auth';
 
 
-const urlBase = import.meta.env.VITE_FM_MV_URL;
 const router = useRouter()
 const authStore = useAuthStore();
-let popupWindow = null;
 const screenWidth = window.screen.width;
 const screenHeight = window.screen.height;
 const width = screenWidth / 1.5;
@@ -36,58 +35,65 @@ const height = screenHeight / 1.5;
 const left = screenWidth / 6;  
 const top = screenHeight / 6; 
 
+let popupWindow = null
+let loginTimer = null
 
-const handleMessage = (event) => {
-  console.log('HANDLE MESSAGE ENTERED', event.origin, event.data)
-  const origins = new Set([import.meta.env.VITE_ORIGIN])
-  console.log('allowed origins', [...origins])
-  if (!origins.has(event.origin)) {
-    console.log('origin rejected')
-    return
+const checkLoginStatus = async () => {
+  const { data, error, response } = await useFetch('/pc/userData.html', {
+    credentials: 'include',
+  }).get().json()
+  if (response.value?.status === 403 || response.value?.status === 401) {
+    return false
   }
-  console.log('origin accepted')
-  console.log('event.origin:', event.origin)
-  console.log('VITE_ORIGIN:', import.meta.env.VITE_ORIGIN)
-  let autenticado = false;
-  let usrObj = {};
-  if (!origins.has(event.origin)) return
-  let jsonStr = event.data.usr
-  if(jsonStr !== undefined) {
-    console.log("recibido: " + jsonStr)
-    usrObj = JSON.parse(jsonStr)
-    autenticado = usrObj.autenticado
+  if (error.value || !data.value?.autenticado) {
+    return false
   }
-  if (usrObj && autenticado) {
-    authStore.setPerfil({
-        autenticado,
-        rutas: usrObj.rutas,
-        nombre: usrObj.nombre,
-        email: usrObj.email,
-        legajo: usrObj.legajo
-      })
-    router.push({ name: 'main'})
-    window.removeEventListener('message', handleMessage)
-    if (popupWindow) {
-      popupWindow.close()
-      popupWindow = null
-    }
+  authStore.setPerfil({
+    autenticado: data.value.autenticado,
+    rutas: data.value.rutas,
+    nombre: data.value.nombre,
+    email: data.value.email,
+    legajo: data.value.legajo,
+  })
+  router.push({ name: 'main' })
+  if (popupWindow) {
+    popupWindow.close()
+    popupWindow = null
   }
-  
+  return true
 }
 
-const ingresar = () => {
+const startLoginPolling = () => {
+  let attempts = 0
+  const maxAttempts = 120
+  loginTimer = setInterval(async () => {
+    attempts++
+    const ok = await checkLoginStatus()
+    if (ok || attempts >= maxAttempts) {
+      clearInterval(loginTimer)
+      loginTimer = null
+    }
+  }, 1000)    // llama a java para obtener datos de usuario cada un segundo
+}
+
+const ingresar = async () => {
   popupWindow = window.open(
-    `${window.location.origin}/pc/llamado.html`,
+    window.location.origin + '/pc/llamado.html',
     'LoginPopup',
     `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
   )
+  setTimeout(() => {
+    startLoginPolling();
+  }, 30000);   // 30 segundos de espera para que java expire cookie e invalide sesión
 }
 
-/* onMounted(() => {
-  window.removeEventListener('message', handleMessage)
-  window.addEventListener('message', handleMessage)
-}) 
-onBeforeUnmount(() => window.removeEventListener('message', handleMessage)) */
+
+onBeforeUnmount(() => {
+  if (loginTimer) {
+    clearInterval(loginTimer)
+  }
+})
+
 
 </script>
 

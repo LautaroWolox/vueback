@@ -46,7 +46,12 @@ export const useAuthStore = defineStore('auth', {
             this.usuario = { nombre, legajo, email }
         },
         logout() {
-            this.$reset()
+            this.autenticado=false,
+            this.rutas=[],
+            this.nombre="",
+            this.legajo="",
+            this.email="",
+            this.usuario=null
         },
     },
     persist: [
