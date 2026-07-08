@@ -82,6 +82,11 @@ const startLoginPolling = () => {
 }
 
 const ingresar = async () => {
+  console.log("before polling timeout")
+  setTimeout(() => {
+    console.log("starting polling now")
+    startLoginPolling()
+  }, 30000)
   console.log("INGRESAR START")
   try {
     console.log("before window.open")
@@ -91,11 +96,11 @@ const ingresar = async () => {
       `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
     )
     console.log("after window.open", popupWindow)
-    console.log("before polling timeout")
-    setTimeout(() => {
+    console.log("acá iba el pooling")
+/*     setTimeout(() => {
       console.log("starting polling now")
       startLoginPolling()
-    }, 30000)
+    }, 30000) */
     console.log("INGRESAR END")
   } catch (e) {
     console.error("ingresar failed", e)
