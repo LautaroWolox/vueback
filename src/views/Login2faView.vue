@@ -33,9 +33,9 @@ const ingresar = () => {
 
 onMounted( async () => {
   const user = await authStore.fetchUserData()
-    if (user && autenticado) {
+    if (user) {
       authStore.setPerfil({
-          autenticado,
+          autenticado: user.autenticado,
           rutas: user.rutas,
           nombre: user.nombre,
           email: user.email,
