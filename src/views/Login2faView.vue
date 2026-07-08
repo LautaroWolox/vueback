@@ -82,15 +82,15 @@ const startLoginPolling = () => {
 }
 
 const ingresar = async () => {
+  console.log("Antes de empezar polling")
+  setTimeout(() => {
+    startLoginPolling();
+  }, 30000);   // 30 segundos de espera para que java expire cookie e invalide sesión
   popupWindow = window.open(
     window.location.origin + '/pc/llamado.html',
     'LoginPopup',
     `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
   )
-  console.log("Antes de empezar polling")
-  setTimeout(() => {
-    startLoginPolling();
-  }, 10000);   // 10 segundos de espera para que java expire cookie e invalide sesión
 }
 
 
