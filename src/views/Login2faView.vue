@@ -20,14 +20,15 @@
 
 <script setup>
 import Button from 'primevue/button';
-import { onBeforeUnmount,ref } from 'vue'
-import { useFetch } from '@vueuse/core'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/store/auth';
 
 
+const urlBase = import.meta.env.VITE_FM_MV_URL;
 const router = useRouter()
 const authStore = useAuthStore();
+const popupWindow = null
 const screenWidth = window.screen.width;
 const screenHeight = window.screen.height;
 const width = screenWidth / 1.5;
@@ -35,86 +36,45 @@ const height = screenHeight / 1.5;
 const left = screenWidth / 6;  
 const top = screenHeight / 6; 
 
-let popupWindow = null
-let loginTimer = null
 
-const checkLoginStatus = async () => {
-  console.log("Entró a checkLoginStatus")
-  const { data, error, response } = await useFetch(window.location.origin + '/pc/userData.html', {
-    credentials: 'include',
-  }).get().json()
-  console.log("Login status = " + response.value?.status)
-  if (response.value?.status === 403 || response.value?.status === 401) {
-    return false
+const handleMessage = (event) => {
+  const origins = new Set([import.meta.env.VITE_ORIGIN, window.location.origin]);
+  let autenticado = false;
+  let usrObj = {};
+  if (!origins.has(event.origin)) return
+  let jsonStr = event.data.usr
+  if(jsonStr !== undefined) {
+    console.log("recibido: " + jsonStr)
+    usrObj = JSON.parse(jsonStr)
+    autenticado = usrObj.autenticado
   }
-  if (error.value || !data.value?.autenticado) {
-    return false
-  }
-  console.log("Login status = " + response.value?.status)
-  authStore.setPerfil({
-    autenticado: data.value.autenticado,
-    rutas: data.value.rutas,
-    nombre: data.value.nombre,
-    email: data.value.email,
-    legajo: data.value.legajo,
-  })
-  console.log("después the llamar a Pinia, antes de abrir main")
-  router.push({ name: 'main' })  // no mandar debajo del cierre del popup porque trae problemas
-  if (popupWindow) {
-    popupWindow.close()
-    popupWindow = null
-  }
-  return true
-}
-
-const startLoginPolling = () => {
-  console.log("entré a startLoginPolling")
-  let attempts = 0
-  const maxAttempts = 120
-  loginTimer = setInterval(async () => {
-    attempts++
-    const ok = await checkLoginStatus()
-    if (ok || attempts >= maxAttempts) {
-      clearInterval(loginTimer)
-      loginTimer = null
+  if (usrObj && autenticado) {
+    authStore.setPerfil({
+        autenticado,
+        rutas: usrObj.rutas,
+        nombre: usrObj.nombre,
+        email: usrObj.email,
+        legajo: usrObj.legajo
+      })
+    router.push({ name: 'main'})
+    if (popupWindow) {
+      popupWindow.close()
+      popupWindow = null
     }
-  }, 1000)    // llama a java para obtener datos de usuario cada un segundo
+
+  }
+  
 }
 
-const ingresar = async () => {
-  console.log("before polling timeout")
-  setTimeout(() => {
-    console.log("starting polling now")
-    startLoginPolling()
-  }, 30000)
-  console.log("INGRESAR START")
-  try {
-    console.log("before window.open")
-    popupWindow = window.open(
-      window.location.origin + '/pc/llamado.html',
-      'LoginPopup',
-      `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
-    )
-    console.log("after window.open", popupWindow)
-    console.log("acá iba el pooling")
-/*     setTimeout(() => {
-      console.log("starting polling now")
-      startLoginPolling()
-    }, 30000) */
-    console.log("INGRESAR END")
-  } catch (e) {
-    console.error("ingresar failed", e)
-  }
+const ingresar = () => {
+  popupWindow = window.open(window.location.origin + '/pc/llamado.html','LoginPopup',`width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`)
 }
 
-
-onBeforeUnmount(() => {
-  if (loginTimer) {
-    clearInterval(loginTimer)
-  }
+onMounted(() => {
+  //window.removeEventListener('message', handleMessage)
+  window.addEventListener('message', handleMessage)
 })
-
-
+onBeforeUnmount(() => window.removeEventListener('message', handleMessage))
 </script>
 
 <style scoped>
