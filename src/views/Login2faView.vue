@@ -40,7 +40,7 @@ let loginTimer = null
 
 const checkLoginStatus = async () => {
   console.log("Entró a checkLoginStatus")
-  const { data, error, response } = await useFetch('/pc/userData.html', {
+  const { data, error, response } = await useFetch(window.location.origin + '/pc/userData.html', {
     credentials: 'include',
   }).get().json()
   console.log("Login status = " + response.value?.status)
