@@ -34,6 +34,7 @@ const authStore = useAuthStore();
 const loadingUser = ref(false)
 
 const ingresar = () => {
+  console.log("PRUEBA NUEVA VERSIÓN")
   window.location.href = `${window.location.origin}/pc/llamado.html`
 }
 
