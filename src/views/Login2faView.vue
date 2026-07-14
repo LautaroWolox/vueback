@@ -1,6 +1,6 @@
 <template>
   <div v-if="loadingUser" class="login-loading">
-    <h1>Tu turno Lautaro</h1>
+    <h1>Tu turno Lautaro...</h1>
   </div>
   <div v-else>
     <div>
