@@ -1,0 +1,23 @@
+export const columns = [
+    {field: 'id', header: 'ID OT FALLIDAS', hidden:true, exportable:false, filter: false},
+    {field: 'nroOrdenTrabajo', header: 'Nro. OT', hidden:false, exportable:true, filter: true, sort:true},
+    {field: 'fechaCierre', header: 'FECHA CIERRE', hidden:false, exportable:true, filter: false},
+    {field: 'tareaCodigo', header: 'COD TAREA', hidden:false, exportable:true, filter: true, sort:true},
+    {field: 'direccion', header: 'DIRECCION', hidden:false, exportable:true, filter: false},
+    {field: 'ciudad', header: 'CIUDAD', hidden:false, exportable:true, filter: false},
+    {field: 'provincia', header: 'PROVINCIA', hidden:false, exportable:true, filter: false},
+    {field: 'region', header: 'REGION', hidden:false, exportable:true, filter: false},
+    {field: 'pais', header: 'PAIS', hidden:false, exportable:true, filter: false},
+    {field: 'contratista', header: 'CONTRATISTA', hidden:false, exportable:true, filter: true, sort:true},
+    {field: 'tecnicoCierre', header: 'TECNICO CIERRE', hidden:false, exportable:true, filter: true, sort:true},
+    {field: 'actividades', header: 'ACTIVIDADES', hidden:false, exportable:true, filter: false},
+    {field: 'sistemaOrigen', header: 'SISTEMA ORIGEN', hidden:false, exportable:true, filter: false},
+    {field: 'errorDescripcion', header: 'DESCRIPCION ERROR', hidden:false, exportable:true, filter: false},
+    {field: 'excluida', header: 'EXCLUIDA', hidden:false, exportable:true, filter: false},
+    {field: 'motivoExclusion', header: 'MOTIVO EXCLUSION', hidden:false, exportable:true, filter: false},
+    {field: 'nota', header: 'NOTA', hidden:true, exportable:true, filter: false},
+    {field: 'tieneNota', header: 'NOTA', hidden:false, exportable:false, filter: false},
+    {field: 'incluirExp', header: 'INCLUIR', hidden:true, exportable:true, filter: false},
+    {field: 'incluir', header: 'INCLUIR', hidden:false, exportable:false, filter: false},
+]
+
