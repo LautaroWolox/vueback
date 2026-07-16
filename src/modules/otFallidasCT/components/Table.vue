@@ -97,7 +97,6 @@ import ExcluirDialog from './ExcluirDialog.vue';
 import { useExcelExport } from '@/composables/useExportExcel';
 
 const store = useFallidasCtStore()
-//const mockRes = ref(store.rows)
 const cols = ref(columns)
 const dt = ref()
 const showExcluir = ref(false)
@@ -108,6 +107,7 @@ const filters = ref({
     tareaCodigo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
     tecnicoCierre: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
     contratista: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    // Agregar el resto
 });
 
 const selectedRows = computed({
@@ -168,8 +168,6 @@ const exportarExcel = () => {
     groupField: null,
   })
 }
-
-
 
 </script>
 

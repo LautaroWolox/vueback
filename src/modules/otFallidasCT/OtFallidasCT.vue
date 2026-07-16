@@ -1,7 +1,7 @@
 <template>
     <LoadingOverlay :loading="store.loading" />
     <div class="mx-2">
-        <Accordion v-model:value=active multiple>
+        <Accordion v-model:value=store.activeTab multiple>
             <AccordionPanel value="0">
                 <AccordionHeader>
                     FILTROS DE BÚSQUEDA
@@ -29,7 +29,7 @@ import Filtros from './components/Filtros.vue';
 import LoadingOverlay from '../shared/components/LoadingOverlay.vue';
 
 const store = useFallidasCtStore()
-const active = store.activeTab
+//const active = store.activeTab
 
 </script>
 

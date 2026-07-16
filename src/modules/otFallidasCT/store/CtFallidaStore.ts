@@ -53,16 +53,13 @@ export const useFallidasCtStore = defineStore('fallidasCT', {
             this.selectedRows = rows;
         },
         async sendExcluidas(motivo: string, comentario: string): Promise<ActionResponse> {
-            console.log("motivo en store: " + motivo)
-            console.log("comentario en store: " + comentario)
+            this.loading = true;
             try {
-                this.loading = true;
                 const payload: ExcluirRequest = {
                     idOts: this.selectedNotExcludedRows.map(row => row.id.toString()),
                     nota: comentario,
                     motivoNombreCorto: motivo
                 }
-                console.log("payload: " + JSON.stringify(payload))
                 const { data, error } = await useFetch('/pc/registroOTFallidasReproceso/excluirOTFallida.html')
                     .post(payload)
                     .json<ActionResponse>()

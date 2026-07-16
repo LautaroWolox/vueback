@@ -88,62 +88,21 @@
             header: 'ACEPTAR',
             rejectProps: {label: 'Cancelar'},
             acceptProps: {label: 'Aceptar'},
-            accept: async () => {
+            accept: async () => { 
                let resp = await store.sendExcluidas(motivoSelected.value.nombreCorto,comentario.value)
                console.log('resp: ' + JSON.stringify(resp))
                cerrar()
+               store.setData()
             },
             reject: () => { cerrar() }
         });
         } else {
             alert('agregar toast de error')
-            cerrar()
+            emit('update:visible', false)
         }
     }
 
     onMounted(() => commonCT.setMotivosExcInc())
 
-
-/*
-//BOTON EXCLUIR OT Y LLAMADA A CONTROLLER
-const excluirOtFallida = () => {
-		var arrData = [];
-		var selectedRow = $(OT_FALLIDAS_GRID).jqGrid("getGridParam", 'selrow');
-		var arrDataStr;
-		var arrSelectedRows = $(OT_FALLIDAS_GRID).jqGrid("getGridParam", 'selarrrow');
-		let nota = $("#notaExclusionFallida").val();
-		let motivoExclusion = $("#excluirOtFallidaMotivos").val();
-		for (var i = 0; i < arrSelectedRows.length; i++) {
-			var curr = $(OT_FALLIDAS_GRID).getRowData(arrSelectedRows[i]);
-			if(curr.excluida === "N"){
-						arrData.push(curr.id); // arrData.push(curr["nroOrdenTrabajo"]);
-				}		
-			}
-		arrDataStr = JSON.stringify(arrData);
-		toggleLoader();                                                                                               
-		
-		$.post("registroOTFallidasReproceso/excluirOTFallida.html", {arrDataStr: arrDataStr, nota: nota,motivoNombreCorto: motivoExclusion },function(data) {
-			var page = $(OT_FALLIDAS_GRID).jqGrid("getGridParam", 'page');
-			if(data.status) {
-				if (validateFilters("filtrosForm")) {
-					var filtrosBusqueda = $("#filtrosForm :input").serialize() + "&sinFiltros="+false;
-					initotFallidasGrid("registroOT
-                    FallidasReproceso/searchFallidas.html", filtrosBusqueda, page);
-				} else {
-					var filtrosBusqueda = $("#filtrosForm :input").serialize() + "&sinFiltros="+ true;
-					initotFallidasGrid("registroOTFallidasReproceso/searchFallidas.html", filtrosBusqueda, page);
-				}
-			} else {
-				let alertConfirm = $("#alertConfirmar");
-				alertConfirm.find('#messageModal').html(data.respuesta);
-				alertConfirm.modal("show");
-			}
-			$('#modalExcluirOtFallida').modal('hide');
-		}).fail(function(error) {
-		}).always(function() {
-			toggleLoader();
-		});
-}
-*/
 </script>
 
