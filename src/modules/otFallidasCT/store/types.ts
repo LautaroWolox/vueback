@@ -35,6 +35,7 @@ export interface StoreState {
   filters: Filters
   rows: Row[]
   selectedRows: number[]
+  rowId: number | null
   loading: boolean
 }
 export interface ActionResponse {

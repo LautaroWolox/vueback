@@ -13,6 +13,7 @@ export const useFallidasCtStore = defineStore('fallidasCT', {
         filters: emptyFilters(),
         rows: [],
         selectedRows: [],
+        rowId: null,
         loading: false,
     }),
 
@@ -73,8 +74,11 @@ export const useFallidasCtStore = defineStore('fallidasCT', {
                 this.loading = false
             }
         },
-        async sendIncluir(motivo: string, comentario: string): Promise<ActionResponse> {
-            this.loading = true;
+        async sendIncluir(id:number ,motivo: string, comentario: string) { //: Promise<ActionResponse> {
+            console.log("store: ", this.rowId)
+            console.log("incluir id: ",id)
+            console.log("incluir motivo: ",motivo)
+            console.log("incluir comentario: ",comentario)
         },
         clearFilters() {
             this.filters = emptyFilters()

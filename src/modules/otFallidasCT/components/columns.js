@@ -17,7 +17,7 @@ export const columns = [
     {field: 'motivoExclusion', header: 'MOTIVO EXCLUSION', hidden:false, exportable:true, filter: false},
     {field: 'nota', header: 'NOTA', hidden:true, exportable:true, filter: false},
     {field: 'tieneNota', header: 'NOTA', hidden:false, exportable:false, filter: false},
-    {field: 'incluirExp', header: 'INCLUIR', hidden:true, exportable:true, filter: false},
+    {field: 'incluirExp', header: 'INCLUIR', hidden:true, exportable:false, filter: false},
     {field: 'incluir', header: 'INCLUIR', hidden:false, exportable:false, filter: false},
 ]
 

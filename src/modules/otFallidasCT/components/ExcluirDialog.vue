@@ -1,6 +1,6 @@
 <template>
     <Dialog
-        :visible="visible"
+        :visible="visibleExc"
         modal
         header="ALERTA"
         :style="{ width: '50rem' }"
@@ -80,6 +80,12 @@
         comentario.value = ''
         await store.setData()
         store.selectedRows = []
+    }
+
+    const cerrar = () => {
+        emit('update:visibleExc', false)
+        motivoSelected.value = ''
+        comentario.value = ''
     }
 
     onMounted(() => commonCT.setMotivosExcInc())

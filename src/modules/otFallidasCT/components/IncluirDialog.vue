@@ -1,6 +1,6 @@
 <template>
     <Dialog
-        :visible="visible"
+        :visible="visibleInc"
         modal
         header="ALERTA"
         :style="{ width: '50rem' }"
@@ -47,11 +47,7 @@
     import { useConfirm } from "primevue/useconfirm";
 
     const props = defineProps({
-        visibleInc: Boolean,
-        selectedRows: {
-            type: Array,
-            default: () => []
-        }
+        visibleInc: Boolean
     })
 
     const confirm = useConfirm();
@@ -74,12 +70,17 @@
     
     const confirmar = async() => {
         emit('update:visibleInc', false)
-        let resp = await store.sendIncluir(motivoSelected.value.nombreCorto,comentario.value)
+        let resp = await store.sendIncluir(store.rowId,motivoSelected.value.nombreCorto,comentario.value)
         console.log('resp: ' + JSON.stringify(resp))
         motivoSelected.value = ''
         comentario.value = ''
         await store.setData()
-        store.selectedRows = []
+    }
+
+    const cerrar = () => {
+        emit('update:visibleInc', false)
+        motivoSelected.value = ''
+        comentario.value = ''
     }
 
     onMounted(() => commonCT.setMotivosExcInc())

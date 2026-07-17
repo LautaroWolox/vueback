@@ -86,7 +86,6 @@
 
     <IncluirDialog
       v-model:visibleInc="showIncluir"
-      :selected-rows="selectedRows"
     />
 
   </div>
@@ -99,6 +98,7 @@ import { FilterMatchMode } from '@primevue/core/api';
 import { columns } from './columns'
 import { useFallidasCtStore } from '../store/CtFallidaStore';
 import ExcluirDialog from './ExcluirDialog.vue';
+import IncluirDialog from './IncluirDialog.vue';
 import { useExcelExport } from '@/composables/useExportExcel';
 
 const store = useFallidasCtStore()
@@ -106,6 +106,7 @@ const cols = ref(columns)
 const dt = ref()
 const showExcluir = ref(false)
 const showIncluir = ref(false)
+let rowId = null
 const { exportToExcel, parseDataFromTable } = useExcelExport()
 
 const filters = ref({
@@ -142,7 +143,8 @@ const handleAction = (data,actionType) => {
   if (actionType === 'nota') {
     alert("nota")
   } else if (actionType === 'incluir') {
-    incluir()
+    store.rowId = data.id
+    showIncluir.value = true
   }
 }
 
@@ -150,15 +152,6 @@ const excluir = () => {
   console.log(store.selectedRows.length)
   if(store.selectedRows.length > 0){
     showExcluir.value = true
-  } else {
-    alert("agregar toast")
-  }
-}
-
-const incluir = () => {
-  console.log(store.selectedRows.length)
-  if(store.selectedRows.length > 0){
-    showIncluir.value = true
   } else {
     alert("agregar toast")
   }
