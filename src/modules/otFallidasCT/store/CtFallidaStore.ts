@@ -11,7 +11,6 @@ export const useFallidasCtStore = defineStore('fallidasCT', {
     state: (): StoreState => ({
         activeTab: ['0'],
         filters: emptyFilters(),
-        validFilters: true,
         rows: [],
         selectedRows: [],
         loading: false,
@@ -20,7 +19,7 @@ export const useFallidasCtStore = defineStore('fallidasCT', {
     getters: {
         getRow: (state: StoreState) => (index: number): Row | undefined =>
             state.rows[index],
-
+        
         selectedNotExcludedRows: (state: StoreState): Row[] =>
             state.selectedRows
                 .map(id => state.rows.find(row => row.id === id))   // busca en todos los datos las filas con los ids seleccionados
@@ -32,10 +31,6 @@ export const useFallidasCtStore = defineStore('fallidasCT', {
         setFilter<K extends keyof Filters>(key: K, value: Filters[K]): void {
             this.filters[key] = value
         },        
-        validateFilters() {
-            // acá hay que agregar la lógica de validación de filtros
-            this.validFilters = true
-        },
         async setData() {
             this.loading = true;
             const { data, error } = await useFetch('/pc/registroOTFallidasReproceso/searchFallidas.html')
@@ -52,6 +47,10 @@ export const useFallidasCtStore = defineStore('fallidasCT', {
         setSelectedRows(rows: number[]): void {
             this.selectedRows = rows;
         },
+        async sendReproceso() {
+            await useFetch('/pc/registroOTFallidasReproceso/reprocesar.html')
+                .post(this.selectedRows)
+        },
         async sendExcluidas(motivo: string, comentario: string): Promise<ActionResponse> {
             this.loading = true;
             try {
@@ -62,15 +61,13 @@ export const useFallidasCtStore = defineStore('fallidasCT', {
                 }
                 const { data, error } = await useFetch('/pc/registroOTFallidasReproceso/excluirOTFallida.html')
                     .post(payload)
-                    .json<ActionResponse>()
-                console.log('data: ' + JSON.stringify(data.value))    
-                console.log('error; ' + JSON.stringify(error.value))    
+                    .json<ActionResponse>() 
                 if (error.value) {
                     return {status: false, respuesta: String(error.value)}
                 }
                 if (!data.value) {
                     return { status: false, respuesta: 'Respuesta vacía del servidor' }
-                }
+                } 
                 return data.value
             } finally {
                 this.loading = false
@@ -83,15 +80,5 @@ export const useFallidasCtStore = defineStore('fallidasCT', {
             this.$reset()
         },
     },
-
-/*     persist: [
-        {
-            key: 'fallidasCT',             
-            storage: {
-                getItem: (key: string): string | null => fallidasCtStore.getItem(key) ?? null,
-                setItem: (key: string, value: string): void => fallidasCtStore.setItem(key, value),
-            },
-        },
-    ], */
 })
 

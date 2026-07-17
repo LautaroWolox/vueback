@@ -71,35 +71,15 @@
         },
         ...(motivos.value ?? []),
     ])
-
-    function cerrar() {
+    
+    const confirmar = async() => {
+        emit('update:visible', false)
+        let resp = await store.sendExcluidas(motivoSelected.value.nombreCorto,comentario.value)
+        console.log('resp: ' + JSON.stringify(resp))
         motivoSelected.value = ''
         comentario.value = ''
-        emit('update:visible', false)
-    }
-
-    function confirmar() {
-        console.log('motivo:' + motivoSelected.value.nombreCorto)
-        console.log('comentario: ' + comentario.value)
-        console.log('selección: ' + store.selectedRows)
-        if(store.selectedRows.length > 0){
-        confirm.require({
-            message: '¿Confirma que desea excluir la OT seleccionada?',
-            header: 'ACEPTAR',
-            rejectProps: {label: 'Cancelar'},
-            acceptProps: {label: 'Aceptar'},
-            accept: async () => { 
-               let resp = await store.sendExcluidas(motivoSelected.value.nombreCorto,comentario.value)
-               console.log('resp: ' + JSON.stringify(resp))
-               cerrar()
-               store.setData()
-            },
-            reject: () => { cerrar() }
-        });
-        } else {
-            alert('agregar toast de error')
-            emit('update:visible', false)
-        }
+        await store.setData()
+        store.selectedRows = []
     }
 
     onMounted(() => commonCT.setMotivosExcInc())

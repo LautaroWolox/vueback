@@ -29,12 +29,12 @@ import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
 
+
 const router = useRouter()
 const authStore = useAuthStore();
 const loadingUser = ref(false)
 
 const ingresar = () => {
-  console.log("PRUEBA NUEVA VERSIÓN")
   window.location.href = `${window.location.origin}/pc/llamado.html`
 }
 

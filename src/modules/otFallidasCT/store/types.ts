@@ -33,7 +33,6 @@ export interface Row {
 export interface StoreState {
   activeTab: string[]  
   filters: Filters
-  validFilters: boolean
   rows: Row[]
   selectedRows: number[]
   loading: boolean

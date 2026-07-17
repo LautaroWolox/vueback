@@ -150,7 +150,7 @@ const excluir = () => {
 }
 
 const reprocesar = () => {
-  alert("reprocesar")
+  store.sendReproceso()
 }
 
 const exportarExcel = () => {
