@@ -4,7 +4,7 @@
         modal
         header="ALERTA"
         :style="{ width: '50rem' }"
-        @update:visible="$emit('update:visible', $event)"
+        @update:visibleInc="$emit('update:visibleInc', $event)"
         >
         <div class="card flex-col justify-center">
             <div>
@@ -47,7 +47,7 @@
     import { useConfirm } from "primevue/useconfirm";
 
     const props = defineProps({
-        visibleExc: Boolean,
+        visibleInc: Boolean,
         selectedRows: {
             type: Array,
             default: () => []
@@ -55,7 +55,7 @@
     })
 
     const confirm = useConfirm();
-    const emit = defineEmits(['update:visibleExc'])
+    const emit = defineEmits(['update:visibleInc'])
     const store = useFallidasCtStore()  
     const commonCT = useCommonCtStore()
     const { motivos, status } = storeToRefs(commonCT)
@@ -71,10 +71,10 @@
         },
         ...(motivos.value ?? []),
     ])
-
+    
     const confirmar = async() => {
-        emit('update:visibleExc', false)
-        let resp = await store.sendExcluidas(motivoSelected.value.nombreCorto,comentario.value)
+        emit('update:visibleInc', false)
+        let resp = await store.sendIncluir(motivoSelected.value.nombreCorto,comentario.value)
         console.log('resp: ' + JSON.stringify(resp))
         motivoSelected.value = ''
         comentario.value = ''
@@ -85,4 +85,3 @@
     onMounted(() => commonCT.setMotivosExcInc())
 
 </script>
-

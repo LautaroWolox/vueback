@@ -80,7 +80,12 @@
     </DataTable>
 
     <ExcluirDialog
-      v-model:visible="showExcluir"
+      v-model:visibleExc="showExcluir"
+      :selected-rows="selectedRows"
+    />
+
+    <IncluirDialog
+      v-model:visibleInc="showIncluir"
       :selected-rows="selectedRows"
     />
 
@@ -100,6 +105,7 @@ const store = useFallidasCtStore()
 const cols = ref(columns)
 const dt = ref()
 const showExcluir = ref(false)
+const showIncluir = ref(false)
 const { exportToExcel, parseDataFromTable } = useExcelExport()
 
 const filters = ref({
@@ -136,7 +142,7 @@ const handleAction = (data,actionType) => {
   if (actionType === 'nota') {
     alert("nota")
   } else if (actionType === 'incluir') {
-    alert("incluir")
+    incluir()
   }
 }
 
@@ -148,6 +154,16 @@ const excluir = () => {
     alert("agregar toast")
   }
 }
+
+const incluir = () => {
+  console.log(store.selectedRows.length)
+  if(store.selectedRows.length > 0){
+    showIncluir.value = true
+  } else {
+    alert("agregar toast")
+  }
+}
+
 
 const reprocesar = () => {
   store.sendReproceso()

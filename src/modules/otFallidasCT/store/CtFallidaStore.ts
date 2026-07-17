@@ -73,6 +73,9 @@ export const useFallidasCtStore = defineStore('fallidasCT', {
                 this.loading = false
             }
         },
+        async sendIncluir(motivo: string, comentario: string): Promise<ActionResponse> {
+            this.loading = true;
+        },
         clearFilters() {
             this.filters = emptyFilters()
         },
