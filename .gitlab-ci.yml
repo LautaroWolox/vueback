@@ -29,7 +29,7 @@ variables:
           cat "$MAVEN_SETTINGS" > settings.xml
         elif [[ -f "./package.json" ]]; then
           echo "Se detectó NODE; copiando .npmrc"
-          cat "$npmrc" > .npmrc
+          cat "$npmrc_artifactory6" > .npmrc
         elif [[ -f "./NuGet.Config" ]]; then
           echo "Se detectó NUGET; copiando NuGet.Config"
           cat "$nuget_config" > NuGet.Config
