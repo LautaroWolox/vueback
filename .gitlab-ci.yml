@@ -1,5 +1,346 @@
-include: 
-  - project: 'telecom-argentina/devops/cicd/templates'
-    ref: master
-    file:
-      - 'K8S-pipelines/kustomize/ci-ocp4.yml'
+# Pipeline de build independiente por ambiente.
+# Lee las variables VITE_* desde el ConfigMap del overlay correspondiente.
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+    - if: '$CI_COMMIT_BRANCH == "testing"'
+    - if: '$CI_COMMIT_BRANCH == "uat"'
+    - if: '$CI_COMMIT_BRANCH == "master"'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+    - when: never
+
+stages:
+  - git_clone
+  - build_image
+  - update_manifests
+
+variables:
+  BUILDAH_IMAGE: "registry.access.redhat.com/ubi8/buildah:8.10-7.1728872575"
+  GIT_STRATEGY: fetch
+
+.check_language:
+  script:
+    - |
+      check_language() {
+        if [[ -f "./pom.xml" ]]; then
+          echo "Se detectó JAVA; copiando settings.xml"
+          cat "$MAVEN_SETTINGS" > settings.xml
+        elif [[ -f "./package.json" ]]; then
+          echo "Se detectó NODE; copiando .npmrc"
+          cat "$npmrc" > .npmrc
+        elif [[ -f "./NuGet.Config" ]]; then
+          echo "Se detectó NUGET; copiando NuGet.Config"
+          cat "$nuget_config" > NuGet.Config
+        else
+          echo "No se detectó un lenguaje soportado"
+        fi
+      }
+      check_language
+
+# Clona el repositorio GitOps donde están los overlays dev/test/uat/prod.
+git_clone:
+  image:
+    name: ${QUAY_CONTAINER_REGISTRY}/devops/git-alpine:1
+  stage: git_clone
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "trigger"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH =~ /^(develop|testing|uat|master)$/'
+  tags:
+    - openshift_general
+  script:
+    - |
+      set -eu
+      NAMESPACE_GROUP=$(echo "$CI_PROJECT_DIR" | awk -F"/" '{print $(NF-1)}')
+      git clone \
+        "https://GL_TOKEN:${GL_TOKEN}@gitlab.com/${K8S_MANIFESTS_URL}/${NAMESPACE_GROUP}/${CI_PROJECT_NAME}.git" \
+        k8s-manifests
+  artifacts:
+    paths:
+      - k8s-manifests/
+    expire_in: 1 week
+
+# Plantilla común para los cuatro builds.
+.build_image_template:
+  image:
+    name: ${BUILDAH_IMAGE}
+  stage: build_image
+  tags:
+    - openshift_general
+  needs:
+    - job: git_clone
+      artifacts: true
+  before_script:
+    - buildah version
+    - buildah login --tls-verify=false --username "${REGISTRY_USERNAME}" --password "${REGISTRY_PASSWORD}" "${QUAY_CONTAINER_REGISTRY}"
+  script:
+    - !reference [.check_language, script]
+    - |
+      set -eu
+
+      NAMESPACE_GROUP=$(echo "$CI_PROJECT_DIR" | awk -F"/" '{print $(NF-1)}')
+      CONFIG_FILE="k8s-manifests/${K8S_KUSTOMIZE_PATH}/${OVERLAY}/configmaps.yaml"
+      IMAGE_TAG="${CI_COMMIT_SHORT_SHA}-${IMAGE_SUFFIX}"
+
+      if [[ ! -f "$CONFIG_FILE" ]]; then
+        echo "ERROR: no existe $CONFIG_FILE"
+        exit 1
+      fi
+
+      # Lee una clave YAML simple del bloque data del ConfigMap.
+      read_config_value() {
+        key="$1"
+        awk -v key="$key" '
+          $1 == key ":" {
+            sub(/^[^:]+:[[:space:]]*/, "", $0)
+            gsub(/^["\047]|["\047]$/, "", $0)
+            print $0
+            exit
+          }
+        ' "$CONFIG_FILE"
+      }
+
+      VITE_FM_MV_URL=$(read_config_value VITE_FM_MV_URL)
+      VITE_ORIGIN=$(read_config_value VITE_ORIGIN)
+      VITE_ALLOWED_HOSTS=$(read_config_value VITE_ALLOWED_HOSTS)
+      VITE_PARAMETER1=$(read_config_value VITE_PARAMETER1)
+
+      for variable in VITE_FM_MV_URL VITE_ORIGIN VITE_ALLOWED_HOSTS VITE_PARAMETER1; do
+        eval "value=\${$variable}"
+        if [[ -z "$value" ]]; then
+          echo "ERROR: $variable está vacía o no existe en $CONFIG_FILE"
+          exit 1
+        fi
+      done
+
+      echo "Construyendo ${CI_PROJECT_NAME}:${IMAGE_TAG} para ${ENVIRONMENT_NAME}"
+      echo "Overlay utilizado: ${OVERLAY}"
+      echo "${IMAGE_TAG}" > imagetag
+
+      buildah bud \
+        --storage-driver=vfs \
+        --format=oci \
+        --tls-verify=false \
+        --no-cache \
+        --build-arg "VITE_FM_MV_URL=${VITE_FM_MV_URL}" \
+        --build-arg "VITE_ORIGIN=${VITE_ORIGIN}" \
+        --build-arg "VITE_ALLOWED_HOSTS=${VITE_ALLOWED_HOSTS}" \
+        --build-arg "VITE_PARAMETER1=${VITE_PARAMETER1}" \
+        -f ./Containerfile \
+        -t "${CI_PROJECT_NAME}:${IMAGE_TAG}"
+
+      buildah push \
+        --storage-driver=vfs \
+        --tls-verify=false \
+        "${CI_PROJECT_NAME}:${IMAGE_TAG}" \
+        "${QUAY_CONTAINER_REGISTRY}/${NAMESPACE_GROUP}/${CI_PROJECT_NAME}:${IMAGE_TAG}"
+  after_script:
+    - buildah logout "${QUAY_CONTAINER_REGISTRY}" || true
+  artifacts:
+    paths:
+      - imagetag
+    expire_in: 1 week
+
+build_image_dev:
+  extends: .build_image_template
+  variables:
+    OVERLAY: dev
+    IMAGE_SUFFIX: dev
+    ENVIRONMENT_NAME: develop
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "trigger"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+  environment:
+    name: develop
+
+build_image_testing:
+  extends: .build_image_template
+  variables:
+    OVERLAY: test
+    IMAGE_SUFFIX: testing
+    ENVIRONMENT_NAME: testing
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "trigger"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "testing"'
+  environment:
+    name: testing
+
+build_image_uat:
+  extends: .build_image_template
+  variables:
+    OVERLAY: uat
+    IMAGE_SUFFIX: uat
+    ENVIRONMENT_NAME: uat
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "trigger"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "uat" && $CI_COMMIT_TITLE !~ /hotfix/i'
+  environment:
+    name: uat
+
+build_image_prod:
+  extends: .build_image_template
+  variables:
+    OVERLAY: prod
+    IMAGE_SUFFIX: prod
+    ENVIRONMENT_NAME: production
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "trigger"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "master" && $CI_COMMIT_TITLE !~ /hotfix/i'
+  environment:
+    name: production
+
+# Plantilla común para modificar el tag en el overlay y hacer push al repo GitOps.
+.update_manifests_template:
+  image:
+    name: ${QUAY_CONTAINER_REGISTRY}/devops/generate-config:5.0.1
+  stage: update_manifests
+  tags:
+    - openshift_general
+  script:
+    - |
+      set -eu
+
+      NAMESPACE_GROUP=$(echo "$CI_PROJECT_DIR" | awk -F"/" '{print $(NF-1)}')
+      IMAGE_TAG=$(cat imagetag)
+
+      cd "k8s-manifests/${K8S_KUSTOMIZE_PATH}/${OVERLAY}"
+      git pull origin master
+
+      /app/kustomize edit set image \
+        "registry.example/image-example=${QUAY_CONTAINER_REGISTRY}/${NAMESPACE_GROUP}/${CI_PROJECT_NAME}:${IMAGE_TAG}"
+
+      cd ../..
+      git config user.email "pipeline@gitlab.com"
+      git config user.name "Pipeline"
+      git add .
+
+      if git diff --cached --quiet; then
+        echo "No hay cambios para publicar"
+      else
+        git commit -m "GitOps: actualiza ${CI_PROJECT_NAME} a ${IMAGE_TAG} en ${ENVIRONMENT_NAME}"
+        git push origin master
+      fi
+
+update_manifests_dev:
+  extends: .update_manifests_template
+  variables:
+    OVERLAY: dev
+    ENVIRONMENT_NAME: develop
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+  needs:
+    - job: git_clone
+      artifacts: true
+    - job: build_image_dev
+      artifacts: true
+  environment:
+    name: develop
+
+update_manifests_test:
+  extends: .update_manifests_template
+  variables:
+    OVERLAY: test
+    ENVIRONMENT_NAME: testing
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "testing"'
+  needs:
+    - job: git_clone
+      artifacts: true
+    - job: build_image_testing
+      artifacts: true
+  environment:
+    name: testing
+
+update_manifests_uat:
+  extends: .update_manifests_template
+  variables:
+    OVERLAY: uat
+    ENVIRONMENT_NAME: uat
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "uat" && $PASAJE_MANUAL == "true"'
+      when: manual
+    - if: '$CI_COMMIT_BRANCH == "uat" && $CI_COMMIT_TITLE !~ /hotfix/i'
+  needs:
+    - job: git_clone
+      artifacts: true
+    - job: build_image_uat
+      artifacts: true
+  environment:
+    name: uat
+
+update_manifests_prod:
+  extends: .update_manifests_template
+  variables:
+    OVERLAY: prod
+    ENVIRONMENT_NAME: production
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master" && $PASAJE_MANUAL == "true"'
+      when: manual
+    - if: '$CI_COMMIT_BRANCH == "master" && $CI_COMMIT_TITLE !~ /hotfix/i'
+  needs:
+    - job: git_clone
+      artifacts: true
+    - job: build_image_prod
+      artifacts: true
+  environment:
+    name: production
+
+# HOTFIX UAT: build nuevo usando las variables del overlay uat.
+build_image_uat_hotfix:
+  extends: .build_image_template
+  variables:
+    OVERLAY: uat
+    IMAGE_SUFFIX: uat-hotfix
+    ENVIRONMENT_NAME: uat
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "uat" && $CI_COMMIT_TITLE =~ /hotfix/i'
+  environment:
+    name: uat
+
+update_manifests_uat_hotfix:
+  extends: .update_manifests_template
+  variables:
+    OVERLAY: uat
+    ENVIRONMENT_NAME: uat
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "uat" && $CI_COMMIT_TITLE =~ /hotfix/i'
+  needs:
+    - job: git_clone
+      artifacts: true
+    - job: build_image_uat_hotfix
+      artifacts: true
+  environment:
+    name: uat
+
+# HOTFIX PROD: build nuevo usando las variables del overlay prod.
+build_image_prod_hotfix:
+  extends: .build_image_template
+  variables:
+    OVERLAY: prod
+    IMAGE_SUFFIX: prod-hotfix
+    ENVIRONMENT_NAME: production
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master" && $CI_COMMIT_TITLE =~ /hotfix/i'
+  environment:
+    name: production
+
+update_manifests_prod_hotfix:
+  extends: .update_manifests_template
+  variables:
+    OVERLAY: prod
+    ENVIRONMENT_NAME: production
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master" && $CI_COMMIT_TITLE =~ /hotfix/i'
+  needs:
+    - job: git_clone
+      artifacts: true
+    - job: build_image_prod_hotfix
+      artifacts: true
+  environment:
+    name: production
