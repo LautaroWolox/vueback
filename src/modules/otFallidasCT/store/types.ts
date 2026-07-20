@@ -35,7 +35,7 @@ export interface StoreState {
   filters: Filters
   rows: Row[]
   selectedRows: number[]
-  rowId: number | null
+  nroOT: string | null
   loading: boolean
 }
 export interface ActionResponse {
@@ -55,6 +55,12 @@ export const emptyFilters = (): Filters => ({
 
 export interface ExcluirRequest {
   idOts: string[]
+	nota: string | null
+	motivoNombreCorto: string
+}
+
+export interface IncluirRequest {
+  nroOts: string[]
 	nota: string | null
 	motivoNombreCorto: string
 }

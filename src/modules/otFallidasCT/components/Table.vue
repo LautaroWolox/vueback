@@ -143,7 +143,7 @@ const handleAction = (data,actionType) => {
   if (actionType === 'nota') {
     alert("nota")
   } else if (actionType === 'incluir') {
-    store.rowId = data.id
+    store.nroOT = data.nroOrdenTrabajo
     showIncluir.value = true
   }
 }

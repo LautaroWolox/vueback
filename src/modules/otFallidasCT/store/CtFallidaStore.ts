@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { EncryptStorage } from 'encrypt-storage'
 import { useFetch } from '@vueuse/core'
-import type { Filters, Row, StoreState, ActionResponse, ExcluirRequest } from './types'
+import type { Filters, Row, StoreState, ActionResponse, ExcluirRequest, IncluirRequest } from './types'
 import { emptyFilters } from './types'
 
 const clave = import.meta.env.VITE_PARAMETER1 as string;
@@ -13,7 +13,7 @@ export const useFallidasCtStore = defineStore('fallidasCT', {
         filters: emptyFilters(),
         rows: [],
         selectedRows: [],
-        rowId: null,
+        nroOT: null,
         loading: false,
     }),
 
@@ -74,11 +74,30 @@ export const useFallidasCtStore = defineStore('fallidasCT', {
                 this.loading = false
             }
         },
-        async sendIncluir(id:number ,motivo: string, comentario: string) { //: Promise<ActionResponse> {
-            console.log("store: ", this.rowId)
-            console.log("incluir id: ",id)
+        async sendIncluir(ot:string, motivo: string, comentario: string): Promise<ActionResponse> {
+            console.log("incluir ot: ",ot)
             console.log("incluir motivo: ",motivo)
             console.log("incluir comentario: ",comentario)
+                        this.loading = true;
+            try {
+                const payload: IncluirRequest = {
+                    nroOts: [this.nroOT != null? this.nroOT : ''],
+                    nota: comentario,
+                    motivoNombreCorto: motivo
+                }
+                const { data, error } = await useFetch('/pc/registroOTFallidasReproceso/incluirOTFallidaExcluida.html')
+                    .post(payload)
+                    .json<ActionResponse>() 
+                if (error.value) {
+                    return {status: false, respuesta: String(error.value)}
+                }
+                if (!data.value) {
+                    return { status: false, respuesta: 'Respuesta vacía del servidor' }
+                } 
+                return data.value
+            } finally {
+                this.loading = false
+            }
         },
         clearFilters() {
             this.filters = emptyFilters()
