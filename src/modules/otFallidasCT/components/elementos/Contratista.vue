@@ -1,9 +1,11 @@
 <template>
     <div class="flex flex-column px-2">
         <label for="desc">Contratista</label>       
-        <span v-if="status.contratistas === 'loading'">
-            Cargando...
-        </span>
+        <Select 
+            v-if="status.contratistas === 'loading'"
+            v-model="contratista"
+            :disabled="true"
+        />
         <Select
             v-else-if="status.contratistas === 'loaded'"
             v-model="contratista"

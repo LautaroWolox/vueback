@@ -9,9 +9,11 @@
         <div class="card flex-col justify-center">
             <div>
                 <label for="desc">Motivo</label>       
-                <span v-if="status.motivos === 'loading'">
-                    Cargando...
-                </span>
+                <Select 
+                    v-if="status.motivos === 'loading'"
+                    v-model="motivoSelected"
+                    :disabled="true"
+                />
                 <Select
                     v-else-if="status.motivos === 'loaded'"
                     v-model="motivoSelected"
