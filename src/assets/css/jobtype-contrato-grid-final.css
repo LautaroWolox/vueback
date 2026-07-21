@@ -1,4 +1,8 @@
-/* Ajuste final de paginación e iconos de Jobtype-Contrato. */
+/*
+ * Puente puntual de Jobtype-Contrato hacia los componentes globales de grilla.
+ * La estructura, los iconos y la navegación viven en FmGridActions y
+ * FmGridPaginator para que puedan reutilizarse en todo el aplicativo.
+ */
 
 .jobtype-contrato-page .jobtype-contrato-grid,
 .jobtype-contrato-page #tabla-jobtype-contrato,
@@ -9,295 +13,35 @@
   box-sizing: border-box !important;
 }
 
-/*
- * PrimeVue puede renderizar el paginador como raíz directa o agregar las
- * clases de DataTable sobre la misma raíz. Se cubren ambas variantes para
- * que el footer siempre ocupe todo el ancho de la grilla.
- */
 .jobtype-contrato-page .jobtype-contrato-grid .p-paginator,
 .jobtype-contrato-page .jobtype-contrato-grid .p-datatable-paginator-bottom,
 .jobtype-contrato-page .jobtype-contrato-grid .fm-pt-paginator,
-.jobtype-contrato-page #tabla-jobtype-contrato > .p-paginator,
-.jobtype-contrato-page #tabla-jobtype-contrato > .p-datatable-paginator-bottom {
-  position: relative !important;
+.jobtype-contrato-page #tabla-jobtype-contrato > .p-paginator {
   width: 100% !important;
   min-width: 100% !important;
   max-width: 100% !important;
-  height: 42px !important;
-  min-height: 42px !important;
-  box-sizing: border-box !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 3px !important;
-  padding: 4px 126px !important;
-  margin: 0 !important;
-  border-top: 1px solid #c7d7df !important;
-  background: #ffffff !important;
-  overflow: visible !important;
-}
-
-/* Acciones siempre ancladas a la izquierda. */
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-start,
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-content-start,
-.jobtype-contrato-page .jobtype-contrato-grid [data-pc-section="start"] {
-  position: absolute !important;
-  left: 12px !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
-  z-index: 2 !important;
-  min-width: 0 !important;
-  min-height: 24px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  overflow: visible !important;
-}
-
-/* Contador siempre anclado a la derecha. */
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-end,
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-content-end,
-.jobtype-contrato-page .jobtype-contrato-grid [data-pc-section="end"] {
-  position: absolute !important;
-  right: 12px !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
-  z-index: 2 !important;
-  min-width: 0 !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-content {
-  position: static !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 3px !important;
-  width: auto !important;
-  margin: 0 !important;
-}
-
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-rpp-dropdown,
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator .p-select {
-  width: 82px !important;
-  min-width: 82px !important;
-  max-width: 82px !important;
-  height: 28px !important;
-  min-height: 28px !important;
-  max-height: 28px !important;
-  margin: 0 5px 0 0 !important;
-  border: 1px solid #c8d6df !important;
-  border-radius: 3px !important;
-  background: #ffffff !important;
-  box-shadow: none !important;
-}
-
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator .p-select-label {
-  height: 26px !important;
-  padding: 4px 26px 4px 8px !important;
-  color: #4c6578 !important;
-  font-size: 12px !important;
-  line-height: 18px !important;
-}
-
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator .p-select-dropdown {
-  width: 24px !important;
-}
-
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-first,
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-prev,
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-page,
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-next,
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-last {
-  width: 24px !important;
-  min-width: 24px !important;
-  max-width: 24px !important;
-  height: 24px !important;
-  min-height: 24px !important;
-  max-height: 24px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 0 !important;
-  margin: 0 1px !important;
-  border: 0 !important;
-  border-radius: 3px !important;
-  background: transparent !important;
-  color: #6e8798 !important;
-  box-shadow: none !important;
-  transform: none !important;
-}
-
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-first:not(.p-disabled):hover,
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-prev:not(.p-disabled):hover,
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-page:not(.p-disabled):hover,
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-next:not(.p-disabled):hover,
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-last:not(.p-disabled):hover {
-  background: #e8f8fb !important;
-  color: #006f7d !important;
-}
-
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-page.p-paginator-page-selected,
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-page.p-highlight {
-  background: #d7f3f6 !important;
-  color: #006f7d !important;
-  font-weight: 700 !important;
-}
-
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-first.p-disabled,
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-prev.p-disabled,
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-page.p-disabled,
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-next.p-disabled,
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-last.p-disabled {
-  color: #b3c0c7 !important;
-  opacity: 1 !important;
-}
-
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-first .p-icon,
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-prev .p-icon,
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-next .p-icon,
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-last .p-icon,
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator svg {
-  width: 11px !important;
-  height: 11px !important;
-}
-
-.jobtype-contrato-page .jobtype-contrato-grid .p-paginator-current {
-  width: auto !important;
-  min-width: auto !important;
-  height: 24px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  padding: 0 5px !important;
-  margin: 0 2px !important;
-  color: #4c6578 !important;
-  font-size: 12px !important;
-  line-height: 24px !important;
-  white-space: nowrap !important;
-}
-
-.jobtype-contrato-page .jobtype-contrato-grid .fm-grid-counter {
-  display: inline-flex !important;
-  align-items: center !important;
-  color: #001f2f !important;
-  font-size: 12px !important;
-  line-height: 1 !important;
-  white-space: nowrap !important;
-}
-
-/* Iconos de acciones: se neutralizan los tamaños globales de FmButton. */
-.jobtype-contrato-page .jobtype-grid-actions {
-  min-height: 24px !important;
-  height: 24px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  gap: 10px !important;
+  height: auto !important;
+  min-height: 38px !important;
+  display: block !important;
   padding: 0 !important;
   margin: 0 !important;
-  overflow: visible !important;
-}
-
-.jobtype-contrato-page .jobtype-grid-actions .p-button.jobtype-grid-action,
-.jobtype-contrato-page .jobtype-grid-actions .p-button.jobtype-grid-action.p-button-text,
-.jobtype-contrato-page .jobtype-grid-actions .p-button.jobtype-grid-action.p-button-rounded,
-.jobtype-contrato-page .jobtype-grid-actions .fm-action-button.jobtype-grid-action {
-  width: 22px !important;
-  min-width: 22px !important;
-  max-width: 22px !important;
-  height: 22px !important;
-  min-height: 22px !important;
-  max-height: 22px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  border: 0 !important;
+  border: 1px solid #d1d1d1 !important;
+  border-top: 0 !important;
   border-radius: 0 !important;
-  background: transparent !important;
-  background-color: transparent !important;
-  color: #001f2f !important;
-  box-shadow: none !important;
-  transform: none !important;
-  opacity: 1 !important;
+  background: #ffffff !important;
   overflow: visible !important;
+  box-sizing: border-box !important;
 }
 
-.jobtype-contrato-page .jobtype-grid-actions .p-button-label {
-  display: none !important;
-}
-
-.jobtype-contrato-page .jobtype-grid-actions .p-button.jobtype-grid-action .p-button-icon,
-.jobtype-contrato-page .jobtype-grid-actions .p-button.jobtype-grid-action .pi,
-.jobtype-contrato-page .jobtype-grid-actions .p-button.jobtype-grid-action svg {
-  width: 15px !important;
-  min-width: 15px !important;
-  height: 15px !important;
-  min-height: 15px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  margin: 0 !important;
-  color: currentColor !important;
-  fill: currentColor !important;
-  font-size: 15px !important;
-  line-height: 15px !important;
-  overflow: visible !important;
-}
-
-.jobtype-contrato-page .jobtype-grid-actions .p-button.jobtype-grid-action:enabled:hover,
-.jobtype-contrato-page .jobtype-grid-actions .p-button.jobtype-grid-action:enabled:focus,
-.jobtype-contrato-page .jobtype-grid-actions .p-button.jobtype-grid-action:enabled:active {
-  background: transparent !important;
-  color: #006f7d !important;
-  box-shadow: none !important;
-  transform: none !important;
-}
-
-.jobtype-contrato-page .jobtype-grid-actions .p-button.jobtype-grid-action:disabled,
-.jobtype-contrato-page .jobtype-grid-actions .p-button.jobtype-grid-action.p-disabled {
-  background: transparent !important;
-  color: #aebbc2 !important;
-  box-shadow: none !important;
-  opacity: 1 !important;
+.jobtype-contrato-page .jobtype-contrato-grid .fm-custom-paginator {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .jobtype-contrato-page .jobtype-contrato-grid .p-datatable-empty-message > td,
 .jobtype-contrato-page .jobtype-contrato-grid .p-datatable-empty-message td {
-  height: 96px !important;
-  min-height: 96px !important;
-}
-
-@media (max-width: 760px) {
-  .jobtype-contrato-page .jobtype-contrato-grid .p-paginator,
-  .jobtype-contrato-page .jobtype-contrato-grid .p-datatable-paginator-bottom,
-  .jobtype-contrato-page .jobtype-contrato-grid .fm-pt-paginator {
-    height: auto !important;
-    min-height: 92px !important;
-    padding: 38px 8px 30px !important;
-    flex-wrap: wrap !important;
-  }
-
-  .jobtype-contrato-page .jobtype-contrato-grid .p-paginator-start,
-  .jobtype-contrato-page .jobtype-contrato-grid .p-paginator-content-start {
-    left: 8px !important;
-    top: 8px !important;
-    transform: none !important;
-  }
-
-  .jobtype-contrato-page .jobtype-contrato-grid .p-paginator-end,
-  .jobtype-contrato-page .jobtype-contrato-grid .p-paginator-content-end {
-    right: 8px !important;
-    top: auto !important;
-    bottom: 8px !important;
-    transform: none !important;
-  }
+  height: 110px !important;
+  min-height: 110px !important;
 }
