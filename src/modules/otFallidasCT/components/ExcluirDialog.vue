@@ -4,7 +4,7 @@
     modal
     :closable="false"
     class="fm-dialog otf-action-dialog otf-exclude-dialog"
-    :style="{ '--fm-dialog-width': '34rem' }"
+    :style="{ '--fm-dialog-width': '36rem' }"
     @update:visible="$emit('update:visibleExc', $event)"
   >
     <template #header>
@@ -27,29 +27,20 @@
 
       <div class="fm-field otf-motivo-field">
         <label for="motivo-exclusion">Motivo</label>
-        <select
+        <FmCompactSelect
           v-if="status.motivos === 'loading'"
           id="motivo-exclusion"
-          class="otf-motivo-select"
           disabled
-        >
-          <option>Cargando...</option>
-        </select>
-        <select
+          placeholder="Cargando..."
+        />
+        <FmCompactSelect
           v-else-if="status.motivos === 'loaded'"
           id="motivo-exclusion"
           v-model="motivoSelected"
-          class="otf-motivo-select"
-        >
-          <option :value="null"></option>
-          <option
-            v-for="motivo in motivoOptions"
-            :key="motivo.nombreCorto"
-            :value="motivo"
-          >
-            {{ motivo.nombre }}
-          </option>
-        </select>
+          :options="motivoOptions"
+          option-label="nombre"
+          :max-panel-height="190"
+        />
         <span v-else-if="status.motivos === 'error'" class="fm-field-error">Error al cargar.</span>
       </div>
 
@@ -85,6 +76,7 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
+import FmCompactSelect from '@/components/shared/FmCompactSelect.vue'
 import { useFallidasCtStore } from '../store/CtFallidaStore'
 import { useCommonCtStore } from '@/store/commonCt'
 
@@ -158,43 +150,8 @@ onMounted(() => commonCT.setMotivosExcInc())
 }
 
 .otf-motivo-field {
-  width: min(340px, 100%);
-  max-width: 340px;
-}
-
-.otf-motivo-select {
-  width: 100%;
-  height: 38px;
-  min-height: 38px;
-  padding: 0 36px 0 10px;
-  border: 1px solid #bfc8cd;
-  border-radius: 4px;
-  background: #fff;
-  color: #263746;
-  font: inherit;
-  font-size: 13px;
-  line-height: 38px;
-  cursor: pointer;
-  box-shadow: none;
-}
-
-.otf-motivo-select:focus {
-  outline: none;
-  border-color: #00a9bd;
-  box-shadow: 0 0 0 2px rgba(0, 169, 189, .14);
-}
-
-.otf-motivo-select:disabled {
-  background: #edf1f3;
-  color: #84939c;
-  cursor: not-allowed;
-}
-
-.otf-motivo-select option {
-  padding: 4px 8px;
-  color: #263746;
-  background: #fff;
-  font-size: 13px;
+  width: min(360px, 100%);
+  max-width: 360px;
 }
 
 .otf-note-textarea {
@@ -206,7 +163,7 @@ onMounted(() => commonCT.setMotivosExcInc())
   overflow: auto;
   resize: vertical;
   border: 1px solid #bfc8cd;
-  border-radius: 4px;
+  border-radius: 2px;
   background: #fff;
   color: #263746;
   font: inherit;
@@ -266,21 +223,23 @@ onMounted(() => commonCT.setMotivosExcInc())
   color: #00a9bd;
 }
 
-:global(.otf-exclude-dialog) {
-  border-radius: 0 !important;
+:global(.p-dialog.otf-exclude-dialog.fm-dialog) {
+  overflow: visible !important;
+  border-radius: 2px !important;
 }
 
 :global(.otf-exclude-dialog .p-dialog-header) {
   min-height: 54px !important;
   padding: 0 16px !important;
   border-bottom: 1px solid #d5dadd !important;
+  border-radius: 2px 2px 0 0 !important;
   background: #fff !important;
 }
 
 :global(.otf-exclude-dialog .p-dialog-content) {
   padding: 20px 18px 22px !important;
-  background: #fff !important;
   overflow: visible !important;
+  background: #fff !important;
 }
 
 :global(.otf-exclude-dialog .p-dialog-footer) {
@@ -291,6 +250,7 @@ onMounted(() => commonCT.setMotivosExcInc())
   gap: 10px !important;
   padding: 10px 16px !important;
   border-top: 1px solid #d5dadd !important;
+  border-radius: 0 0 2px 2px !important;
   background: #fff !important;
 }
 
@@ -302,7 +262,7 @@ onMounted(() => commonCT.setMotivosExcInc())
   height: 40px !important;
   min-height: 40px !important;
   max-height: 40px !important;
-  border-radius: 6px !important;
+  border-radius: 4px !important;
   font-size: 14px !important;
   font-weight: 400 !important;
   box-shadow: 0 4px 10px rgba(0, 91, 104, .12) !important;
