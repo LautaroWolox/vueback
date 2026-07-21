@@ -1,7 +1,7 @@
 <template>
   <button
     :type="type"
-    class="fm-action-button fm-ui-button"
+    class="fm-action-button fm-ui-button fm-responsive-button"
     :class="buttonClass"
     :disabled="disabled"
     @click="$emit('click', $event)"
