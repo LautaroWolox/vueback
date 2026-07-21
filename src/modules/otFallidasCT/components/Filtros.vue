@@ -1,54 +1,60 @@
 <template>
-    <div class="card" id="cajon">
-        <div class="grid">
-            <div class="col-3">
-               <NroOT />
-            </div>
-            <div class="col-3">
-               <FechaDesde />
-            </div>
-            <div class="col-3">
-                <FechaHasta />
-            </div>
-            <div class="col-3">
-                <Contratista />
-            </div>
-            <div class="col-3">
-                <DescError />
-            </div>
-            <div class="col-3">
-                <Excluida />
-            </div>
-            <div class="col-3">
-                <Pais />
-            </div>
-        </div>
-        <div class="flex flex-row justify-content-center gap-6 mt-3" >
-            <Button id="BotonBuscar" label="BUSCAR" severity="info" rounded @click=store.setData size="large" />
-            <Button id="BotonLimpiar" class="text-primary border-primary" label="LIMPIAR" severity="info" rounded outlined @click=store.clearFilters size="large" />
-        </div>
-
+  <div class="fm-panel-content fm-panel-content--accent fm-filters otf-filters">
+    <div class="fm-filter-grid">
+      <NroOT />
+      <FechaDesde />
+      <FechaHasta />
+      <Contratista />
+      <DescError />
+      <Excluida />
+      <Pais />
     </div>
+
+    <div class="fm-actions fm-filter-actions">
+      <FmButton
+        label="BUSCAR"
+        icon="pi-search"
+        :disabled="store.loading"
+        @click="store.setData"
+      />
+      <FmButton
+        label="LIMPIAR"
+        icon="pi-filter-slash"
+        variant="outline"
+        :disabled="store.loading"
+        @click="store.clearFilters"
+      />
+    </div>
+  </div>
 </template>
 
-<script setup lang="js">
-import Contratista from './elementos/Contratista.vue';
-import DescError from './elementos/DescError.vue';
-import Excluida from './elementos/Excluida.vue';
-import FechaDesde from './elementos/FechaDesde.vue';
-import FechaHasta from './elementos/FechaHasta.vue';
-import NroOT from './elementos/NroOT.vue';
-import Pais from './elementos/Pais.vue';
-import { useFallidasCtStore } from '../store/CtFallidaStore.js';
+<script setup>
+import Contratista from './elementos/Contratista.vue'
+import DescError from './elementos/DescError.vue'
+import Excluida from './elementos/Excluida.vue'
+import FechaDesde from './elementos/FechaDesde.vue'
+import FechaHasta from './elementos/FechaHasta.vue'
+import NroOT from './elementos/NroOT.vue'
+import Pais from './elementos/Pais.vue'
+import { useFallidasCtStore } from '../store/CtFallidaStore'
 
-const store = useFallidasCtStore();
-
-const limpiar = () => {
-    store.clearFilters()
-}
-
+const store = useFallidasCtStore()
 </script>
 
+<style scoped>
+.otf-filters {
+  width: 100%;
+}
 
-<style lang="css" scoped>
+@media (max-width: 900px) {
+  .otf-filters :deep(.fm-field--span-3) {
+    grid-column: span 6;
+  }
+}
+
+@media (max-width: 620px) {
+  .otf-filters :deep(.fm-field--span-3) {
+    grid-column: span 12;
+  }
+}
 </style>
