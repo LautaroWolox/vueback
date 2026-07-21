@@ -51,6 +51,8 @@
           <FmGridActions
             class="otf-custom-paginator__actions"
             size="large"
+            :delete-disabled="!hasSelectedRows"
+            :refresh-disabled="!hasSelectedRows"
             @export="exportarExcel"
             @delete="excluir"
             @refresh="reprocesar"
@@ -162,12 +164,12 @@
         <template #body="{ data }">
           <template v-if="col.field === 'tieneNota'">
             <button
+              v-if="hasNote(data)"
               type="button"
               class="otf-row-action otf-row-action--note"
-              :class="{ 'otf-row-action--disabled': !data.nota }"
-              :disabled="!data.nota"
-              :title="data.nota ? 'Ver nota' : 'Sin nota'"
-              :aria-label="data.nota ? 'Ver nota' : 'Sin nota'"
+              :class="{ 'otf-row-action--note-excluded': data.excluida === 'S' }"
+              title="Ver nota"
+              aria-label="Ver nota"
               @click.stop="showNote(data)"
             >
               <svg class="otf-row-action__icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -262,6 +264,7 @@ const filters = ref(Object.fromEntries(
 ))
 
 const selectableRows = computed(() => store.rows.filter((row) => row.excluida !== 'S'))
+const hasSelectedRows = computed(() => store.selectedRows.length > 0)
 const allSelectableSelected = computed(() => (
   selectableRows.value.length > 0 &&
   selectableRows.value.every((row) => store.selectedRows.includes(row.id))
@@ -292,8 +295,6 @@ const onSelectAllChange = () => {
   )
 }
 
-/* Una única definición de ancho por columna. PrimeVue la aplica a encabezado,
-   filtros y todas las filas, evitando desalineaciones al redimensionar. */
 const columnStyle = (column) => ({
   width: column.width || '120px',
   minWidth: '48px'
@@ -315,13 +316,18 @@ const changeRows = (event, rowChangeCallback) => {
   if (Number.isFinite(rows) && rows > 0) rowChangeCallback(rows)
 }
 
+const hasNote = (data) => {
+  const note = data?.nota
+  return note !== null && note !== undefined && String(note).trim().length > 0
+}
+
 const showMessage = (message) => {
   alertMessage.value = message
   showAlert.value = true
 }
 
 const showNote = (data) => {
-  if (!data?.nota) return
+  if (!hasNote(data)) return
   selectedNote.value = data.nota
   showNota.value = true
 }
@@ -333,18 +339,12 @@ const openInclude = (data) => {
 }
 
 const excluir = () => {
-  if (!store.selectedRows.length) {
-    showMessage('No hay datos para la consulta efectuada')
-    return
-  }
+  if (!hasSelectedRows.value) return
   showExcluir.value = true
 }
 
 const reprocesar = () => {
-  if (!store.selectedRows.length) {
-    showMessage('No hay datos para la consulta efectuada')
-    return
-  }
+  if (!hasSelectedRows.value) return
   showReproceso.value = true
 }
 
