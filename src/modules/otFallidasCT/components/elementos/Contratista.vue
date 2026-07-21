@@ -1,5 +1,8 @@
 <template>
-  <div class="fm-field fm-field--span-3">
+  <div
+    class="fm-field fm-field--span-3 otf-filter-element"
+    :class="{ 'otf-filter-element--disabled': disabled }"
+  >
     <label for="contratista">Contratista</label>
     <Select
       id="contratista"
@@ -16,6 +19,7 @@
       optionLabel="nombre"
       placeholder="Seleccione"
       showClear
+      :disabled="disabled"
     />
     <span v-else-if="status.contratistas === 'error'" class="fm-field-error">
       Error al cargar.
@@ -28,6 +32,10 @@ import { computed, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useFallidasCtStore } from '../../store/CtFallidaStore'
 import { useCommonCtStore } from '@/store/commonCt'
+
+defineProps({
+  disabled: { type: Boolean, default: false }
+})
 
 const store = useFallidasCtStore()
 const commonCT = useCommonCtStore()
