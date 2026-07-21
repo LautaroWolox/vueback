@@ -1,5 +1,11 @@
 <template>
-  <section class="fm-grid-shell fm-ui-grid-shell" :class="{ 'fm-grid-shell--loading': loading, 'fm-ui-grid-shell--loading': loading }">
+  <section
+    class="fm-grid-shell fm-ui-grid-shell fm-responsive-grid-shell"
+    :class="{
+      'fm-grid-shell--loading': loading,
+      'fm-ui-grid-shell--loading': loading
+    }"
+  >
     <header v-if="title || $slots.title || $slots.actions" class="fm-grid-title fm-ui-grid-title">
       <slot name="title">
         <span>{{ title }}</span>
