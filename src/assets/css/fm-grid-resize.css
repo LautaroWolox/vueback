@@ -89,6 +89,31 @@
     color: #111 !important;
   }
 
+  /* Excluir y Reprocesar quedan visualmente inactivos sin selección. */
+  #app #tabla.otf-grid .fm-grid-action-final:disabled,
+  #app #tabla.otf-grid .fm-grid-action-final.p-disabled,
+  #app #tabla.otf-grid .fm-grid-actions-final .p-button:disabled,
+  #app #tabla.otf-grid .fm-grid-actions-final .p-button.p-disabled {
+    color: #aeb8bd !important;
+    opacity: .5 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+  }
+
+  #app #tabla.otf-grid .fm-grid-action-final:disabled .pi,
+  #app #tabla.otf-grid .fm-grid-action-final.p-disabled .pi {
+    color: #aeb8bd !important;
+  }
+
+  /* Una OT excluida puede conservar su nota, pero el icono se muestra grisado. */
+  #app #tabla.otf-grid .otf-row-action--note-excluded {
+    color: #8f9ba2 !important;
+  }
+
+  #app #tabla.otf-grid .otf-row-action--note-excluded:hover {
+    color: #707d84 !important;
+  }
+
   body.p-unselectable-text,
   body.p-datatable-resizing {
     cursor: col-resize !important;
