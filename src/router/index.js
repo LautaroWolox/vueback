@@ -221,11 +221,7 @@ const routes = [
         path: 'jobtypeContrato.html',
         name: 'JOCO',
         beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/jobtypeContrato.html',
-          titleParam: 'configuracion jobtype-contrato'
-        }
+        component: () => import('../modules/parametrizaciones/jobtypeContrato/JobtypeContrato.vue')
       },
       {
         path: 'configuraCmoActividad.html',
@@ -333,4 +329,3 @@ const router = createRouter({
 });
 
 export default router;
-
