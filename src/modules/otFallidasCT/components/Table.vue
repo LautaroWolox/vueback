@@ -28,25 +28,108 @@
       paginator
       :rows="10"
       :rowsPerPageOptions="[10, 50, 100, 500]"
-      paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
-      currentPageReportTemplate="Pagina {currentPage} de {totalPages}"
       showGridlines
-      @page="onPage"
       @select-all-change="onSelectAllChange"
     >
-      <template #paginatorstart>
-        <FmGridActions
-          size="large"
-          @export="exportarExcel"
-          @delete="excluir"
-          @refresh="reprocesar"
-        />
-      </template>
+      <template
+        #paginatorcontainer="{
+          first,
+          last,
+          page,
+          pageCount,
+          rows,
+          totalRecords,
+          firstPageCallback,
+          lastPageCallback,
+          prevPageCallback,
+          nextPageCallback,
+          rowChangeCallback,
+          changePageCallback
+        }"
+      >
+        <div class="otf-custom-paginator">
+          <FmGridActions
+            class="otf-custom-paginator__actions"
+            size="large"
+            @export="exportarExcel"
+            @delete="excluir"
+            @refresh="reprocesar"
+          />
 
-      <template #paginatorend>
-        <span class="fm-grid-counter">
-          Mostrando {{ firstDisplayed }} - {{ lastDisplayed }} de {{ store.rows.length }}
-        </span>
+          <div class="otf-custom-paginator__navigation" aria-label="Paginación">
+            <button
+              type="button"
+              class="otf-page-button"
+              title="Primera página"
+              aria-label="Primera página"
+              :disabled="page === 0 || pageCount === 0"
+              @click="firstPageCallback"
+            >
+              |&lt;
+            </button>
+
+            <button
+              type="button"
+              class="otf-page-button"
+              title="Página anterior"
+              aria-label="Página anterior"
+              :disabled="page === 0 || pageCount === 0"
+              @click="prevPageCallback"
+            >
+              &lt;
+            </button>
+
+            <span class="otf-page-label">Pagina</span>
+            <input
+              class="otf-page-input"
+              type="number"
+              min="1"
+              :max="Math.max(pageCount, 1)"
+              :value="pageCount ? page + 1 : 0"
+              :disabled="pageCount === 0"
+              aria-label="Número de página"
+              @change="changePageFromInput($event, pageCount, changePageCallback)"
+            />
+            <span class="otf-page-total">de {{ pageCount }}</span>
+
+            <button
+              type="button"
+              class="otf-page-button"
+              title="Página siguiente"
+              aria-label="Página siguiente"
+              :disabled="pageCount === 0 || page >= pageCount - 1"
+              @click="nextPageCallback"
+            >
+              &gt;
+            </button>
+
+            <button
+              type="button"
+              class="otf-page-button"
+              title="Última página"
+              aria-label="Última página"
+              :disabled="pageCount === 0 || page >= pageCount - 1"
+              @click="lastPageCallback"
+            >
+              &gt;|
+            </button>
+
+            <select
+              class="otf-rows-select"
+              :value="rows"
+              aria-label="Filas por página"
+              @change="changeRows($event, rowChangeCallback)"
+            >
+              <option v-for="option in [10, 50, 100, 500]" :key="option" :value="option">
+                {{ option }}
+              </option>
+            </select>
+          </div>
+
+          <span class="otf-custom-paginator__counter">
+            Mostrando {{ totalRecords ? first + 1 : 0 }} - {{ last }} de {{ totalRecords }}
+          </span>
+        </div>
       </template>
 
       <template #empty>
@@ -90,27 +173,36 @@
         <template #body="{ data }">
           <template v-if="col.field === 'tieneNota'">
             <button
-              v-if="data.nota"
               type="button"
-              class="fm-icon-btn otf-row-action"
-              title="Ver nota"
-              aria-label="Ver nota"
+              class="otf-row-action otf-row-action--note"
+              :class="{ 'otf-row-action--disabled': !data.nota }"
+              :disabled="!data.nota"
+              :title="data.nota ? 'Ver nota' : 'Sin nota'"
+              :aria-label="data.nota ? 'Ver nota' : 'Sin nota'"
               @click.stop="showNote(data)"
             >
-              <i class="pi pi-file-edit"></i>
+              <svg class="otf-row-action__icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 6h10M4 11h8M4 16h6" />
+                <path d="m14.5 14.5 4.8-4.8 2 2-4.8 4.8-3.2 1.2 1.2-3.2Z" />
+              </svg>
             </button>
           </template>
 
           <template v-else-if="col.field === 'incluir'">
             <button
-              v-if="data.excluida === 'S'"
               type="button"
-              class="fm-icon-btn otf-row-action"
-              title="Incluir OT"
-              aria-label="Incluir OT"
+              class="otf-row-action otf-row-action--include"
+              :class="{ 'otf-row-action--disabled': data.excluida !== 'S' }"
+              :disabled="data.excluida !== 'S'"
+              :title="data.excluida === 'S' ? 'Incluir OT' : 'OT no disponible para incluir'"
+              :aria-label="data.excluida === 'S' ? 'Incluir OT' : 'OT no disponible para incluir'"
               @click.stop="openInclude(data)"
             >
-              <i class="pi pi-undo"></i>
+              <svg class="otf-row-action__icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 12a7 7 0 1 1 2.05 4.95" />
+                <path d="M5 17v-5h5" />
+                <circle cx="12" cy="12" r="1.2" class="otf-row-action__dot" />
+              </svg>
             </button>
           </template>
 
@@ -169,7 +261,6 @@ const showReproceso = ref(false)
 const showAlert = ref(false)
 const alertMessage = ref('')
 const selectedNote = ref('')
-const pageState = ref({ first: 0, rows: 10 })
 const { exportToExcel, parseDataFromTable } = useExcelExport()
 
 const filters = ref(Object.fromEntries(
@@ -196,22 +287,6 @@ const selectedRows = computed({
   )
 })
 
-const firstDisplayed = computed(() => (
-  store.rows.length ? pageState.value.first + 1 : 0
-))
-
-const lastDisplayed = computed(() => Math.min(
-  pageState.value.first + pageState.value.rows,
-  store.rows.length
-))
-
-const onPage = (event) => {
-  pageState.value = {
-    first: event.first ?? 0,
-    rows: event.rows ?? 10
-  }
-}
-
 const rowClass = (data) => ({
   'fm-disabled-row': data?.excluida === 'S',
   'fm-enabled-row': data?.excluida === 'N',
@@ -233,17 +308,35 @@ const columnStyle = (column) => ({
   minWidth: column.minWidth || column.width || '80px'
 })
 
+const changePageFromInput = (event, pageCount, changePageCallback) => {
+  if (!pageCount) return
+
+  const rawValue = Number(event.target.value)
+  const requestedPage = Number.isFinite(rawValue) ? rawValue : 1
+  const normalizedPage = Math.min(Math.max(requestedPage, 1), pageCount)
+
+  event.target.value = String(normalizedPage)
+  changePageCallback(normalizedPage - 1)
+}
+
+const changeRows = (event, rowChangeCallback) => {
+  const rows = Number(event.target.value)
+  if (Number.isFinite(rows) && rows > 0) rowChangeCallback(rows)
+}
+
 const showMessage = (message) => {
   alertMessage.value = message
   showAlert.value = true
 }
 
 const showNote = (data) => {
-  selectedNote.value = data.nota || ''
+  if (!data?.nota) return
+  selectedNote.value = data.nota
   showNota.value = true
 }
 
 const openInclude = (data) => {
+  if (data?.excluida !== 'S') return
   store.nroOT = data.nroOrdenTrabajo
   showIncluir.value = true
 }
