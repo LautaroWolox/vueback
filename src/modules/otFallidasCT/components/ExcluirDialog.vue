@@ -4,7 +4,7 @@
     modal
     :closable="false"
     class="fm-dialog otf-action-dialog otf-exclude-dialog"
-    :style="{ '--fm-dialog-width': '54rem' }"
+    :style="{ '--fm-dialog-width': '42rem' }"
     @update:visible="$emit('update:visibleExc', $event)"
   >
     <template #header>
@@ -50,7 +50,7 @@
         <Textarea
           id="comentario-exclusion"
           v-model="comentario"
-          rows="4"
+          rows="3"
           placeholder="Opcional"
         />
       </div>
@@ -125,13 +125,13 @@ onMounted(() => commonCT.setMotivosExcInc())
 .otf-exclude-content {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 14px;
 }
 
 .otf-exclude-confirmation {
-  margin: 0;
+  margin: 0 0 2px;
   color: #202020;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 400;
   line-height: 1.4;
 }
@@ -142,86 +142,30 @@ onMounted(() => commonCT.setMotivosExcInc())
 }
 
 .otf-exclude-content .fm-field label {
-  margin: 0 0 8px;
+  margin: 0 0 6px;
   color: #202020;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 400;
   line-height: 1.2;
 }
 
-.otf-motivo-field {
-  max-width: 540px;
-}
-
-.otf-motivo-field :deep(.p-select) {
-  width: 100% !important;
-  height: 46px !important;
-  min-height: 46px !important;
-  border: 1px solid #bfc8cd !important;
-  border-radius: 4px !important;
-  background: #fff !important;
-  box-shadow: none !important;
-}
-
-.otf-motivo-field :deep(.p-select-label),
-.otf-motivo-field :deep(.p-select-dropdown) {
-  height: 44px !important;
-  min-height: 44px !important;
-  display: flex !important;
-  align-items: center !important;
-}
-
-.otf-motivo-field :deep(.p-select-label) {
-  padding: 0 11px !important;
-  color: #263746 !important;
-  font-size: 15px !important;
-}
-
-.otf-motivo-field :deep(.p-select-dropdown) {
-  width: 48px !important;
-  min-width: 48px !important;
-  justify-content: center !important;
-}
-
-.otf-nota-field :deep(.p-textarea) {
-  width: 100% !important;
-  min-height: 106px !important;
-  max-height: 180px !important;
-  padding: 12px !important;
-  resize: vertical !important;
-  border: 1px solid #bfc8cd !important;
-  border-radius: 4px !important;
-  background: #fff !important;
-  color: #263746 !important;
-  font-size: 15px !important;
-  line-height: 1.4 !important;
-  box-shadow: none !important;
-}
-
-.otf-nota-field :deep(.p-textarea::placeholder) {
-  color: #747474 !important;
-  font-family: monospace;
-  font-weight: 600;
-  opacity: 1;
-}
-
 .otf-exclude-header {
   width: 100%;
-  min-height: 64px;
+  min-height: 48px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
   color: #4a4a4a;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 400;
 }
 
 .otf-exclude-close {
-  width: 32px;
-  min-width: 32px;
-  height: 32px;
-  min-height: 32px;
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  min-height: 30px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -231,7 +175,7 @@ onMounted(() => commonCT.setMotivosExcInc())
   background: transparent;
   color: #999;
   font-family: Arial, sans-serif;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 400;
   line-height: 1;
   cursor: pointer;
@@ -247,40 +191,100 @@ onMounted(() => commonCT.setMotivosExcInc())
 }
 
 :global(.otf-exclude-dialog .p-dialog-header) {
-  min-height: 66px !important;
-  padding: 0 18px !important;
+  min-height: 54px !important;
+  padding: 0 16px !important;
   border-bottom: 1px solid #d5dadd !important;
   background: #fff !important;
 }
 
 :global(.otf-exclude-dialog .p-dialog-content) {
-  padding: 38px 18px 40px !important;
+  padding: 20px 18px 22px !important;
   background: #fff !important;
+  overflow: visible !important;
+}
+
+:global(.otf-exclude-dialog .otf-motivo-field) {
+  width: min(420px, 100%) !important;
+  max-width: 420px !important;
+}
+
+:global(.otf-exclude-dialog .otf-motivo-field .p-select) {
+  width: 100% !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  border: 1px solid #bfc8cd !important;
+  border-radius: 4px !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+
+:global(.otf-exclude-dialog .otf-motivo-field .p-select-label),
+:global(.otf-exclude-dialog .otf-motivo-field .p-select-dropdown) {
+  height: 38px !important;
+  min-height: 38px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+:global(.otf-exclude-dialog .otf-motivo-field .p-select-label) {
+  padding: 0 10px !important;
+  color: #263746 !important;
+  font-size: 14px !important;
+}
+
+:global(.otf-exclude-dialog .otf-motivo-field .p-select-dropdown) {
+  width: 42px !important;
+  min-width: 42px !important;
+  justify-content: center !important;
+}
+
+:global(.otf-exclude-dialog .otf-nota-field .p-textarea) {
+  width: 100% !important;
+  height: 78px !important;
+  min-height: 78px !important;
+  max-height: none !important;
+  padding: 10px !important;
+  overflow: auto !important;
+  resize: vertical !important;
+  border: 1px solid #bfc8cd !important;
+  border-radius: 4px !important;
+  background: #fff !important;
+  color: #263746 !important;
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+  box-shadow: none !important;
+}
+
+:global(.otf-exclude-dialog .otf-nota-field .p-textarea::placeholder) {
+  color: #747474 !important;
+  font-family: monospace;
+  font-weight: 600;
+  opacity: 1;
 }
 
 :global(.otf-exclude-dialog .p-dialog-footer) {
-  min-height: 76px !important;
+  min-height: 62px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: flex-end !important;
-  gap: 12px !important;
-  padding: 12px 18px !important;
+  gap: 10px !important;
+  padding: 10px 16px !important;
   border-top: 1px solid #d5dadd !important;
   background: #fff !important;
 }
 
 :global(.otf-exclude-dialog .otf-exclude-cancel),
 :global(.otf-exclude-dialog .otf-exclude-accept) {
-  width: 150px !important;
-  min-width: 150px !important;
-  max-width: 150px !important;
-  height: 48px !important;
-  min-height: 48px !important;
-  max-height: 48px !important;
+  width: 132px !important;
+  min-width: 132px !important;
+  max-width: 132px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
   border-radius: 6px !important;
-  font-size: 16px !important;
+  font-size: 14px !important;
   font-weight: 400 !important;
-  box-shadow: 0 6px 14px rgba(0, 91, 104, .14) !important;
+  box-shadow: 0 4px 10px rgba(0, 91, 104, .12) !important;
   transform: none !important;
 }
 
@@ -305,17 +309,22 @@ onMounted(() => commonCT.setMotivosExcInc())
 
 @media (max-width: 600px) {
   .otf-exclude-header {
-    min-height: 52px;
-    font-size: 21px;
+    min-height: 46px;
+    font-size: 19px;
   }
 
   .otf-exclude-confirmation,
   .otf-exclude-content .fm-field label {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   :global(.otf-exclude-dialog .p-dialog-content) {
-    padding: 24px 14px !important;
+    padding: 16px 12px 18px !important;
+  }
+
+  :global(.otf-exclude-dialog .otf-motivo-field) {
+    width: 100% !important;
+    max-width: none !important;
   }
 
   :global(.otf-exclude-dialog .p-dialog-footer) {
