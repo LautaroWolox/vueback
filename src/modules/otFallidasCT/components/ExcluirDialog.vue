@@ -4,7 +4,7 @@
     modal
     :closable="false"
     class="fm-dialog otf-action-dialog otf-exclude-dialog"
-    :style="{ '--fm-dialog-width': '42rem' }"
+    :style="{ '--fm-dialog-width': '36rem' }"
     @update:visible="$emit('update:visibleExc', $event)"
   >
     <template #header>
@@ -41,6 +41,7 @@
           :options="motivoOptions"
           optionLabel="nombre"
           placeholder=""
+          appendTo="self"
         />
         <span v-else-if="status.motivos === 'error'" class="fm-field-error">Error al cargar.</span>
       </div>
@@ -50,7 +51,8 @@
         <Textarea
           id="comentario-exclusion"
           v-model="comentario"
-          rows="3"
+          class="otf-note-textarea"
+          rows="4"
           placeholder="Opcional"
         />
       </div>
@@ -204,14 +206,15 @@ onMounted(() => commonCT.setMotivosExcInc())
 }
 
 :global(.otf-exclude-dialog .otf-motivo-field) {
-  width: min(420px, 100%) !important;
-  max-width: 420px !important;
+  position: relative !important;
+  width: min(360px, 100%) !important;
+  max-width: 360px !important;
 }
 
 :global(.otf-exclude-dialog .otf-motivo-field .p-select) {
   width: 100% !important;
-  height: 40px !important;
-  min-height: 40px !important;
+  height: 38px !important;
+  min-height: 38px !important;
   border: 1px solid #bfc8cd !important;
   border-radius: 4px !important;
   background: #fff !important;
@@ -220,8 +223,8 @@ onMounted(() => commonCT.setMotivosExcInc())
 
 :global(.otf-exclude-dialog .otf-motivo-field .p-select-label),
 :global(.otf-exclude-dialog .otf-motivo-field .p-select-dropdown) {
-  height: 38px !important;
-  min-height: 38px !important;
+  height: 36px !important;
+  min-height: 36px !important;
   display: flex !important;
   align-items: center !important;
 }
@@ -229,20 +232,50 @@ onMounted(() => commonCT.setMotivosExcInc())
 :global(.otf-exclude-dialog .otf-motivo-field .p-select-label) {
   padding: 0 10px !important;
   color: #263746 !important;
-  font-size: 14px !important;
+  font-size: 13px !important;
 }
 
 :global(.otf-exclude-dialog .otf-motivo-field .p-select-dropdown) {
-  width: 42px !important;
-  min-width: 42px !important;
+  width: 40px !important;
+  min-width: 40px !important;
   justify-content: center !important;
 }
 
-:global(.otf-exclude-dialog .otf-nota-field .p-textarea) {
+:global(.otf-exclude-dialog .otf-motivo-field .p-select-overlay) {
   width: 100% !important;
-  height: 78px !important;
-  min-height: 78px !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  max-height: 190px !important;
+  overflow: hidden !important;
+  border-radius: 4px !important;
+}
+
+:global(.otf-exclude-dialog .otf-motivo-field .p-select-list-container) {
+  max-height: 190px !important;
+  overflow-y: auto !important;
+  scrollbar-width: thin;
+}
+
+:global(.otf-exclude-dialog .otf-motivo-field .p-select-list) {
+  padding: 4px 0 !important;
+}
+
+:global(.otf-exclude-dialog .otf-motivo-field .p-select-option) {
+  min-height: 34px !important;
+  padding: 6px 12px !important;
+  color: #263746 !important;
+  font-size: 13px !important;
+  line-height: 1.25 !important;
+  white-space: normal !important;
+}
+
+:global(.otf-exclude-dialog .otf-nota-field .otf-note-textarea.p-textarea) {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 104px !important;
+  min-height: 50px !important;
   max-height: none !important;
+  display: block !important;
   padding: 10px !important;
   overflow: auto !important;
   resize: vertical !important;
@@ -253,9 +286,10 @@ onMounted(() => commonCT.setMotivosExcInc())
   font-size: 14px !important;
   line-height: 1.4 !important;
   box-shadow: none !important;
+  box-sizing: border-box !important;
 }
 
-:global(.otf-exclude-dialog .otf-nota-field .p-textarea::placeholder) {
+:global(.otf-exclude-dialog .otf-nota-field .otf-note-textarea.p-textarea::placeholder) {
   color: #747474 !important;
   font-family: monospace;
   font-weight: 600;
@@ -319,7 +353,7 @@ onMounted(() => commonCT.setMotivosExcInc())
   }
 
   :global(.otf-exclude-dialog .p-dialog-content) {
-    padding: 16px 12px 18px !important;
+    padding: 16px 14px 18px !important;
   }
 
   :global(.otf-exclude-dialog .otf-motivo-field) {
