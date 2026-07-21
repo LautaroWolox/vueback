@@ -66,7 +66,7 @@ const props = defineProps({
   errorMessage: { type: String, default: '' }
 })
 
-const emit = defineEmits(['update:visible'])
+const emit = defineEmits(['close'])
 
 const dialogTitle = computed(() => {
   if (props.processing) return 'Reprocesando'
@@ -76,12 +76,11 @@ const dialogTitle = computed(() => {
 
 const cerrar = () => {
   if (props.processing) return
-  emit('update:visible', false)
+  emit('close')
 }
 
 const onVisibleChange = (value) => {
-  if (props.processing) return
-  emit('update:visible', value)
+  if (!value && !props.processing) emit('close')
 }
 </script>
 
