@@ -70,13 +70,20 @@
   }
 
   #app #tabla.otf-grid .fm-disabled-row > td,
-  #app #tabla.otf-grid .fm-disabled-row:hover > td {
+  #app #tabla.otf-grid .fm-disabled-row:hover > td,
+  #app #tabla.otf-grid .fm-reprocessed-row > td,
+  #app #tabla.otf-grid .fm-reprocessed-row:hover > td {
     background: #edf0f2 !important;
     color: #65737b !important;
   }
 
-  #app #tabla.otf-grid .fm-disabled-row .fm-cell-text {
+  #app #tabla.otf-grid .fm-disabled-row .fm-cell-text,
+  #app #tabla.otf-grid .fm-reprocessed-row .fm-cell-text {
     color: #65737b !important;
+  }
+
+  #app #tabla.otf-grid .fm-reprocessed-row .otf-row-action {
+    color: #8f9ba2 !important;
   }
 
   #app #tabla.otf-grid .fm-selected-row > td,
