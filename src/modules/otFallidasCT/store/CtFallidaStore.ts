@@ -59,8 +59,6 @@ export const useFallidasCtStore = defineStore('fallidasCT', {
             if (error.value) {
                 throw new Error(String(error.value))
             }
-
-            this.selectedRows = []
         },
         async sendExcluidas(motivo: string, comentario: string): Promise<ActionResponse> {
             this.loading = true;
