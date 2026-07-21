@@ -66,7 +66,7 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
 <style scoped>
 .otf-filters {
   width: 100%;
-  padding: 0 0 12px !important;
+  padding: 0 0 10px !important;
   margin: 0 !important;
   border-left: 4px solid #00a9bd !important;
   border-bottom: 0 !important;
@@ -76,11 +76,22 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
 }
 
 .otf-filter-grid {
-  padding: 18px 20px 0 !important;
+  display: grid !important;
+  grid-template-columns:
+    minmax(280px, 2.35fr)
+    minmax(180px, .65fr)
+    minmax(180px, .65fr)
+    minmax(280px, 2.35fr) !important;
+  gap: 10px 14px !important;
+  align-items: end !important;
+  padding: 14px 20px 0 !important;
   margin: 0 !important;
-  align-items: end;
-  column-gap: 14px !important;
-  row-gap: 10px !important;
+}
+
+.otf-filter-grid :deep(.otf-filter-element) {
+  grid-column: auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
 }
 
 .otf-filters :deep(.fm-field label) {
@@ -95,21 +106,55 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
 .otf-filters :deep(.fm-field .p-select),
 .otf-filters :deep(.fm-field .ct-date-button),
 .otf-filters :deep(.fm-field input) {
+  width: 100% !important;
   height: 26px !important;
   min-height: 26px !important;
-  font-size: 12px !important;
+  max-height: 26px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
   border-color: #cbd4db !important;
   border-radius: 2px !important;
+  background: #fff !important;
+  font-size: 12px !important;
+  line-height: 24px !important;
   box-shadow: none !important;
+  box-sizing: border-box !important;
+}
+
+.otf-filters :deep(.p-select-label) {
+  height: 24px !important;
+  min-height: 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 7px !important;
+  font-size: 12px !important;
+  line-height: 24px !important;
+}
+
+.otf-filters :deep(.p-select-dropdown),
+.otf-filters :deep(.p-select-clear-icon) {
+  height: 24px !important;
+  min-height: 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.otf-filters :deep(.p-select-dropdown) {
+  width: 28px !important;
+  min-width: 28px !important;
+}
+
+.otf-filters :deep(.ct-date-button) {
+  padding: 0 7px !important;
 }
 
 .otf-filter-actions {
   gap: 8px !important;
-  margin: 11px 0 0 !important;
-  padding: 14px 0 0 !important;
+  margin: 10px 0 0 !important;
+  padding: 11px 0 0 !important;
   border-top: 1px solid #e4e8eb !important;
   border-bottom: 0 !important;
-  box-shadow: none !important;
   background: transparent !important;
   display: flex !important;
   align-items: center !important;
@@ -179,7 +224,6 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
 .otf-filters :deep(.otf-filter-element--disabled .p-select),
 .otf-filters :deep(.otf-filter-element--disabled .ct-date-button) {
   background: #d5dde3 !important;
-  background-color: #d5dde3 !important;
   border-color: #9eacb7 !important;
   color: #53636f !important;
   cursor: not-allowed !important;
@@ -188,10 +232,7 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
 
 .otf-filters :deep(.otf-filter-element--disabled .p-inputtext::placeholder),
 .otf-filters :deep(.otf-filter-element--disabled .ct-date-button span),
-.otf-filters :deep(.otf-filter-element--disabled .p-select-label) {
-  color: #53636f !important;
-}
-
+.otf-filters :deep(.otf-filter-element--disabled .p-select-label),
 .otf-filters :deep(.otf-filter-element--disabled .p-select-dropdown),
 .otf-filters :deep(.otf-filter-element--disabled .ct-date-button .pi) {
   color: #53636f !important;
@@ -212,15 +253,17 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
   font-size: 11px !important;
 }
 
-@media (max-width: 900px) {
-  .otf-filters :deep(.fm-field--span-3) {
-    grid-column: span 6;
+@media (max-width: 1200px) {
+  .otf-filter-grid {
+    grid-template-columns: repeat(2, minmax(240px, 1fr)) !important;
   }
 }
 
 @media (max-width: 620px) {
-  .otf-filters :deep(.fm-field--span-3) {
-    grid-column: span 12;
+  .otf-filter-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    padding-right: 10px !important;
+    padding-left: 10px !important;
   }
 
   .otf-filter-actions {
