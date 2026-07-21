@@ -131,8 +131,9 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
   line-height: 24px !important;
 }
 
-.otf-filters :deep(.p-select-dropdown),
-.otf-filters :deep(.p-select-clear-icon) {
+.otf-filters :deep(.p-select-dropdown) {
+  width: 28px !important;
+  min-width: 28px !important;
   height: 24px !important;
   min-height: 24px !important;
   display: flex !important;
@@ -140,9 +141,8 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
   justify-content: center !important;
 }
 
-.otf-filters :deep(.p-select-dropdown) {
-  width: 28px !important;
-  min-width: 28px !important;
+.otf-filters :deep(.p-select-clear-icon) {
+  display: none !important;
 }
 
 .otf-filters :deep(.ct-date-button) {
@@ -174,13 +174,17 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
   gap: 7px !important;
   border-radius: 4px !important;
   font-size: 12px !important;
-  font-weight: 500 !important;
+  font-weight: 400 !important;
   line-height: 1 !important;
   letter-spacing: 0 !important;
   box-shadow: 0 5px 12px rgba(0, 0, 0, .14) !important;
   transform: none !important;
   box-sizing: border-box !important;
   white-space: nowrap !important;
+}
+
+.otf-filter-actions :deep(.p-button-label) {
+  font-weight: 400 !important;
 }
 
 .otf-filter-actions :deep(.fm-filter-action-button i),
