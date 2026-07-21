@@ -6,7 +6,7 @@
     :label="loading ? loadingLabel : label"
     :icon="primeIcon"
     :outlined="variant === 'outline'"
-    class="fm-action-button fm-ui-button"
+    class="fm-action-button fm-ui-button fm-responsive-button"
     :class="variantClass"
     @click="$emit('click', $event)"
   >
