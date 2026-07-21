@@ -27,6 +27,10 @@
             <DataTable
               id="tabla-jobtype-contrato"
               ref="dt"
+              v-model:filters="filters"
+              v-model:selection="selectedRow"
+              v-model:first="pageFirst"
+              v-model:rows="pageRows"
               class="fm-pass-grid jobtype-contrato-grid"
               :value="store.rows"
               dataKey="id"
@@ -36,73 +40,65 @@
               removableSort
               sortMode="multiple"
               filterDisplay="row"
-              v-model:filters="filters"
-              v-model:selection="selectedRow"
               selectionMode="single"
               :rowClass="rowClass"
               paginator
-              :first="pageFirst"
-              :rows="pageRows"
-              :rowsPerPageOptions="[10, 20, 50, 100]"
-              paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
-              currentPageReportTemplate="Pagina {currentPage} de {totalPages}"
+              :rowsPerPageOptions="[10, 50, 100, 500]"
               :resizableColumns="true"
               columnResizeMode="expand"
               showGridlines
-              @page="onPage"
               @row-click="onRowClick"
             >
-              <template #paginatorstart>
-                <div class="jobtype-grid-actions" aria-label="Acciones de grilla">
-                  <Button
-                    icon="pi pi-download"
-                    text
-                    rounded
-                    class="fm-grid-action-final jobtype-grid-action"
-                    title="Exportar"
-                    aria-label="Exportar"
-                    v-tooltip.top="'Exportar'"
-                    @click="exportarExcel"
-                  />
-                  <Button
-                    icon="pi pi-trash"
-                    text
-                    rounded
-                    class="fm-grid-action-final jobtype-grid-action"
-                    :disabled="!store.hasSelection"
-                    title="Eliminar"
-                    aria-label="Eliminar"
-                    v-tooltip.top="'Eliminar'"
-                    @click="eliminar"
-                  />
-                  <Button
-                    icon="pi pi-pencil"
-                    text
-                    rounded
-                    class="fm-grid-action-final jobtype-grid-action"
-                    :disabled="!store.hasSelection"
-                    title="Editar"
-                    aria-label="Editar"
-                    v-tooltip.top="'Editar'"
-                    @click="abrirEdicion"
-                  />
-                  <Button
-                    icon="pi pi-plus"
-                    text
-                    rounded
-                    class="fm-grid-action-final jobtype-grid-action"
-                    title="Nueva Relación"
-                    aria-label="Nueva Relación"
-                    v-tooltip.top="'Nueva Relación'"
-                    @click="abrirAlta"
-                  />
-                </div>
-              </template>
-
-              <template #paginatorend>
-                <span class="fm-grid-counter">
-                  Mostrando {{ shownStart }} - {{ shownEnd }} de {{ store.rows.length }}
-                </span>
+              <template
+                #paginatorcontainer="{
+                  first,
+                  last,
+                  page,
+                  pageCount,
+                  rows,
+                  totalRecords,
+                  firstPageCallback,
+                  lastPageCallback,
+                  prevPageCallback,
+                  nextPageCallback,
+                  rowChangeCallback,
+                  changePageCallback
+                }"
+              >
+                <FmGridPaginator
+                  :first="first"
+                  :last="last"
+                  :page="page"
+                  :page-count="pageCount"
+                  :rows="rows"
+                  :total-records="totalRecords"
+                  :rows-options="[10, 50, 100, 500]"
+                  :disabled="store.loading"
+                  @first-page="firstPageCallback"
+                  @prev-page="prevPageCallback"
+                  @next-page="nextPageCallback"
+                  @last-page="lastPageCallback"
+                  @page-change="changePageCallback"
+                  @rows-change="rowChangeCallback"
+                >
+                  <template #actions>
+                    <FmGridActions
+                      size="large"
+                      :show-refresh="false"
+                      :show-edit="true"
+                      :show-add="true"
+                      :delete-disabled="!store.hasSelection"
+                      :edit-disabled="!store.hasSelection"
+                      delete-title="Eliminar"
+                      edit-title="Editar"
+                      add-title="Nueva Relación"
+                      @export="exportarExcel"
+                      @delete="eliminar"
+                      @edit="abrirEdicion"
+                      @add="abrirAlta"
+                    />
+                  </template>
+                </FmGridPaginator>
               </template>
 
               <template #empty>
@@ -540,13 +536,7 @@ const origenAllOptions = [
 
 const origenPyOptions = [{ label: 'FAN', value: 'FAN' }]
 
-const altaForm = reactive({
-  pais: '',
-  jobtype: '',
-  contrato: '',
-  origen: ''
-})
-
+const altaForm = reactive({ pais: '', jobtype: '', contrato: '', origen: '' })
 const editForm = reactive({
   jobtype: '',
   contratoActual: '',
@@ -555,23 +545,19 @@ const editForm = reactive({
   origen: ''
 })
 
-const filters = ref(
-  Object.fromEntries(
-    columns.value.map((col) => [
-      col.field,
-      { value: null, matchMode: FilterMatchMode.CONTAINS }
-    ])
-  )
-)
+const filters = ref(Object.fromEntries(
+  columns.value.map((col) => [
+    col.field,
+    { value: null, matchMode: FilterMatchMode.CONTAINS }
+  ])
+))
 
-const altaTableFilters = ref(
-  Object.fromEntries(
-    altaColumns.value.map((col) => [
-      col.field,
-      { value: null, matchMode: FilterMatchMode.CONTAINS }
-    ])
-  )
-)
+const altaTableFilters = ref(Object.fromEntries(
+  altaColumns.value.map((col) => [
+    col.field,
+    { value: null, matchMode: FilterMatchMode.CONTAINS }
+  ])
+))
 
 const selectedRow = computed({
   get: () => store.selectedRow,
@@ -593,27 +579,18 @@ const canAgregarRelacion = computed(() => Boolean(
   altaForm.origen
 ))
 
-const shownStart = computed(() => (store.rows.length ? pageFirst.value + 1 : 0))
-const shownEnd = computed(() => Math.min(pageFirst.value + pageRows.value, store.rows.length))
-
 const normalizarOrigenPorPais = (pais, origen) => {
   if (pais === 'PY') return 'FAN'
   return ['FAN', 'MXM'].includes(origen) ? origen : ''
 }
 
-watch(
-  () => altaForm.pais,
-  (pais) => {
-    altaForm.origen = normalizarOrigenPorPais(pais, altaForm.origen)
-  }
-)
+watch(() => altaForm.pais, (pais) => {
+  altaForm.origen = normalizarOrigenPorPais(pais, altaForm.origen)
+})
 
-watch(
-  () => editForm.pais,
-  (pais) => {
-    editForm.origen = normalizarOrigenPorPais(pais, editForm.origen)
-  }
-)
+watch(() => editForm.pais, (pais) => {
+  editForm.origen = normalizarOrigenPorPais(pais, editForm.origen)
+})
 
 const mostrarMensaje = (message) => {
   messageText.value = message || 'Ocurrió un error inesperado.'
@@ -643,11 +620,6 @@ const buscar = async () => {
   }
 
   activePanels.value = ['0', '1']
-}
-
-const onPage = (event) => {
-  pageFirst.value = event.first
-  pageRows.value = event.rows
 }
 
 const columnStyle = (col) => ({
@@ -749,7 +721,6 @@ const agregarRelacionPreview = () => {
 
 const eliminarAltaPreview = () => {
   if (!altaSelectedRow.value) return
-
   altaRows.value = altaRows.value.filter((row) => row.id !== altaSelectedRow.value.id)
   altaSelectedRow.value = null
 }
