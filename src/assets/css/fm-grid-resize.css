@@ -77,7 +77,7 @@
   /* Estados visuales específicos de Registro OTs Fallidas. */
   #app #tabla.otf-grid .fm-disabled-row > td,
   #app #tabla.otf-grid .fm-disabled-row:hover > td {
-    background: #cfd5da !important;
+    background: #e4e8eb !important;
     color: #111 !important;
   }
 
