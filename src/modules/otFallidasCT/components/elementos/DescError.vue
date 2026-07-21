@@ -1,9 +1,9 @@
 <template>
   <div
-    class="fm-field fm-field--span-3 otf-filter-element"
+    class="fm-field fm-field--span-4 otf-filter-element otf-filter-element--descripcion"
     :class="{ 'otf-filter-element--disabled': disabled }"
   >
-    <label for="error">Descripción Error</label>
+    <label for="error">Descripcion Error</label>
     <InputText
       id="error"
       v-model="desc"
