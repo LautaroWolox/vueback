@@ -26,6 +26,7 @@ import FmAlertDialog from './components/shared/FmAlertDialog.vue'
 import FmActionButton from './components/shared/FmActionButton.vue'
 import FmGridActions from './components/shared/FmGridActions.vue'
 import FmTypingLoader from './components/shared/FmTypingLoader.vue'
+import FmResponsivePage from './components/shared/FmResponsivePage.vue'
 
 import Accordion from 'primevue/accordion'
 import AccordionPanel from 'primevue/accordionpanel'
@@ -105,6 +106,7 @@ app.component('FmAlertDialog', FmAlertDialog)
 app.component('FmActionButton', FmActionButton)
 app.component('FmGridActions', FmGridActions)
 app.component('FmTypingLoader', FmTypingLoader)
+app.component('FmResponsivePage', FmResponsivePage)
 
 app.directive('tooltip', Tooltip)
 app.mount('#app')
