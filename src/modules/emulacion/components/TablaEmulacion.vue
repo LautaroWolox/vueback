@@ -11,11 +11,14 @@
       :value="data"
       dataKey="legajo"
       class="fm-pass-grid emulation-grid"
+      tableStyle="table-layout: fixed; width: max-content; min-width: 100%"
       scrollable
       scrollHeight="390px"
       sortMode="multiple"
       removableSort
       selectionMode="single"
+      resizableColumns
+      columnResizeMode="expand"
       paginator
       :rows="10"
       :rowsPerPageOptions="[10, 20, 30, 50]"
@@ -101,10 +104,10 @@ const operario = ref(null)
 const toast = useToast()
 
 const columns = [
-  { field: 'legajo', header: 'LEGAJO', style: 'width: 155px' },
-  { field: 'nombre', header: 'NOMBRE', style: 'width: 220px' },
-  { field: 'apellido', header: 'APELLIDO', style: 'width: 220px' },
-  { field: 'perfil', header: 'PERFIL', style: 'width: 220px' }
+  { field: 'legajo', header: 'LEGAJO', style: 'width: 155px; min-width: 120px' },
+  { field: 'nombre', header: 'NOMBRE', style: 'width: 220px; min-width: 140px' },
+  { field: 'apellido', header: 'APELLIDO', style: 'width: 220px; min-width: 140px' },
+  { field: 'perfil', header: 'PERFIL', style: 'width: 220px; min-width: 140px' }
 ]
 
 const filters = ref({
