@@ -66,6 +66,21 @@
     max-width: none !important;
   }
 
+  /* Estados visuales específicos de Registro OTs Fallidas. */
+  #app #tabla.otf-grid .fm-disabled-row > td,
+  #app #tabla.otf-grid .fm-disabled-row:hover > td {
+    background: #fff3dc !important;
+    color: #5f513e !important;
+  }
+
+  #app #tabla.otf-grid .fm-selected-row > td,
+  #app #tabla.otf-grid .fm-selected-row:hover > td,
+  #app #tabla.otf-grid .p-datatable-row-selected > td,
+  #app #tabla.otf-grid .p-highlight > td {
+    background: #c9f5f8 !important;
+    color: #263238 !important;
+  }
+
   body.p-unselectable-text,
   body.p-datatable-resizing {
     cursor: col-resize !important;
