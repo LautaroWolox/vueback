@@ -4,7 +4,7 @@
     modal
     :closable="false"
     class="fm-dialog otf-action-dialog otf-exclude-dialog"
-    :style="{ '--fm-dialog-width': '46rem' }"
+    :style="{ '--fm-dialog-width': dialogWidth }"
     @update:visible="$emit('update:visibleExc', $event)"
   >
     <template #header>
@@ -50,6 +50,7 @@
         <label for="comentario-exclusion">Nota</label>
         <textarea
           id="comentario-exclusion"
+          ref="notaTextarea"
           v-model="comentario"
           class="otf-note-textarea"
           rows="2"
@@ -76,7 +77,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import FmCompactSelect from '@/components/shared/FmCompactSelect.vue'
 import { useFallidasCtStore } from '../store/CtFallidaStore'
@@ -93,6 +94,10 @@ const commonCT = useCommonCtStore()
 const { motivos, status } = storeToRefs(commonCT)
 const motivoSelected = ref(null)
 const comentario = ref('')
+const notaTextarea = ref(null)
+const dialogWidth = ref('46rem')
+let notaResizeObserver
+let dialogExtraWidth = 0
 
 const motivoOptions = computed(() => motivos.value ?? [])
 const confirmationMessage = computed(() => (
@@ -101,9 +106,63 @@ const confirmationMessage = computed(() => (
     : '¿Confirma que desea excluir la OT seleccionada?'
 ))
 
+const getDefaultDialogWidth = () => {
+  const rootFontSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16
+  return 46 * rootFontSize
+}
+
+const stopNotaResizeObserver = () => {
+  notaResizeObserver?.disconnect()
+  notaResizeObserver = undefined
+  window.removeEventListener('resize', syncDialogWidth)
+}
+
+const syncDialogWidth = () => {
+  if (!notaTextarea.value || window.innerWidth <= 600) return
+
+  const dialog = document.querySelector('.p-dialog.otf-exclude-dialog')
+  if (!dialog) return
+
+  const textareaWidth = notaTextarea.value.getBoundingClientRect().width
+  const minimumWidth = Math.min(getDefaultDialogWidth(), window.innerWidth - 16)
+  const maximumWidth = Math.max(minimumWidth, window.innerWidth - 16)
+  const requestedWidth = textareaWidth + dialogExtraWidth
+  const nextWidth = Math.min(maximumWidth, Math.max(minimumWidth, requestedWidth))
+
+  dialogWidth.value = `${Math.round(nextWidth)}px`
+}
+
+const setupNotaResizeObserver = async () => {
+  stopNotaResizeObserver()
+  dialogWidth.value = '46rem'
+  dialogExtraWidth = 0
+
+  await nextTick()
+  await new Promise((resolve) => requestAnimationFrame(resolve))
+
+  const dialog = document.querySelector('.p-dialog.otf-exclude-dialog')
+  if (!dialog || !notaTextarea.value) return
+
+  dialogExtraWidth = Math.max(
+    24,
+    dialog.getBoundingClientRect().width - notaTextarea.value.getBoundingClientRect().width
+  )
+
+  notaResizeObserver = new ResizeObserver(syncDialogWidth)
+  notaResizeObserver.observe(notaTextarea.value)
+  window.addEventListener('resize', syncDialogWidth)
+}
+
 const reset = () => {
   motivoSelected.value = null
   comentario.value = ''
+  dialogWidth.value = '46rem'
+  dialogExtraWidth = 0
+
+  if (notaTextarea.value) {
+    notaTextarea.value.style.removeProperty('width')
+    notaTextarea.value.style.removeProperty('height')
+  }
 }
 
 const confirmar = async () => {
@@ -119,7 +178,13 @@ const cerrar = () => {
   reset()
 }
 
+watch(() => props.visibleExc, (visible) => {
+  if (visible) setupNotaResizeObserver()
+  else stopNotaResizeObserver()
+})
+
 onMounted(() => commonCT.setMotivosExcInc())
+onBeforeUnmount(stopNotaResizeObserver)
 </script>
 
 <style scoped>
@@ -191,7 +256,7 @@ onMounted(() => commonCT.setMotivosExcInc())
 .otf-note-textarea {
   width: min(620px, 100%);
   min-width: 280px;
-  max-width: min(700px, calc(100vw - 40px));
+  max-width: calc(100vw - 40px);
   height: 46px;
   min-height: 36px;
   padding: 7px 9px;
