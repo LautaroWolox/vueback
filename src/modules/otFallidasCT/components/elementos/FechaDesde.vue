@@ -3,7 +3,7 @@
     class="fm-field fm-field--span-3 otf-filter-element"
     :class="{ 'otf-filter-element--disabled': disabled }"
   >
-    <label for="fecha-desde">Fecha desde</label>
+    <label for="fecha-desde">Fecha Cierre OT Desde</label>
     <CtDatePicker
       input-id="fecha-desde"
       v-model="fechaDesde"
