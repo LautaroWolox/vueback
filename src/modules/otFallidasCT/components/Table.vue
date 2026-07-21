@@ -52,7 +52,7 @@
             class="otf-custom-paginator__actions"
             size="large"
             :delete-disabled="!hasSelectedRows"
-            :refresh-disabled="!hasSelectedRows"
+            :refresh-disabled="!hasSelectedRows || reprocesoProcessing"
             @export="exportarExcel"
             @delete="excluir"
             @refresh="reprocesar"
@@ -218,8 +218,9 @@
 
     <ReprocesoDialog
       v-model:visible="showReproceso"
-      :count="store.selectedRows.length"
-      @confirm="confirmReprocess"
+      :count="reprocesoCount"
+      :processing="reprocesoProcessing"
+      :error-message="reprocesoError"
     />
 
     <FmAlertDialog
@@ -252,6 +253,9 @@ const showReproceso = ref(false)
 const showAlert = ref(false)
 const alertMessage = ref('')
 const selectedNote = ref('')
+const reprocesoProcessing = ref(false)
+const reprocesoError = ref('')
+const reprocesoCount = ref(0)
 const { exportToExcel, parseDataFromTable } = useExcelExport()
 
 const filters = ref(Object.fromEntries(
@@ -343,14 +347,21 @@ const excluir = () => {
   showExcluir.value = true
 }
 
-const reprocesar = () => {
-  if (!hasSelectedRows.value) return
-  showReproceso.value = true
-}
+const reprocesar = async () => {
+  if (!hasSelectedRows.value || reprocesoProcessing.value) return
 
-const confirmReprocess = async () => {
-  showReproceso.value = false
-  await store.sendReproceso()
+  reprocesoCount.value = store.selectedRows.length
+  reprocesoError.value = ''
+  reprocesoProcessing.value = true
+  showReproceso.value = true
+
+  try {
+    await store.sendReproceso()
+  } catch (error) {
+    reprocesoError.value = error?.message || 'Ocurrió un error al reprocesar las órdenes seleccionadas.'
+  } finally {
+    reprocesoProcessing.value = false
+  }
 }
 
 const exportarExcel = () => {
