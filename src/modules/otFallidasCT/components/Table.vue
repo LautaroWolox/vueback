@@ -52,7 +52,7 @@
             class="otf-custom-paginator__actions"
             size="large"
             :delete-disabled="!hasSelectedRows"
-            :refresh-disabled="!hasSelectedRows"
+            :refresh-disabled="!hasSelectedRows || reprocesoProcessing"
             @export="exportarExcel"
             @delete="excluir"
             @refresh="reprocesar"
@@ -217,9 +217,11 @@
     />
 
     <ReprocesoDialog
-      v-model:visible="showReproceso"
-      :count="store.selectedRows.length"
-      @click="reprocess"
+      :visible="showReproceso"
+      :count="reprocesoCount"
+      :processing="reprocesoProcessing"
+      :error-message="reprocesoError"
+      @close="cerrarReproceso"
     />
 
     <FmAlertDialog
@@ -252,7 +254,15 @@ const showReproceso = ref(false)
 const showAlert = ref(false)
 const alertMessage = ref('')
 const selectedNote = ref('')
+const reprocesoProcessing = ref(false)
+const reprocesoError = ref('')
+const reprocesoCount = ref(0)
+const reprocesoIds = ref([])
+const reprocesoCompleted = ref(false)
+const reprocessedRowIds = ref([])
 const { exportToExcel, parseDataFromTable } = useExcelExport()
+
+const isReprocessedId = (id) => reprocessedRowIds.value.includes(id)
 
 const filters = ref(Object.fromEntries(
   columns
@@ -279,11 +289,16 @@ const selectedRows = computed({
   )
 })
 
-const rowClass = (data) => ({
-  'fm-disabled-row': data?.excluida === 'S',
-  'fm-enabled-row': data?.excluida === 'N',
-  'fm-selected-row': store.selectedRows.includes(data?.id)
-})
+const rowClass = (data) => {
+  const reprocessed = isReprocessedId(data?.id)
+
+  return {
+    'fm-reprocessed-row': reprocessed,
+    'fm-disabled-row': data?.excluida === 'S',
+    'fm-enabled-row': data?.excluida === 'N' && !reprocessed,
+    'fm-selected-row': store.selectedRows.includes(data?.id)
+  }
+}
 
 const isRowSelectable = (event) => event?.data?.excluida !== 'S'
 
@@ -343,15 +358,42 @@ const excluir = () => {
   showExcluir.value = true
 }
 
-const reprocesar = () => {
-  if (!hasSelectedRows.value) return
+const reprocesar = async () => {
+  if (!hasSelectedRows.value || reprocesoProcessing.value) return
+
+  reprocesoIds.value = [...store.selectedRows]
+  reprocesoCount.value = reprocesoIds.value.length
+  reprocesoError.value = ''
+  reprocesoCompleted.value = false
+  reprocesoProcessing.value = true
   showReproceso.value = true
+
+  try {
+    await store.sendReproceso()
+    reprocesoCompleted.value = true
+  } catch (error) {
+    reprocesoError.value = error?.message || 'Ocurrió un error al reprocesar las órdenes seleccionadas.'
+  } finally {
+    reprocesoProcessing.value = false
+  }
 }
 
-const reprocess = async () => {
-  await store.sendReproceso()
+const cerrarReproceso = () => {
+  if (reprocesoProcessing.value) return
+
   showReproceso.value = false
-  
+
+  if (reprocesoCompleted.value && !reprocesoError.value) {
+    reprocessedRowIds.value = [
+      ...new Set([...reprocessedRowIds.value, ...reprocesoIds.value])
+    ]
+    store.setSelectedRows([])
+  }
+
+  reprocesoIds.value = []
+  reprocesoCount.value = 0
+  reprocesoCompleted.value = false
+  reprocesoError.value = ''
 }
 
 const exportarExcel = () => {

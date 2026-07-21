@@ -2,23 +2,45 @@
   <Dialog
     :visible="visible"
     modal
-    header="Reproceso"
+    :header="dialogTitle"
+    :closable="false"
+    :closeOnEscape="false"
+    :dismissableMask="false"
     class="fm-dialog otf-reprocess-dialog"
     :style="{ width: '38rem' }"
-    @update:visible="cerrar"
   >
     <div class="fm-dialog-body otf-reprocess-body">
-      <div class="otf-reprocess-icon">
-        <i class="pi pi-refresh"></i>
+      <div
+        class="otf-reprocess-icon"
+        :class="{
+          'otf-reprocess-icon--processing': processing,
+          'otf-reprocess-icon--error': Boolean(errorMessage)
+        }"
+      >
+        <i :class="errorMessage ? 'pi pi-exclamation-triangle' : 'pi pi-refresh'"></i>
       </div>
 
       <div class="otf-reprocess-message">
-        <h3>Reproceso de órdenes</h3>
+        <template v-if="processing">
+          <h3>Reprocesando...</h3>
+          <p>
+            Se están reprocesando {{ count }}
+            OT{{ count === 1 ? '' : 's' }}. Aguarde un momento.
+          </p>
+        </template>
 
-        <p>
-          Se enviaron {{ count }}
-          OT{{ count === 1 ? '' : 's' }} al proceso de reproceso.
-        </p>
+        <template v-else-if="errorMessage">
+          <h3>No se pudo completar el reproceso</h3>
+          <p>{{ errorMessage }}</p>
+        </template>
+
+        <template v-else>
+          <h3>Reproceso finalizado</h3>
+          <p>
+            Se enviaron {{ count }}
+            OT{{ count === 1 ? '' : 's' }} al proceso de reproceso.
+          </p>
+        </template>
       </div>
     </div>
 
@@ -26,6 +48,7 @@
       <FmButton
         label="CERRAR"
         variant="outline"
+        :disabled="processing"
         @click="cerrar"
       />
     </template>
@@ -33,21 +56,26 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
+
 const props = defineProps({
-  visible: {
-    type: Boolean,
-    default: false
-  },
-  count: {
-    type: Number,
-    default: 0
-  }
+  visible: { type: Boolean, default: false },
+  count: { type: Number, default: 0 },
+  processing: { type: Boolean, default: false },
+  errorMessage: { type: String, default: '' }
 })
 
-const emit = defineEmits(['update:visible'])
+const emit = defineEmits(['close'])
+
+const dialogTitle = computed(() => {
+  if (props.processing) return 'Reprocesando'
+  if (props.errorMessage) return 'Error de reproceso'
+  return 'Reproceso finalizado'
+})
 
 const cerrar = () => {
-  emit('update:visible', false)
+  if (props.processing) return
+  emit('close')
 }
 </script>
 
@@ -75,6 +103,15 @@ const cerrar = () => {
   font-size: 24px;
 }
 
+.otf-reprocess-icon--processing i {
+  animation: otf-reprocess-spin .9s linear infinite;
+}
+
+.otf-reprocess-icon--error {
+  background: #fff0f1;
+  color: #d9363e;
+}
+
 .otf-reprocess-message {
   min-width: 0;
 }
@@ -91,6 +128,11 @@ const cerrar = () => {
   color: #607887;
   font-size: 13px;
   line-height: 1.5;
+}
+
+@keyframes otf-reprocess-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 :global(.otf-reprocess-dialog .p-dialog-footer) {
