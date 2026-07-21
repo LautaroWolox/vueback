@@ -4,7 +4,7 @@
     modal
     :closable="false"
     class="fm-dialog otf-action-dialog otf-exclude-dialog"
-    :style="{ '--fm-dialog-width': '40rem' }"
+    :style="{ '--fm-dialog-width': '42rem' }"
     @update:visible="$emit('update:visibleExc', $event)"
   >
     <template #header>
@@ -50,7 +50,7 @@
           id="comentario-exclusion"
           v-model="comentario"
           class="otf-note-textarea"
-          rows="5"
+          rows="2"
           placeholder="Opcional"
         ></textarea>
       </div>
@@ -124,7 +124,7 @@ onMounted(() => commonCT.setMotivosExcInc())
 .otf-exclude-content {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
 }
 
 .otf-exclude-confirmation {
@@ -132,7 +132,7 @@ onMounted(() => commonCT.setMotivosExcInc())
   color: #202020;
   font-size: 14px;
   font-weight: 400;
-  line-height: 1.4;
+  line-height: 1.35;
 }
 
 .otf-exclude-content .fm-field {
@@ -142,24 +142,24 @@ onMounted(() => commonCT.setMotivosExcInc())
 
 .otf-exclude-content .fm-field label {
   display: block;
-  margin: 0 0 6px;
+  margin: 0 0 5px;
   color: #202020;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 400;
   line-height: 1.2;
 }
 
 .otf-motivo-field {
-  width: min(400px, 100%);
-  max-width: 400px;
+  width: 100%;
+  max-width: none;
 }
 
 .otf-note-textarea {
   width: 100%;
   max-width: 100%;
-  height: 112px;
-  min-height: 64px;
-  padding: 10px;
+  height: 54px;
+  min-height: 42px;
+  padding: 8px 10px;
   overflow: auto;
   resize: vertical;
   border: 1px solid #bfc8cd;
@@ -167,8 +167,8 @@ onMounted(() => commonCT.setMotivosExcInc())
   background: #fff;
   color: #263746;
   font: inherit;
-  font-size: 14px;
-  line-height: 1.4;
+  font-size: 13px;
+  line-height: 1.35;
   box-shadow: none;
   box-sizing: border-box;
 }
@@ -188,21 +188,21 @@ onMounted(() => commonCT.setMotivosExcInc())
 
 .otf-exclude-header {
   width: 100%;
-  min-height: 48px;
+  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   color: #4a4a4a;
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 400;
 }
 
 .otf-exclude-close {
-  width: 30px;
-  min-width: 30px;
-  height: 30px;
-  min-height: 30px;
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  min-height: 28px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -212,7 +212,7 @@ onMounted(() => commonCT.setMotivosExcInc())
   background: transparent;
   color: #999;
   font-family: Arial, sans-serif;
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 400;
   line-height: 1;
   cursor: pointer;
@@ -229,26 +229,26 @@ onMounted(() => commonCT.setMotivosExcInc())
 }
 
 :global(.otf-exclude-dialog .p-dialog-header) {
-  min-height: 54px !important;
-  padding: 0 16px !important;
+  min-height: 50px !important;
+  padding: 0 14px !important;
   border-bottom: 1px solid #d5dadd !important;
   border-radius: 2px 2px 0 0 !important;
   background: #fff !important;
 }
 
 :global(.otf-exclude-dialog .p-dialog-content) {
-  padding: 20px 18px 22px !important;
+  padding: 16px 14px 18px !important;
   overflow: visible !important;
   background: #fff !important;
 }
 
 :global(.otf-exclude-dialog .p-dialog-footer) {
-  min-height: 62px !important;
+  min-height: 54px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: flex-end !important;
-  gap: 10px !important;
-  padding: 10px 16px !important;
+  gap: 8px !important;
+  padding: 8px 14px !important;
   border-top: 1px solid #d5dadd !important;
   border-radius: 0 0 2px 2px !important;
   background: #fff !important;
@@ -256,16 +256,17 @@ onMounted(() => commonCT.setMotivosExcInc())
 
 :global(.otf-exclude-dialog .otf-exclude-cancel),
 :global(.otf-exclude-dialog .otf-exclude-accept) {
-  width: 132px !important;
-  min-width: 132px !important;
-  max-width: 132px !important;
-  height: 40px !important;
-  min-height: 40px !important;
-  max-height: 40px !important;
+  width: 116px !important;
+  min-width: 116px !important;
+  max-width: 116px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
+  padding: 0 12px !important;
   border-radius: 4px !important;
-  font-size: 14px !important;
-  font-weight: 400 !important;
-  box-shadow: 0 4px 10px rgba(0, 91, 104, .12) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 3px 8px rgba(0, 91, 104, .1) !important;
   transform: none !important;
 }
 
@@ -290,22 +291,17 @@ onMounted(() => commonCT.setMotivosExcInc())
 
 @media (max-width: 600px) {
   .otf-exclude-header {
-    min-height: 46px;
-    font-size: 19px;
+    min-height: 42px;
+    font-size: 18px;
   }
 
   .otf-exclude-confirmation,
   .otf-exclude-content .fm-field label {
-    font-size: 14px;
-  }
-
-  .otf-motivo-field {
-    width: 100%;
-    max-width: none;
+    font-size: 13px;
   }
 
   :global(.otf-exclude-dialog .p-dialog-content) {
-    padding: 16px 14px 18px !important;
+    padding: 14px 12px 16px !important;
   }
 
   :global(.otf-exclude-dialog .p-dialog-footer) {
