@@ -18,7 +18,6 @@
       :options="contratistaOptions"
       optionLabel="nombre"
       placeholder="Seleccione"
-      showClear
       :disabled="disabled"
     />
     <span v-else-if="status.contratistas === 'error'" class="fm-field-error">
