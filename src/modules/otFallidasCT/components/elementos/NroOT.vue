@@ -1,7 +1,16 @@
 <template>
-  <div class="fm-field fm-field--span-3">
+  <div
+    class="fm-field fm-field--span-3 otf-filter-element"
+    :class="{ 'otf-filter-element--disabled': disabled }"
+  >
     <label for="ot">Nro. OT</label>
-    <InputText id="ot" v-model="nroOt" type="text" autocomplete="off" />
+    <InputText
+      id="ot"
+      v-model="nroOt"
+      type="text"
+      autocomplete="off"
+      :disabled="disabled"
+    />
   </div>
 </template>
 
@@ -9,6 +18,10 @@
 import { computed } from 'vue'
 import InputText from 'primevue/inputtext'
 import { useFallidasCtStore } from '../../store/CtFallidaStore'
+
+defineProps({
+  disabled: { type: Boolean, default: false }
+})
 
 const store = useFallidasCtStore()
 const nroOt = computed({
