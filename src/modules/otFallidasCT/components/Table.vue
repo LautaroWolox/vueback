@@ -259,10 +259,7 @@ const reprocesoError = ref('')
 const reprocesoCount = ref(0)
 const reprocesoIds = ref([])
 const reprocesoCompleted = ref(false)
-const reprocessedRowIds = ref([])
 const { exportToExcel, parseDataFromTable } = useExcelExport()
-
-const isReprocessedId = (id) => reprocessedRowIds.value.includes(id)
 
 const filters = ref(Object.fromEntries(
   columns
@@ -289,16 +286,11 @@ const selectedRows = computed({
   )
 })
 
-const rowClass = (data) => {
-  const reprocessed = isReprocessedId(data?.id)
-
-  return {
-    'fm-reprocessed-row': reprocessed,
-    'fm-disabled-row': data?.excluida === 'S',
-    'fm-enabled-row': data?.excluida === 'N' && !reprocessed,
-    'fm-selected-row': store.selectedRows.includes(data?.id)
-  }
-}
+const rowClass = (data) => ({
+  'fm-disabled-row': data?.excluida === 'S',
+  'fm-enabled-row': data?.excluida === 'N',
+  'fm-selected-row': store.selectedRows.includes(data?.id)
+})
 
 const isRowSelectable = (event) => event?.data?.excluida !== 'S'
 
@@ -384,9 +376,6 @@ const cerrarReproceso = () => {
   showReproceso.value = false
 
   if (reprocesoCompleted.value && !reprocesoError.value) {
-    reprocessedRowIds.value = [
-      ...new Set([...reprocessedRowIds.value, ...reprocesoIds.value])
-    ]
     store.setSelectedRows([])
   }
 
