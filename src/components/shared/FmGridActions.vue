@@ -1,5 +1,8 @@
 <template>
-  <div class="fm-grid-actions-final" :class="{ 'fm-grid-actions-final--large': size === 'large' }">
+  <div
+    class="fm-grid-actions-final fm-responsive-grid-actions"
+    :class="{ 'fm-grid-actions-final--large': size === 'large' }"
+  >
     <Button
       v-if="showExport"
       icon="pi pi-download"
