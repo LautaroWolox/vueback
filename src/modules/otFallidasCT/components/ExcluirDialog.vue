@@ -4,7 +4,7 @@
     modal
     :closable="false"
     class="fm-dialog otf-action-dialog otf-exclude-dialog"
-    :style="{ '--fm-dialog-width': '36rem' }"
+    :style="{ '--fm-dialog-width': '34rem' }"
     @update:visible="$emit('update:visibleExc', $event)"
   >
     <template #header>
@@ -27,34 +27,41 @@
 
       <div class="fm-field otf-motivo-field">
         <label for="motivo-exclusion">Motivo</label>
-        <Select
-          id="motivo-exclusion"
+        <select
           v-if="status.motivos === 'loading'"
-          v-model="motivoSelected"
-          disabled
-          placeholder="Cargando..."
-        />
-        <Select
           id="motivo-exclusion"
+          class="otf-motivo-select"
+          disabled
+        >
+          <option>Cargando...</option>
+        </select>
+        <select
           v-else-if="status.motivos === 'loaded'"
+          id="motivo-exclusion"
           v-model="motivoSelected"
-          :options="motivoOptions"
-          optionLabel="nombre"
-          placeholder=""
-          appendTo="self"
-        />
+          class="otf-motivo-select"
+        >
+          <option :value="null"></option>
+          <option
+            v-for="motivo in motivoOptions"
+            :key="motivo.nombreCorto"
+            :value="motivo"
+          >
+            {{ motivo.nombre }}
+          </option>
+        </select>
         <span v-else-if="status.motivos === 'error'" class="fm-field-error">Error al cargar.</span>
       </div>
 
       <div class="fm-field otf-nota-field">
         <label for="comentario-exclusion">Nota</label>
-        <Textarea
+        <textarea
           id="comentario-exclusion"
           v-model="comentario"
           class="otf-note-textarea"
-          rows="4"
+          rows="5"
           placeholder="Opcional"
-        />
+        ></textarea>
       </div>
     </div>
 
@@ -78,8 +85,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import Select from 'primevue/select'
-import Textarea from 'primevue/textarea'
 import { useFallidasCtStore } from '../store/CtFallidaStore'
 import { useCommonCtStore } from '@/store/commonCt'
 
@@ -144,11 +149,84 @@ onMounted(() => commonCT.setMotivosExcInc())
 }
 
 .otf-exclude-content .fm-field label {
+  display: block;
   margin: 0 0 6px;
   color: #202020;
   font-size: 14px;
   font-weight: 400;
   line-height: 1.2;
+}
+
+.otf-motivo-field {
+  width: min(340px, 100%);
+  max-width: 340px;
+}
+
+.otf-motivo-select {
+  width: 100%;
+  height: 38px;
+  min-height: 38px;
+  padding: 0 36px 0 10px;
+  border: 1px solid #bfc8cd;
+  border-radius: 4px;
+  background: #fff;
+  color: #263746;
+  font: inherit;
+  font-size: 13px;
+  line-height: 38px;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+.otf-motivo-select:focus {
+  outline: none;
+  border-color: #00a9bd;
+  box-shadow: 0 0 0 2px rgba(0, 169, 189, .14);
+}
+
+.otf-motivo-select:disabled {
+  background: #edf1f3;
+  color: #84939c;
+  cursor: not-allowed;
+}
+
+.otf-motivo-select option {
+  padding: 4px 8px;
+  color: #263746;
+  background: #fff;
+  font-size: 13px;
+}
+
+.otf-note-textarea {
+  width: 100%;
+  max-width: 100%;
+  height: 112px;
+  min-height: 64px;
+  padding: 10px;
+  overflow: auto;
+  resize: vertical;
+  border: 1px solid #bfc8cd;
+  border-radius: 4px;
+  background: #fff;
+  color: #263746;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  box-shadow: none;
+  box-sizing: border-box;
+}
+
+.otf-note-textarea:focus {
+  outline: none;
+  border-color: #00a9bd;
+  box-shadow: 0 0 0 2px rgba(0, 169, 189, .14);
+}
+
+.otf-note-textarea::placeholder {
+  color: #747474;
+  font-family: monospace;
+  font-weight: 600;
+  opacity: 1;
 }
 
 .otf-exclude-header {
@@ -203,97 +281,6 @@ onMounted(() => commonCT.setMotivosExcInc())
   padding: 20px 18px 22px !important;
   background: #fff !important;
   overflow: visible !important;
-}
-
-:global(.otf-exclude-dialog .otf-motivo-field) {
-  position: relative !important;
-  width: min(360px, 100%) !important;
-  max-width: 360px !important;
-}
-
-:global(.otf-exclude-dialog .otf-motivo-field .p-select) {
-  width: 100% !important;
-  height: 38px !important;
-  min-height: 38px !important;
-  border: 1px solid #bfc8cd !important;
-  border-radius: 4px !important;
-  background: #fff !important;
-  box-shadow: none !important;
-}
-
-:global(.otf-exclude-dialog .otf-motivo-field .p-select-label),
-:global(.otf-exclude-dialog .otf-motivo-field .p-select-dropdown) {
-  height: 36px !important;
-  min-height: 36px !important;
-  display: flex !important;
-  align-items: center !important;
-}
-
-:global(.otf-exclude-dialog .otf-motivo-field .p-select-label) {
-  padding: 0 10px !important;
-  color: #263746 !important;
-  font-size: 13px !important;
-}
-
-:global(.otf-exclude-dialog .otf-motivo-field .p-select-dropdown) {
-  width: 40px !important;
-  min-width: 40px !important;
-  justify-content: center !important;
-}
-
-:global(.otf-exclude-dialog .otf-motivo-field .p-select-overlay) {
-  width: 100% !important;
-  min-width: 100% !important;
-  max-width: 100% !important;
-  max-height: 190px !important;
-  overflow: hidden !important;
-  border-radius: 4px !important;
-}
-
-:global(.otf-exclude-dialog .otf-motivo-field .p-select-list-container) {
-  max-height: 190px !important;
-  overflow-y: auto !important;
-  scrollbar-width: thin;
-}
-
-:global(.otf-exclude-dialog .otf-motivo-field .p-select-list) {
-  padding: 4px 0 !important;
-}
-
-:global(.otf-exclude-dialog .otf-motivo-field .p-select-option) {
-  min-height: 34px !important;
-  padding: 6px 12px !important;
-  color: #263746 !important;
-  font-size: 13px !important;
-  line-height: 1.25 !important;
-  white-space: normal !important;
-}
-
-:global(.otf-exclude-dialog .otf-nota-field .otf-note-textarea.p-textarea) {
-  width: 100% !important;
-  max-width: 100% !important;
-  height: 104px !important;
-  min-height: 50px !important;
-  max-height: none !important;
-  display: block !important;
-  padding: 10px !important;
-  overflow: auto !important;
-  resize: vertical !important;
-  border: 1px solid #bfc8cd !important;
-  border-radius: 4px !important;
-  background: #fff !important;
-  color: #263746 !important;
-  font-size: 14px !important;
-  line-height: 1.4 !important;
-  box-shadow: none !important;
-  box-sizing: border-box !important;
-}
-
-:global(.otf-exclude-dialog .otf-nota-field .otf-note-textarea.p-textarea::placeholder) {
-  color: #747474 !important;
-  font-family: monospace;
-  font-weight: 600;
-  opacity: 1;
 }
 
 :global(.otf-exclude-dialog .p-dialog-footer) {
@@ -352,13 +339,13 @@ onMounted(() => commonCT.setMotivosExcInc())
     font-size: 14px;
   }
 
-  :global(.otf-exclude-dialog .p-dialog-content) {
-    padding: 16px 14px 18px !important;
+  .otf-motivo-field {
+    width: 100%;
+    max-width: none;
   }
 
-  :global(.otf-exclude-dialog .otf-motivo-field) {
-    width: 100% !important;
-    max-width: none !important;
+  :global(.otf-exclude-dialog .p-dialog-content) {
+    padding: 16px 14px 18px !important;
   }
 
   :global(.otf-exclude-dialog .p-dialog-footer) {
