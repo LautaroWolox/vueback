@@ -1,9 +1,9 @@
 <template>
   <div
-    class="fm-field fm-field--span-3 otf-filter-element"
+    class="fm-field fm-field--span-2 otf-filter-element otf-filter-element--pais"
     :class="{ 'otf-filter-element--disabled': disabled }"
   >
-    <label for="pais">País</label>
+    <label for="pais">Pais</label>
     <Select
       id="pais"
       v-model="pais"
