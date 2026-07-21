@@ -5,6 +5,7 @@ import './assets/css/fm-grid-resize.css'
 import './assets/css/fm-responsive.css'
 import './assets/css/fm-menu-responsive.css'
 import './assets/css/fm-select.css'
+import './assets/css/jobtype-contrato-ocp.css'
 
 import Lara from '@primeuix/themes/lara'
 import { definePreset } from '@primeuix/themes'
@@ -21,6 +22,7 @@ import router from './router'
 import { strings } from './strings.js'
 import { fmPrimePassThrough } from './components/shared/primePassThrough.js'
 import { installResponsiveIframes } from './plugins/responsiveIframes.js'
+import { initJobtypeModalMaximize } from './modules/parametrizaciones/jobtypeContrato/jobtypeModalMaximize.js'
 
 import FmButton from './components/shared/FmButton.vue'
 import FmPanel from './components/shared/FmPanel.vue'
@@ -114,5 +116,7 @@ app.component('FmTypingLoader', FmTypingLoader)
 app.component('FmResponsivePage', FmResponsivePage)
 
 app.directive('tooltip', Tooltip)
+
+initJobtypeModalMaximize()
 app.mount('#app')
 installResponsiveIframes()
