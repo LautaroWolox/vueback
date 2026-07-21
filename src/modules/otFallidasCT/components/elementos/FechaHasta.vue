@@ -1,30 +1,30 @@
 <template>
-    <div class="flex flex-column px-2">
-        <label for="date">Fecha Hasta</label>
-        <DatePicker id="date" dateFormat="dd/mm/yy" :manualInput="false" class="w-auto"
-        v-model="fechaHasta" variant="filled" @clear-click="borrarFecha($event)" showIcon 
-        selectOtherMonths showButtonBar />
-    </div>
+  <div
+    class="fm-field fm-field--span-2 otf-filter-element otf-filter-element--fecha-hasta"
+    :class="{ 'otf-filter-element--disabled': disabled }"
+  >
+    <label for="fecha-hasta">Fecha Cierre OT Hasta</label>
+    <CtDatePicker
+      input-id="fecha-hasta"
+      v-model="fechaHasta"
+      placeholder="Seleccionar fecha"
+      :disabled="disabled"
+    />
+  </div>
 </template>
 
 <script setup>
-
-import DatePicker from 'primevue/datepicker';
-import { computed } from "vue";
+import { computed } from 'vue'
+import CtDatePicker from '../CtDatePicker.vue'
 import { useFallidasCtStore } from '../../store/CtFallidaStore'
+
+defineProps({
+  disabled: { type: Boolean, default: false }
+})
 
 const store = useFallidasCtStore()
 const fechaHasta = computed({
   get: () => store.filters.fechaCierreOTHasta,
-  set: (fechaHasta) =>
-    store.setFilter('fechaCierreOTHasta', fechaHasta? fechaHasta : '') 
+  set: (value) => store.setFilter('fechaCierreOTHasta', value || null)
 })
-const borrarFecha = (event) => {
-    store.setFilter('fechaCierreOTHasta',null)
-}
-
-
 </script>
-
-<style scoped>
-</style>
