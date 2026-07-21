@@ -1,6 +1,6 @@
 <template>
   <div class="fm-screen fm-screen--pad iframe-page" :class="profileClass">
-    <FmPanel :title="titulo" accent class="iframe-panel">
+    <FmPanel :title="panelTitle" accent class="iframe-panel">
       <div class="iframe-stage">
         <iframe
           ref="iframeRef"
@@ -46,6 +46,7 @@ const profileName = computed(() => {
   return 'generic'
 })
 const profileClass = computed(() => `iframe-page--${profileName.value}`)
+const panelTitle = computed(() => profileName.value === 'jobtype' ? '' : titulo.value)
 
 watchEffect(() => {
   sessionStorage.setItem('urlParam', props.urlParam)
@@ -94,35 +95,45 @@ const legacyCss = `
 `
 
 const jobtypeCss = `
-  body.fm-legacy-skin[data-fm-profile=jobtype]{padding:0!important;background:#fff!important;color:#263238!important}
-  body.fm-legacy-skin[data-fm-profile=jobtype] .ui-accordion,body.fm-legacy-skin[data-fm-profile=jobtype] .accordion,body.fm-legacy-skin[data-fm-profile=jobtype] [class*=accordion]{width:100%!important}
-  body.fm-legacy-skin[data-fm-profile=jobtype] .ui-accordion-header,body.fm-legacy-skin[data-fm-profile=jobtype] .accordion-heading,body.fm-legacy-skin[data-fm-profile=jobtype] .accordion-header{height:28px!important;min-height:28px!important;margin:0!important;padding:5px 10px!important;border:0!important;border-bottom:1px solid #dfe4e8!important;border-radius:0!important;background:#f7f7f7!important;color:#000!important;font-size:12px!important;font-weight:500!important;line-height:18px!important;box-shadow:none!important}
-  body.fm-legacy-skin[data-fm-profile=jobtype] .ui-accordion-content,body.fm-legacy-skin[data-fm-profile=jobtype] .accordion-inner,body.fm-legacy-skin[data-fm-profile=jobtype] .accordion-content{margin:0 0 10px!important;padding:0!important;border:1px solid #d6dde2!important;border-left:3px solid #00a9bd!important;border-radius:0!important;background:#fff!important;overflow:visible!important}
-  body.fm-legacy-skin[data-fm-profile=jobtype] fieldset,body.fm-legacy-skin[data-fm-profile=jobtype] .panel,body.fm-legacy-skin[data-fm-profile=jobtype] .ui-panel{margin:0 0 10px!important;border:1px solid #d6dde2!important;border-left:3px solid #00a9bd!important;border-radius:0!important;background:#fff!important;box-shadow:none!important}
-  body.fm-legacy-skin[data-fm-profile=jobtype] legend,body.fm-legacy-skin[data-fm-profile=jobtype] .panel-heading,body.fm-legacy-skin[data-fm-profile=jobtype] .ui-panel-titlebar{height:28px!important;min-height:28px!important;margin:0!important;padding:5px 10px!important;border:0!important;border-bottom:1px solid #dfe4e8!important;border-radius:0!important;background:#f7f7f7!important;color:#000!important;font-size:12px!important;font-weight:500!important;line-height:18px!important;box-shadow:none!important}
+  body.fm-legacy-skin[data-fm-profile=jobtype]{padding:8px 10px 12px!important;overflow-x:hidden!important;background:#fff!important;color:#263238!important}
+  body.fm-legacy-skin[data-fm-profile=jobtype] .ui-accordion,body.fm-legacy-skin[data-fm-profile=jobtype] .accordion,body.fm-legacy-skin[data-fm-profile=jobtype] [class*=accordion]{width:100%!important;margin:0!important}
+  body.fm-legacy-skin[data-fm-profile=jobtype] .ui-accordion-header,body.fm-legacy-skin[data-fm-profile=jobtype] .accordion-heading,body.fm-legacy-skin[data-fm-profile=jobtype] .accordion-header{height:28px!important;min-height:28px!important;margin:0!important;padding:5px 10px!important;border:1px solid #d6dde2!important;border-bottom:1px solid #dfe4e8!important;border-radius:0!important;background:#f7f7f7!important;color:#000!important;font-size:12px!important;font-weight:500!important;line-height:18px!important;box-shadow:none!important}
+  body.fm-legacy-skin[data-fm-profile=jobtype] .ui-accordion-content,body.fm-legacy-skin[data-fm-profile=jobtype] .accordion-inner,body.fm-legacy-skin[data-fm-profile=jobtype] .accordion-content{margin:0 0 10px!important;padding:0!important;border:1px solid #d6dde2!important;border-top:0!important;border-left:3px solid #00a9bd!important;border-radius:0!important;background:#fff!important;overflow:hidden!important}
+  body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-search-panel{min-height:64px!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:12px 16px!important}
   body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-action{width:120px!important;min-width:120px!important;max-width:120px!important;height:36px!important;min-height:36px!important;max-height:36px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;padding:0 13px!important;border:1px solid #00a9bd!important;border-radius:6px!important;background:#00a9bd!important;color:#fff!important;font-size:13px!important;font-weight:400!important;line-height:1!important;box-shadow:0 4px 10px rgba(0,78,91,.16)!important;text-shadow:none!important;white-space:nowrap!important}
   body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-action:hover:not(:disabled){border-color:#008fa1!important;background:#008fa1!important;color:#fff!important}
   body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-action.fm-jobtype-outline{background:#fff!important;color:#00a0b4!important}
   body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-action:disabled,body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-action.ui-state-disabled{border-color:#aeb8bd!important;background:#edf0f2!important;color:#8f9ba2!important;box-shadow:none!important;cursor:not-allowed!important;opacity:.7!important}
-  body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-icon-button{width:26px!important;min-width:26px!important;max-width:26px!important;height:26px!important;min-height:26px!important;max-height:26px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;margin:0 auto!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;color:#173142!important;box-shadow:none!important;text-shadow:none!important}
-  body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-icon-button:hover:not(:disabled){border:0!important;background:transparent!important;color:#007d8c!important;box-shadow:none!important}
-  body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-icon-button i,body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-icon-button svg,body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-icon-button img,body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-icon-button .ui-icon{width:18px!important;max-width:18px!important;height:18px!important;max-height:18px!important;font-size:16px!important;line-height:18px!important;color:currentColor!important;opacity:1!important}
-  body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-icon-button:disabled,body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-icon-button.ui-state-disabled{color:#aeb8bd!important;cursor:not-allowed!important;opacity:.55!important}
-  body.fm-legacy-skin[data-fm-profile=jobtype] .ui-datatable,body.fm-legacy-skin[data-fm-profile=jobtype] .dataTables_wrapper,body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-grid-wrapper{width:100%!important;max-width:100%!important;overflow:auto!important;border:1px solid #d1d1d1!important;background:#fff!important}
-  body.fm-legacy-skin[data-fm-profile=jobtype] table.fm-jobtype-grid,body.fm-legacy-skin[data-fm-profile=jobtype] .ui-datatable table,body.fm-legacy-skin[data-fm-profile=jobtype] table.dataTable{width:max-content!important;min-width:100%!important;table-layout:fixed!important;border-collapse:collapse!important;background:#fff!important;font-size:12px!important}
-  body.fm-legacy-skin[data-fm-profile=jobtype] table.fm-jobtype-grid thead th,body.fm-legacy-skin[data-fm-profile=jobtype] .ui-datatable thead th,body.fm-legacy-skin[data-fm-profile=jobtype] table.dataTable thead th{height:34px!important;min-height:34px!important;padding:4px 7px!important;border-right:1px solid #c9d3da!important;border-bottom:1px solid #dce3e8!important;background:#f4f7f9!important;color:#263f50!important;font-size:11px!important;font-weight:700!important;vertical-align:middle!important;white-space:nowrap!important}
-  body.fm-legacy-skin[data-fm-profile=jobtype] table.fm-jobtype-grid tbody td,body.fm-legacy-skin[data-fm-profile=jobtype] .ui-datatable tbody td,body.fm-legacy-skin[data-fm-profile=jobtype] table.dataTable tbody td{height:35px!important;min-height:35px!important;padding:5px 8px!important;border-right:1px solid #c9d3da!important;border-bottom:1px solid #dce3e8!important;background:#fff!important;color:#263238!important;font-size:12px!important;vertical-align:middle!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+  body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-grid-wrapper,body.fm-legacy-skin[data-fm-profile=jobtype] .ui-datatable,body.fm-legacy-skin[data-fm-profile=jobtype] .dataTables_wrapper{width:100%!important;max-width:100%!important;margin:0!important;overflow:hidden!important;border:0!important;background:#fff!important}
+  body.fm-legacy-skin[data-fm-profile=jobtype] .ui-datatable-tablewrapper,body.fm-legacy-skin[data-fm-profile=jobtype] .ui-datatable-scrollable-header,body.fm-legacy-skin[data-fm-profile=jobtype] .ui-datatable-scrollable-body,body.fm-legacy-skin[data-fm-profile=jobtype] .ui-datatable-scrollable-footer{width:100%!important;max-width:100%!important;overflow-x:hidden!important}
+  body.fm-legacy-skin[data-fm-profile=jobtype] .ui-datatable-scrollable-body{height:360px!important;min-height:180px!important;max-height:360px!important;overflow-y:auto!important}
+  body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-empty .ui-datatable-scrollable-body{height:170px!important;min-height:170px!important;max-height:170px!important}
+  body.fm-legacy-skin[data-fm-profile=jobtype] table.fm-jobtype-grid,body.fm-legacy-skin[data-fm-profile=jobtype] .ui-datatable table,body.fm-legacy-skin[data-fm-profile=jobtype] table.dataTable{width:100%!important;min-width:100%!important;max-width:100%!important;table-layout:fixed!important;border-collapse:collapse!important;background:#fff!important;font-size:12px!important}
+  body.fm-legacy-skin[data-fm-profile=jobtype] table.fm-jobtype-grid colgroup col,body.fm-legacy-skin[data-fm-profile=jobtype] .ui-datatable colgroup col{width:auto!important}
+  body.fm-legacy-skin[data-fm-profile=jobtype] table.fm-jobtype-grid thead th,body.fm-legacy-skin[data-fm-profile=jobtype] .ui-datatable thead th,body.fm-legacy-skin[data-fm-profile=jobtype] table.dataTable thead th{height:32px!important;min-height:32px!important;padding:4px 6px!important;border-right:1px solid #c9d3da!important;border-bottom:1px solid #dce3e8!important;background:#f4f7f9!important;color:#263f50!important;font-size:11px!important;font-weight:700!important;vertical-align:middle!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+  body.fm-legacy-skin[data-fm-profile=jobtype] table.fm-jobtype-grid tbody td,body.fm-legacy-skin[data-fm-profile=jobtype] .ui-datatable tbody td,body.fm-legacy-skin[data-fm-profile=jobtype] table.dataTable tbody td{height:34px!important;min-height:34px!important;padding:5px 7px!important;border-right:1px solid #c9d3da!important;border-bottom:1px solid #dce3e8!important;background:#fff!important;color:#263238!important;font-size:12px!important;vertical-align:middle!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
   body.fm-legacy-skin[data-fm-profile=jobtype] table.fm-jobtype-grid tbody tr:hover td,body.fm-legacy-skin[data-fm-profile=jobtype] .ui-datatable tbody tr:hover td,body.fm-legacy-skin[data-fm-profile=jobtype] table.dataTable tbody tr:hover td{background:#edfafd!important}
   body.fm-legacy-skin[data-fm-profile=jobtype] table.fm-jobtype-grid tbody tr.ui-state-highlight td,body.fm-legacy-skin[data-fm-profile=jobtype] table.fm-jobtype-grid tbody tr.selected td,body.fm-legacy-skin[data-fm-profile=jobtype] .ui-datatable tbody tr.ui-state-highlight td,body.fm-legacy-skin[data-fm-profile=jobtype] table.dataTable tbody tr.selected td{background:#d9f8fa!important;color:#111!important}
   body.fm-legacy-skin[data-fm-profile=jobtype] table.fm-jobtype-grid tbody tr.ui-state-disabled td,body.fm-legacy-skin[data-fm-profile=jobtype] table.fm-jobtype-grid tbody tr.disabled td,body.fm-legacy-skin[data-fm-profile=jobtype] .ui-datatable tbody tr.ui-state-disabled td{background:#edf0f2!important;color:#111!important}
-  body.fm-legacy-skin[data-fm-profile=jobtype] thead input,body.fm-legacy-skin[data-fm-profile=jobtype] thead select,body.fm-legacy-skin[data-fm-profile=jobtype] .ui-column-filter{height:25px!important;min-height:25px!important;padding:3px 5px!important;border:1px solid #c7d1d8!important;border-radius:3px!important;background:#fff!important;color:#263746!important;font-size:11px!important;box-shadow:none!important}
-  body.fm-legacy-skin[data-fm-profile=jobtype] .ui-paginator,body.fm-legacy-skin[data-fm-profile=jobtype] .p-paginator,body.fm-legacy-skin[data-fm-profile=jobtype] .dataTables_paginate,body.fm-legacy-skin[data-fm-profile=jobtype] .pagination,body.fm-legacy-skin[data-fm-profile=jobtype] .pager{min-height:38px!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:5px!important;margin:0!important;padding:3px 8px!important;border:1px solid #d1d1d1!important;border-top:0!important;border-radius:0!important;background:#fff!important;color:#111!important;font-size:12px!important;box-shadow:none!important}
+  body.fm-legacy-skin[data-fm-profile=jobtype] thead tr.ui-filter-row th,body.fm-legacy-skin[data-fm-profile=jobtype] thead tr[class*=filter] th{height:34px!important;padding:4px 5px!important;background:#fff!important;overflow:hidden!important}
+  body.fm-legacy-skin[data-fm-profile=jobtype] thead input,body.fm-legacy-skin[data-fm-profile=jobtype] thead select,body.fm-legacy-skin[data-fm-profile=jobtype] .ui-column-filter{width:calc(100% - 32px)!important;max-width:calc(100% - 32px)!important;height:25px!important;min-height:25px!important;padding:3px 5px!important;border:1px solid #c7d1d8!important;border-radius:3px!important;background:#fff!important;color:#263746!important;font-size:11px!important;box-shadow:none!important}
+  body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-footer-row{width:100%!important;min-height:40px!important;display:flex!important;align-items:center!important;background:#fff!important}
+  body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-footer-row>td{width:auto!important;min-width:0!important;height:40px!important;display:flex!important;align-items:center!important;padding:3px 5px!important;border:0!important;border-top:1px solid #d1d1d1!important;background:#fff!important}
+  body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-footer-row>.fm-jobtype-toolbar-cell{flex:0 0 38px!important;justify-content:center!important}
+  body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-footer-row>.fm-jobtype-paginator-cell{flex:1 1 auto!important;justify-content:center!important}
+  body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-footer-row>.fm-jobtype-info-cell{flex:0 0 auto!important;min-width:145px!important;justify-content:flex-end!important;margin-left:auto!important;color:#222!important;font-size:12px!important;white-space:nowrap!important}
+  body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-icon-button{width:26px!important;min-width:26px!important;max-width:26px!important;height:26px!important;min-height:26px!important;max-height:26px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;color:#173142!important;box-shadow:none!important;text-shadow:none!important}
+  body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-icon-button:hover:not(:disabled){border:0!important;background:transparent!important;color:#007d8c!important;box-shadow:none!important}
+  body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-icon-button i,body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-icon-button svg,body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-icon-button img,body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-icon-button .ui-icon{width:18px!important;max-width:18px!important;height:18px!important;max-height:18px!important;font-size:16px!important;line-height:18px!important;color:currentColor!important;opacity:1!important}
+  body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-icon-button:disabled,body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-icon-button.ui-state-disabled{color:#aeb8bd!important;cursor:not-allowed!important;opacity:.55!important}
+  body.fm-legacy-skin[data-fm-profile=jobtype] .ui-paginator,body.fm-legacy-skin[data-fm-profile=jobtype] .p-paginator,body.fm-legacy-skin[data-fm-profile=jobtype] .dataTables_paginate,body.fm-legacy-skin[data-fm-profile=jobtype] .pagination,body.fm-legacy-skin[data-fm-profile=jobtype] .pager{min-height:34px!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:4px!important;margin:0!important;padding:2px 6px!important;border:0!important;border-radius:0!important;background:#fff!important;color:#111!important;font-size:12px!important;box-shadow:none!important}
   body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-pager-control{width:22px!important;min-width:22px!important;max-width:22px!important;height:28px!important;min-height:28px!important;max-height:28px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;color:#111!important;font-size:14px!important;font-weight:400!important;line-height:1!important;box-shadow:none!important;text-shadow:none!important}
   body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-pager-control:hover:not(.ui-state-disabled):not(.disabled){border:0!important;background:transparent!important;color:#00a9bd!important;box-shadow:none!important}
   body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-pager-control.ui-state-disabled,body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-pager-control.disabled{color:#b7c0c4!important;cursor:default!important;opacity:1!important}
+  body.fm-legacy-skin[data-fm-profile=jobtype] .ui-paginator input{width:42px!important;min-width:42px!important;height:28px!important;min-height:28px!important;padding:2px 5px!important;text-align:center!important}
   body.fm-legacy-skin[data-fm-profile=jobtype] .ui-paginator select,body.fm-legacy-skin[data-fm-profile=jobtype] .dataTables_length select{width:58px!important;min-width:58px!important;height:28px!important;min-height:28px!important;padding:0 6px!important;border:1px solid #cbd4db!important;border-radius:4px!important;background:#fff!important;color:#111!important;font-size:12px!important}
-  body.fm-legacy-skin[data-fm-profile=jobtype] .ui-paginator-current,body.fm-legacy-skin[data-fm-profile=jobtype] .dataTables_info{margin-left:auto!important;color:#222!important;font-size:12px!important;white-space:nowrap!important}
-  @media(max-width:900px){body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-action{width:min(120px,calc(50vw - 24px))!important;min-width:0!important}body.fm-legacy-skin[data-fm-profile=jobtype] .ui-paginator,body.fm-legacy-skin[data-fm-profile=jobtype] .p-paginator,body.fm-legacy-skin[data-fm-profile=jobtype] .dataTables_paginate{flex-wrap:wrap!important}}
+  body.fm-legacy-skin[data-fm-profile=jobtype] .ui-paginator-current,body.fm-legacy-skin[data-fm-profile=jobtype] .dataTables_info{color:#222!important;font-size:12px!important;white-space:nowrap!important}
+  @media(max-width:900px){body.fm-legacy-skin[data-fm-profile=jobtype]{padding:6px!important}body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-action{width:min(120px,calc(50vw - 24px))!important;min-width:0!important}body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-footer-row{flex-wrap:wrap!important}body.fm-legacy-skin[data-fm-profile=jobtype] .fm-jobtype-footer-row>.fm-jobtype-paginator-cell{order:2!important;flex-basis:100%!important}}
 `
 
 const dialogSelectors = '.ui-dialog, .p-dialog, .modal-content, [role="dialog"]'
@@ -135,6 +146,7 @@ const paginatorControlSelectors = [
   '.pagination a', '.pagination button', '.pager a', '.pager button'
 ].join(', ')
 const controlSelectors = 'button, input[type="button"], input[type="submit"], a.btn, a.ui-button, a.p-button, .ui-button, .p-button'
+const footerRowSelectors = '.ui-datatable-footer tr, .ui-datatable-scrollable-footer tr, tfoot tr'
 
 const enhanceDialogs = (document) => {
   document.querySelectorAll(dialogSelectors).forEach((dialog) => {
@@ -168,13 +180,28 @@ const controlText = (control) => String(
   control.value || control.textContent || control.getAttribute('aria-label') || control.title || ''
 ).replace(/\s+/g, ' ').trim()
 
+const isGridEmpty = (table) => {
+  const rows = Array.from(table.querySelectorAll('tbody tr'))
+  return !rows.some((row) => {
+    if (row.classList.contains('ui-datatable-empty-message')) return false
+    const text = String(row.textContent || '').replace(/\s+/g, ' ').trim()
+    return text.length > 0 && !/no hay resultados/i.test(text)
+  })
+}
+
 const enhanceJobtype = (document) => {
   if (document.body.dataset.fmProfile !== 'jobtype') return
 
   document.querySelectorAll('table').forEach((table) => {
+    if (table.closest(paginatorSelectors)) return
+    if (table.querySelectorAll('thead th').length < 2) return
+
     table.classList.add('fm-jobtype-grid')
-    const wrapper = table.closest('.ui-datatable, .dataTables_wrapper, .table-responsive, [class*="table-container"]')
-    wrapper?.classList.add('fm-jobtype-grid-wrapper')
+    const wrapper = table.closest('.ui-datatable, .dataTables_wrapper, .table-responsive, [class*="table-container"], [class*="grid"]')
+    if (!wrapper) return
+
+    wrapper.classList.add('fm-jobtype-grid-wrapper')
+    wrapper.classList.toggle('fm-jobtype-empty', isGridEmpty(table))
   })
 
   document.querySelectorAll(controlSelectors).forEach((control) => {
@@ -196,6 +223,11 @@ const enhanceJobtype = (document) => {
     if (iconOnly) {
       control.classList.add('fm-jobtype-icon-button')
       control.classList.remove('fm-jobtype-action', 'fm-jobtype-outline')
+
+      const cell = control.closest('td')
+      const row = control.closest(footerRowSelectors)
+      cell?.classList.add('fm-jobtype-toolbar-cell')
+      row?.classList.add('fm-jobtype-footer-row')
       return
     }
 
@@ -209,10 +241,30 @@ const enhanceJobtype = (document) => {
       control.classList.contains('p-button-outlined')
 
     control.classList.toggle('fm-jobtype-outline', outline)
+
+    if (/buscar/i.test(text)) {
+      control.closest('.ui-accordion-content, .accordion-inner, .accordion-content')?.classList.add('fm-jobtype-search-panel')
+    }
   })
 
   document.querySelectorAll(paginatorControlSelectors).forEach((control) => {
     control.classList.add('fm-jobtype-pager-control')
+  })
+
+  document.querySelectorAll(paginatorSelectors).forEach((paginator) => {
+    const cell = paginator.closest('td')
+    const row = paginator.closest(footerRowSelectors)
+    cell?.classList.add('fm-jobtype-paginator-cell')
+    row?.classList.add('fm-jobtype-footer-row')
+  })
+
+  document.querySelectorAll(footerRowSelectors).forEach((row) => {
+    row.querySelectorAll('td').forEach((cell) => {
+      const text = String(cell.textContent || '').replace(/\s+/g, ' ').trim()
+      if (/no hay resultados|mostrando|resultados/i.test(text)) {
+        cell.classList.add('fm-jobtype-info-cell')
+      }
+    })
   })
 }
 
@@ -236,6 +288,7 @@ const applyLegacyStyles = () => {
       style.id = 'fm-injected-styles'
       document.head.appendChild(style)
     }
+
     style.textContent = profileName.value === 'jobtype' ? `${legacyCss}\n${jobtypeCss}` : legacyCss
 
     enhanceLegacyDocument(document)
@@ -289,6 +342,14 @@ onUnmounted(() => {
   background: #fff;
 }
 
+.iframe-page--jobtype {
+  padding-top: 0 !important;
+}
+
+.iframe-page--jobtype .iframe-stage {
+  height: calc(100vh - 86px);
+}
+
 .fm-legacy-frame {
   width: 100%;
   height: 100%;
@@ -301,6 +362,10 @@ onUnmounted(() => {
   .iframe-stage {
     height: calc(100vh - 116px);
     min-height: 460px;
+  }
+
+  .iframe-page--jobtype .iframe-stage {
+    height: calc(100vh - 78px);
   }
 }
 </style>
