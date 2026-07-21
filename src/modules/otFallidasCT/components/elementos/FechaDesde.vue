@@ -1,6 +1,6 @@
 <template>
   <div
-    class="fm-field fm-field--span-3 otf-filter-element"
+    class="fm-field fm-field--span-2 otf-filter-element otf-filter-element--fecha-desde"
     :class="{ 'otf-filter-element--disabled': disabled }"
   >
     <label for="fecha-desde">Fecha Cierre OT Desde</label>
