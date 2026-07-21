@@ -83,11 +83,6 @@
     color: #111 !important;
   }
 
-  #app #tabla.otf-grid .fm-reprocessed-row .p-checkbox {
-    pointer-events: none !important;
-    opacity: .45 !important;
-  }
-
   #app #tabla.otf-grid .fm-reprocessed-row .otf-row-action {
     color: #8f9ba2 !important;
   }
