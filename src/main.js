@@ -1,6 +1,7 @@
 import 'primeicons/primeicons.css'
 import 'primeflex/primeflex.css'
 import './assets/css/fm-global.css'
+import './assets/css/fm-grid-resize.css'
 
 import Lara from '@primeuix/themes/lara'
 import { definePreset } from '@primeuix/themes'
