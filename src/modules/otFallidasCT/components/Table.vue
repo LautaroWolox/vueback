@@ -13,14 +13,14 @@
       :value="store.rows"
       dataKey="id"
       class="fm-pass-grid otf-grid"
-      tableStyle="table-layout: fixed; width: max-content; min-width: 100%"
+      tableStyle="table-layout: fixed; min-width: 100%; width: max-content"
       scrollable
       scrollHeight="430px"
       :rowClass="rowClass"
       :isDataSelectable="isRowSelectable"
       :selectAll="allSelectableSelected"
       resizableColumns
-      columnResizeMode="expand"
+      columnResizeMode="fit"
       removableSort
       sortMode="multiple"
       filterDisplay="row"
@@ -64,9 +64,7 @@
               aria-label="Primera página"
               :disabled="page === 0 || pageCount === 0"
               @click="firstPageCallback"
-            >
-              |&lt;
-            </button>
+            >|&lt;</button>
 
             <button
               type="button"
@@ -75,9 +73,7 @@
               aria-label="Página anterior"
               :disabled="page === 0 || pageCount === 0"
               @click="prevPageCallback"
-            >
-              &lt;
-            </button>
+            >&lt;</button>
 
             <span class="otf-page-label">Pagina</span>
             <input
@@ -99,9 +95,7 @@
               aria-label="Página siguiente"
               :disabled="pageCount === 0 || page >= pageCount - 1"
               @click="nextPageCallback"
-            >
-              &gt;
-            </button>
+            >&gt;</button>
 
             <button
               type="button"
@@ -110,9 +104,7 @@
               aria-label="Última página"
               :disabled="pageCount === 0 || page >= pageCount - 1"
               @click="lastPageCallback"
-            >
-              &gt;|
-            </button>
+            >&gt;|</button>
 
             <select
               class="otf-rows-select"
@@ -138,8 +130,7 @@
 
       <Column
         selectionMode="multiple"
-        headerStyle="width: 3rem; min-width: 3rem"
-        bodyStyle="width: 3rem; min-width: 3rem"
+        style="width: 44px; min-width: 44px"
       />
 
       <Column
@@ -154,8 +145,6 @@
         :hidden="col.hidden"
         :exportable="col.exportable"
         :style="columnStyle(col)"
-        :headerStyle="columnStyle(col)"
-        :bodyStyle="columnStyle(col)"
       >
         <template #filter="{ filterModel, filterCallback }">
           <div v-if="col.filter !== false" class="fm-filter-cell">
@@ -303,9 +292,11 @@ const onSelectAllChange = () => {
   )
 }
 
+/* Una única definición de ancho por columna. PrimeVue la aplica a encabezado,
+   filtros y todas las filas, evitando desalineaciones al redimensionar. */
 const columnStyle = (column) => ({
   width: column.width || '120px',
-  minWidth: column.minWidth || column.width || '80px'
+  minWidth: '48px'
 })
 
 const changePageFromInput = (event, pageCount, changePageCallback) => {
