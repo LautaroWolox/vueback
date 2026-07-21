@@ -28,108 +28,25 @@
       paginator
       :rows="10"
       :rowsPerPageOptions="[10, 50, 100, 500]"
+      paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
+      currentPageReportTemplate="Pagina {currentPage} de {totalPages}"
       showGridlines
+      @page="onPage"
       @select-all-change="onSelectAllChange"
     >
-      <template
-        #paginatorcontainer="{
-          first,
-          last,
-          page,
-          pageCount,
-          rows,
-          totalRecords,
-          firstPageCallback,
-          lastPageCallback,
-          prevPageCallback,
-          nextPageCallback,
-          rowChangeCallback,
-          changePageCallback
-        }"
-      >
-        <div class="otf-custom-paginator">
-          <FmGridActions
-            class="otf-custom-paginator__actions"
-            size="large"
-            @export="exportarExcel"
-            @delete="excluir"
-            @refresh="reprocesar"
-          />
+      <template #paginatorstart>
+        <FmGridActions
+          size="large"
+          @export="exportarExcel"
+          @delete="excluir"
+          @refresh="reprocesar"
+        />
+      </template>
 
-          <div class="otf-custom-paginator__navigation">
-            <button
-              type="button"
-              class="otf-page-button"
-              title="Primera página"
-              aria-label="Primera página"
-              :disabled="page === 0 || pageCount === 0"
-              @click="firstPageCallback"
-            >
-              <i class="pi pi-angle-double-left"></i>
-            </button>
-
-            <button
-              type="button"
-              class="otf-page-button"
-              title="Página anterior"
-              aria-label="Página anterior"
-              :disabled="page === 0 || pageCount === 0"
-              @click="prevPageCallback"
-            >
-              <i class="pi pi-angle-left"></i>
-            </button>
-
-            <span class="otf-page-label">Página</span>
-            <input
-              class="otf-page-input"
-              type="number"
-              min="1"
-              :max="Math.max(pageCount, 1)"
-              :value="pageCount ? page + 1 : 0"
-              :disabled="pageCount === 0"
-              aria-label="Número de página"
-              @change="changePageFromInput($event, pageCount, changePageCallback)"
-            />
-            <span class="otf-page-total">de {{ pageCount }}</span>
-
-            <button
-              type="button"
-              class="otf-page-button"
-              title="Página siguiente"
-              aria-label="Página siguiente"
-              :disabled="pageCount === 0 || page >= pageCount - 1"
-              @click="nextPageCallback"
-            >
-              <i class="pi pi-angle-right"></i>
-            </button>
-
-            <button
-              type="button"
-              class="otf-page-button"
-              title="Última página"
-              aria-label="Última página"
-              :disabled="pageCount === 0 || page >= pageCount - 1"
-              @click="lastPageCallback"
-            >
-              <i class="pi pi-angle-double-right"></i>
-            </button>
-
-            <select
-              class="otf-rows-select"
-              :value="rows"
-              aria-label="Filas por página"
-              @change="changeRows($event, rowChangeCallback)"
-            >
-              <option v-for="option in [10, 50, 100, 500]" :key="option" :value="option">
-                {{ option }}
-              </option>
-            </select>
-          </div>
-
-          <span class="otf-custom-paginator__counter">
-            Mostrando {{ totalRecords ? first + 1 : 0 }} - {{ last }} de {{ totalRecords }}
-          </span>
-        </div>
+      <template #paginatorend>
+        <span class="fm-grid-counter">
+          Mostrando {{ firstDisplayed }} - {{ lastDisplayed }} de {{ store.rows.length }}
+        </span>
       </template>
 
       <template #empty>
@@ -138,8 +55,8 @@
 
       <Column
         selectionMode="multiple"
-        headerStyle="width: 36px; min-width: 36px; max-width: 36px"
-        bodyStyle="width: 36px; min-width: 36px; max-width: 36px"
+        headerStyle="width: 3rem; min-width: 3rem"
+        bodyStyle="width: 3rem; min-width: 3rem"
       />
 
       <Column
@@ -153,9 +70,9 @@
         :showFilterMenu="false"
         :hidden="col.hidden"
         :exportable="col.exportable"
-        :style="columnStyle(col.field)"
-        :headerStyle="columnStyle(col.field)"
-        :bodyStyle="columnStyle(col.field)"
+        :style="columnStyle(col)"
+        :headerStyle="columnStyle(col)"
+        :bodyStyle="columnStyle(col)"
       >
         <template #filter="{ filterModel, filterCallback }">
           <div v-if="col.filter !== false" class="fm-filter-cell">
@@ -252,6 +169,7 @@ const showReproceso = ref(false)
 const showAlert = ref(false)
 const alertMessage = ref('')
 const selectedNote = ref('')
+const pageState = ref({ first: 0, rows: 10 })
 const { exportToExcel, parseDataFromTable } = useExcelExport()
 
 const filters = ref(Object.fromEntries(
@@ -278,6 +196,22 @@ const selectedRows = computed({
   )
 })
 
+const firstDisplayed = computed(() => (
+  store.rows.length ? pageState.value.first + 1 : 0
+))
+
+const lastDisplayed = computed(() => Math.min(
+  pageState.value.first + pageState.value.rows,
+  store.rows.length
+))
+
+const onPage = (event) => {
+  pageState.value = {
+    first: event.first ?? 0,
+    rows: event.rows ?? 10
+  }
+}
+
 const rowClass = (data) => ({
   'fm-disabled-row': data?.excluida === 'S',
   'fm-enabled-row': data?.excluida === 'N',
@@ -294,51 +228,10 @@ const onSelectAllChange = () => {
   )
 }
 
-const columnStyle = (field) => {
-  const widths = {
-    nroOrdenTrabajo: '132px',
-    fechaCierre: '145px',
-    tareaCodigo: '100px',
-    direccion: '180px',
-    ciudad: '125px',
-    provincia: '125px',
-    region: '105px',
-    pais: '72px',
-    contratista: '190px',
-    tecnicoCierre: '125px',
-    actividades: '175px',
-    sistemaOrigen: '115px',
-    errorDescripcion: '190px',
-    excluida: '82px',
-    motivoExclusion: '160px',
-    tieneNota: '60px',
-    incluir: '60px'
-  }
-
-  const width = widths[field] || '120px'
-  const actionColumn = field === 'tieneNota' || field === 'incluir'
-
-  return {
-    width,
-    minWidth: actionColumn ? '50px' : '60px'
-  }
-}
-
-const changePageFromInput = (event, pageCount, changePageCallback) => {
-  if (!pageCount) return
-
-  const rawValue = Number(event.target.value)
-  const requestedPage = Number.isFinite(rawValue) ? rawValue : 1
-  const normalizedPage = Math.min(Math.max(requestedPage, 1), pageCount)
-
-  event.target.value = String(normalizedPage)
-  changePageCallback(normalizedPage - 1)
-}
-
-const changeRows = (event, rowChangeCallback) => {
-  const rows = Number(event.target.value)
-  if (Number.isFinite(rows) && rows > 0) rowChangeCallback(rows)
-}
+const columnStyle = (column) => ({
+  width: column.width || '120px',
+  minWidth: column.minWidth || column.width || '80px'
+})
 
 const showMessage = (message) => {
   alertMessage.value = message
