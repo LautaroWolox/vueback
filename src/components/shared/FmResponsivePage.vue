@@ -20,3 +20,23 @@ defineProps({
   dense: { type: Boolean, default: false }
 })
 </script>
+
+<style scoped>
+.fm-responsive-page {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.fm-responsive-page--scroll {
+  height: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.fm-responsive-page--dense {
+  --fm-section-gap: 6px;
+  --fm-page-padding: 4px;
+}
+</style>
