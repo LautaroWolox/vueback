@@ -76,22 +76,16 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
 }
 
 .otf-filter-grid {
-  display: grid !important;
-  grid-template-columns:
-    minmax(280px, 2.35fr)
-    minmax(180px, .65fr)
-    minmax(180px, .65fr)
-    minmax(280px, 2.35fr) !important;
-  gap: 10px 14px !important;
   align-items: end !important;
   padding: 14px 20px 0 !important;
+  column-gap: 14px !important;
+  row-gap: 10px !important;
   margin: 0 !important;
 }
 
 .otf-filter-grid :deep(.otf-filter-element) {
-  grid-column: auto !important;
-  width: 100% !important;
   min-width: 0 !important;
+  width: 100% !important;
 }
 
 .otf-filters :deep(.fm-field label) {
@@ -100,6 +94,7 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
   font-size: 11px !important;
   font-weight: 700 !important;
   line-height: 14px !important;
+  white-space: nowrap !important;
 }
 
 .otf-filters :deep(.fm-field .p-inputtext),
@@ -112,9 +107,10 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
   max-height: 26px !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
-  border-color: #cbd4db !important;
+  border: 1px solid #cbd4db !important;
   border-radius: 2px !important;
   background: #fff !important;
+  color: #263746 !important;
   font-size: 12px !important;
   line-height: 24px !important;
   box-shadow: none !important;
@@ -150,15 +146,14 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
 }
 
 .otf-filter-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   gap: 8px !important;
   margin: 10px 0 0 !important;
   padding: 11px 0 0 !important;
   border-top: 1px solid #e4e8eb !important;
-  border-bottom: 0 !important;
   background: transparent !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
 }
 
 .otf-filter-actions :deep(.fm-filter-action-button),
@@ -172,14 +167,13 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
   min-height: 28px !important;
   padding: 0 10px !important;
   gap: 7px !important;
-  border-radius: 4px !important;
-  font-size: 12px !important;
+  border-radius: 3px !important;
+  font-size: 11px !important;
   font-weight: 400 !important;
   line-height: 1 !important;
   letter-spacing: 0 !important;
-  box-shadow: 0 5px 12px rgba(0, 0, 0, .14) !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, .13) !important;
   transform: none !important;
-  box-sizing: border-box !important;
   white-space: nowrap !important;
 }
 
@@ -187,33 +181,13 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
   font-weight: 400 !important;
 }
 
-.otf-filter-actions :deep(.fm-filter-action-button i),
-.otf-filter-actions :deep(.fm-filter-action-button .pi),
-.otf-filter-actions :deep(.p-button-icon) {
-  width: 14px !important;
-  min-width: 14px !important;
-  height: 14px !important;
-  font-size: 14px !important;
-  line-height: 14px !important;
-}
-
-.otf-filter-actions :deep(.fm-action-button--outline .pi),
-.otf-filter-actions :deep(.fm-ui-button--outline .pi) {
-  position: relative !important;
-  font-size: 0 !important;
-}
-
-.otf-filter-actions :deep(.fm-action-button--outline .pi::before),
-.otf-filter-actions :deep(.fm-ui-button--outline .pi::before) {
-  content: '' !important;
-  position: absolute !important;
-  left: 1px !important;
-  top: 3px !important;
-  width: 11px !important;
-  height: 2px !important;
-  background: currentColor !important;
-  border-radius: 2px !important;
-  box-shadow: 0 4px 0 currentColor, 0 8px 0 currentColor !important;
+.otf-filter-actions :deep(.p-button-icon),
+.otf-filter-actions :deep(.pi) {
+  width: 13px !important;
+  min-width: 13px !important;
+  height: 13px !important;
+  font-size: 13px !important;
+  line-height: 13px !important;
 }
 
 .otf-filters :deep(.otf-filter-element--disabled) {
@@ -257,17 +231,17 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
   font-size: 11px !important;
 }
 
-@media (max-width: 1200px) {
-  .otf-filter-grid {
-    grid-template-columns: repeat(2, minmax(240px, 1fr)) !important;
+@media (max-width: 900px) {
+  .otf-filter-grid :deep(.fm-field--span-2),
+  .otf-filter-grid :deep(.fm-field--span-4) {
+    grid-column: span 6;
   }
 }
 
 @media (max-width: 620px) {
-  .otf-filter-grid {
-    grid-template-columns: minmax(0, 1fr) !important;
-    padding-right: 10px !important;
-    padding-left: 10px !important;
+  .otf-filter-grid :deep(.fm-field--span-2),
+  .otf-filter-grid :deep(.fm-field--span-4) {
+    grid-column: span 12;
   }
 
   .otf-filter-actions {
