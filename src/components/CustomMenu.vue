@@ -1,6 +1,22 @@
 <template>
   <div class="menu-container">
     <Menubar :model="items" class="main-menu">
+      <template #item="{ item, props, hasSubmenu, root }">
+        <a
+          v-bind="props.action"
+          class="fm-menu-link"
+          :class="root ? 'fm-menu-link--root' : 'fm-menu-link--submenu'"
+        >
+          <span class="fm-menu-label">{{ item.label }}</span>
+          <i
+            v-if="hasSubmenu"
+            class="pi fm-menu-chevron"
+            :class="root ? 'pi-chevron-down' : 'pi-chevron-right'"
+            aria-hidden="true"
+          ></i>
+        </a>
+      </template>
+
       <template #end>
         <div class="user-section">
           <Button class="user-profile" text type="button" @click="toggleDropdown">
@@ -103,6 +119,140 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
   background: #00a9bd !important;
 }
 
+:deep(.p-menubar-root-list) {
+  height: 48px !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+}
+
+:deep(.p-menubar-root-list > .p-menubar-item),
+:deep(.p-menubar-root-list > .p-menuitem) {
+  height: 48px !important;
+}
+
+:deep(.p-menubar-root-list > .p-menubar-item > .p-menubar-item-content),
+:deep(.p-menubar-root-list > .p-menuitem > .p-menuitem-content) {
+  height: 48px !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.fm-menu-link {
+  display: flex !important;
+  align-items: center !important;
+  text-decoration: none !important;
+  cursor: pointer;
+}
+
+.fm-menu-link--root {
+  height: 48px !important;
+  gap: 7px;
+  padding: 0 12px !important;
+  color: #fff !important;
+}
+
+.fm-menu-link--root .fm-menu-label,
+.fm-menu-link--root .fm-menu-chevron {
+  color: #fff !important;
+}
+
+.fm-menu-link--root .fm-menu-label {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.fm-menu-link--root .fm-menu-chevron {
+  font-size: 8px;
+}
+
+:deep(.p-menubar-root-list > .p-menubar-item > .p-menubar-item-content:hover),
+:deep(.p-menubar-root-list > .p-menubar-item.p-focus > .p-menubar-item-content),
+:deep(.p-menubar-root-list > .p-menuitem > .p-menuitem-content:hover),
+:deep(.p-menubar-root-list > .p-menuitem.p-focus > .p-menuitem-content) {
+  background: rgba(255, 255, 255, .14) !important;
+}
+
+:deep(.p-menubar-submenu),
+:deep(.p-submenu-list) {
+  min-width: 210px !important;
+  width: max-content !important;
+  max-width: 340px !important;
+  padding: 5px 0 !important;
+  border: 1px solid #d5dee4 !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+  box-shadow: 0 9px 24px rgba(18, 45, 57, .20) !important;
+  overflow: visible !important;
+  z-index: 3000 !important;
+}
+
+:deep(.p-menubar-submenu .p-menubar-item),
+:deep(.p-submenu-list .p-menubar-item),
+:deep(.p-submenu-list .p-menuitem) {
+  min-height: 29px !important;
+  height: auto !important;
+}
+
+:deep(.p-menubar-submenu .p-menubar-item-content),
+:deep(.p-submenu-list .p-menubar-item-content),
+:deep(.p-submenu-list .p-menuitem-content) {
+  min-height: 29px !important;
+  height: auto !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+}
+
+.fm-menu-link--submenu {
+  width: 100%;
+  min-height: 29px !important;
+  gap: 10px;
+  padding: 5px 13px !important;
+  color: #213746 !important;
+  background: #fff !important;
+}
+
+.fm-menu-link--submenu .fm-menu-label {
+  flex: 1 1 auto;
+  color: #213746 !important;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.25;
+  white-space: nowrap;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.fm-menu-link--submenu .fm-menu-chevron {
+  flex: 0 0 auto;
+  margin-left: auto;
+  color: #91a1ab !important;
+  font-size: 9px;
+}
+
+:deep(.p-menubar-submenu .p-menubar-item-content:hover),
+:deep(.p-menubar-submenu .p-menubar-item.p-focus > .p-menubar-item-content),
+:deep(.p-submenu-list .p-menubar-item-content:hover),
+:deep(.p-submenu-list .p-menubar-item.p-focus > .p-menubar-item-content),
+:deep(.p-submenu-list .p-menuitem-content:hover),
+:deep(.p-submenu-list .p-menuitem.p-focus > .p-menuitem-content) {
+  background: #e8fafd !important;
+}
+
+:deep(.p-menubar-submenu .p-menubar-item-content:hover .fm-menu-link--submenu),
+:deep(.p-submenu-list .p-menubar-item-content:hover .fm-menu-link--submenu),
+:deep(.p-submenu-list .p-menuitem-content:hover .fm-menu-link--submenu) {
+  color: #006f7d !important;
+  background: #e8fafd !important;
+}
+
+:deep(.p-menubar-submenu .p-menubar-item-content:hover .fm-menu-label),
+:deep(.p-submenu-list .p-menubar-item-content:hover .fm-menu-label),
+:deep(.p-submenu-list .p-menuitem-content:hover .fm-menu-label) {
+  color: #006f7d !important;
+}
+
 .user-section {
   position: relative;
   height: 48px;
@@ -169,7 +319,7 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
 
 .dropdown-content {
   position: absolute;
-  z-index: 1500;
+  z-index: 3100;
   top: calc(100% + 4px);
   right: 0;
   min-width: 220px;
@@ -254,35 +404,8 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
   background: #f7f9fa;
 }
 
-:deep(.p-menubar-root-list) {
-  gap: 0 !important;
-}
-
-:deep(.p-menubar-root-list > .p-menubar-item > .p-menubar-item-content),
-:deep(.p-menubar-root-list > .p-menubar-item > .p-menubar-item-content .p-menubar-item-link) {
-  min-height: 48px !important;
-  height: 48px !important;
-  border-radius: 0 !important;
-}
-
-:deep(.p-menubar-root-list > .p-menubar-item > .p-menubar-item-content .p-menubar-item-link) {
-  padding: 0 12px !important;
-}
-
-:deep(.p-menubar-root-list > .p-menubar-item > .p-menubar-item-content .p-menubar-item-label) {
-  color: #fff !important;
-  font-size: 12px !important;
-  font-weight: 500 !important;
-}
-
-:deep(.p-menubar-root-list > .p-menubar-item > .p-menubar-item-content:hover) {
-  background: rgba(255, 255, 255, .14) !important;
-}
-
 @media (max-width: 900px) {
   .username { display: none; }
-  :deep(.p-menubar-root-list > .p-menubar-item > .p-menubar-item-content .p-menubar-item-link) {
-    padding: 0 8px !important;
-  }
+  .fm-menu-link--root { padding: 0 8px !important; }
 }
 </style>
