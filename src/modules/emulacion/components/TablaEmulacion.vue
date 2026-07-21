@@ -1,153 +1,191 @@
-
 <template>
+  <FmGridShell
+    class="emulation-grid-shell"
+    :loading="store.toggleLoader"
+    loading-title="Cargando perfil"
+    loading-message="Procesando la emulación"
+  >
+    <DataTable
+      v-model:filters="filters"
+      v-model:selection="operario"
+      :value="data"
+      dataKey="legajo"
+      class="fm-pass-grid emulation-grid"
+      scrollable
+      scrollHeight="390px"
+      sortMode="multiple"
+      removableSort
+      selectionMode="single"
+      paginator
+      :rows="10"
+      :rowsPerPageOptions="[10, 20, 30, 50]"
+      paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
+      currentPageReportTemplate="Mostrando {first} - {last} de {totalRecords}"
+      filterDisplay="row"
+      showGridlines
+      @row-select="onRowSelect"
+    >
+      <template #empty>
+        <div class="fm-grid-empty">No hay resultados</div>
+      </template>
 
-    <div class="card">
-        <DataTable scrollable sortMode="multiple" removableSort v-model:filters="filters" :value="data" 
-        paginator :rows="20" :rowsPerPageOptions="[10, 20, 30, 50]" 
-        tableStyle="min-width: 50rem" selectionMode="single" @row-select= "onRowSelect"
-        paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
-        currentPageReportTemplate="{first} to {last} of {totalRecords}" filterDisplay="row"
-        id="tabla" stripedRows v-model:selection="operario">    
-            <template #empty>
-                <p class="py-1 pl-8 text-xl"> No se encontraron resultados. </p>
-            </template>
+      <Column
+        v-for="column in columns"
+        :key="column.field"
+        :field="column.field"
+        :header="column.header"
+        sortable
+        :style="column.style"
+      >
+        <template #filter="{ filterModel, filterCallback }">
+          <div class="fm-filter-cell">
+            <span class="fm-filter-prefix">~</span>
+            <InputText
+              v-model="filterModel.value"
+              type="text"
+              class="fm-column-filter"
+              @input="filterCallback()"
+            />
+            <span class="fm-filter-more">...</span>
+          </div>
+        </template>
+        <template #body="{ data: row }">
+          <span class="fm-cell-text" :title="String(row[column.field] ?? '')">
+            {{ row[column.field] ?? '' }}
+          </span>
+        </template>
+      </Column>
+    </DataTable>
 
-            <Column field="legajo" sortable header="LEGAJO" style="min-width: 20dvh">
-                <template #filter="{ filterModel, filterCallback }">
-                    <InputText v-model="filterModel.value" @input="filterCallback()" type="text"
-                        class="p-column-filter" />
-                </template>
-            </Column>
-
-            <Column field="nombre" sortable header="NOMBRE" style="min-width: 20dvh" class="pr-3">
-                <template #filter="{ filterModel, filterCallback }">
-                    <InputText v-model="filterModel.value" @input="filterCallback()" type="text"
-                        class="p-column-filter" />
-                </template>
-            </Column>
-            <Column field="apellido" sortable header="APELLIDO" style="min-width: 10dvh" class="pr-3">
-                <template #filter="{ filterModel, filterCallback }">
-                    <InputText v-model="filterModel.value" @input="filterCallback()" type="text"
-                        class="p-column-filter" />
-                </template>
-            </Column>
-            <Column field="perfil" sortable header="PERFIL" style="min-width: 10dvh" class="pr-3">
-                <template #filter="{ filterModel, filterCallback }">
-                    <InputText v-model="filterModel.value" @input="filterCallback()" type="text"
-                        class="p-column-filter" />
-                </template>
-            </Column>
-        </DataTable>
-    </div>
-          
-    
-
-    <Dialog v-model:visible="showPopup" modal header="Emulacion" style="width:25rem; z-index: 10;">
-        
-        <loadingOverlay :loading="store.toggleLoader"/>
-    
-        <div class="flex gap-2"> 
-            Se redirecciona al usuario ingresado
-            <div v-if="store.toggleLoader" class="flex align-items-center">
-                <!-- <ProgressSpinner :style="{ width: '30px', height: '30px' }" /> -->
-            </div>
-            <div>
-                <Button type="button" label="Aceptar" @click="emular"></Button>
-            </div>
+    <Dialog
+      v-model:visible="showPopup"
+      modal
+      header="Confirmar emulación"
+      class="fm-dialog emulation-dialog"
+      :style="{ width: '38rem' }"
+    >
+      <div class="fm-dialog-body emulation-dialog-body">
+        <div class="emulation-dialog-icon">
+          <i class="pi pi-user-edit"></i>
         </div>
-    </Dialog>
-  <Toast position="top-center" />
-  
-  
+        <div>
+          <h3>Emular operador</h3>
+          <p>Se iniciará una sesión con el legajo <strong>{{ selectedLegajo }}</strong>.</p>
+        </div>
+      </div>
 
+      <template #footer>
+        <FmButton label="CANCELAR" variant="outline" @click="showPopup = false" />
+        <FmButton label="ACEPTAR" icon="pi-check" @click="emular" />
+      </template>
+    </Dialog>
+
+    <Toast position="top-center" />
+  </FmGridShell>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
-import emulacionStore from '../store/emulacionStore.js';
-import { useFetch } from '@vueuse/core'
-import router from '@/router';
-import { FilterMatchMode } from '@primevue/core/api';
-import InputText from 'primevue/inputtext';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import Dialog from 'primevue/dialog';
-import Button from 'primevue/button';
-import Toast from 'primevue/toast';
-import { useToast } from 'primevue/usetoast';
-import loadingOverlay from '../../shared/components/LoadingOverlay.vue';
-import { useAuthStore } from '@/store/auth';
+import { ref, watch } from 'vue'
+import { FilterMatchMode } from '@primevue/core/api'
+import InputText from 'primevue/inputtext'
+import Toast from 'primevue/toast'
+import { useToast } from 'primevue/usetoast'
+import emulacionStore from '../store/emulacionStore.js'
+import router from '@/router'
 
+const store = emulacionStore()
+const data = ref([])
+const showPopup = ref(false)
+const selectedLegajo = ref('')
+const operario = ref(null)
+const toast = useToast()
 
-const store = emulacionStore();
-const data = ref([]);
-const showPopup = ref(false);
-const legajo =ref('');
-const operario = ref(null);
-const toast = useToast();
-const authStore = useAuthStore();
-
-
-const showErrorToast = (val) => {
-  toast.add({ severity: 'error', summary: '', detail: val })
-}
-
-const onRowSelect = (event) => {
-    showPopup.value = true;
-    legajo.value = event.data.legajo;
-}
-
-const emular = async (event) => {
-    store.toggleLoader=true;
-    showPopup.value = false;
-    await store.$emulate();
-        if(store.error_message !== ""){
-            showErrorToast('No se pudo emular al operario seleccionado')
-            console.error("error: " + store.error_message)
-        }else {
-            console.log(authStore.$state)
-            await router.push({ name: 'main' });
-            window.location.reload();  
-    }
-    store.toggleLoader=false;
-}
-
-watch(() => store.data, (newVal) => {
-    data.value = newVal;
-
-});
-
+const columns = [
+  { field: 'legajo', header: 'LEGAJO', style: 'width: 155px' },
+  { field: 'nombre', header: 'NOMBRE', style: 'width: 220px' },
+  { field: 'apellido', header: 'APELLIDO', style: 'width: 220px' },
+  { field: 'perfil', header: 'PERFIL', style: 'width: 220px' }
+]
 
 const filters = ref({
-    legajo: { value: null, matchMode: FilterMatchMode.IN },
-    nombre: { value: null, matchMode: FilterMatchMode.IN },
-    apellido: { value: null, matchMode: FilterMatchMode.IN },
-    perfil: { value: null, matchMode: FilterMatchMode.IN },
-   
-});
+  legajo: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  nombre: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  apellido: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  perfil: { value: null, matchMode: FilterMatchMode.CONTAINS }
+})
 
+const onRowSelect = (event) => {
+  selectedLegajo.value = event.data.legajo
+  store.$setlegajoSelected(event.data.legajo)
+  showPopup.value = true
+}
 
+const emular = async () => {
+  showPopup.value = false
+  store.toggleLoader = true
+
+  await store.$emulate()
+
+  if (store.error_message !== '') {
+    toast.add({
+      severity: 'error',
+      summary: 'No se pudo emular',
+      detail: 'No se pudo emular al operario seleccionado'
+    })
+    store.toggleLoader = false
+    return
+  }
+
+  await router.push({ name: 'main' })
+  window.location.reload()
+}
+
+watch(() => store.data, (newValue) => {
+  data.value = Array.isArray(newValue) ? newValue : []
+}, { immediate: true })
 </script>
 
-
 <style scoped>
+.emulation-grid-shell {
+  min-height: 250px;
+}
 
-.gap-2 {
-  gap: 0.5rem; 
+.emulation-grid :deep(.p-datatable-table-container) {
+  min-height: 190px;
+  background: #eafcff;
 }
-.align-items-center {
-  align-items: left; 
-}
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparente */
+
+.emulation-dialog-body {
+  min-height: 100px;
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 999; /* Asegúrate de que la capa de carga esté encima del resto del contenido */
+  gap: 16px;
+}
+
+.emulation-dialog-icon {
+  width: 54px;
+  height: 54px;
+  flex: 0 0 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #e4f9fc;
+  color: #008fa1;
+}
+
+.emulation-dialog-icon i {
+  font-size: 24px;
+}
+
+.emulation-dialog-body h3 {
+  margin: 0 0 6px;
+  color: #203947;
+  font-size: 16px;
+}
+
+.emulation-dialog-body p {
+  margin: 0;
+  color: #607887;
 }
 </style>
