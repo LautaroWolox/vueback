@@ -82,7 +82,7 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
   --otf-control-height: 30px;
   width: 100%;
   margin: 0 !important;
-  padding: 0 0 10px !important;
+  padding: 0 0 9px !important;
   overflow: visible !important;
   border-left: 3px solid #00a9bd !important;
   border-bottom: 0 !important;
@@ -117,7 +117,6 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
   white-space: nowrap !important;
 }
 
-/* Una única medida real para inputs, selects y calendario. */
 .otf-filters :deep(.fm-field .p-inputtext),
 .otf-filters :deep(.fm-field .p-select),
 .otf-filters :deep(.fm-field .ct-date-button),
@@ -185,32 +184,31 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 12px !important;
-  margin: 10px 0 0 !important;
-  padding: 12px 0 2px !important;
+  gap: 10px !important;
+  margin: 9px 0 0 !important;
+  padding: 10px 0 1px !important;
   border-top: 1px solid #e4e8eb !important;
   background: transparent !important;
 }
 
-/* Diseño exacto de la referencia: rectangulares, no tipo píldora. */
 .otf-filter-actions :deep(.fm-filter-action-button),
 .otf-filter-actions :deep(.fm-action-button),
 .otf-filter-actions :deep(.fm-ui-button),
 .otf-filter-actions :deep(.p-button) {
-  width: 160px !important;
-  min-width: 160px !important;
-  max-width: 160px !important;
-  height: 48px !important;
-  min-height: 48px !important;
-  max-height: 48px !important;
-  padding: 0 18px !important;
-  gap: 12px !important;
+  width: 132px !important;
+  min-width: 132px !important;
+  max-width: 132px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
+  padding: 0 15px !important;
+  gap: 10px !important;
   border-radius: 6px !important;
-  font-size: 16px !important;
+  font-size: 14px !important;
   font-weight: 400 !important;
   line-height: 1 !important;
   letter-spacing: 0 !important;
-  box-shadow: 0 6px 14px rgba(0, 78, 91, .20) !important;
+  box-shadow: 0 5px 12px rgba(0, 78, 91, .18) !important;
   transform: none !important;
   white-space: nowrap !important;
 }
@@ -230,15 +228,15 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
 }
 
 .otf-filter-actions :deep(.p-button-label) {
-  font-size: 16px !important;
+  font-size: 14px !important;
   font-weight: 400 !important;
 }
 
 .otf-filter-actions :deep(.otf-button-icon) {
-  width: 21px !important;
-  min-width: 21px !important;
-  height: 21px !important;
-  flex: 0 0 21px !important;
+  width: 18px !important;
+  min-width: 18px !important;
+  height: 18px !important;
+  flex: 0 0 18px !important;
   fill: none !important;
   stroke: currentColor !important;
   stroke-width: 2.2 !important;
@@ -306,7 +304,7 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
 
   .otf-filter-actions :deep(.fm-filter-action-button),
   .otf-filter-actions :deep(.p-button) {
-    width: min(160px, calc(50vw - 24px)) !important;
+    width: min(132px, calc(50vw - 24px)) !important;
     min-width: 0 !important;
   }
 }
