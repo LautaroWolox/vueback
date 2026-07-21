@@ -31,6 +31,7 @@
       paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
       currentPageReportTemplate="Página {currentPage} de {totalPages}"
       showGridlines
+      @page="onPage"
       @select-all-change="onSelectAllChange"
     >
       <template #paginatorstart>
@@ -44,7 +45,7 @@
 
       <template #paginatorend>
         <span class="fm-grid-counter">
-          Mostrando {{ store.rows.length ? 1 : 0 }} - {{ Math.min(10, store.rows.length) }} de {{ store.rows.length }}
+          Mostrando {{ firstDisplayed }} - {{ lastDisplayed }} de {{ store.rows.length }}
         </span>
       </template>
 
@@ -168,6 +169,7 @@ const showReproceso = ref(false)
 const showAlert = ref(false)
 const alertMessage = ref('')
 const selectedNote = ref('')
+const pageState = ref({ first: 0, rows: 10 })
 const { exportToExcel, parseDataFromTable } = useExcelExport()
 
 const filters = ref(Object.fromEntries(
@@ -193,6 +195,22 @@ const selectedRows = computed({
       .map((row) => row.id)
   )
 })
+
+const firstDisplayed = computed(() => (
+  store.rows.length ? pageState.value.first + 1 : 0
+))
+
+const lastDisplayed = computed(() => Math.min(
+  pageState.value.first + pageState.value.rows,
+  store.rows.length
+))
+
+const onPage = (event) => {
+  pageState.value = {
+    first: event.first ?? 0,
+    rows: event.rows ?? 10
+  }
+}
 
 const rowClass = (data) => ({
   'fm-disabled-row': data?.excluida === 'S',
@@ -295,40 +313,55 @@ const exportarExcel = () => {
 
 <style scoped>
 .otf-grid-shell {
-  min-height: 300px;
-  border-left-width: 2px !important;
+  min-height: 0;
+  border-left-width: 4px !important;
+  background: #fff !important;
 }
 
 :deep(#tabla.fm-pass-grid),
 :deep(#tabla.p-datatable) {
   width: 100% !important;
   max-width: 100% !important;
-  border-left: 2px solid #00a9bd !important;
+  border-left: 0 !important;
+  background: #fff !important;
 }
 
 :deep(#tabla .p-datatable-table-container),
 :deep(#tabla .p-datatable-wrapper) {
-  min-height: 300px !important;
+  min-height: 186px !important;
+  max-height: 470px !important;
   max-width: 100% !important;
   overflow: auto !important;
-  background: #eafcff !important;
+  border: 1px solid #d1d1d1 !important;
+  background: #fff !important;
 }
 
 :deep(#tabla .p-datatable-table) {
   width: max-content !important;
   min-width: 100% !important;
   table-layout: fixed !important;
+  border-collapse: collapse !important;
+  font-size: 12px !important;
+}
+
+:deep(#tabla .p-datatable-thead > tr > th),
+:deep(#tabla .p-datatable-tbody > tr > td) {
+  border-right: 1px solid #c9d3da !important;
+  border-bottom: 1px solid #dce3e8 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  vertical-align: middle !important;
 }
 
 :deep(#tabla .p-datatable-thead > tr > th) {
   height: 35px !important;
   min-height: 35px !important;
   padding: 4px 7px !important;
-  background: #f3f7f9 !important;
-  color: #173142 !important;
+  background: #f4f7f9 !important;
+  color: #263f50 !important;
   font-size: 11px !important;
   font-weight: 700 !important;
-  white-space: nowrap !important;
 }
 
 :deep(#tabla .p-datatable-thead > tr.p-datatable-filter-row > th),
@@ -343,24 +376,28 @@ const exportarExcel = () => {
   height: 35px !important;
   min-height: 35px !important;
   padding: 5px 8px !important;
-  color: #263746 !important;
+  color: #263238 !important;
   font-size: 12px !important;
-  white-space: nowrap !important;
+}
+
+:deep(#tabla .p-datatable-tbody > tr) {
+  cursor: pointer;
 }
 
 :deep(#tabla .p-datatable-tbody > tr:hover > td) {
-  background: #f1fbfc !important;
+  background: #edfafd !important;
 }
 
-:deep(#tabla .fm-selected-row > td) {
-  background: #9debf3 !important;
-  color: #112f39 !important;
-  font-weight: 600 !important;
+:deep(#tabla .fm-selected-row > td),
+:deep(#tabla .p-datatable-row-selected > td),
+:deep(#tabla .p-highlight > td) {
+  background: #9eeff7 !important;
+  color: #263238 !important;
 }
 
 :deep(#tabla .fm-disabled-row > td) {
-  background: #eef1f3 !important;
-  color: #76858d !important;
+  background: #fff !important;
+  color: #8b8b8b !important;
 }
 
 :deep(#tabla .fm-disabled-row .p-checkbox) {
@@ -369,106 +406,204 @@ const exportarExcel = () => {
 }
 
 :deep(#tabla .fm-filter-cell) {
-  display: grid !important;
-  grid-template-columns: auto minmax(45px, 1fr) auto !important;
+  display: flex !important;
   align-items: center !important;
-  gap: 4px !important;
+  gap: 3px !important;
   width: 100% !important;
+  min-width: 0 !important;
+}
+
+:deep(#tabla .fm-filter-prefix),
+:deep(#tabla .fm-filter-more) {
+  flex: 0 0 auto !important;
+  color: #000 !important;
+  font-size: 11px !important;
 }
 
 :deep(#tabla .fm-column-filter) {
   width: 100% !important;
+  min-width: 0 !important;
   height: 25px !important;
   min-height: 25px !important;
-  padding: 2px 5px !important;
-  border: 1px solid #c5d1d8 !important;
-  border-radius: 2px !important;
-  background: #fff !important;
-  font-size: 11px !important;
+  padding: 3px 6px !important;
+  border: 1px solid #c7d1d8 !important;
+  border-radius: 3px !important;
+  font-size: 12px !important;
+  box-sizing: border-box !important;
+}
+
+:deep(#tabla .fm-column-filter:focus) {
+  outline: none !important;
+  border-color: #00a9bd !important;
+  box-shadow: 0 0 0 2px rgba(0, 188, 212, .14) !important;
+}
+
+:deep(#tabla .p-datatable-empty-message > td),
+:deep(#tabla .fm-grid-empty) {
+  height: 110px !important;
+  min-height: 110px !important;
+  background: #eafcff !important;
+  text-align: center !important;
+  color: #407080 !important;
+}
+
+:deep(#tabla .p-checkbox-box) {
+  width: 14px !important;
+  height: 14px !important;
+  border-color: #9eb4bd !important;
+}
+
+:deep(#tabla .p-checkbox-checked .p-checkbox-box),
+:deep(#tabla .p-checkbox.p-highlight .p-checkbox-box) {
+  background: #00a9bd !important;
+  border-color: #00a9bd !important;
 }
 
 :deep(#tabla .p-paginator) {
-  min-height: 42px !important;
-  padding: 4px 9px !important;
-  border: 1px solid #d4dde2 !important;
-  border-top: 0 !important;
-  border-radius: 0 !important;
-  background: #fff !important;
-}
-
-:deep(#tabla .p-paginator-content) {
-  width: 100% !important;
-  display: grid !important;
-  grid-template-columns: 1fr auto 1fr !important;
+  min-height: 38px !important;
+  height: 38px !important;
+  display: flex !important;
+  flex-wrap: nowrap !important;
   align-items: center !important;
+  justify-content: center !important;
+  gap: 2px !important;
+  padding: 3px 150px !important;
+  border: 1px solid #d1d1d1 !important;
+  border-top: 0 !important;
+  background: #fff !important;
+  font-size: 12px !important;
+  position: relative !important;
+  overflow: visible !important;
 }
 
-:deep(#tabla .p-paginator-start) {
-  justify-self: start !important;
+:deep(#tabla .p-paginator-content-start),
+:deep(#tabla .p-paginator-left-content) {
+  position: absolute !important;
+  left: 8px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  display: flex !important;
+  align-items: center !important;
+  margin: 0 !important;
 }
 
-:deep(#tabla .p-paginator-end) {
-  justify-self: end !important;
+:deep(#tabla .p-paginator-content-end),
+:deep(#tabla .p-paginator-right-content) {
+  position: absolute !important;
+  right: 8px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  display: flex !important;
+  align-items: center !important;
+  margin: 0 !important;
 }
 
-:deep(#tabla .p-paginator-page),
 :deep(#tabla .p-paginator-first),
 :deep(#tabla .p-paginator-prev),
 :deep(#tabla .p-paginator-next),
 :deep(#tabla .p-paginator-last) {
-  width: 30px !important;
-  min-width: 30px !important;
-  height: 30px !important;
-  min-height: 30px !important;
+  width: 28px !important;
+  min-width: 28px !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
   border-radius: 50% !important;
-  color: #45606f !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+:deep(#tabla .p-paginator-current) {
+  min-width: 106px !important;
+  margin: 0 7px !important;
+  color: #294457 !important;
+  font-size: 12px !important;
+  text-align: center !important;
+  white-space: nowrap !important;
 }
 
 :deep(#tabla .p-paginator-rpp-dropdown),
 :deep(#tabla .p-paginator .p-select) {
-  width: 82px !important;
-  min-width: 82px !important;
-  height: 30px !important;
-  min-height: 30px !important;
+  width: 74px !important;
+  min-width: 74px !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  margin-left: 8px !important;
+  border-radius: 3px !important;
+}
+
+:deep(#tabla .p-paginator .p-disabled) {
+  opacity: .28 !important;
 }
 
 .fm-grid-counter {
-  padding-right: 8px;
   color: #222;
   font-size: 12px;
   white-space: nowrap;
 }
 
 :deep(#tabla .fm-grid-actions-final) {
-  gap: 12px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 10px !important;
 }
 
 :deep(#tabla .fm-grid-action-final),
 :deep(#tabla .fm-grid-actions-final .p-button) {
-  width: 25px !important;
-  min-width: 25px !important;
-  height: 25px !important;
-  min-height: 25px !important;
-  padding: 0 !important;
-  color: #001f2f !important;
-}
-
-:deep(#tabla .fm-grid-action-final .pi),
-:deep(#tabla .fm-grid-actions-final .p-button .pi) {
-  font-size: 18px !important;
-  line-height: 18px !important;
-}
-
-.otf-row-action {
   width: 24px !important;
   min-width: 24px !important;
   height: 24px !important;
   min-height: 24px !important;
-  margin: 0 auto;
-  color: #001f2f !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #173142 !important;
+  box-shadow: none !important;
 }
 
-.otf-row-action .pi {
+:deep(#tabla .fm-grid-actions-final .pi) {
   font-size: 17px !important;
+}
+
+.otf-row-action {
+  margin: 0 auto;
+}
+
+:deep(#tabla .otf-row-action) {
+  width: 24px !important;
+  min-width: 24px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 !important;
+  color: #001f2f !important;
+  background: transparent !important;
+}
+
+:deep(#tabla .otf-row-action .pi) {
+  font-size: 16px !important;
+}
+
+@media (max-width: 900px) {
+  :deep(#tabla .p-paginator) {
+    min-height: 76px !important;
+    height: auto !important;
+    padding: 5px 8px 38px !important;
+  }
+
+  :deep(#tabla .p-paginator-content-start),
+  :deep(#tabla .p-paginator-left-content) {
+    top: auto !important;
+    bottom: 5px !important;
+    transform: none !important;
+  }
+
+  :deep(#tabla .p-paginator-content-end),
+  :deep(#tabla .p-paginator-right-content) {
+    top: auto !important;
+    bottom: 9px !important;
+    transform: none !important;
+  }
 }
 </style>
