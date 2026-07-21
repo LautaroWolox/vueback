@@ -6,8 +6,9 @@
       text
       rounded
       class="fm-grid-action-final"
-      title="Exportar"
-      aria-label="Exportar"
+      :disabled="exportDisabled"
+      :title="exportDisabled ? 'Exportación no disponible' : 'Exportar'"
+      :aria-label="exportDisabled ? 'Exportación no disponible' : 'Exportar'"
       @click="$emit('export')"
     />
     <Button
@@ -16,8 +17,9 @@
       text
       rounded
       class="fm-grid-action-final"
-      title="Excluir seleccionados"
-      aria-label="Excluir seleccionados"
+      :disabled="deleteDisabled"
+      :title="deleteDisabled ? 'Seleccione al menos una OT' : 'Excluir seleccionados'"
+      :aria-label="deleteDisabled ? 'Seleccione al menos una OT' : 'Excluir seleccionados'"
       @click="$emit('delete')"
     />
     <Button
@@ -26,8 +28,9 @@
       text
       rounded
       class="fm-grid-action-final"
-      title="Reprocesar"
-      aria-label="Reprocesar"
+      :disabled="refreshDisabled"
+      :title="refreshDisabled ? 'Seleccione al menos una OT' : 'Reprocesar'"
+      :aria-label="refreshDisabled ? 'Seleccione al menos una OT' : 'Reprocesar'"
       @click="$emit('refresh')"
     />
   </div>
@@ -40,6 +43,9 @@ defineProps({
   showExport: { type: Boolean, default: true },
   showDelete: { type: Boolean, default: true },
   showRefresh: { type: Boolean, default: true },
+  exportDisabled: { type: Boolean, default: false },
+  deleteDisabled: { type: Boolean, default: false },
+  refreshDisabled: { type: Boolean, default: false },
   size: { type: String, default: 'compact' }
 })
 
