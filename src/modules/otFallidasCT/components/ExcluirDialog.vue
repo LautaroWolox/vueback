@@ -4,7 +4,7 @@
     modal
     :closable="false"
     class="fm-dialog otf-action-dialog otf-exclude-dialog"
-    :style="{ '--fm-dialog-width': '36rem' }"
+    :style="{ '--fm-dialog-width': '40rem' }"
     @update:visible="$emit('update:visibleExc', $event)"
   >
     <template #header>
@@ -150,8 +150,8 @@ onMounted(() => commonCT.setMotivosExcInc())
 }
 
 .otf-motivo-field {
-  width: min(360px, 100%);
-  max-width: 360px;
+  width: min(400px, 100%);
+  max-width: 400px;
 }
 
 .otf-note-textarea {
