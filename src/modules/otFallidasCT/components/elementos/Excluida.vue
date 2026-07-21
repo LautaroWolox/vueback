@@ -10,7 +10,6 @@
       :options="excluida"
       optionLabel="valor"
       placeholder="Seleccione"
-      showClear
       :disabled="disabled"
     />
   </div>
