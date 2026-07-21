@@ -273,9 +273,7 @@ const filters = ref(Object.fromEntries(
     ])
 ))
 
-const selectableRows = computed(() => store.rows.filter(
-  (row) => row.excluida !== 'S' && !isReprocessedId(row.id)
-))
+const selectableRows = computed(() => store.rows.filter((row) => row.excluida !== 'S'))
 const hasSelectedRows = computed(() => store.selectedRows.length > 0)
 const allSelectableSelected = computed(() => (
   selectableRows.value.length > 0 &&
@@ -286,7 +284,7 @@ const selectedRows = computed({
   get: () => store.rows.filter((row) => store.selectedRows.includes(row.id)),
   set: (value) => store.setSelectedRows(
     value
-      .filter((row) => row.excluida !== 'S' && !isReprocessedId(row.id))
+      .filter((row) => row.excluida !== 'S')
       .map((row) => row.id)
   )
 })
@@ -302,9 +300,7 @@ const rowClass = (data) => {
   }
 }
 
-const isRowSelectable = (event) => (
-  event?.data?.excluida !== 'S' && !isReprocessedId(event?.data?.id)
-)
+const isRowSelectable = (event) => event?.data?.excluida !== 'S'
 
 const onSelectAllChange = () => {
   store.setSelectedRows(
@@ -391,9 +387,7 @@ const cerrarReproceso = () => {
     reprocessedRowIds.value = [
       ...new Set([...reprocessedRowIds.value, ...reprocesoIds.value])
     ]
-    store.setSelectedRows(
-      store.selectedRows.filter((id) => !reprocesoIds.value.includes(id))
-    )
+    store.setSelectedRows([])
   }
 
   reprocesoIds.value = []
