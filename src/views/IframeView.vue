@@ -128,6 +128,12 @@ const jobtypeCss = `
 const dialogSelectors = '.ui-dialog, .p-dialog, .modal-content, [role="dialog"]'
 const headerSelectors = '.ui-dialog-titlebar, .p-dialog-header, .modal-header, [class*="dialog-header"]'
 const paginatorSelectors = '.ui-paginator, .p-paginator, .dataTables_paginate, .pagination, .pager'
+const paginatorControlSelectors = [
+  '.ui-paginator a', '.ui-paginator button', '.ui-paginator span.ui-paginator-page',
+  '.p-paginator a', '.p-paginator button', '.p-paginator span.p-paginator-page',
+  '.dataTables_paginate a', '.dataTables_paginate button',
+  '.pagination a', '.pagination button', '.pager a', '.pager button'
+].join(', ')
 const controlSelectors = 'button, input[type="button"], input[type="submit"], a.btn, a.ui-button, a.p-button, .ui-button, .p-button'
 
 const enhanceDialogs = (document) => {
@@ -205,7 +211,7 @@ const enhanceJobtype = (document) => {
     control.classList.toggle('fm-jobtype-outline', outline)
   })
 
-  document.querySelectorAll(`${paginatorSelectors} a, ${paginatorSelectors} button, ${paginatorSelectors} span.ui-paginator-page`).forEach((control) => {
+  document.querySelectorAll(paginatorControlSelectors).forEach((control) => {
     control.classList.add('fm-jobtype-pager-control')
   })
 }
