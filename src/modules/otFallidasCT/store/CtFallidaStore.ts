@@ -48,9 +48,19 @@ export const useFallidasCtStore = defineStore('fallidasCT', {
         setSelectedRows(rows: number[]): void {
             this.selectedRows = rows;
         },
-        async sendReproceso() {
-            await useFetch('/pc/registroOTFallidasReproceso/reprocesar.html')
-                .post(this.selectedRows)
+        async sendReproceso(): Promise<void> {
+            const idsSeleccionados = [...this.selectedRows]
+
+            if (!idsSeleccionados.length) return
+
+            const { error } = await useFetch('/pc/registroOTFallidasReproceso/reprocesar.html')
+                .post(idsSeleccionados)
+
+            if (error.value) {
+                throw new Error(String(error.value))
+            }
+
+            this.selectedRows = []
         },
         async sendExcluidas(motivo: string, comentario: string): Promise<ActionResponse> {
             this.loading = true;
@@ -107,4 +117,3 @@ export const useFallidasCtStore = defineStore('fallidasCT', {
         },
     },
 })
-
