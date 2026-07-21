@@ -10,6 +10,8 @@
       ref="dt"
       v-model:filters="filters"
       v-model:selection="selectedRows"
+      v-model:first="currentFirst"
+      v-model:rows="currentRows"
       :value="store.rows"
       dataKey="id"
       class="fm-pass-grid otf-grid"
@@ -18,7 +20,7 @@
       scrollHeight="430px"
       :rowClass="rowClass"
       :isDataSelectable="isRowSelectable"
-      :selectAll="allSelectableSelected"
+      :selectAll="allSelectablePageSelected"
       resizableColumns
       columnResizeMode="fit"
       removableSort
@@ -26,10 +28,10 @@
       filterDisplay="row"
       selectionMode="multiple"
       paginator
-      :rows="10"
       :rowsPerPageOptions="[10, 50, 100, 500]"
       showGridlines
       @select-all-change="onSelectAllChange"
+      @value-change="onValueChange"
     >
       <template
         #paginatorcontainer="{
@@ -260,6 +262,10 @@ const reprocesoCount = ref(0)
 const reprocesoIds = ref([])
 const reprocesoCompleted = ref(false)
 const reprocessedRowIds = ref([])
+const currentFirst = ref(0)
+const currentRows = ref(10)
+const processedRows = ref([])
+const hasProcessedRows = ref(false)
 const { exportToExcel, parseDataFromTable } = useExcelExport()
 
 const isReprocessedId = (id) => reprocessedRowIds.value.includes(id)
@@ -273,13 +279,23 @@ const filters = ref(Object.fromEntries(
     ])
 ))
 
-const selectableRows = computed(() => store.rows.filter(
+const processedSourceRows = computed(() => (
+  hasProcessedRows.value ? processedRows.value : store.rows
+))
+
+const currentPageRows = computed(() => processedSourceRows.value.slice(
+  currentFirst.value,
+  currentFirst.value + currentRows.value
+))
+
+const currentPageSelectableRows = computed(() => currentPageRows.value.filter(
   (row) => row.excluida !== 'S' && !isReprocessedId(row.id)
 ))
+
 const hasSelectedRows = computed(() => store.selectedRows.length > 0)
-const allSelectableSelected = computed(() => (
-  selectableRows.value.length > 0 &&
-  selectableRows.value.every((row) => store.selectedRows.includes(row.id))
+const allSelectablePageSelected = computed(() => (
+  currentPageSelectableRows.value.length > 0 &&
+  currentPageSelectableRows.value.every((row) => store.selectedRows.includes(row.id))
 ))
 
 const selectedRows = computed({
@@ -306,12 +322,25 @@ const isRowSelectable = (event) => (
   event?.data?.excluida !== 'S' && !isReprocessedId(event?.data?.id)
 )
 
-const onSelectAllChange = () => {
-  store.setSelectedRows(
-    allSelectableSelected.value
-      ? []
-      : selectableRows.value.map((row) => row.id)
-  )
+const onValueChange = (value) => {
+  processedRows.value = Array.isArray(value) ? value : []
+  hasProcessedRows.value = true
+
+  if (currentFirst.value >= processedRows.value.length) {
+    currentFirst.value = 0
+  }
+}
+
+const onSelectAllChange = ({ checked }) => {
+  const selectedIds = new Set(store.selectedRows)
+  const pageIds = currentPageSelectableRows.value.map((row) => row.id)
+
+  pageIds.forEach((id) => {
+    if (checked) selectedIds.add(id)
+    else selectedIds.delete(id)
+  })
+
+  store.setSelectedRows([...selectedIds])
 }
 
 const columnStyle = (column) => ({
