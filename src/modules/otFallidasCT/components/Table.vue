@@ -259,7 +259,10 @@ const reprocesoError = ref('')
 const reprocesoCount = ref(0)
 const reprocesoIds = ref([])
 const reprocesoCompleted = ref(false)
+const reprocessedRowIds = ref([])
 const { exportToExcel, parseDataFromTable } = useExcelExport()
+
+const isReprocessedId = (id) => reprocessedRowIds.value.includes(id)
 
 const filters = ref(Object.fromEntries(
   columns
@@ -270,7 +273,9 @@ const filters = ref(Object.fromEntries(
     ])
 ))
 
-const selectableRows = computed(() => store.rows.filter((row) => row.excluida !== 'S'))
+const selectableRows = computed(() => store.rows.filter(
+  (row) => row.excluida !== 'S' && !isReprocessedId(row.id)
+))
 const hasSelectedRows = computed(() => store.selectedRows.length > 0)
 const allSelectableSelected = computed(() => (
   selectableRows.value.length > 0 &&
@@ -281,18 +286,25 @@ const selectedRows = computed({
   get: () => store.rows.filter((row) => store.selectedRows.includes(row.id)),
   set: (value) => store.setSelectedRows(
     value
-      .filter((row) => row.excluida !== 'S')
+      .filter((row) => row.excluida !== 'S' && !isReprocessedId(row.id))
       .map((row) => row.id)
   )
 })
 
-const rowClass = (data) => ({
-  'fm-disabled-row': data?.excluida === 'S',
-  'fm-enabled-row': data?.excluida === 'N',
-  'fm-selected-row': store.selectedRows.includes(data?.id)
-})
+const rowClass = (data) => {
+  const reprocessed = isReprocessedId(data?.id)
 
-const isRowSelectable = (event) => event?.data?.excluida !== 'S'
+  return {
+    'fm-reprocessed-row': reprocessed,
+    'fm-disabled-row': data?.excluida === 'S',
+    'fm-enabled-row': data?.excluida === 'N' && !reprocessed,
+    'fm-selected-row': store.selectedRows.includes(data?.id)
+  }
+}
+
+const isRowSelectable = (event) => (
+  event?.data?.excluida !== 'S' && !isReprocessedId(event?.data?.id)
+)
 
 const onSelectAllChange = () => {
   store.setSelectedRows(
@@ -376,6 +388,9 @@ const cerrarReproceso = () => {
   showReproceso.value = false
 
   if (reprocesoCompleted.value && !reprocesoError.value) {
+    reprocessedRowIds.value = [
+      ...new Set([...reprocessedRowIds.value, ...reprocesoIds.value])
+    ]
     store.setSelectedRows([])
   }
 
