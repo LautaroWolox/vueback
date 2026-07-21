@@ -66,19 +66,27 @@
     max-width: none !important;
   }
 
+  /* En modo fit la tabla ocupa el ancho disponible y el separador ajusta
+     la columna actual junto con la columna contigua, sin dejar huecos. */
+  #app #tabla.otf-grid .p-datatable-table {
+    width: 100% !important;
+    min-width: 100% !important;
+    table-layout: fixed !important;
+  }
+
   /* Estados visuales específicos de Registro OTs Fallidas. */
   #app #tabla.otf-grid .fm-disabled-row > td,
   #app #tabla.otf-grid .fm-disabled-row:hover > td {
-    background: #fff3dc !important;
-    color: #5f513e !important;
+    background: #cfd5da !important;
+    color: #111 !important;
   }
 
   #app #tabla.otf-grid .fm-selected-row > td,
   #app #tabla.otf-grid .fm-selected-row:hover > td,
   #app #tabla.otf-grid .p-datatable-row-selected > td,
   #app #tabla.otf-grid .p-highlight > td {
-    background: #c9f5f8 !important;
-    color: #263238 !important;
+    background: #d9f8fa !important;
+    color: #111 !important;
   }
 
   body.p-unselectable-text,
