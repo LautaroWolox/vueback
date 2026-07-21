@@ -4,7 +4,7 @@
     modal
     :closable="false"
     :style="{ width }"
-    class="fm-alert-dialog fm-alert-dialog--refined"
+    class="fm-alert-dialog fm-alert-dialog--refined fm-responsive-dialog"
     @update:visible="$emit('update:visible', $event)"
   >
     <template #header>
