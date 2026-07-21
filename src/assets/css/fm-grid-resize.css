@@ -1,5 +1,4 @@
 @layer fieldmanager {
-  /* Mantiene visible la fila de filtros debajo de los encabezados. */
   .fm-pass-grid .p-datatable-thead > tr.p-datatable-filter-row,
   .fm-pass-grid .p-datatable-thead > tr.p-filter-row,
   .fm-pt-datatable .p-datatable-thead > tr.p-datatable-filter-row,
@@ -13,7 +12,6 @@
     position: relative !important;
   }
 
-  /* PrimeVue 3 y 4 usan nombres distintos para el separador. */
   .fm-pass-grid .p-column-resizer,
   .fm-pass-grid .p-datatable-column-resizer,
   .fm-pt-datatable .p-column-resizer,
@@ -56,7 +54,6 @@
     box-shadow: 0 0 0 2px rgba(0, 169, 189, .14);
   }
 
-  /* Permite que el ancho inicial cambie al arrastrar. */
   .otf-grid .p-datatable-thead > tr > th,
   .otf-grid .p-datatable-tbody > tr > td,
   .emulation-grid .p-datatable-thead > tr > th,
@@ -66,15 +63,12 @@
     max-width: none !important;
   }
 
-  /* En modo fit la tabla ocupa el ancho disponible y el separador ajusta
-     la columna actual junto con la columna contigua, sin dejar huecos. */
   #app #tabla.otf-grid .p-datatable-table {
     width: 100% !important;
     min-width: 100% !important;
     table-layout: fixed !important;
   }
 
-  /* Estados visuales específicos de Registro OTs Fallidas. */
   #app #tabla.otf-grid .fm-disabled-row > td,
   #app #tabla.otf-grid .fm-disabled-row:hover > td,
   #app #tabla.otf-grid .fm-reprocessed-row > td,
@@ -95,7 +89,6 @@
     color: #111 !important;
   }
 
-  /* Excluir y Reprocesar quedan visualmente inactivos sin selección. */
   #app #tabla.otf-grid .fm-grid-action-final:disabled,
   #app #tabla.otf-grid .fm-grid-action-final.p-disabled,
   #app #tabla.otf-grid .fm-grid-actions-final .p-button:disabled,
@@ -111,7 +104,6 @@
     color: #aeb8bd !important;
   }
 
-  /* Una OT excluida puede conservar su nota, pero el icono se muestra grisado. */
   #app #tabla.otf-grid .otf-row-action--note-excluded {
     color: #8f9ba2 !important;
   }
