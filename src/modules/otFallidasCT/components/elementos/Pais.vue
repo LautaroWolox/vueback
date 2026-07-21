@@ -10,7 +10,6 @@
       :options="paises"
       optionLabel="valor"
       placeholder="Seleccione"
-      showClear
       :disabled="disabled"
     />
   </div>
