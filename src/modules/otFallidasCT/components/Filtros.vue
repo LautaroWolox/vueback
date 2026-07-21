@@ -184,9 +184,9 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 10px !important;
-  margin: 9px 0 0 !important;
-  padding: 10px 0 1px !important;
+  gap: 9px !important;
+  margin: 8px 0 0 !important;
+  padding: 9px 0 1px !important;
   border-top: 1px solid #e4e8eb !important;
   background: transparent !important;
 }
@@ -195,20 +195,20 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
 .otf-filter-actions :deep(.fm-action-button),
 .otf-filter-actions :deep(.fm-ui-button),
 .otf-filter-actions :deep(.p-button) {
-  width: 132px !important;
-  min-width: 132px !important;
-  max-width: 132px !important;
-  height: 40px !important;
-  min-height: 40px !important;
-  max-height: 40px !important;
-  padding: 0 15px !important;
-  gap: 10px !important;
+  width: 120px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  padding: 0 13px !important;
+  gap: 8px !important;
   border-radius: 6px !important;
-  font-size: 14px !important;
+  font-size: 13px !important;
   font-weight: 400 !important;
   line-height: 1 !important;
   letter-spacing: 0 !important;
-  box-shadow: 0 5px 12px rgba(0, 78, 91, .18) !important;
+  box-shadow: 0 4px 10px rgba(0, 78, 91, .16) !important;
   transform: none !important;
   white-space: nowrap !important;
 }
@@ -228,15 +228,15 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
 }
 
 .otf-filter-actions :deep(.p-button-label) {
-  font-size: 14px !important;
+  font-size: 13px !important;
   font-weight: 400 !important;
 }
 
 .otf-filter-actions :deep(.otf-button-icon) {
-  width: 18px !important;
-  min-width: 18px !important;
-  height: 18px !important;
-  flex: 0 0 18px !important;
+  width: 16px !important;
+  min-width: 16px !important;
+  height: 16px !important;
+  flex: 0 0 16px !important;
   fill: none !important;
   stroke: currentColor !important;
   stroke-width: 2.2 !important;
@@ -304,7 +304,7 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
 
   .otf-filter-actions :deep(.fm-filter-action-button),
   .otf-filter-actions :deep(.p-button) {
-    width: min(132px, calc(50vw - 24px)) !important;
+    width: min(120px, calc(50vw - 24px)) !important;
     min-width: 0 !important;
   }
 }
