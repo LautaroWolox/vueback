@@ -27,7 +27,7 @@ const routes = [
   {
     path: '/login2fa.html',
     name: 'login2fa',
-    alias: ['/'],
+    alias: ['/','/index.html'],
     component: () => import('../views/Login2faView.vue')
   },
   {
@@ -311,11 +311,7 @@ const routes = [
         path: 'registroOTFallidasReproceso.html',
         name: 'ROTF',
         beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/registroOTFallidasReproceso.html',
-          titleParam: 'Registro OTs Fallidas'
-        }
+        component: () => import('../modules/otFallidasCT/OtFallidasCT.vue')
       },
       {
         path: 'busquedaOtsGcc.html',
