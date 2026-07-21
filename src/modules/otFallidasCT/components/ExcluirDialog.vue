@@ -150,18 +150,19 @@ onMounted(() => commonCT.setMotivosExcInc())
 }
 
 .otf-motivo-field {
-  width: min(320px, 100%);
-  max-width: 320px;
+  width: min(280px, 100%);
+  max-width: 280px;
 }
 
 .otf-note-textarea {
-  width: 100%;
-  max-width: 100%;
+  width: min(620px, 100%);
+  min-width: 280px;
+  max-width: min(700px, calc(100vw - 40px));
   height: 46px;
   min-height: 36px;
   padding: 7px 9px;
   overflow: auto;
-  resize: vertical;
+  resize: both;
   border: 1px solid #bfc8cd;
   border-radius: 2px;
   background: #fff;
@@ -243,11 +244,11 @@ onMounted(() => commonCT.setMotivosExcInc())
 }
 
 :global(.otf-exclude-dialog .p-dialog-footer) {
-  min-height: 46px !important;
+  min-height: 44px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: flex-end !important;
-  gap: 7px !important;
+  gap: 6px !important;
   padding: 6px 12px !important;
   border-top: 1px solid #d5dadd !important;
   border-radius: 0 0 2px 2px !important;
@@ -256,17 +257,17 @@ onMounted(() => commonCT.setMotivosExcInc())
 
 :global(.otf-exclude-dialog .otf-exclude-cancel),
 :global(.otf-exclude-dialog .otf-exclude-accept) {
-  width: 104px !important;
-  min-width: 104px !important;
-  max-width: 104px !important;
-  height: 30px !important;
-  min-height: 30px !important;
-  max-height: 30px !important;
-  padding: 0 9px !important;
-  border-radius: 4px !important;
+  width: 96px !important;
+  min-width: 96px !important;
+  max-width: 96px !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  max-height: 28px !important;
+  padding: 0 8px !important;
+  border-radius: 3px !important;
   font-size: 11px !important;
-  font-weight: 600 !important;
-  box-shadow: 0 3px 8px rgba(0, 91, 104, .1) !important;
+  font-weight: 400 !important;
+  box-shadow: 0 2px 6px rgba(0, 91, 104, .08) !important;
   transform: none !important;
 }
 
@@ -300,9 +301,15 @@ onMounted(() => commonCT.setMotivosExcInc())
     font-size: 12px;
   }
 
-  .otf-motivo-field {
+  .otf-motivo-field,
+  .otf-note-textarea {
     width: 100%;
-    max-width: none;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .otf-note-textarea {
+    resize: vertical;
   }
 
   :global(.otf-exclude-dialog .p-dialog-content) {
