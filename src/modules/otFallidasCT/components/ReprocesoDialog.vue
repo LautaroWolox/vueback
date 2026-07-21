@@ -34,13 +34,9 @@
           <p>{{ errorMessage }}</p>
         </template>
 
-        <template v-else>
-          <h3>Reproceso finalizado</h3>
-          <p>
-            Se enviaron {{ count }}
-            OT{{ count === 1 ? '' : 's' }} al proceso de reproceso.
-          </p>
-        </template>
+        <p v-else class="otf-reprocess-result">
+          Se enviaron a reprocesar ({{ count }}) OT{{ count === 1 ? '' : 's' }}.
+        </p>
       </div>
     </div>
 
@@ -70,7 +66,7 @@ const emit = defineEmits(['close'])
 const dialogTitle = computed(() => {
   if (props.processing) return 'Reprocesando'
   if (props.errorMessage) return 'Error de reproceso'
-  return 'Reproceso finalizado'
+  return 'Reproceso'
 })
 
 const cerrar = () => {
@@ -128,6 +124,12 @@ const cerrar = () => {
   color: #607887;
   font-size: 13px;
   line-height: 1.5;
+}
+
+.otf-reprocess-result {
+  color: #203947 !important;
+  font-size: 16px !important;
+  font-weight: 500;
 }
 
 @keyframes otf-reprocess-spin {
