@@ -2,18 +2,30 @@
   <Dialog
     :visible="visibleExc"
     modal
-    header="Excluir órdenes seleccionadas"
-    class="fm-dialog otf-action-dialog"
-    :style="{ width: '42rem' }"
+    :closable="false"
+    class="fm-dialog otf-action-dialog otf-exclude-dialog"
+    :style="{ width: '38rem' }"
     @update:visible="$emit('update:visibleExc', $event)"
   >
-    <div class="fm-dialog-body otf-dialog-form">
-      <div class="otf-dialog-summary">
-        <i class="pi pi-trash"></i>
-        <span>Se excluirán {{ selectedRows.length }} OT{{ selectedRows.length === 1 ? '' : 's' }}.</span>
+    <template #header>
+      <div class="otf-exclude-header">
+        <span>Excluir órdenes seleccionadas</span>
+        <button
+          type="button"
+          class="otf-exclude-close"
+          aria-label="Cerrar ventana"
+          title="Cerrar"
+          @click="cerrar"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 5l14 14M19 5 5 19" />
+          </svg>
+        </button>
       </div>
+    </template>
 
-      <div class="fm-field fm-field--span-12">
+    <div class="fm-dialog-body otf-dialog-form">
+      <div class="fm-field fm-field--span-12 otf-motivo-field">
         <label for="motivo-exclusion">Motivo</label>
         <Select
           id="motivo-exclusion"
@@ -106,25 +118,25 @@ onMounted(() => commonCT.setMotivosExcInc())
 .otf-dialog-form {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 14px;
+  gap: 16px;
 }
 
-.otf-dialog-summary {
-  grid-column: span 12;
-  min-height: 48px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  border: 1px solid #f0d8db;
-  border-radius: 6px;
-  background: #fff7f8;
-  color: #77303a;
+.otf-motivo-field {
+  width: min(330px, 100%);
 }
 
-.otf-dialog-summary i {
-  color: #d9363e;
-  font-size: 20px;
+.otf-motivo-field :deep(.p-select) {
+  width: 100% !important;
+  height: 32px !important;
+  min-height: 32px !important;
+}
+
+.otf-motivo-field :deep(.p-select-label),
+.otf-motivo-field :deep(.p-select-dropdown) {
+  height: 30px !important;
+  min-height: 30px !important;
+  display: flex !important;
+  align-items: center !important;
 }
 
 :deep(.p-textarea) {
@@ -134,5 +146,60 @@ onMounted(() => commonCT.setMotivosExcInc())
   border-radius: 4px;
   background: #fff;
   font-size: 12px;
+}
+
+.otf-exclude-header {
+  width: 100%;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: #263746;
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.otf-exclude-close {
+  width: 34px;
+  min-width: 34px;
+  height: 34px;
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #97a8b2;
+  cursor: pointer;
+}
+
+.otf-exclude-close:hover {
+  background: #edf9fa;
+  color: #008fa1;
+}
+
+.otf-exclude-close svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+:global(.otf-exclude-dialog .p-dialog-header) {
+  min-height: 58px !important;
+  padding: 0 16px !important;
+}
+
+:global(.otf-exclude-dialog .p-dialog-content) {
+  padding: 18px !important;
+}
+
+:global(.otf-exclude-dialog .p-dialog-footer) {
+  padding: 12px 18px !important;
 }
 </style>
