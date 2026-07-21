@@ -10,7 +10,7 @@ export const columns = [
   { field: 'pais', header: 'PAIS', hidden: false, exportable: true, filter: true, sort: true, width: '62px', minWidth: '48px' },
   { field: 'contratista', header: 'CONTRATISTA', hidden: false, exportable: true, filter: true, sort: true, width: '140px', minWidth: '48px' },
   { field: 'tecnicoCierre', header: 'TECNICO CIERRE', hidden: false, exportable: true, filter: true, sort: true, width: '110px', minWidth: '48px' },
-  { field: 'actividades', header: 'ACTIVIDADES', hidden: false, exportable: true, filter: true, sort: true, width: '105px', minWidth: '48px' },
+  { field: 'actividades', header: 'ACTIVIDADES', hidden: false, exportable: true, filter: true, sort: true, width: '140px', minWidth: '48px' },
   { field: 'sistemaOrigen', header: 'SISTEMA ORIGEN', hidden: false, exportable: true, filter: true, sort: true, width: '105px', minWidth: '48px' },
   { field: 'errorDescripcion', header: 'DESCRIPCION ERROR', hidden: false, exportable: true, filter: true, sort: true, width: '115px', minWidth: '48px' },
   { field: 'excluida', header: 'EXCLUIDA', hidden: false, exportable: true, filter: true, sort: true, width: '82px', minWidth: '48px' },
