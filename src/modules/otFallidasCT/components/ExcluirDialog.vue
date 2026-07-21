@@ -4,7 +4,7 @@
     modal
     :closable="false"
     class="fm-dialog otf-action-dialog otf-exclude-dialog"
-    :style="{ '--fm-dialog-width': '42rem' }"
+    :style="{ '--fm-dialog-width': '46rem' }"
     @update:visible="$emit('update:visibleExc', $event)"
   >
     <template #header>
@@ -124,15 +124,15 @@ onMounted(() => commonCT.setMotivosExcInc())
 .otf-exclude-content {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .otf-exclude-confirmation {
-  margin: 0 0 2px;
+  margin: 0;
   color: #202020;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 400;
-  line-height: 1.35;
+  line-height: 1.3;
 }
 
 .otf-exclude-content .fm-field {
@@ -142,24 +142,24 @@ onMounted(() => commonCT.setMotivosExcInc())
 
 .otf-exclude-content .fm-field label {
   display: block;
-  margin: 0 0 5px;
+  margin: 0 0 4px;
   color: #202020;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 400;
   line-height: 1.2;
 }
 
 .otf-motivo-field {
-  width: 100%;
-  max-width: none;
+  width: min(320px, 100%);
+  max-width: 320px;
 }
 
 .otf-note-textarea {
   width: 100%;
   max-width: 100%;
-  height: 54px;
-  min-height: 42px;
-  padding: 8px 10px;
+  height: 46px;
+  min-height: 36px;
+  padding: 7px 9px;
   overflow: auto;
   resize: vertical;
   border: 1px solid #bfc8cd;
@@ -167,8 +167,8 @@ onMounted(() => commonCT.setMotivosExcInc())
   background: #fff;
   color: #263746;
   font: inherit;
-  font-size: 13px;
-  line-height: 1.35;
+  font-size: 12px;
+  line-height: 1.3;
   box-shadow: none;
   box-sizing: border-box;
 }
@@ -188,21 +188,21 @@ onMounted(() => commonCT.setMotivosExcInc())
 
 .otf-exclude-header {
   width: 100%;
-  min-height: 44px;
+  min-height: 40px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
   color: #4a4a4a;
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 400;
 }
 
 .otf-exclude-close {
-  width: 28px;
-  min-width: 28px;
-  height: 28px;
-  min-height: 28px;
+  width: 26px;
+  min-width: 26px;
+  height: 26px;
+  min-height: 26px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -212,7 +212,7 @@ onMounted(() => commonCT.setMotivosExcInc())
   background: transparent;
   color: #999;
   font-family: Arial, sans-serif;
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 400;
   line-height: 1;
   cursor: pointer;
@@ -229,26 +229,26 @@ onMounted(() => commonCT.setMotivosExcInc())
 }
 
 :global(.otf-exclude-dialog .p-dialog-header) {
-  min-height: 50px !important;
-  padding: 0 14px !important;
+  min-height: 46px !important;
+  padding: 0 12px !important;
   border-bottom: 1px solid #d5dadd !important;
   border-radius: 2px 2px 0 0 !important;
   background: #fff !important;
 }
 
 :global(.otf-exclude-dialog .p-dialog-content) {
-  padding: 16px 14px 18px !important;
+  padding: 12px 12px 14px !important;
   overflow: visible !important;
   background: #fff !important;
 }
 
 :global(.otf-exclude-dialog .p-dialog-footer) {
-  min-height: 54px !important;
+  min-height: 46px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: flex-end !important;
-  gap: 8px !important;
-  padding: 8px 14px !important;
+  gap: 7px !important;
+  padding: 6px 12px !important;
   border-top: 1px solid #d5dadd !important;
   border-radius: 0 0 2px 2px !important;
   background: #fff !important;
@@ -256,15 +256,15 @@ onMounted(() => commonCT.setMotivosExcInc())
 
 :global(.otf-exclude-dialog .otf-exclude-cancel),
 :global(.otf-exclude-dialog .otf-exclude-accept) {
-  width: 116px !important;
-  min-width: 116px !important;
-  max-width: 116px !important;
-  height: 34px !important;
-  min-height: 34px !important;
-  max-height: 34px !important;
-  padding: 0 12px !important;
+  width: 104px !important;
+  min-width: 104px !important;
+  max-width: 104px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  max-height: 30px !important;
+  padding: 0 9px !important;
   border-radius: 4px !important;
-  font-size: 12px !important;
+  font-size: 11px !important;
   font-weight: 600 !important;
   box-shadow: 0 3px 8px rgba(0, 91, 104, .1) !important;
   transform: none !important;
@@ -291,17 +291,22 @@ onMounted(() => commonCT.setMotivosExcInc())
 
 @media (max-width: 600px) {
   .otf-exclude-header {
-    min-height: 42px;
-    font-size: 18px;
+    min-height: 40px;
+    font-size: 17px;
   }
 
   .otf-exclude-confirmation,
   .otf-exclude-content .fm-field label {
-    font-size: 13px;
+    font-size: 12px;
+  }
+
+  .otf-motivo-field {
+    width: 100%;
+    max-width: none;
   }
 
   :global(.otf-exclude-dialog .p-dialog-content) {
-    padding: 14px 12px 16px !important;
+    padding: 12px 10px 14px !important;
   }
 
   :global(.otf-exclude-dialog .p-dialog-footer) {
