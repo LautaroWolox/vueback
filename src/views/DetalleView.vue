@@ -1,24 +1,59 @@
 <template>
-    <iframe :src=iframeSrc :title=titulo id="iframe" frameborder="0" allowfullscreen />
+  <div class="fm-screen fm-screen--pad detail-page">
+    <FmPanel :title="titulo" accent class="detail-panel">
+      <div class="detail-stage">
+        <iframe
+          :src="iframeSrc"
+          :title="titulo"
+          class="detail-frame"
+          frameborder="0"
+          allowfullscreen
+          @load="loading = false"
+        />
+        <FmTypingLoader
+          v-if="loading"
+          overlay
+          variant="grid"
+          title="Cargando detalle"
+          :message="titulo"
+        />
+      </div>
+    </FmPanel>
+  </div>
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue'
 
-
-//const urlBase = import.meta.env.VITE_FM_MV_URL;
-const iframeSrc = computed(() => {
-    return window.location.origin + '/pc' + sessionStorage.getItem('urlDetalle') + '?nroActa=' + sessionStorage.getItem('nroActa');
-}); 
-
-const titulo = 'Detalle Acta - ' + sessionStorage.getItem('nroActa');
-
+const loading = ref(true)
+const iframeSrc = computed(() =>
+  `${window.location.origin}/pc${sessionStorage.getItem('urlDetalle')}?nroActa=${sessionStorage.getItem('nroActa')}`
+)
+const titulo = `Detalle Acta - ${sessionStorage.getItem('nroActa') || ''}`
 </script>
 
 <style scoped>
-#iframe {
-    position: absolute;
-    width: 100%;
-    height: 93%;
+.detail-page {
+  min-height: 100vh;
+}
+
+.detail-panel {
+  margin: 0;
+}
+
+.detail-stage {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 56px);
+  min-height: 520px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.detail-frame {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border: 0;
 }
 </style>
