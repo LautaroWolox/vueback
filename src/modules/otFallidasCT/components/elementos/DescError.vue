@@ -3,7 +3,7 @@
     class="fm-field fm-field--span-3 otf-filter-element"
     :class="{ 'otf-filter-element--disabled': disabled }"
   >
-    <label for="error">Descripción del error</label>
+    <label for="error">Descripción Error</label>
     <InputText
       id="error"
       v-model="desc"
