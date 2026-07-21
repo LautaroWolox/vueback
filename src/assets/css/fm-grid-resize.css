@@ -1,0 +1,74 @@
+@layer fieldmanager {
+  /* Mantiene visible la fila de filtros debajo de los encabezados. */
+  .fm-pass-grid .p-datatable-thead > tr.p-datatable-filter-row,
+  .fm-pass-grid .p-datatable-thead > tr.p-filter-row,
+  .fm-pt-datatable .p-datatable-thead > tr.p-datatable-filter-row,
+  .fm-pt-datatable .p-datatable-thead > tr.p-filter-row {
+    display: table-row !important;
+    visibility: visible !important;
+  }
+
+  .fm-pass-grid .p-datatable-thead > tr > th,
+  .fm-pt-datatable .p-datatable-thead > tr > th {
+    position: relative !important;
+  }
+
+  /* PrimeVue 3 y 4 usan nombres distintos para el separador. */
+  .fm-pass-grid .p-column-resizer,
+  .fm-pass-grid .p-datatable-column-resizer,
+  .fm-pt-datatable .p-column-resizer,
+  .fm-pt-datatable .p-datatable-column-resizer {
+    position: absolute !important;
+    z-index: 12 !important;
+    top: 0 !important;
+    right: -4px !important;
+    width: 8px !important;
+    height: 100% !important;
+    display: block !important;
+    cursor: col-resize !important;
+    background: transparent !important;
+    touch-action: none;
+    user-select: none;
+  }
+
+  .fm-pass-grid .p-column-resizer::after,
+  .fm-pass-grid .p-datatable-column-resizer::after,
+  .fm-pt-datatable .p-column-resizer::after,
+  .fm-pt-datatable .p-datatable-column-resizer::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    bottom: 5px;
+    left: 3px;
+    width: 2px;
+    border-radius: 2px;
+    background: transparent;
+    transition: background-color .15s ease, box-shadow .15s ease;
+  }
+
+  .fm-pass-grid .p-column-resizer:hover::after,
+  .fm-pass-grid .p-datatable-column-resizer:hover::after,
+  .fm-pass-grid .p-column-resizer:active::after,
+  .fm-pass-grid .p-datatable-column-resizer:active::after,
+  .fm-pt-datatable .p-column-resizer:hover::after,
+  .fm-pt-datatable .p-datatable-column-resizer:hover::after {
+    background: #00a9bd;
+    box-shadow: 0 0 0 2px rgba(0, 169, 189, .14);
+  }
+
+  /* Permite que el ancho inicial cambie al arrastrar. */
+  .otf-grid .p-datatable-thead > tr > th,
+  .otf-grid .p-datatable-tbody > tr > td,
+  .emulation-grid .p-datatable-thead > tr > th,
+  .emulation-grid .p-datatable-tbody > tr > td,
+  .report-sas-grid .p-datatable-thead > tr > th,
+  .report-sas-grid .p-datatable-tbody > tr > td {
+    max-width: none !important;
+  }
+
+  body.p-unselectable-text,
+  body.p-datatable-resizing {
+    cursor: col-resize !important;
+    user-select: none !important;
+  }
+}
