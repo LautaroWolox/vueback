@@ -3,12 +3,11 @@
     :visible="visible"
     modal
     :header="dialogTitle"
-    :closable="!processing"
-    :closeOnEscape="!processing"
-    :dismissableMask="!processing"
+    :closable="false"
+    :closeOnEscape="false"
+    :dismissableMask="false"
     class="fm-dialog otf-reprocess-dialog"
     :style="{ width: '38rem' }"
-    @update:visible="onVisibleChange"
   >
     <div class="fm-dialog-body otf-reprocess-body">
       <div
@@ -77,10 +76,6 @@ const dialogTitle = computed(() => {
 const cerrar = () => {
   if (props.processing) return
   emit('close')
-}
-
-const onVisibleChange = (value) => {
-  if (!value && !props.processing) emit('close')
 }
 </script>
 
