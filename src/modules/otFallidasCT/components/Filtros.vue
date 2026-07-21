@@ -12,20 +12,34 @@
 
     <div class="fm-actions fm-filter-actions otf-filter-actions">
       <FmButton
-        class="fm-filter-action-button"
+        class="fm-filter-action-button otf-search-button"
         label="BUSCAR"
-        icon="pi-search"
         :disabled="store.loading"
         @click="store.setData"
-      />
+      >
+        <template #icon>
+          <svg class="otf-button-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="10.5" cy="10.5" r="6.5" />
+            <path d="m15.5 15.5 4.5 4.5" />
+          </svg>
+        </template>
+      </FmButton>
+
       <FmButton
-        class="fm-filter-action-button"
+        class="fm-filter-action-button otf-clean-button"
         label="LIMPIAR"
-        icon="pi-filter-slash"
         variant="outline"
         :disabled="store.loading"
         @click="store.clearFilters"
-      />
+      >
+        <template #icon>
+          <svg class="otf-button-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 6h14" />
+            <path d="M4 12h10" />
+            <path d="M4 18h6" />
+          </svg>
+        </template>
+      </FmButton>
     </div>
   </div>
 </template>
@@ -65,6 +79,7 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
 
 <style scoped>
 .otf-filters {
+  --otf-control-height: 30px;
   width: 100%;
   margin: 0 !important;
   padding: 0 0 10px !important;
@@ -102,47 +117,51 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
   white-space: nowrap !important;
 }
 
-/* Una única medida real para input, select y calendario. */
+/* Una única medida real para inputs, selects y calendario. */
 .otf-filters :deep(.fm-field .p-inputtext),
 .otf-filters :deep(.fm-field .p-select),
 .otf-filters :deep(.fm-field .ct-date-button),
 .otf-filters :deep(.fm-field input) {
   width: 100% !important;
-  height: 28px !important;
-  min-height: 28px !important;
-  max-height: 28px !important;
+  height: var(--otf-control-height) !important;
+  min-height: var(--otf-control-height) !important;
+  max-height: var(--otf-control-height) !important;
   margin: 0 !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
+  padding: 0 8px !important;
   border: 1px solid #c7d1d8 !important;
   border-radius: 3px !important;
   background: #fff !important;
   color: #263746 !important;
   font-size: 12px !important;
-  line-height: 26px !important;
+  line-height: normal !important;
   box-shadow: none !important;
   box-sizing: border-box !important;
 }
 
-.otf-filters :deep(.p-select-label) {
-  height: 26px !important;
-  min-height: 26px !important;
-  max-height: 26px !important;
+.otf-filters :deep(.fm-field .p-inputtext),
+.otf-filters :deep(.fm-field input),
+.otf-filters :deep(.ct-date-button),
+.otf-filters :deep(.p-select-label),
+.otf-filters :deep(.p-select-dropdown) {
   display: flex !important;
   align-items: center !important;
-  padding: 0 7px !important;
+}
+
+.otf-filters :deep(.p-select-label) {
+  height: calc(var(--otf-control-height) - 2px) !important;
+  min-height: calc(var(--otf-control-height) - 2px) !important;
+  max-height: calc(var(--otf-control-height) - 2px) !important;
+  padding: 0 8px !important;
   font-size: 12px !important;
-  line-height: 26px !important;
+  line-height: normal !important;
 }
 
 .otf-filters :deep(.p-select-dropdown) {
-  width: 28px !important;
-  min-width: 28px !important;
-  height: 26px !important;
-  min-height: 26px !important;
-  max-height: 26px !important;
-  display: flex !important;
-  align-items: center !important;
+  width: 30px !important;
+  min-width: 30px !important;
+  height: calc(var(--otf-control-height) - 2px) !important;
+  min-height: calc(var(--otf-control-height) - 2px) !important;
+  max-height: calc(var(--otf-control-height) - 2px) !important;
   justify-content: center !important;
 }
 
@@ -151,66 +170,80 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
 }
 
 .otf-filters :deep(.ct-date-button) {
-  display: flex !important;
-  align-items: center !important;
   justify-content: space-between !important;
-  padding: 0 7px !important;
 }
 
 .otf-filters :deep(.ct-date-button .pi),
 .otf-filters :deep(.ct-date-button svg) {
-  width: 13px !important;
-  height: 13px !important;
-  flex: 0 0 13px !important;
-  font-size: 13px !important;
+  width: 14px !important;
+  height: 14px !important;
+  flex: 0 0 14px !important;
+  font-size: 14px !important;
 }
 
 .otf-filter-actions {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 9px !important;
-  margin: 9px 0 0 !important;
-  padding: 9px 0 0 !important;
+  gap: 12px !important;
+  margin: 10px 0 0 !important;
+  padding: 12px 0 2px !important;
   border-top: 1px solid #e4e8eb !important;
   background: transparent !important;
 }
 
-/* Diseño aprobado, manteniendo tamaño compacto dentro de la pantalla. */
+/* Diseño exacto de la referencia: rectangulares, no tipo píldora. */
 .otf-filter-actions :deep(.fm-filter-action-button),
 .otf-filter-actions :deep(.fm-action-button),
 .otf-filter-actions :deep(.fm-ui-button),
 .otf-filter-actions :deep(.p-button) {
-  width: 112px !important;
-  min-width: 112px !important;
-  max-width: 112px !important;
-  height: 32px !important;
-  min-height: 32px !important;
-  max-height: 32px !important;
-  padding: 0 12px !important;
-  gap: 8px !important;
+  width: 160px !important;
+  min-width: 160px !important;
+  max-width: 160px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+  padding: 0 18px !important;
+  gap: 12px !important;
   border-radius: 6px !important;
-  font-size: 12px !important;
+  font-size: 16px !important;
   font-weight: 400 !important;
   line-height: 1 !important;
   letter-spacing: 0 !important;
-  box-shadow: 0 4px 11px rgba(0, 78, 91, .16) !important;
+  box-shadow: 0 6px 14px rgba(0, 78, 91, .20) !important;
   transform: none !important;
   white-space: nowrap !important;
 }
 
+.otf-filter-actions :deep(.otf-search-button.p-button),
+.otf-filter-actions :deep(.otf-search-button) {
+  border: 1px solid #00a9bd !important;
+  background: #00a9bd !important;
+  color: #fff !important;
+}
+
+.otf-filter-actions :deep(.otf-clean-button.p-button),
+.otf-filter-actions :deep(.otf-clean-button) {
+  border: 1px solid #00a9bd !important;
+  background: #fff !important;
+  color: #00a0b4 !important;
+}
+
 .otf-filter-actions :deep(.p-button-label) {
-  font-size: 12px !important;
+  font-size: 16px !important;
   font-weight: 400 !important;
 }
 
-.otf-filter-actions :deep(.p-button-icon),
-.otf-filter-actions :deep(.pi) {
-  width: 15px !important;
-  min-width: 15px !important;
-  height: 15px !important;
-  font-size: 15px !important;
-  line-height: 15px !important;
+.otf-filter-actions :deep(.otf-button-icon) {
+  width: 21px !important;
+  min-width: 21px !important;
+  height: 21px !important;
+  flex: 0 0 21px !important;
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 2.2 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
 }
 
 .otf-filters :deep(.otf-filter-element--disabled) {
@@ -242,7 +275,7 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
 .otf-filters :deep(.fm-calendar),
 .otf-filters :deep(.ct-calendar) {
   z-index: 13000 !important;
-  top: 31px !important;
+  top: 33px !important;
   width: 244px !important;
   padding: 8px !important;
   border-color: #00a9bd !important;
@@ -269,6 +302,12 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
 
   .otf-filter-actions {
     flex-wrap: wrap !important;
+  }
+
+  .otf-filter-actions :deep(.fm-filter-action-button),
+  .otf-filter-actions :deep(.p-button) {
+    width: min(160px, calc(50vw - 24px)) !important;
+    min-width: 0 !important;
   }
 }
 </style>
