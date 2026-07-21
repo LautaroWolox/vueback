@@ -1,0 +1,696 @@
+/* Jobtype-Contrato visual alignment with front-vue-ocp. */
+
+.jobtype-contrato-page {
+  width: 100%;
+}
+
+.jobtype-contrato-page .jobtype-contrato-accordion {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+}
+
+.jobtype-contrato-page .p-accordionpanel + .p-accordionpanel {
+  margin-top: 4px !important;
+}
+
+.jobtype-contrato-page .jobtype-contrato-filters,
+.jobtype-contrato-page .p-accordionpanel:first-child .p-accordioncontent-content,
+.jobtype-contrato-page .p-accordionpanel:nth-child(2) .p-accordioncontent-content {
+  border-left: 2px solid #00a9bd !important;
+}
+
+.jobtype-contrato-filters {
+  min-height: 86px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 16px;
+}
+
+.jobtype-contrato-page .jobtype-contrato-filters .fm-ui-button,
+.jobtype-contrato-page .jobtype-contrato-filters .fm-action-button,
+.jobtype-contrato-page .jobtype-contrato-filters .p-button {
+  min-width: 116px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 16px !important;
+  border-radius: 4px !important;
+  font-size: 12px !important;
+}
+
+.jobtype-contrato-page .jobtype-contrato-filters .p-button .p-button-icon,
+.jobtype-contrato-page .jobtype-contrato-filters .p-button .pi {
+  font-size: 13px !important;
+  line-height: 13px !important;
+}
+
+.jobtype-contrato-page #tabla-jobtype-contrato,
+.jobtype-contrato-page #tabla-jobtype-contrato.p-datatable {
+  border-left: 0 !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+}
+
+.jobtype-contrato-page #tabla-jobtype-contrato .p-datatable-table,
+.jobtype-alta-datatable .p-datatable-table {
+  table-layout: fixed !important;
+}
+
+.jobtype-contrato-page #tabla-jobtype-contrato .p-datatable-thead > tr > th,
+.jobtype-contrato-page #tabla-jobtype-contrato .p-datatable-tbody > tr > td {
+  border-right: 1px solid #d7e5eb !important;
+  border-bottom: 1px solid #e2edf2 !important;
+  overflow: hidden !important;
+  vertical-align: middle !important;
+}
+
+.jobtype-contrato-page #tabla-jobtype-contrato .p-datatable-thead > tr > th {
+  border-bottom-color: #bfe9ef !important;
+}
+
+.jobtype-contrato-page #tabla-jobtype-contrato .p-datatable-tbody > tr,
+.jobtype-alta-datatable .p-datatable-tbody > tr {
+  cursor: pointer;
+}
+
+.jobtype-contrato-page #tabla-jobtype-contrato .p-datatable-tbody > tr:hover > td,
+.jobtype-alta-datatable .p-datatable-tbody > tr:hover > td {
+  background: #f2fbfc !important;
+}
+
+.jobtype-contrato-page #tabla-jobtype-contrato .p-datatable-tbody > tr.jobtype-row-selected > td,
+.jobtype-contrato-page #tabla-jobtype-contrato .p-datatable-tbody > tr.fm-selected-row > td,
+.jobtype-contrato-page #tabla-jobtype-contrato .p-datatable-tbody > tr.p-highlight > td,
+.jobtype-alta-datatable .p-datatable-tbody > tr.jobtype-row-selected > td,
+.jobtype-alta-datatable .p-datatable-tbody > tr.fm-selected-row > td,
+.jobtype-alta-datatable .p-datatable-tbody > tr.p-highlight > td {
+  background: #d7f3f6 !important;
+  color: #006f7d !important;
+  font-weight: 700 !important;
+}
+
+.jobtype-cell-text {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.jobtype-contrato-grid .p-paginator,
+.jobtype-contrato-grid .p-datatable-paginator-bottom {
+  min-height: 34px !important;
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+  overflow: visible !important;
+  align-items: center !important;
+}
+
+.jobtype-grid-actions {
+  min-height: 24px !important;
+  height: 24px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  overflow: visible !important;
+}
+
+.jobtype-grid-actions .p-button.jobtype-grid-action,
+.jobtype-grid-actions .p-button.jobtype-grid-action.p-button-text,
+.jobtype-grid-actions .p-button.jobtype-grid-action.p-button-rounded {
+  width: 22px !important;
+  min-width: 22px !important;
+  max-width: 22px !important;
+  height: 22px !important;
+  min-height: 22px !important;
+  max-height: 22px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: visible !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #001f2f !important;
+}
+
+.jobtype-grid-actions .p-button.jobtype-grid-action .p-button-icon,
+.jobtype-grid-actions .p-button.jobtype-grid-action .pi {
+  width: 15px !important;
+  min-width: 15px !important;
+  height: 15px !important;
+  min-height: 15px !important;
+  font-size: 15px !important;
+  line-height: 15px !important;
+  margin: 0 !important;
+  color: currentColor !important;
+}
+
+.jobtype-grid-actions .p-button.jobtype-grid-action:disabled,
+.jobtype-grid-actions .p-button.jobtype-grid-action.p-disabled {
+  color: #001f2f !important;
+  opacity: .35 !important;
+}
+
+.jobtype-grid-actions .p-button.jobtype-grid-action:enabled:hover,
+.jobtype-grid-actions .p-button.jobtype-grid-action:enabled:focus {
+  color: #006f7d !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.jobtype-modal.p-dialog {
+  border: 1px solid #d6e1e8 !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  box-shadow: 0 18px 38px rgba(21, 37, 50, .22) !important;
+  overflow: hidden !important;
+}
+
+.jobtype-modal--alta.p-dialog {
+  width: 980px !important;
+  max-width: calc(100vw - 48px) !important;
+}
+
+.jobtype-modal--edicion.p-dialog {
+  width: 940px !important;
+  max-width: calc(100vw - 48px) !important;
+}
+
+.jobtype-modal .p-dialog-header {
+  height: 40px !important;
+  min-height: 40px !important;
+  padding: 0 16px !important;
+  border-bottom: 1px solid #e4ebef !important;
+  background: #ffffff !important;
+  cursor: move !important;
+}
+
+.jobtype-modal-header {
+  width: 100% !important;
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 20px 20px !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.jobtype-modal-title {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  color: #344f61 !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 1.2 !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.jobtype-modal-maximize,
+.jobtype-modal-close,
+.jobtype-modal-maximize:hover,
+.jobtype-modal-maximize:focus,
+.jobtype-modal-close:hover,
+.jobtype-modal-close:focus {
+  width: 20px !important;
+  min-width: 20px !important;
+  height: 20px !important;
+  min-height: 20px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+  color: #30475a !important;
+  cursor: pointer !important;
+}
+
+.jobtype-modal-maximize:hover,
+.jobtype-modal-maximize:focus,
+.jobtype-modal-close:hover,
+.jobtype-modal-close:focus {
+  color: #008fa1 !important;
+}
+
+.jobtype-modal-maximize .pi,
+.jobtype-modal-close .pi {
+  width: 14px !important;
+  min-width: 14px !important;
+  height: 14px !important;
+  min-height: 14px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: currentColor !important;
+  font-size: 14px !important;
+  line-height: 14px !important;
+}
+
+.jobtype-modal .p-dialog-content {
+  padding: 16px 20px 10px !important;
+  overflow: hidden !important;
+  background: #ffffff !important;
+}
+
+.jobtype-modal .p-dialog-footer {
+  min-height: 58px !important;
+  height: 58px !important;
+  padding: 10px 20px 14px !important;
+  border-top: 1px solid #edf2f5 !important;
+  background: #ffffff !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+}
+
+.jobtype-modal-form {
+  display: grid !important;
+  grid-template-columns: 220px minmax(0, 1fr) minmax(0, 1fr) 164px 112px !important;
+  gap: 18px !important;
+  align-items: end !important;
+  margin-bottom: 14px !important;
+}
+
+.jobtype-edit-form--origen {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 16px 22px !important;
+  padding: 8px 4px 28px !important;
+}
+
+.jobtype-edit-empty {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.jobtype-modal-field {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  min-width: 0 !important;
+}
+
+.jobtype-modal-field label {
+  color: #000000 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  line-height: 1.1 !important;
+}
+
+.jobtype-modal-input,
+.jobtype-modal-select,
+.jobtype-modal-input.p-inputtext,
+.jobtype-modal-select.p-select {
+  width: 100% !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
+  border-radius: 3px !important;
+  font-size: 12px !important;
+}
+
+.jobtype-modal-select .p-select-label {
+  padding: 4px 26px 4px 8px !important;
+  line-height: 24px !important;
+  font-size: 12px !important;
+}
+
+.jobtype-modal-select .p-select-dropdown {
+  width: 26px !important;
+}
+
+.jobtype-modal-input:disabled,
+.jobtype-modal-input.p-disabled {
+  color: #8b969d !important;
+  background: #f8f8f8 !important;
+  opacity: 1 !important;
+}
+
+.jobtype-input--active,
+.jobtype-input--active:enabled:focus {
+  border-color: #00b4b5 !important;
+  box-shadow: none !important;
+}
+
+.jobtype-modal-button,
+.jobtype-modal-button.p-button,
+.jobtype-modal-button.p-button:enabled:hover,
+.jobtype-modal-button.p-button:enabled:focus {
+  min-width: 108px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 18px !important;
+  border: 0 !important;
+  border-radius: 18px !important;
+  background: #00a9bd !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  justify-content: center !important;
+}
+
+.jobtype-modal-button.p-button:disabled,
+.jobtype-modal-button.p-button.p-disabled {
+  background: #b8c6ce !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+.jobtype-modal-button--add {
+  align-self: end !important;
+  justify-self: stretch !important;
+}
+
+.jobtype-alta-grid-shell {
+  position: relative !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  border: 1px solid #9fb8c7 !important;
+  border-left: 4px solid #00a9bd !important;
+  background: #ffffff !important;
+  overflow: hidden !important;
+}
+
+.jobtype-alta-datatable.p-datatable,
+.jobtype-alta-datatable .p-datatable-table-container,
+.jobtype-alta-datatable .p-datatable-wrapper {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.jobtype-alta-datatable .p-datatable-table-container,
+.jobtype-alta-datatable .p-datatable-wrapper {
+  max-height: 210px !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  scrollbar-gutter: stable !important;
+  border-bottom: 1px solid #9fb8c7 !important;
+}
+
+.jobtype-alta-datatable .p-datatable-thead > tr > th {
+  height: 31px !important;
+  min-height: 31px !important;
+  padding: 0 7px !important;
+  border-right: 1px solid #9fb8c7 !important;
+  border-bottom: 1px solid #9fb8c7 !important;
+  background: #f8fafb !important;
+  color: #163849 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  line-height: 1.1 !important;
+  text-transform: uppercase !important;
+  white-space: nowrap !important;
+}
+
+.jobtype-alta-datatable .p-datatable-thead > tr.p-datatable-filter-row > th {
+  height: 31px !important;
+  min-height: 31px !important;
+  padding: 3px 5px !important;
+  background: #ffffff !important;
+  border-bottom: 1px solid #9fb8c7 !important;
+}
+
+.jobtype-alta-datatable .fm-filter-cell {
+  width: 100% !important;
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-columns: 12px minmax(0, 1fr) 16px !important;
+  align-items: center !important;
+  gap: 3px !important;
+}
+
+.jobtype-alta-datatable .fm-column-filter,
+.jobtype-alta-datatable .p-inputtext {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 22px !important;
+  min-height: 22px !important;
+  max-height: 22px !important;
+  padding: 0 5px !important;
+  border: 1px solid #c7d6df !important;
+  border-radius: 2px !important;
+  background: #ffffff !important;
+  color: #0f2f3d !important;
+  font-size: 11px !important;
+  line-height: 22px !important;
+  box-shadow: none !important;
+}
+
+.jobtype-alta-datatable .p-datatable-tbody > tr > td {
+  height: 31px !important;
+  min-height: 31px !important;
+  max-height: 31px !important;
+  padding: 0 7px !important;
+  border-right: 1px solid #b7cbd6 !important;
+  border-bottom: 1px solid #c1d2dc !important;
+  background: #ffffff !important;
+  color: #0f2f3d !important;
+  font-size: 12px !important;
+  line-height: 31px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.jobtype-alta-empty {
+  height: 146px !important;
+  min-height: 146px !important;
+  padding: 52px 12px !important;
+  color: #6f8594 !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  text-align: center !important;
+}
+
+.jobtype-alta-datatable .p-paginator,
+.jobtype-alta-datatable .p-datatable-paginator-bottom {
+  height: 34px !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 8px !important;
+  border: 0 !important;
+  background: #ffffff !important;
+  color: #4c6578 !important;
+  font-size: 11px !important;
+  overflow: visible !important;
+}
+
+.jobtype-alta-trash-left,
+.jobtype-alta-trash-left:hover,
+.jobtype-alta-trash-left:focus,
+.jobtype-alta-trash-left:active,
+.jobtype-alta-trash-left:disabled {
+  position: absolute !important;
+  left: 14px !important;
+  bottom: 6px !important;
+  z-index: 5 !important;
+  width: 22px !important;
+  min-width: 22px !important;
+  height: 22px !important;
+  min-height: 22px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #001f2f !important;
+  cursor: pointer !important;
+}
+
+.jobtype-alta-trash-left:disabled {
+  opacity: .55 !important;
+  cursor: not-allowed !important;
+}
+
+.jobtype-alta-trash-left .pi {
+  font-size: 16px !important;
+  line-height: 16px !important;
+  color: currentColor !important;
+}
+
+.jobtype-delete-confirm.p-dialog {
+  width: 430px !important;
+  max-width: calc(100vw - 32px) !important;
+  border-radius: 0 !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .16) !important;
+  overflow: hidden !important;
+}
+
+.jobtype-delete-confirm .p-dialog-header {
+  min-height: 32px !important;
+  padding: 0 !important;
+  border-bottom: 1px solid #d8e0e5 !important;
+}
+
+.jobtype-delete-confirm__header {
+  width: 100% !important;
+  min-height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0 12px 0 14px !important;
+}
+
+.jobtype-delete-confirm__title {
+  color: #2c3e4d !important;
+  font-size: 15px !important;
+  font-weight: 400 !important;
+}
+
+.jobtype-delete-confirm__close {
+  width: 20px !important;
+  height: 20px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #8da0aa !important;
+  cursor: pointer !important;
+}
+
+.jobtype-delete-confirm__close:hover,
+.jobtype-delete-confirm__close:focus {
+  color: #00a9bd !important;
+}
+
+.jobtype-delete-confirm__close .pi {
+  font-size: 17px !important;
+}
+
+.jobtype-delete-confirm .p-dialog-content {
+  padding: 0 !important;
+  border-bottom: 1px solid #d8e0e5 !important;
+  overflow: hidden !important;
+}
+
+.jobtype-delete-confirm__body {
+  min-height: 86px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 20px !important;
+  padding: 0 26px !important;
+}
+
+.jobtype-delete-confirm__icon {
+  width: 34px !important;
+  min-width: 34px !important;
+  color: #e5393f !important;
+  font-size: 34px !important;
+  line-height: 34px !important;
+}
+
+.jobtype-delete-confirm__message {
+  color: #2c3e4d !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 1.28 !important;
+}
+
+.jobtype-delete-confirm .p-dialog-footer {
+  min-height: 52px !important;
+  padding: 0 14px !important;
+  border-top: 0 !important;
+}
+
+.jobtype-delete-confirm__footer {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.jobtype-delete-confirm__button {
+  min-width: 112px !important;
+  height: 34px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 4px !important;
+  padding: 0 18px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+}
+
+.jobtype-delete-confirm__button--cancel {
+  background: #ffffff !important;
+  border: 1px solid #00a9bd !important;
+  color: #00a9bd !important;
+}
+
+.jobtype-delete-confirm__button--accept {
+  background: #00a9bd !important;
+  border: 1px solid #00a9bd !important;
+  color: #ffffff !important;
+}
+
+.jobtype-modal.jobtype-modal--expanded {
+  width: min(1180px, calc(100vw - 54px)) !important;
+  max-width: calc(100vw - 54px) !important;
+}
+
+.jobtype-modal.jobtype-modal--expanded .p-dialog-content {
+  max-height: calc(100vh - 172px) !important;
+  overflow: hidden !important;
+}
+
+.jobtype-modal.jobtype-modal--expanded .jobtype-modal-form {
+  grid-template-columns: 230px minmax(0, 1fr) minmax(0, 1fr) 174px 112px !important;
+}
+
+.jobtype-modal.jobtype-modal--expanded .jobtype-alta-datatable .p-datatable-table-container,
+.jobtype-modal.jobtype-modal--expanded .jobtype-alta-datatable .p-datatable-wrapper {
+  max-height: 382px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+@media (max-width: 900px) {
+  .jobtype-modal-form,
+  .jobtype-edit-form--origen {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .jobtype-edit-empty {
+    display: none !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .jobtype-contrato-filters {
+    min-height: 68px;
+    padding: 10px;
+  }
+
+  .jobtype-modal-form,
+  .jobtype-edit-form--origen {
+    grid-template-columns: 1fr !important;
+  }
+
+  .jobtype-modal-button,
+  .jobtype-delete-confirm__button {
+    width: 100% !important;
+  }
+}
