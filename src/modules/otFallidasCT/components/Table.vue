@@ -1,81 +1,106 @@
 <template>
-  <div class="card">
-    <DataTable id="tabla" 
-          :value=store.rows
-          dataKey="id" 
-          ref="dt"
-          tableStyle="table-layout: fixed; width: 100%"
-          scrollable
-          scrollHeight="400px"
-          :rowClass="rowClass"
-          :resizableColumns="true" 
-          columnResizeMode="expand"
-          removableSort
-          sortMode="multiple"
-          filterDisplay="row" 
-          v-model:filters="filters" 
-          v-model:selection="selectedRows" 
-          selectionMode="multiple"
-          paginator :rows="10" 
-          :rowsPerPageOptions="[100, 250, 500]" 
-          paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
-          currentPageReportTemplate="{first} to {last} of {totalRecords}" 
-          showGridlines>
+  <FmGridShell
+    class="otf-grid-shell"
+    :loading="store.loading"
+    loading-title="Cargando aviso"
+    loading-message="Preparando el mensaje"
+  >
+    <DataTable
+      ref="dt"
+      v-model:filters="filters"
+      v-model:selection="selectedRows"
+      :value="store.rows"
+      dataKey="id"
+      class="fm-pass-grid otf-grid"
+      tableStyle="table-layout: fixed; width: 100%"
+      scrollable
+      scrollHeight="430px"
+      :rowClass="rowClass"
+      resizableColumns
+      columnResizeMode="expand"
+      removableSort
+      sortMode="multiple"
+      filterDisplay="row"
+      selectionMode="multiple"
+      paginator
+      :rows="10"
+      :rowsPerPageOptions="[10, 50, 100, 250, 500]"
+      paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
+      currentPageReportTemplate="Mostrando {first} - {last} de {totalRecords}"
+      showGridlines
+    >
       <template #paginatorstart>
-          <Button id="btnExportar" type="button" icon="pi pi-download" size="large" style="height:3rem; color: black;" class="icon-button"
-            v-tooltip.top="'Exportar a Excel'" text @click="exportarExcel"/>        
-          <Button id="btnExcluir" type="btn" icon="pi pi-trash" size="large" style="height:3rem" class="icon-button"
-            v-tooltip.top="'Excluir'" text @click="excluir" />
-          <Button id="btnReprocesar" type="button" icon="pi pi-external-link" size="large" style="height:3rem;" class="icon-button" 
-            v-tooltip.top="'Reprocesar'" text  @click="reprocesar" /> 
+        <FmGridActions
+          size="large"
+          @export="exportarExcel"
+          @delete="excluir"
+          @refresh="reprocesar"
+        />
       </template>
-      <template #empty> <p class="py-1 pl-8 text-xl"> No se encontraron resultados. </p></template>
-      <Column selectionMode="multiple" headerStyle="width: 3rem"/>
+
+      <template #empty>
+        <div class="fm-grid-empty">No hay resultados</div>
+      </template>
+
+      <Column selectionMode="multiple" headerStyle="width: 34px" />
+
       <Column
-        v-for="(col, index) in cols"
-        :key=col.field
-        :field=col.field
-        :header=col.header
-        :sortable=col.sort
-        :filter=col.filter
-        :filterField=col.field
-        :showFilterMenu=col.filter
-        :hidden=col.hidden
-        :exportable=col.exportable
+        v-for="col in cols"
+        :key="col.field"
+        :field="col.field"
+        :header="col.header"
+        :sortable="col.sort"
+        :filter="col.filter"
+        :filterField="col.field"
+        :showFilterMenu="false"
+        :hidden="col.hidden"
+        :exportable="col.exportable"
+        :style="columnStyle(col.field)"
       >
         <template #filter="{ filterModel, filterCallback }">
-          <InputText 
-            v-if="col.filter"
-            type="text" 
-            v-model="filterModel.value" 
-            @input="filterCallback()" 
-            class="p-column-filter" 
-            :placeholder="`Search`"
-          />
-        </template>
-        <template #body="{ data }">
-          <div :class="{ 'disabled-content': isDisabled(data) }">
-            <div v-if="col.field === 'tieneNota'" >
-              <div v-if="data['nota'] && data['nota'] !== ''"> 
-                <span @click.stop="handleAction(data,'nota')" :class="{ 'disabled-click': isDisabled(data) }">
-                  <img alt="nota" src="@/assets/icons/notes.png" class="image">
-                </span> 
-              </div>
-              <div v-else></div>
-            </div>
-            <div v-if="col.field === 'incluir'" >
-              <div v-if="data['excluida'] === 'S'" > 
-                <span @click="handleAction(data,'incluir')" :class="{ 'disabled-click': isDisabled(data) }">
-                  <img alt="nota" src="@/assets/icons/inclusion-icon.png" class="image">
-                </span> 
-              </div>
-              <div v-else></div>
-            </div>
-            <div v-else>
-              {{ data[col.field] ?? '' }}
-            </div>
+          <div v-if="col.filter" class="fm-filter-cell">
+            <span class="fm-filter-prefix">~</span>
+            <InputText
+              v-model="filterModel.value"
+              type="text"
+              class="fm-column-filter"
+              @input="filterCallback()"
+            />
+            <span class="fm-filter-more">...</span>
           </div>
-        </template>   
+        </template>
+
+        <template #body="{ data }">
+          <template v-if="col.field === 'tieneNota'">
+            <button
+              v-if="data.nota"
+              type="button"
+              class="fm-icon-btn otf-row-action"
+              title="Ver nota"
+              aria-label="Ver nota"
+              @click.stop="showNote(data)"
+            >
+              <i class="pi pi-file-edit"></i>
+            </button>
+          </template>
+
+          <template v-else-if="col.field === 'incluir'">
+            <button
+              v-if="data.excluida === 'S'"
+              type="button"
+              class="fm-icon-btn otf-row-action"
+              title="Incluir OT"
+              aria-label="Incluir OT"
+              @click.stop="openInclude(data)"
+            >
+              <i class="pi pi-undo"></i>
+            </button>
+          </template>
+
+          <span v-else class="fm-cell-text" :title="String(data[col.field] ?? '')">
+            {{ data[col.field] ?? '' }}
+          </span>
+        </template>
       </Column>
     </DataTable>
 
@@ -84,151 +109,170 @@
       :selected-rows="selectedRows"
     />
 
-    <IncluirDialog
-      v-model:visibleInc="showIncluir"
+    <IncluirDialog v-model:visibleInc="showIncluir" />
+
+    <NotaDialog
+      v-model:visible="showNota"
+      :note="selectedNote"
     />
 
-  </div>
+    <ReprocesoDialog
+      v-model:visible="showReproceso"
+      :count="store.selectedRows.length"
+      @confirm="confirmReprocess"
+    />
+
+    <FmAlertDialog
+      v-model:visible="showAlert"
+      title="Alerta"
+      :message="alertMessage"
+    />
+  </FmGridShell>
 </template>
 
 <script setup>
-import { ref, onMounted, computed} from 'vue'
-import InputText from 'primevue/inputtext';
-import { FilterMatchMode } from '@primevue/core/api';
+import { computed, ref } from 'vue'
+import InputText from 'primevue/inputtext'
+import { FilterMatchMode } from '@primevue/core/api'
 import { columns } from './columns'
-import { useFallidasCtStore } from '../store/CtFallidaStore';
-import ExcluirDialog from './ExcluirDialog.vue';
-import IncluirDialog from './IncluirDialog.vue';
-import { useExcelExport } from '@/composables/useExportExcel';
+import { useFallidasCtStore } from '../store/CtFallidaStore'
+import ExcluirDialog from './ExcluirDialog.vue'
+import IncluirDialog from './IncluirDialog.vue'
+import NotaDialog from './NotaDialog.vue'
+import ReprocesoDialog from './ReprocesoDialog.vue'
+import { useExcelExport } from '@/composables/useExportExcel'
 
 const store = useFallidasCtStore()
 const cols = ref(columns)
 const dt = ref()
 const showExcluir = ref(false)
 const showIncluir = ref(false)
-let rowId = null
+const showNota = ref(false)
+const showReproceso = ref(false)
+const showAlert = ref(false)
+const alertMessage = ref('')
+const selectedNote = ref('')
 const { exportToExcel, parseDataFromTable } = useExcelExport()
 
 const filters = ref({
-    nroOrdenTrabajo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-    tareaCodigo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-    tecnicoCierre: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-    contratista: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-    // Agregar el resto
-});
-
-const selectedRows = computed({
-  get: () => store.rows.filter(row =>
-    store.selectedRows.includes(row.id)
-  ),
-  set: (value) => store.setSelectedRows(value.map(v => v.id))
+  nroOrdenTrabajo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+  tareaCodigo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+  tecnicoCierre: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+  contratista: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
 })
 
-const isDisabled = (rowData) => {
-  return rowData?.excluida === 'S'
+const selectedRows = computed({
+  get: () => store.rows.filter((row) => store.selectedRows.includes(row.id)),
+  set: (value) => store.setSelectedRows(value.map((row) => row.id))
+})
+
+const rowClass = (data) => ({
+  'fm-disabled-row': data?.excluida === 'S',
+  'fm-enabled-row': data?.excluida === 'N'
+})
+
+const columnStyle = (field) => {
+  const widths = {
+    nroOrdenTrabajo: 'width: 130px',
+    fechaCierre: 'width: 145px',
+    tareaCodigo: 'width: 100px',
+    direccion: 'width: 180px',
+    ciudad: 'width: 125px',
+    provincia: 'width: 125px',
+    region: 'width: 105px',
+    pais: 'width: 72px',
+    contratista: 'width: 190px',
+    tecnicoCierre: 'width: 125px',
+    actividades: 'width: 170px',
+    sistemaOrigen: 'width: 115px',
+    errorDescripcion: 'width: 190px',
+    excluida: 'width: 82px',
+    motivoExclusion: 'width: 160px',
+    tieneNota: 'width: 60px',
+    incluir: 'width: 60px'
+  }
+  return widths[field] || 'width: 120px'
 }
 
-const rowClass = (data) => {
-  return {
-    'disabled-row': data?.excluida === 'S',
-    'enabled-row': data?.excluida === 'N'
-  }
+const showMessage = (message) => {
+  alertMessage.value = message
+  showAlert.value = true
 }
 
-const handleAction = (data,actionType) => {
-  if (isDisabled(data) && actionType !== 'incluir') {
-    console.log('WO excluida')
-    return
-  } 
-  if (actionType === 'nota') {
-    alert("nota")
-  } else if (actionType === 'incluir') {
-    store.nroOT = data.nroOrdenTrabajo
-    showIncluir.value = true
-  }
+const showNote = (data) => {
+  selectedNote.value = data.nota || ''
+  showNota.value = true
+}
+
+const openInclude = (data) => {
+  store.nroOT = data.nroOrdenTrabajo
+  showIncluir.value = true
 }
 
 const excluir = () => {
-  console.log(store.selectedRows.length)
-  if(store.selectedRows.length > 0){
-    showExcluir.value = true
-  } else {
-    alert("agregar toast")
+  if (!store.selectedRows.length) {
+    showMessage('No hay datos para la consulta efectuada')
+    return
   }
+  showExcluir.value = true
 }
 
-
 const reprocesar = () => {
-  store.sendReproceso()
+  if (!store.selectedRows.length) {
+    showMessage('No hay datos para la consulta efectuada')
+    return
+  }
+  showReproceso.value = true
+}
+
+const confirmReprocess = async () => {
+  showReproceso.value = false
+  await store.sendReproceso()
 }
 
 const exportarExcel = () => {
-  let { rows, fields } = parseDataFromTable(dt)
-  let exportedFields = fields.filter((f) => {
-    let col = cols.value.find((c) => c.field === f)
-    return col && col.exportable !== false
+  const { rows, fields } = parseDataFromTable(dt)
+  const exportedFields = fields.filter((field) => {
+    const column = cols.value.find((item) => item.field === field)
+    return column && column.exportable !== false
   })
+
   exportToExcel({
     rows,
     fields: exportedFields,
     columns: cols.value,
     filename: 'Ot_FallidasReproceso.xlsx',
     columnTypes: {},
-    groupField: null,
+    groupField: null
   })
 }
-
 </script>
 
 <style scoped>
-/* 1. Modify the height rule to ONLY target data rows and main header titles */
-.p-datatable .p-datatable-thead > tr:not(.p-filter-row) > th,
-.p-datatable .p-datatable-tbody > tr > td {
-  height: 60px;
-  padding: 0 1rem;
-  box-sizing: border-box;
+.otf-grid-shell {
+  min-height: 300px;
 }
 
-/* 2. Give the filter row container its own relaxed, padded breathing room */
-.p-datatable .p-datatable-thead > tr.p-filter-row > th {
-  /* padding: 0.5rem 1rem; */
-  height: auto; /* Allows input fields to scale without squishing */
+.otf-grid :deep(.p-datatable-table-container) {
+  min-height: 210px;
+  background: #eafcff;
 }
 
-/* 3. Ensure the custom input element scales fluidly within your resizable columns */
-.p-column-filter {
-  width: 100%;
-  box-sizing: border-box;
-  height: 25px;
+.otf-row-action {
+  margin: 0 auto;
 }
 
-.image {
-  max-width: 20px;
-  height: auto;
-  padding-top: auto;
-  padding-bottom: auto;
+.otf-row-action .pi {
+  font-size: 16px;
 }
 
-/* Row styling */
-.disabled-row {
-  background-color: rgb(58, 52, 52) !important;
-  opacity: 0.7;
-  pointer-events: none; 
-  cursor: not-allowed;
+:deep(.fm-disabled-row > td) {
+  background: #eef1f3 !important;
+  color: #76858d !important;
 }
 
-.enabled-row {
-  background-color: #ffffff;
+:deep(.fm-disabled-row .p-checkbox) {
+  pointer-events: none;
+  opacity: .45;
 }
-
-/* Style for buttons */
-:deep(.p-datatable .disabled-row .status-column) {
-  pointer-events: auto;
-}
-
-:deep(.p-button:disabled) {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 </style>
