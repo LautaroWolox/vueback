@@ -219,7 +219,7 @@
     <ReprocesoDialog
       v-model:visible="showReproceso"
       :count="store.selectedRows.length"
-      @confirm="confirmReprocess"
+      @click="reprocess"
     />
 
     <FmAlertDialog
@@ -348,9 +348,10 @@ const reprocesar = () => {
   showReproceso.value = true
 }
 
-const confirmReprocess = async () => {
-  showReproceso.value = false
+const reprocess = async () => {
   await store.sendReproceso()
+  showReproceso.value = false
+  
 }
 
 const exportarExcel = () => {
