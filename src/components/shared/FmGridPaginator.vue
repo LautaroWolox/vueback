@@ -23,7 +23,7 @@
         @click="$emit('prev-page')"
       >&lt;</button>
 
-      <span class="fm-page-label">Página</span>
+      <span class="fm-page-label">Pagina</span>
       <input
         class="fm-page-input"
         type="number"
@@ -111,16 +111,19 @@ const changePage = (event) => {
   width: 100%;
   min-height: 38px;
   display: grid;
-  grid-template-columns: minmax(110px, 1fr) auto minmax(160px, 1fr);
+  grid-template-columns: minmax(130px, 1fr) auto minmax(180px, 1fr);
   align-items: center;
-  padding: 3px 8px;
+  padding: 3px 10px;
   color: #111;
   font-size: 12px;
+  box-sizing: border-box;
 }
 
 .fm-custom-paginator__actions {
   justify-self: start;
   min-width: 0;
+  display: inline-flex;
+  align-items: center;
 }
 
 .fm-custom-paginator__navigation {
@@ -144,10 +147,15 @@ const changePage = (event) => {
   justify-content: center;
   padding: 0;
   border: 0;
+  border-radius: 0;
   background: transparent;
   color: #111;
+  font-family: Arial, sans-serif;
   font-size: 15px;
+  font-weight: 400;
+  line-height: 1;
   cursor: pointer;
+  box-shadow: none;
 }
 
 .fm-page-button:hover:not(:disabled) {
@@ -159,6 +167,13 @@ const changePage = (event) => {
   cursor: default;
 }
 
+.fm-page-label,
+.fm-page-total {
+  color: #111;
+  font-size: 12px;
+  font-weight: 400;
+}
+
 .fm-page-input,
 .fm-rows-select {
   height: 28px;
@@ -168,6 +183,7 @@ const changePage = (event) => {
   background: #fff;
   color: #111;
   font-size: 12px;
+  box-shadow: none;
 }
 
 .fm-page-input {
@@ -175,6 +191,12 @@ const changePage = (event) => {
   min-width: 46px;
   padding: 2px 6px;
   text-align: center;
+}
+
+.fm-page-input::-webkit-inner-spin-button,
+.fm-page-input::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
 }
 
 .fm-rows-select {
@@ -191,9 +213,16 @@ const changePage = (event) => {
   box-shadow: 0 0 0 2px rgba(0, 169, 189, .14);
 }
 
+.fm-page-input:disabled,
+.fm-rows-select:disabled {
+  background: #f1f3f4;
+  color: #9aa5aa;
+}
+
 .fm-custom-paginator__counter {
   justify-self: end;
   color: #222;
+  font-size: 12px;
   white-space: nowrap;
 }
 
