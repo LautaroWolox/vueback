@@ -3,52 +3,65 @@
     <Menubar :model="items" class="main-menu">
       <template #end>
         <div class="user-section">
-          <div class="user-profile" @click="toggleDropdown">
-            <span class="username">{{ nombre }}</span>
-            <i class="pi pi-chevron-down dropdown-icon" :class="{ 'rotated': showDropdown }"></i>
-          </div>
-          
+          <Button class="user-profile" text type="button" @click="toggleDropdown">
+            <span class="user-avatar" aria-hidden="true">{{ userInitials }}</span>
+            <span class="username">{{ userLabel }}</span>
+            <i class="pi pi-chevron-down dropdown-icon" :class="{ rotated: showDropdown }"></i>
+          </Button>
+
           <div v-if="showDropdown" class="dropdown-content">
             <div class="user-info">
-              <div class="info-item">
+              <div v-if="email" class="info-item">
                 <i class="pi pi-envelope"></i>
                 <span>{{ email }}</span>
               </div>
-              <div class="info-item">
+              <div v-if="legajo" class="info-item">
                 <i class="pi pi-id-card"></i>
                 <span>Legajo: {{ legajo }}</span>
               </div>
             </div>
-            <div class="divider"></div>
-            <button class="logout-btn" @click="logout">
-              <i class="pi pi-sign-out"></i>
-              <span>Cerrar Sesión</span>
-            </button>
+
+            <Button
+              class="logout-btn"
+              text
+              type="button"
+              icon="pi pi-sign-out"
+              label="Cerrar Sesión"
+              @click="logout"
+            />
           </div>
         </div>
       </template>
     </Menubar>
+
     <div class="color-gradient"></div>
     <div class="spacer"></div>
   </div>
 </template>
 
 <script setup lang="ts">
-import Menubar from 'primevue/menubar';
-import router from '@/router';
-import { ref, onMounted, onUnmounted } from 'vue';
-import { useAuthStore } from '@/store/auth';
-import 'primeicons/primeicons.css';
-import { getRutas } from './rutas';
+import Menubar from 'primevue/menubar'
+import Button from 'primevue/button'
+import router from '@/router'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { useAuthStore } from '@/store/auth'
+import { getRutas } from './rutas'
 
 const authStore = useAuthStore()
-
 const nombre = authStore.usuario?.nombre ?? ''
 const email = authStore.usuario?.email ?? ''
 const legajo = authStore.usuario?.legajo ?? ''
-const rutas = authStore.rutas;
-const showDropdown = ref(false);
-const items = ref( getRutas(rutas ) );
+const rutas = authStore.rutas
+const showDropdown = ref(false)
+const items = ref(getRutas(rutas))
+
+const userLabel = computed(() => legajo || nombre || 'Usuario')
+const userInitials = computed(() => {
+  const value = String(nombre || legajo || 'Usuario').trim()
+  const parts = value.split(/\s+/).filter(Boolean)
+  if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+  return value.slice(0, 2).toUpperCase()
+})
 
 const logout = () => {
   authStore.logout()
@@ -56,84 +69,98 @@ const logout = () => {
 }
 
 const toggleDropdown = (event: MouseEvent) => {
-  event.stopPropagation();
-  showDropdown.value = !showDropdown.value;
-};
+  event.stopPropagation()
+  showDropdown.value = !showDropdown.value
+}
 
 const closeDropdown = () => {
-  showDropdown.value = false;
-};
+  showDropdown.value = false
+}
 
-const handleClickOutside = (event: any) => {
-  const userSection = document.querySelector('.user-section');
-  const dropdown = document.querySelector('.dropdown-content');
-  
-  if (!userSection!.contains(event.target) && (!dropdown || !dropdown.contains(event.target))) {
-    closeDropdown();
-  }
-};
+const handleClickOutside = (event: MouseEvent) => {
+  const userSection = document.querySelector('.user-section')
+  if (!userSection?.contains(event.target as Node)) closeDropdown()
+}
 
-onMounted(() =>  document.addEventListener('click', handleClickOutside) );
-
-onUnmounted(() =>  document.removeEventListener('click', handleClickOutside) );
+onMounted(() => document.addEventListener('click', handleClickOutside))
+onUnmounted(() => document.removeEventListener('click', handleClickOutside))
 </script>
 
 <style scoped>
 .menu-container {
-  width: 100%;
   position: relative;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  box-shadow: 0 2px 9px rgba(19, 49, 61, .12);
 }
 
-.main-menu {
-  background: linear-gradient(135deg, #2c3e50, #3498db);
-  border: none;
-  border-radius: 0;
-  padding: 0 2rem;
-  height: 60px;
+.main-menu,
+:deep(.main-menu.p-menubar) {
+  min-height: 48px !important;
+  height: 48px !important;
+  padding: 0 10px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #00a9bd !important;
 }
 
 .user-section {
   position: relative;
-  height: 100%;
+  height: 48px;
   display: flex;
   align-items: center;
   margin-left: auto;
 }
 
-.user-profile {
-  display: flex;
-  align-items: center;
-  padding: 0.5rem 1rem;
-  border-radius: 30px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+.user-profile,
+:deep(.user-profile.p-button) {
+  min-width: 0 !important;
+  min-height: 34px !important;
+  height: 34px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  padding: 0 8px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #fff !important;
+  box-shadow: none !important;
 }
 
-.user-profile:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+.user-profile:hover,
+:deep(.user-profile.p-button:hover) {
+  background: rgba(255, 255, 255, .13) !important;
+  transform: none !important;
+}
+
+.user-avatar {
+  width: 27px;
+  height: 27px;
+  flex: 0 0 27px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #fff;
+  color: #008fa1;
+  font-size: 10px;
+  font-weight: 700;
 }
 
 .username {
-  color: white;
-  font-weight: 600;
-  font-size: 0.95rem;
-  margin-right: 0.5rem;
-  max-width: 180px;
-  white-space: nowrap;
+  max-width: 128px;
   overflow: hidden;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .dropdown-icon {
-  color: white;
-  font-size: 0.8rem;
-  transition: transform 0.3s ease;
+  color: #fff;
+  font-size: 9px;
+  transition: transform .18s ease;
 }
 
 .dropdown-icon.rotated {
@@ -142,149 +169,120 @@ onUnmounted(() =>  document.removeEventListener('click', handleClickOutside) );
 
 .dropdown-content {
   position: absolute;
-  top: calc(100% + 10px);
+  z-index: 1500;
+  top: calc(100% + 4px);
   right: 0;
-  width: 280px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
+  min-width: 220px;
   overflow: hidden;
-  animation: dropdownFadeIn 0.2s ease-out;
+  border: 1px solid #dce5e9;
+  background: #fff;
+  box-shadow: 0 9px 24px rgba(18, 45, 57, .18);
+  animation: dropdown-in .16s ease-out;
 }
 
-@keyframes dropdownFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+@keyframes dropdown-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .user-info {
-  padding: 1.25rem;
+  padding: 7px 9px;
+  border-bottom: 1px solid #e5ecef;
 }
 
 .info-item {
+  min-height: 28px;
   display: flex;
   align-items: center;
-  padding: 0.75rem;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  margin-bottom: 0.5rem;
-}
-
-.info-item:hover {
-  background: #f8f9fa;
-}
-
-.info-item:hover span {
-  color: #28a745 !important;
+  gap: 8px;
+  padding: 4px 5px;
+  color: #4e6572;
+  font-size: 11px;
 }
 
 .info-item i {
-  margin-right: 0.75rem;
-  color: #6c757d;
+  width: 14px;
+  color: #008fa1;
+  font-size: 11px;
 }
 
 .info-item span {
-  font-size: 0.9rem;
-  color: #495057;
-  transition: color 0.3s ease;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.divider {
-  height: 1px;
-  background: #e9ecef;
-  margin: 0 1.25rem;
+.logout-btn,
+:deep(.logout-btn.p-button) {
+  width: 100% !important;
+  min-height: 34px !important;
+  height: 34px !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  padding: 0 12px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+  color: #d92932 !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
 }
 
-.logout-btn {
-  width: 100%;
-  padding: 0.75rem 1.25rem;
-  background: none;
-  border: none;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  color: #dc3545;
-  font-weight: 600;
-}
-
-.logout-btn:hover {
-  background: #f8f9fa;
-}
-
-.logout-btn i {
-  margin-right: 0.75rem;
+.logout-btn:hover,
+:deep(.logout-btn.p-button:hover) {
+  background: #eafcfe !important;
+  color: #008fa1 !important;
 }
 
 .color-gradient {
-  height: 5px;
   width: 100%;
-  background: linear-gradient(
-    to right,
-    #3fc1cb 0%, #3bb9c2 2%, #009a97 16%,
-    #97a96b 24%, #ebbb1d 32%, #f28cb9 48%,
-    #e30f72 66%, #91268f 82%, #024da1 100%
-  );
+  height: 4px;
+  background: linear-gradient(90deg, #00b4b5, #00d4ff, #024da1, #91268f, #e30f72, #ff7a00, #ebbb1d, #97c93d, #00a65a, #00b4b5);
+  background-size: 300% 100%;
+  animation: fm-color-flow 22s linear infinite;
+}
+
+@keyframes fm-color-flow {
+  from { background-position: 0 50%; }
+  to { background-position: 100% 50%; }
 }
 
 .spacer {
   height: 30px;
-  background-color: #f8f9fa;
+  background: #f7f9fa;
 }
 
-/* Estilos para el menú principal */
-:deep(.p-menubar) {
-  background: transparent;
-  border: none;
-  padding: 0;
+:deep(.p-menubar-root-list) {
+  gap: 0 !important;
 }
 
-:deep(.p-menubar .p-menubar-root-list) {
-  gap: 0.5rem;
+:deep(.p-menubar-root-list > .p-menubar-item > .p-menubar-item-content),
+:deep(.p-menubar-root-list > .p-menubar-item > .p-menubar-item-content .p-menubar-item-link) {
+  min-height: 48px !important;
+  height: 48px !important;
+  border-radius: 0 !important;
 }
 
-:deep(.p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content .p-menuitem-link) {
-  padding: 1rem 1.5rem;
-  color: white !important;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  border-radius: 4px;
+:deep(.p-menubar-root-list > .p-menubar-item > .p-menubar-item-content .p-menubar-item-link) {
+  padding: 0 12px !important;
 }
 
-:deep(.p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content .p-menuitem-link:hover) {
-  background: rgba(255, 255, 255, 0.15) !important;
+:deep(.p-menubar-root-list > .p-menubar-item > .p-menubar-item-content .p-menubar-item-label) {
+  color: #fff !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
 }
 
-:deep(.p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content .p-menuitem-link .p-menuitem-text) {
-  font-size: 0.95rem;
+:deep(.p-menubar-root-list > .p-menubar-item > .p-menubar-item-content:hover) {
+  background: rgba(255, 255, 255, .14) !important;
 }
 
-:deep(.p-menubar .p-submenu-list) {
-  background: white;
-  border: none;
-  border-radius: 8px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  padding: 0.5rem 0;
-  margin-top: 0.5rem;
-}
-
-:deep(.p-menubar .p-submenu-list .p-menuitem-content .p-menuitem-link) {
-  padding: 0.75rem 1.25rem;
-  color: #495057 !important;
-}
-
-:deep(.p-menubar .p-submenu-list .p-menuitem-content .p-menuitem-link:hover) {
-  background: #f8f9fa !important;
-}
-
-:deep(.p-menubar .p-submenu-list .p-menuitem-content .p-menuitem-link .p-menuitem-text) {
-  font-size: 0.9rem;
+@media (max-width: 900px) {
+  .username { display: none; }
+  :deep(.p-menubar-root-list > .p-menubar-item > .p-menubar-item-content .p-menubar-item-link) {
+    padding: 0 8px !important;
+  }
 }
 </style>
