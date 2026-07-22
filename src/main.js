@@ -5,6 +5,7 @@ import './assets/css/fm-grid-resize.css'
 import './assets/css/fm-responsive.css'
 import './assets/css/fm-menu-responsive.css'
 import './assets/css/fm-select.css'
+import './assets/css/fm-grid-dialog-wide.css'
 import './assets/css/jobtype-contrato-ocp.css'
 import './assets/css/jobtype-contrato-grid-final.css'
 
