@@ -5,10 +5,6 @@ const MAXIMIZE_CLASS = 'jobtype-modal-maximize'
 const EXPANDED_CLASS = 'jobtype-modal--expanded'
 const BOUND_ATTR = 'data-jobtype-maximize-bound'
 
-const SHARED_DIALOG_SELECTOR = '.fm-grid-dialog'
-const SHARED_EXPANDED_CLASS = 'fm-grid-dialog--maximized'
-const SHARED_RESIZE_BOUND_ATTR = 'data-fm-grid-resize-bound'
-
 const createToggle = () => {
   const toggle = document.createElement('span')
   toggle.setAttribute('role', 'button')
@@ -86,140 +82,8 @@ const enhanceModal = (modal) => {
   setToggleState(modal, toggle)
 }
 
-const important = (element, property, value) => {
-  element?.style.setProperty(property, value, 'important')
-}
-
-const clearInlineLayout = (element, properties) => {
-  if (!element) return
-  properties.forEach((property) => element.style.removeProperty(property))
-}
-
-const clearSharedDialogLayout = (dialog) => {
-  const body = dialog.querySelector('.fm-grid-dialog__body')
-  const gridArea = dialog.querySelector('.fm-grid-dialog__grid-area')
-  const popupGrid = dialog.querySelector('.fm-popup-grid')
-  const dataTable = popupGrid?.querySelector('.p-datatable')
-  const tableContainer = popupGrid?.querySelector(
-    '.p-datatable-table-container, .p-datatable-wrapper, [data-pc-section="tablecontainer"]'
-  )
-  const emptyContent = popupGrid?.querySelector('.fm-popup-grid__empty')
-
-  clearInlineLayout(body, ['height', 'min-height', 'max-height', 'overflow'])
-  clearInlineLayout(gridArea, ['height', 'min-height', 'max-height', 'display', 'flex'])
-  clearInlineLayout(popupGrid, ['height', 'min-height', 'max-height', 'display', 'flex'])
-  clearInlineLayout(dataTable, ['height', 'min-height', 'max-height', 'display', 'flex'])
-  clearInlineLayout(tableContainer, ['height', 'min-height', 'max-height', 'flex'])
-  clearInlineLayout(emptyContent, ['height', 'min-height', 'max-height'])
-}
-
-const measureSharedDialog = (dialog) => {
-  if (!dialog?.isConnected) return
-
-  if (!dialog.classList.contains(SHARED_EXPANDED_CLASS)) {
-    clearSharedDialogLayout(dialog)
-    return
-  }
-
-  const header = dialog.querySelector('.p-dialog-header')
-  const content = dialog.querySelector('.p-dialog-content')
-  const footer = dialog.querySelector('.p-dialog-footer')
-  const body = dialog.querySelector('.fm-grid-dialog__body')
-  const form = dialog.querySelector('.fm-grid-dialog__form')
-  const gridArea = dialog.querySelector('.fm-grid-dialog__grid-area')
-  const popupGrid = dialog.querySelector('.fm-popup-grid')
-  const dataTable = popupGrid?.querySelector('.p-datatable')
-  const tableContainer = popupGrid?.querySelector(
-    '.p-datatable-table-container, .p-datatable-wrapper, [data-pc-section="tablecontainer"]'
-  )
-  const paginator = popupGrid?.querySelector('.p-datatable-paginator-bottom, .p-paginator')
-  const emptyContent = popupGrid?.querySelector('.fm-popup-grid__empty')
-
-  if (!content || !body || !gridArea || !popupGrid || !dataTable || !tableContainer) return
-
-  const dialogHeight = dialog.getBoundingClientRect().height
-  const headerHeight = header?.getBoundingClientRect().height || 0
-  const footerHeight = footer?.getBoundingClientRect().height || 0
-  const formHeight = form?.getBoundingClientRect().height || 0
-  const paginatorHeight = paginator?.getBoundingClientRect().height || 34
-  const bodyStyles = window.getComputedStyle(body)
-  const paddingTop = Number.parseFloat(bodyStyles.paddingTop) || 0
-  const paddingBottom = Number.parseFloat(bodyStyles.paddingBottom) || 0
-  const gap = Number.parseFloat(bodyStyles.rowGap || bodyStyles.gap) || 0
-
-  const contentHeight = Math.max(240, dialogHeight - headerHeight - footerHeight)
-  const gridHeight = Math.max(
-    180,
-    contentHeight - formHeight - paddingTop - paddingBottom - (formHeight ? gap : 0)
-  )
-  const tableHeight = Math.max(146, gridHeight - paginatorHeight)
-  const emptyHeight = Math.max(80, tableHeight - 62)
-
-  important(content, 'height', `${contentHeight}px`)
-  important(content, 'min-height', `${contentHeight}px`)
-  important(content, 'max-height', `${contentHeight}px`)
-
-  important(body, 'height', `${contentHeight}px`)
-  important(body, 'min-height', '0')
-  important(body, 'max-height', `${contentHeight}px`)
-  important(body, 'overflow', 'hidden')
-
-  important(gridArea, 'height', `${gridHeight}px`)
-  important(gridArea, 'min-height', `${gridHeight}px`)
-  important(gridArea, 'max-height', `${gridHeight}px`)
-  important(gridArea, 'display', 'flex')
-  important(gridArea, 'flex', '0 0 auto')
-
-  important(popupGrid, 'height', `${gridHeight}px`)
-  important(popupGrid, 'min-height', `${gridHeight}px`)
-  important(popupGrid, 'max-height', `${gridHeight}px`)
-  important(popupGrid, 'display', 'flex')
-  important(popupGrid, 'flex', '0 0 auto')
-
-  important(dataTable, 'height', `${gridHeight}px`)
-  important(dataTable, 'min-height', `${gridHeight}px`)
-  important(dataTable, 'max-height', `${gridHeight}px`)
-  important(dataTable, 'display', 'flex')
-  important(dataTable, 'flex', '0 0 auto')
-
-  important(tableContainer, 'height', `${tableHeight}px`)
-  important(tableContainer, 'min-height', `${tableHeight}px`)
-  important(tableContainer, 'max-height', `${tableHeight}px`)
-  important(tableContainer, 'flex', '0 0 auto')
-
-  if (emptyContent) {
-    important(emptyContent, 'height', `${emptyHeight}px`)
-    important(emptyContent, 'min-height', `${emptyHeight}px`)
-    important(emptyContent, 'max-height', `${emptyHeight}px`)
-  }
-}
-
-const scheduleSharedDialogMeasure = (dialog) => {
-  window.requestAnimationFrame(() => {
-    window.requestAnimationFrame(() => measureSharedDialog(dialog))
-  })
-}
-
-const bindSharedDialogResize = (dialog) => {
-  if (!dialog || dialog.getAttribute(SHARED_RESIZE_BOUND_ATTR) === 'true') return
-  dialog.setAttribute(SHARED_RESIZE_BOUND_ATTR, 'true')
-
-  if (typeof ResizeObserver !== 'undefined') {
-    const resizeObserver = new ResizeObserver(() => scheduleSharedDialogMeasure(dialog))
-    resizeObserver.observe(dialog)
-  }
-}
-
-const syncSharedGridDialogs = () => {
-  document.querySelectorAll(SHARED_DIALOG_SELECTOR).forEach((dialog) => {
-    bindSharedDialogResize(dialog)
-    scheduleSharedDialogMeasure(dialog)
-  })
-}
-
 const enhanceOpenModals = () => {
   document.querySelectorAll(MODAL_SELECTOR).forEach(enhanceModal)
-  syncSharedGridDialogs()
 }
 
 export const initJobtypeModalMaximize = () => {
@@ -227,18 +91,11 @@ export const initJobtypeModalMaximize = () => {
 
   enhanceOpenModals()
 
-  const observer = new MutationObserver(() => {
-    enhanceOpenModals()
-  })
-
+  const observer = new MutationObserver(enhanceOpenModals)
   observer.observe(document.body, {
     childList: true,
-    subtree: true,
-    attributes: true,
-    attributeFilter: ['class']
+    subtree: true
   })
-
-  window.addEventListener('resize', syncSharedGridDialogs)
 }
 
 export default initJobtypeModalMaximize
