@@ -44,11 +44,7 @@
     </template>
 
     <div class="fm-grid-dialog__body">
-      <div
-        v-if="$slots.form"
-        class="fm-grid-dialog__form"
-        :style="formStyle"
-      >
+      <div v-if="$slots.form" class="fm-grid-dialog__form">
         <slot name="form" />
       </div>
 
@@ -72,17 +68,14 @@ import Dialog from 'primevue/dialog'
 const props = defineProps({
   visible: { type: Boolean, default: false },
   title: { type: String, default: '' },
-  width: { type: String, default: '1500px' },
-  maxWidth: { type: String, default: 'calc(100vw - 24px)' },
-  height: { type: String, default: 'min(780px, calc(100vh - 24px))' },
+  width: { type: String, default: '1360px' },
+  maxWidth: { type: String, default: 'calc(100vw - 36px)' },
+  height: { type: String, default: '850px' },
   modal: { type: Boolean, default: true },
   draggable: { type: Boolean, default: true },
   maximizable: { type: Boolean, default: true },
-  formColumns: {
-    type: String,
-    default: 'repeat(4, minmax(0, 1fr)) 132px'
-  },
-  formGap: { type: String, default: '16px' }
+  formColumns: { type: String, default: '' },
+  formGap: { type: String, default: '' }
 })
 
 const emit = defineEmits(['update:visible', 'close', 'maximize-change'])
@@ -95,15 +88,14 @@ const visibleModel = computed({
   set: (value) => emit('update:visible', value)
 })
 
+/*
+ * El tamaño estándar de una ventana con grilla es 1360 x 850.
+ * Los parámetros antiguos se conservan por compatibilidad, pero no pueden
+ * achicar el popup por debajo de la proporción definida para el aplicativo.
+ */
 const dialogStyle = computed(() => ({
-  '--fm-grid-dialog-width': props.width,
   '--fm-grid-dialog-max-width': props.maxWidth,
-  '--fm-grid-dialog-height': props.height
-}))
-
-const formStyle = computed(() => ({
-  '--fm-grid-dialog-form-columns': props.formColumns,
-  '--fm-grid-dialog-form-gap': props.formGap
+  '--fm-grid-dialog-requested-height': props.height
 }))
 
 const toggleMaximized = () => {
@@ -123,30 +115,37 @@ const onHide = () => {
 </script>
 
 <style>
-.fm-grid-dialog.p-dialog {
-  width: min(var(--fm-grid-dialog-width), var(--fm-grid-dialog-max-width)) !important;
-  max-width: var(--fm-grid-dialog-max-width) !important;
-  height: var(--fm-grid-dialog-height) !important;
-  min-height: min(560px, calc(100vh - 24px)) !important;
-  max-height: calc(100vh - 24px) !important;
+.fm-grid-dialog.p-dialog:not(.fm-grid-dialog--maximized) {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: min(1360px, calc(100vw - 36px)) !important;
+  min-width: 0 !important;
+  max-width: calc(100vw - 36px) !important;
+  height: min(850px, calc(100vh - 20px)) !important;
+  min-height: min(650px, calc(100vh - 20px)) !important;
+  max-height: calc(100vh - 20px) !important;
   display: grid !important;
-  grid-template-rows: 58px minmax(0, 1fr) 68px !important;
+  grid-template-rows: 70px minmax(0, 1fr) 90px !important;
   margin: 0 !important;
-  border: 1px solid #d6e1e8 !important;
-  border-radius: 2px !important;
+  border: 1px solid #c7d2d9 !important;
+  border-radius: 3px !important;
   background: #fff !important;
-  box-shadow: 0 18px 44px rgba(21, 37, 50, .24) !important;
+  box-shadow: 0 10px 30px rgba(20, 35, 45, .28) !important;
+  transform: translate(-50%, -50%) !important;
   overflow: hidden !important;
 }
 
 .fm-grid-dialog .p-dialog-header {
   width: 100% !important;
-  height: 58px !important;
-  min-height: 58px !important;
+  height: 70px !important;
+  min-height: 70px !important;
   display: flex !important;
   align-items: center !important;
-  padding: 0 20px !important;
-  border-bottom: 1px solid #dce6ec !important;
+  padding: 0 22px !important;
+  border-bottom: 1px solid #d8e0e5 !important;
   background: #fff !important;
   box-sizing: border-box !important;
 }
@@ -157,15 +156,15 @@ const onHide = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 20px;
 }
 
 .fm-grid-dialog__title {
   min-width: 0;
   overflow: hidden;
   color: #344f61;
-  font-size: 21px;
-  font-weight: 500;
+  font-size: 27px;
+  font-weight: 400;
   line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -174,7 +173,7 @@ const onHide = () => {
 .fm-grid-dialog__header-actions {
   display: inline-flex;
   align-items: center;
-  gap: 16px;
+  gap: 18px;
   flex: 0 0 auto;
 }
 
@@ -206,8 +205,8 @@ const onHide = () => {
 }
 
 .fm-grid-dialog__header-button .pi {
-  font-size: 21px;
-  line-height: 21px;
+  font-size: 23px;
+  line-height: 23px;
 }
 
 .fm-grid-dialog .p-dialog-content {
@@ -228,19 +227,19 @@ const onHide = () => {
   min-height: 0;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  gap: 18px;
-  padding: 20px 22px 18px;
+  gap: 22px;
+  padding: 24px 22px 22px;
   overflow: hidden;
   box-sizing: border-box;
-  container-type: inline-size;
 }
 
 .fm-grid-dialog__form {
   width: 100%;
   min-width: 0;
   display: grid;
-  grid-template-columns: var(--fm-grid-dialog-form-columns);
-  gap: var(--fm-grid-dialog-form-gap);
+  grid-template-columns: .9fr 1.45fr 1.45fr .9fr 136px;
+  column-gap: 28px;
+  row-gap: 14px;
   align-items: end;
   box-sizing: border-box;
 }
@@ -249,14 +248,14 @@ const onHide = () => {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 9px;
 }
 
 .fm-grid-dialog__field label {
   display: block;
   margin: 0;
-  color: #101820;
-  font-size: 14px;
+  color: #151c21;
+  font-size: 17px;
   font-weight: 700;
   line-height: 1.1;
   white-space: nowrap;
@@ -268,14 +267,14 @@ const onHide = () => {
   width: 100% !important;
   min-width: 0 !important;
   max-width: 100% !important;
-  height: 38px !important;
-  min-height: 38px !important;
-  max-height: 38px !important;
-  border: 1px solid #b9cbd6 !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+  border: 1px solid #bfcbd2 !important;
   border-radius: 3px !important;
   background: #fff !important;
-  color: #263746 !important;
-  font-size: 14px !important;
+  color: #253846 !important;
+  font-size: 16px !important;
   box-shadow: none !important;
   box-sizing: border-box !important;
 }
@@ -287,32 +286,33 @@ const onHide = () => {
 }
 
 .fm-grid-dialog__control.p-select .p-select-label {
-  padding: 7px 34px 7px 10px !important;
-  line-height: 22px !important;
-  font-size: 14px !important;
+  padding: 11px 40px 11px 12px !important;
+  line-height: 24px !important;
+  font-size: 16px !important;
 }
 
 .fm-grid-dialog__control.p-select .p-select-dropdown {
-  width: 32px !important;
+  width: 38px !important;
 }
 
 .fm-grid-dialog__form-action,
 .fm-grid-dialog__form-action.p-button,
 .fm-grid-dialog__form-action.p-button:enabled:hover,
 .fm-grid-dialog__form-action.p-button:enabled:focus {
-  width: 132px !important;
-  min-width: 132px !important;
-  max-width: 132px !important;
-  height: 38px !important;
-  min-height: 38px !important;
+  width: 136px !important;
+  min-width: 136px !important;
+  max-width: 136px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
   justify-self: stretch;
   padding: 0 18px !important;
   border: 1px solid #00a9bd !important;
-  border-radius: 20px !important;
+  border-radius: 24px !important;
   background: #00a9bd !important;
   color: #fff !important;
   box-shadow: none !important;
-  font-size: 14px !important;
+  font-size: 15px !important;
   font-weight: 700 !important;
 }
 
@@ -340,12 +340,12 @@ const onHide = () => {
 
 .fm-grid-dialog .p-dialog-footer {
   width: 100% !important;
-  height: 68px !important;
-  min-height: 68px !important;
+  height: 90px !important;
+  min-height: 90px !important;
   display: flex !important;
   align-items: center !important;
-  padding: 12px 22px !important;
-  border-top: 1px solid #dce6ec !important;
+  padding: 14px 22px !important;
+  border-top: 1px solid #d8e0e5 !important;
   background: #fff !important;
   box-sizing: border-box !important;
 }
@@ -361,11 +361,11 @@ const onHide = () => {
 .fm-grid-dialog__footer .p-button,
 .fm-grid-dialog__footer .p-button:enabled:hover,
 .fm-grid-dialog__footer .p-button:enabled:focus {
-  min-width: 190px !important;
-  height: 42px !important;
+  min-width: 166px !important;
+  height: 48px !important;
   padding: 0 22px !important;
   border: 1px solid #00a9bd !important;
-  border-radius: 22px !important;
+  border-radius: 24px !important;
   background: #00a9bd !important;
   color: #fff !important;
   box-shadow: none !important;
@@ -381,37 +381,26 @@ const onHide = () => {
   opacity: 1 !important;
 }
 
-.fm-grid-dialog--maximized.p-dialog {
+.fm-grid-dialog.fm-grid-dialog--maximized.p-dialog {
   position: fixed !important;
   inset: 0 !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
   width: 100vw !important;
+  min-width: 0 !important;
   max-width: none !important;
   height: 100vh !important;
-  min-height: 100vh !important;
+  min-height: 0 !important;
   max-height: none !important;
+  margin: 0 !important;
   border: 0 !important;
   border-radius: 0 !important;
   transform: none !important;
 }
 
-@container (max-width: 620px) {
-  .fm-grid-dialog__form {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
-
-  .fm-grid-dialog__form-action,
-  .fm-grid-dialog__form-action.p-button {
-    justify-self: start;
-  }
-}
-
-@container (max-width: 420px) {
-  .fm-grid-dialog__form {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-@media (max-width: 700px), (max-height: 620px) {
+@media (max-width: 900px) {
   .fm-grid-dialog.p-dialog:not(.fm-grid-dialog--maximized) {
     width: calc(100vw - 8px) !important;
     max-width: calc(100vw - 8px) !important;
@@ -420,9 +409,19 @@ const onHide = () => {
     max-height: calc(100vh - 8px) !important;
   }
 
-  .fm-grid-dialog__body {
-    gap: 12px;
-    padding: 14px;
+  .fm-grid-dialog__form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fm-grid-dialog__form-action,
+  .fm-grid-dialog__form-action.p-button {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 520px) {
+  .fm-grid-dialog__form {
+    grid-template-columns: 1fr;
   }
 }
 </style>
