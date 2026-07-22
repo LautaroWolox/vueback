@@ -2,6 +2,7 @@
   <div
     class="fm-popup-grid"
     :class="{ 'fm-popup-grid--horizontal': !fitColumns }"
+    :style="popupGridStyle"
   >
     <DataTable
       ref="dataTable"
@@ -53,6 +54,8 @@
           :total-records="totalRecords"
           :rows-options="rowsOptions"
           :disabled="loading"
+          :show-rows-select="showRowsSelect"
+          :show-counter="showCounter"
           @first-page="firstPageCallback"
           @prev-page="prevPageCallback"
           @next-page="nextPageCallback"
@@ -162,12 +165,14 @@ const props = defineProps({
   rowClass: { type: Function, default: null },
   rowsPerPage: { type: Number, default: 10 },
   rowsOptions: { type: Array, default: () => [10, 20, 50] },
-  scrollHeight: { type: String, default: '230px' },
+  scrollHeight: { type: String, default: '210px' },
   emptyMessage: { type: String, default: 'No hay resultados' },
   loading: { type: Boolean, default: false },
   fitColumns: { type: Boolean, default: true },
   resizableColumns: { type: Boolean, default: true },
-  actionSize: { type: String, default: 'large' },
+  showRowsSelect: { type: Boolean, default: false },
+  showCounter: { type: Boolean, default: false },
+  actionSize: { type: String, default: 'compact' },
   showExport: { type: Boolean, default: false },
   showDelete: { type: Boolean, default: false },
   showEdit: { type: Boolean, default: false },
@@ -219,6 +224,10 @@ const selectionModel = computed({
   set: (value) => emit('update:selection', value)
 })
 
+const popupGridStyle = computed(() => ({
+  '--fm-popup-grid-height': props.scrollHeight
+}))
+
 const tableStyle = computed(() => (
   props.fitColumns
     ? 'table-layout: fixed; width: 100%; min-width: 100%'
@@ -258,9 +267,14 @@ defineExpose({ dataTable })
 .fm-popup-grid .p-datatable-wrapper {
   width: 100% !important;
   max-width: 100% !important;
+  height: min(var(--fm-popup-grid-height), 210px) !important;
+  min-height: min(var(--fm-popup-grid-height), 210px) !important;
+  max-height: min(var(--fm-popup-grid-height), 210px) !important;
   overflow-x: hidden !important;
   overflow-y: auto !important;
+  scrollbar-gutter: stable !important;
   border: 0 !important;
+  border-bottom: 1px solid #9fb8c7 !important;
   background: #fff !important;
 }
 
@@ -273,7 +287,8 @@ defineExpose({ dataTable })
   width: 100% !important;
   min-width: 100% !important;
   table-layout: fixed !important;
-  border-collapse: collapse !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
   font-size: 12px !important;
 }
 
@@ -285,33 +300,53 @@ defineExpose({ dataTable })
   vertical-align: middle !important;
 }
 
+.fm-popup-grid .p-datatable-thead > tr > th:last-child,
+.fm-popup-grid .p-datatable-tbody > tr > td:last-child {
+  border-right: 0 !important;
+}
+
 .fm-popup-grid .p-datatable-thead > tr > th {
-  height: 34px !important;
-  min-height: 34px !important;
-  padding: 4px 9px !important;
+  height: 31px !important;
+  min-height: 31px !important;
+  padding: 0 7px !important;
   overflow: hidden !important;
-  background: #f4f7f9 !important;
-  color: #203b4d !important;
-  font-size: 11px !important;
+  background: #f8fafb !important;
+  color: #163849 !important;
+  font-size: 10px !important;
   font-weight: 700 !important;
-  line-height: 1.15 !important;
+  line-height: 1.1 !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+}
+
+.fm-popup-grid .p-column-header-content {
+  min-width: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  overflow: hidden !important;
+}
+
+.fm-popup-grid .p-datatable-column-title {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  overflow: hidden !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
 }
 
-.fm-popup-grid .p-column-header-content,
-.fm-popup-grid .p-datatable-column-title {
-  min-width: 0 !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  white-space: nowrap !important;
+.fm-popup-grid .p-sortable-column-icon {
+  flex: 0 0 auto !important;
+  width: 12px !important;
+  height: 12px !important;
+  font-size: 12px !important;
 }
 
 .fm-popup-grid .p-datatable-thead > tr.p-datatable-filter-row > th,
 .fm-popup-grid .p-datatable-thead > tr.p-filter-row > th {
-  height: 34px !important;
-  min-height: 34px !important;
-  padding: 4px 6px !important;
+  height: 31px !important;
+  min-height: 31px !important;
+  padding: 3px 5px !important;
   overflow: hidden !important;
   background: #fff !important;
 }
@@ -338,46 +373,50 @@ defineExpose({ dataTable })
   width: 100% !important;
   min-width: 0 !important;
   max-width: 100% !important;
-  height: 25px !important;
-  min-height: 25px !important;
-  padding: 3px 5px !important;
-  border: 1px solid #c7d1d8 !important;
-  border-radius: 3px !important;
+  height: 22px !important;
+  min-height: 22px !important;
+  max-height: 22px !important;
+  padding: 0 5px !important;
+  border: 1px solid #c7d6df !important;
+  border-radius: 2px !important;
   background: #fff !important;
-  color: #263238 !important;
+  color: #0f2f3d !important;
   font-size: 11px !important;
-  line-height: 17px !important;
+  line-height: 22px !important;
   box-shadow: none !important;
   box-sizing: border-box !important;
 }
 
 .fm-popup-grid__filter-input:focus {
   border-color: #00a9bd !important;
-  box-shadow: 0 0 0 2px rgba(0, 169, 189, .14) !important;
+  box-shadow: 0 0 0 1px rgba(0, 169, 189, .14) !important;
   outline: none !important;
 }
 
 .fm-popup-grid .p-datatable-tbody > tr > td {
-  height: 32px !important;
-  min-height: 32px !important;
-  padding: 4px 8px !important;
+  height: 31px !important;
+  min-height: 31px !important;
+  max-height: 31px !important;
+  padding: 0 7px !important;
   overflow: hidden !important;
   background: #fff !important;
-  color: #263238 !important;
+  color: #0f2f3d !important;
   font-size: 12px !important;
+  line-height: 31px !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
 }
 
 .fm-popup-grid .p-datatable-tbody > tr:hover > td {
-  background: #edfafd !important;
+  background: #eefbfc !important;
 }
 
 .fm-popup-grid .p-datatable-tbody > tr.p-highlight > td,
 .fm-popup-grid .p-datatable-tbody > tr.p-datatable-row-selected > td,
 .fm-popup-grid .p-datatable-tbody > tr.fm-selected-row > td {
-  background: #9eeff7 !important;
-  color: #263238 !important;
+  background: #e8f8fb !important;
+  color: #0f2f3d !important;
+  font-weight: 600 !important;
 }
 
 .fm-popup-grid__cell {
@@ -397,15 +436,15 @@ defineExpose({ dataTable })
 
 .fm-popup-grid__empty {
   width: 100%;
-  min-height: 132px;
+  min-height: 146px;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 12px;
   background: #eafcff;
-  color: #607d8b;
+  color: #6f8594;
   font-size: 12px;
-  font-weight: 400;
+  font-weight: 500;
   text-align: center;
   box-sizing: border-box;
 }
@@ -414,12 +453,13 @@ defineExpose({ dataTable })
 .fm-popup-grid .p-datatable-paginator-bottom {
   width: 100% !important;
   min-width: 100% !important;
-  min-height: 38px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
   display: block !important;
   padding: 0 !important;
   margin: 0 !important;
   border: 0 !important;
-  border-top: 1px solid #c7d5dd !important;
   border-radius: 0 !important;
   background: #fff !important;
   overflow: visible !important;
@@ -427,8 +467,22 @@ defineExpose({ dataTable })
 }
 
 .fm-popup-grid .fm-custom-paginator {
-  min-height: 38px !important;
-  padding: 3px 8px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 0 10px !important;
+  font-size: 11px !important;
+}
+
+.fm-popup-grid .fm-page-input {
+  width: 42px !important;
+  min-width: 42px !important;
+  height: 26px !important;
+  min-height: 26px !important;
+}
+
+.fm-popup-grid .fm-page-label,
+.fm-popup-grid .fm-page-total {
+  font-size: 11px !important;
 }
 
 .fm-popup-grid .p-column-resizer,
@@ -437,11 +491,5 @@ defineExpose({ dataTable })
   right: -4px !important;
   cursor: col-resize !important;
   background: transparent !important;
-}
-
-@media (max-width: 620px) {
-  .fm-popup-grid .fm-custom-paginator {
-    min-height: 84px !important;
-  }
 }
 </style>
