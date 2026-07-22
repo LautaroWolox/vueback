@@ -191,7 +191,7 @@
               id="alta-jobtype"
               v-model="altaForm.jobtype"
               class="jobtype-alta-control"
-              :disabled="!altaForm.pais"
+              required
             />
           </div>
 
@@ -201,7 +201,7 @@
               id="alta-contrato"
               v-model="altaForm.contrato"
               class="jobtype-alta-control"
-              :disabled="!altaForm.pais"
+              required
             />
           </div>
 
@@ -214,7 +214,6 @@
               optionLabel="label"
               optionValue="value"
               class="jobtype-alta-control"
-              :disabled="!altaForm.pais"
             />
           </div>
 
