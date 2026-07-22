@@ -35,7 +35,7 @@
           v-model:selection="selectedRow"
           v-model:first="mainFirst"
           v-model:rows="mainPageRows"
-          class="jobtype-main-grid"
+          class="jobtype-main-grid fm-pass-grid"
           :value="mainRows"
           dataKey="id"
           tableStyle="table-layout: fixed; width: 100%; min-width: 100%"
@@ -223,20 +223,20 @@
             />
           </div>
 
-          <Button
+          <FmButton
             label="AGREGAR"
-            class="jobtype-primary-button jobtype-add-button"
+            class="jobtype-add-button"
             :disabled="!canAgregar"
             @click="agregarPreview"
           />
         </div>
 
-        <div class="jobtype-alta-grid-wrap">
+        <div class="jobtype-alta-grid-wrap fm-grid-shell">
           <DataTable
             v-model:selection="altaSelectedRow"
             v-model:first="altaFirst"
             v-model:rows="altaPageRows"
-            class="jobtype-alta-grid"
+            class="jobtype-alta-grid fm-pass-grid"
             :value="altaRows"
             dataKey="id"
             tableStyle="table-layout: fixed; width: 100%; min-width: 100%"
@@ -295,6 +295,10 @@
               </FmGridPaginator>
             </template>
 
+            <template #empty>
+              <div class="fm-grid-empty jobtype-alta-empty"></div>
+            </template>
+
             <Column
               v-for="column in altaColumns"
               :key="column.field"
@@ -315,9 +319,9 @@
       </div>
 
       <template #footer>
-        <Button
+        <FmButton
           label="RELACIONAR"
-          class="jobtype-primary-button jobtype-relate-button"
+          class="jobtype-relate-button"
           :disabled="altaRows.length === 0"
           @click="relacionar"
         />
@@ -328,7 +332,6 @@
 
 <script setup>
 import { computed, reactive, ref, watch } from 'vue'
-import Button from 'primevue/button'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
@@ -349,7 +352,7 @@ const altaRows = ref([])
 
 const altaDialogStyle = computed(() => altaMaximized.value
   ? 'width:100vw !important;height:100vh !important;max-width:100vw !important;max-height:100vh !important;margin:0 !important;border-radius:0 !important;'
-  : 'width:calc(100vw - 22px) !important;height:calc(100vh - 12px) !important;max-width:none !important;max-height:none !important;margin:0 !important;'
+  : 'width:min(1180px, calc(100vw - 48px)) !important;height:min(720px, calc(100vh - 48px)) !important;max-width:calc(100vw - 48px) !important;max-height:calc(100vh - 48px) !important;margin:0 !important;'
 )
 
 const mainColumns = [
