@@ -32,6 +32,8 @@ import FmAlertDialog from './components/shared/FmAlertDialog.vue'
 import FmActionButton from './components/shared/FmActionButton.vue'
 import FmGridActions from './components/shared/FmGridActions.vue'
 import FmGridPaginator from './components/shared/FmGridPaginator.vue'
+import FmGridDialog from './components/shared/FmGridDialog.vue'
+import FmPopupGrid from './components/shared/FmPopupGrid.vue'
 import FmTypingLoader from './components/shared/FmTypingLoader.vue'
 import FmResponsivePage from './components/shared/FmResponsivePage.vue'
 
@@ -113,6 +115,8 @@ app.component('FmAlertDialog', FmAlertDialog)
 app.component('FmActionButton', FmActionButton)
 app.component('FmGridActions', FmGridActions)
 app.component('FmGridPaginator', FmGridPaginator)
+app.component('FmGridDialog', FmGridDialog)
+app.component('FmPopupGrid', FmPopupGrid)
 app.component('FmTypingLoader', FmTypingLoader)
 app.component('FmResponsivePage', FmResponsivePage)
 
