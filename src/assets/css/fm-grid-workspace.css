@@ -1,25 +1,37 @@
 /*
  * Preset global para ventanas de trabajo con grillas.
- * Se aplica a FmGridDialog/FmPopupGrid y evita que cada pantalla repita
- * tamaños, columnas y breakpoints.
+ * Centraliza tamaño, formulario, tabla y comportamiento responsive para que
+ * todas las pantallas reutilicen la misma estructura sin estilos locales.
  */
 
+/* Ventana normal: ancha, proporcionada y sin ocupar todo el alto del viewport. */
 html body .fm-grid-dialog.p-dialog:not(.fm-grid-dialog--maximized) {
   width: min(1500px, calc(100vw - 24px)) !important;
   max-width: calc(100vw - 24px) !important;
-  height: min(780px, calc(100vh - 24px)) !important;
-  min-height: min(600px, calc(100vh - 24px)) !important;
+  height: min(640px, calc(100vh - 24px)) !important;
+  min-height: min(540px, calc(100vh - 24px)) !important;
+  max-height: calc(100vh - 24px) !important;
 }
 
+/*
+ * Estructura estándar del formulario:
+ * País | Jobtype | Contrato | Origen | Acción.
+ * Los valores enviados por FmGridDialog continúan disponibles mediante la
+ * variable, pero este preset evita el auto-fit que quebraba los campos.
+ */
 html body .fm-grid-dialog .fm-grid-dialog__form {
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) 132px !important;
   column-gap: 16px !important;
   row-gap: 14px !important;
+  align-items: end !important;
 }
 
 html body .fm-grid-dialog .fm-grid-dialog__form-action,
 html body .fm-grid-dialog .fm-grid-dialog__form-action.p-button {
-  justify-self: end !important;
+  width: 132px !important;
+  min-width: 132px !important;
+  max-width: 132px !important;
+  justify-self: stretch !important;
 }
 
 html body .fm-grid-dialog .fm-grid-dialog__grid-area,
@@ -29,18 +41,72 @@ html body .fm-grid-dialog .fm-popup-grid .p-datatable {
   min-height: 0 !important;
 }
 
-html body .fm-grid-dialog .fm-popup-grid .p-datatable-table-container,
-html body .fm-grid-dialog .fm-popup-grid .p-datatable-wrapper,
-html body .fm-grid-dialog .fm-popup-grid [data-pc-section="tablecontainer"] {
-  scrollbar-gutter: stable both-edges !important;
+/*
+ * fitColumns=true: las columnas ocupan exactamente el ancho disponible.
+ * Corrige el max-content interno que generaba la barra horizontal y cortaba
+ * ORIGEN, NOMBRE_CONTRATO y PAIS.
+ */
+html body .fm-grid-dialog .fm-popup-grid:not(.fm-popup-grid--horizontal) .p-datatable-table {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  table-layout: fixed !important;
 }
 
+html body .fm-grid-dialog .fm-popup-grid:not(.fm-popup-grid--horizontal) .p-datatable-table-container,
+html body .fm-grid-dialog .fm-popup-grid:not(.fm-popup-grid--horizontal) .p-datatable-wrapper,
+html body .fm-grid-dialog .fm-popup-grid:not(.fm-popup-grid--horizontal) [data-pc-section="tablecontainer"] {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  scrollbar-gutter: stable !important;
+}
+
+html body .fm-grid-dialog .fm-popup-grid:not(.fm-popup-grid--horizontal) .p-datatable-thead > tr > th,
+html body .fm-grid-dialog .fm-popup-grid:not(.fm-popup-grid--horizontal) .p-datatable-tbody > tr > td {
+  min-width: 0 !important;
+  max-width: none !important;
+}
+
+html body .fm-grid-dialog .fm-popup-grid .p-datatable-column-title,
+html body .fm-grid-dialog .fm-popup-grid .fm-popup-grid__cell {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+html body .fm-grid-dialog .fm-popup-grid__empty {
+  width: 100% !important;
+  min-width: 100% !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  text-align: center !important;
+}
+
+/* Mantiene el paginador y las acciones siempre visibles debajo de la tabla. */
+html body .fm-grid-dialog .fm-popup-grid .p-paginator,
+html body .fm-grid-dialog .fm-popup-grid .p-datatable-paginator-bottom {
+  flex: 0 0 46px !important;
+  width: 100% !important;
+}
+
+/* En maximizado se conserva la ventana de trabajo completa. */
+html body .fm-grid-dialog.fm-grid-dialog--maximized.p-dialog {
+  inset: 0 !important;
+  width: 100vw !important;
+  max-width: none !important;
+  height: 100vh !important;
+  min-height: 100vh !important;
+  max-height: none !important;
+}
+
+/* Tablet: dos columnas; el botón queda alineado con el resto del formulario. */
 @media (max-width: 820px) {
   html body .fm-grid-dialog.p-dialog:not(.fm-grid-dialog--maximized) {
     width: calc(100vw - 8px) !important;
     max-width: calc(100vw - 8px) !important;
     height: calc(100vh - 8px) !important;
     min-height: 0 !important;
+    max-height: calc(100vh - 8px) !important;
   }
 
   html body .fm-grid-dialog .fm-grid-dialog__form {
@@ -56,5 +122,11 @@ html body .fm-grid-dialog .fm-popup-grid [data-pc-section="tablecontainer"] {
 @media (max-width: 480px) {
   html body .fm-grid-dialog .fm-grid-dialog__form {
     grid-template-columns: 1fr !important;
+  }
+
+  html body .fm-grid-dialog .fm-grid-dialog__form-action,
+  html body .fm-grid-dialog .fm-grid-dialog__form-action.p-button {
+    width: 100% !important;
+    max-width: none !important;
   }
 }
