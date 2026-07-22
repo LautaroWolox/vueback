@@ -1,0 +1,74 @@
+@layer fieldmanager {
+  .p-select-overlay,
+  .fm-pt-select-panel {
+    overflow: hidden !important;
+    border: 1px solid #d4dde2 !important;
+    border-radius: 8px !important;
+    background: #fff !important;
+    box-shadow: 0 12px 30px rgba(20, 48, 59, .18) !important;
+  }
+
+  .p-select-list,
+  .fm-pt-select-list {
+    margin: 0 !important;
+    padding: 6px 0 !important;
+    background: #fff !important;
+  }
+
+  .p-select-option,
+  .fm-pt-select-option {
+    min-height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 8px 18px !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+    color: #263746 !important;
+    font-size: 16px !important;
+    font-weight: 400 !important;
+    cursor: pointer !important;
+    transition: background-color .12s ease, color .12s ease !important;
+  }
+
+  .p-select-option.p-select-option-selected,
+  .p-select-option[aria-selected="true"],
+  .p-select-option[data-p-selected="true"],
+  .fm-pt-select-option.p-select-option-selected,
+  .fm-pt-select-option[aria-selected="true"],
+  .fm-pt-select-option[data-p-selected="true"] {
+    background: #eef2f4 !important;
+    color: #263746 !important;
+    font-weight: 500 !important;
+  }
+
+  .p-select-option:hover,
+  .p-select-option.p-focus,
+  .p-select-option[data-p-focused="true"],
+  .fm-pt-select-option:hover,
+  .fm-pt-select-option.p-focus,
+  .fm-pt-select-option[data-p-focused="true"] {
+    background: #d9f8fa !important;
+    color: #006f7d !important;
+  }
+
+  .p-select-option.p-select-option-selected:hover,
+  .p-select-option.p-select-option-selected.p-focus,
+  .p-select-option.p-select-option-selected[data-p-focused="true"],
+  .p-select-option[aria-selected="true"]:hover,
+  .p-select-option[aria-selected="true"].p-focus,
+  .p-select-option[aria-selected="true"][data-p-focused="true"],
+  .fm-pt-select-option.p-select-option-selected:hover,
+  .fm-pt-select-option.p-select-option-selected.p-focus,
+  .fm-pt-select-option.p-select-option-selected[data-p-focused="true"] {
+    background: #d9f8fa !important;
+    color: #006f7d !important;
+  }
+
+  @media (max-width: 600px), (pointer: coarse) {
+    .p-select-option,
+    .fm-pt-select-option {
+      min-height: 44px !important;
+      padding: 10px 16px !important;
+    }
+  }
+}

@@ -1,5 +1,5 @@
 <template>
-  <section class="fm-ui-section fm-card">
+  <section class="fm-ui-section fm-card fm-responsive-panel">
     <header v-if="title || $slots.header" class="fm-ui-section-header fm-card__header">
       <slot name="header">
         <span>{{ title }}</span>

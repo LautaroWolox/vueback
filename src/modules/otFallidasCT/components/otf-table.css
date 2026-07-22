@@ -31,7 +31,6 @@
   font-size: 12px !important;
 }
 
-/* El mismo ancho se aplica a encabezado, filtros y cuerpo. */
 :deep(#tabla .p-datatable-thead > tr > th),
 :deep(#tabla .p-datatable-tbody > tr > td) {
   box-sizing: border-box !important;
@@ -60,7 +59,6 @@
   white-space: nowrap !important;
 }
 
-/* Área amplia y visible para tomar cualquier límite de columna. */
 :deep(#tabla .p-column-resizer),
 :deep(#tabla .p-datatable-column-resizer) {
   position: absolute !important;
@@ -203,7 +201,6 @@
   background: #00a9bd !important;
 }
 
-/* Paginador compacto: acciones a la izquierda, navegación al centro, contador a la derecha. */
 :deep(#tabla .p-paginator) {
   height: 38px !important;
   min-height: 38px !important;

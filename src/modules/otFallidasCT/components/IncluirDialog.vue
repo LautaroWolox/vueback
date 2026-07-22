@@ -3,52 +3,54 @@
     :visible="visibleInc"
     modal
     header="Incluir orden de trabajo"
-    class="fm-dialog otf-action-dialog"
+    class="fm-dialog otf-action-dialog otf-include-dialog"
     :style="{ width: '42rem' }"
     @update:visible="$emit('update:visibleInc', $event)"
   >
-    <div class="fm-dialog-body otf-dialog-form">
-      <div class="otf-dialog-summary otf-dialog-summary--include">
-        <i class="pi pi-undo"></i>
-        <span>Se incluirá nuevamente la OT {{ store.nroOT || '' }}.</span>
-      </div>
-
-      <div class="fm-field fm-field--span-12">
+    <div class="otf-include-form">
+      <div class="fm-field otf-include-motivo-field">
         <label for="motivo-inclusion">Motivo</label>
-        <Select
-          id="motivo-inclusion"
+        <FmCompactSelect
           v-if="status.motivos === 'loading'"
-          v-model="motivoSelected"
+          id="motivo-inclusion"
+          class="otf-include-motivo-select"
           disabled
           placeholder="Cargando..."
         />
-        <Select
-          id="motivo-inclusion"
+        <FmCompactSelect
           v-else-if="status.motivos === 'loaded'"
+          id="motivo-inclusion"
           v-model="motivoSelected"
+          class="otf-include-motivo-select"
           :options="motivoOptions"
-          optionLabel="nombre"
+          option-label="nombre"
           placeholder="Seleccione un motivo"
+          :max-panel-height="150"
         />
         <span v-else-if="status.motivos === 'error'" class="fm-field-error">Error al cargar.</span>
       </div>
 
-      <div class="fm-field fm-field--span-12">
+      <div class="fm-field otf-include-comment-field">
         <label for="comentario-inclusion">Comentario</label>
-        <Textarea
+        <textarea
           id="comentario-inclusion"
           v-model="comentario"
-          rows="4"
-          autoResize
-        />
+          class="otf-include-comment"
+          rows="2"
+        ></textarea>
       </div>
     </div>
 
     <template #footer>
-      <FmButton label="CANCELAR" variant="outline" @click="cerrar" />
       <FmButton
+        class="otf-include-cancel"
+        label="CANCELAR"
+        variant="outline"
+        @click="cerrar"
+      />
+      <FmButton
+        class="otf-include-accept"
         label="ACEPTAR"
-        icon="pi-check"
         :disabled="!motivoSelected?.nombreCorto || store.loading"
         @click="confirmar"
       />
@@ -59,8 +61,7 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import Select from 'primevue/select'
-import Textarea from 'primevue/textarea'
+import FmCompactSelect from '@/components/shared/FmCompactSelect.vue'
 import { useFallidasCtStore } from '../store/CtFallidaStore'
 import { useCommonCtStore } from '@/store/commonCt'
 
@@ -75,10 +76,7 @@ const { motivos, status } = storeToRefs(commonCT)
 const motivoSelected = ref(null)
 const comentario = ref('')
 
-const motivoOptions = computed(() => [
-  { id: 0, nombre: '', nombreCorto: '', activo: '' },
-  ...(motivos.value ?? [])
-])
+const motivoOptions = computed(() => motivos.value ?? [])
 
 const reset = () => {
   motivoSelected.value = null
@@ -101,36 +99,144 @@ onMounted(() => commonCT.setMotivosExcInc())
 </script>
 
 <style scoped>
-.otf-dialog-form {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.otf-dialog-summary {
-  grid-column: span 12;
-  min-height: 48px;
+.otf-include-form {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  border: 1px solid #cfe9ec;
-  border-radius: 6px;
-  background: #effcfd;
-  color: #285964;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.otf-dialog-summary i {
-  color: #008fa1;
-  font-size: 20px;
-}
-
-:deep(.p-textarea) {
+.otf-include-form .fm-field {
   width: 100%;
-  min-height: 92px;
-  border: 1px solid #c5d1d8;
-  border-radius: 4px;
-  background: #fff;
+  min-width: 0;
+}
+
+.otf-include-form .fm-field label {
+  display: block;
+  margin: 0 0 4px;
+  color: #202020;
   font-size: 12px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.otf-include-motivo-field {
+  width: min(240px, 100%) !important;
+  max-width: 240px;
+}
+
+:deep(.otf-include-motivo-select .fm-compact-select__trigger) {
+  height: 32px;
+  min-height: 32px;
+  padding: 0 8px;
+  font-size: 11px;
+}
+
+:deep(.otf-include-motivo-select .fm-compact-select__value) {
+  font-size: 11px;
+  font-weight: 400;
+}
+
+:deep(.otf-include-motivo-select .fm-compact-select__chevron) {
+  width: 7px;
+  height: 7px;
+  flex-basis: 7px;
+  border-right-width: 1.5px;
+  border-bottom-width: 1.5px;
+}
+
+:deep(.otf-include-motivo-select .fm-compact-select__panel) {
+  padding: 2px 0;
+}
+
+:deep(.otf-include-motivo-select .fm-compact-select__option) {
+  min-height: 27px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.otf-include-comment {
+  width: 100%;
+  min-width: 240px;
+  max-width: 100%;
+  height: 54px;
+  min-height: 36px;
+  max-height: 45vh;
+  padding: 7px 9px;
+  overflow: auto;
+  resize: both;
+  border: 1px solid #bfc8cd;
+  border-radius: 2px;
+  background: #fff;
+  color: #263746;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.3;
+  box-shadow: none;
+  box-sizing: border-box;
+}
+
+.otf-include-comment:focus {
+  outline: none;
+  border-color: #00a9bd;
+  box-shadow: 0 0 0 2px rgba(0, 169, 189, .14);
+}
+
+:global(.p-dialog.otf-include-dialog.fm-dialog) {
+  overflow: visible !important;
+}
+
+:global(.otf-include-dialog .p-dialog-content) {
+  padding: 12px 12px 14px !important;
+  overflow: visible !important;
+}
+
+:global(.otf-include-dialog .p-dialog-footer) {
+  min-height: 42px !important;
+  gap: 5px !important;
+  padding: 5px 12px !important;
+}
+
+:global(.otf-include-dialog .otf-include-cancel),
+:global(.otf-include-dialog .otf-include-accept) {
+  width: 88px !important;
+  min-width: 88px !important;
+  max-width: 88px !important;
+  height: 26px !important;
+  min-height: 26px !important;
+  max-height: 26px !important;
+  padding: 0 7px !important;
+  border-radius: 3px !important;
+  font-size: 10px !important;
+  font-weight: 400 !important;
+  box-shadow: 0 2px 5px rgba(0, 91, 104, .07) !important;
+  transform: none !important;
+}
+
+:global(.otf-include-dialog .otf-include-cancel .p-button-label),
+:global(.otf-include-dialog .otf-include-accept .p-button-label) {
+  font-size: 10px !important;
+  font-weight: 400 !important;
+}
+
+@media (max-width: 600px) {
+  .otf-include-motivo-field,
+  .otf-include-comment {
+    width: 100% !important;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .otf-include-comment {
+    resize: vertical;
+  }
+
+  :global(.otf-include-dialog .otf-include-cancel),
+  :global(.otf-include-dialog .otf-include-accept) {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
 }
 </style>
