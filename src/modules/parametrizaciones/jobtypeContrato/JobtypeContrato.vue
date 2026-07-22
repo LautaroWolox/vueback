@@ -148,30 +148,26 @@
       :resizable="false"
       :style="altaDialogStyle"
       class="jobtype-alta-dialog"
-      :class="{ 'jobtype-alta-dialog--maximized': altaMaximized }"
       @hide="onAltaHide"
     >
       <template #header>
-        <div class="jobtype-alta-header">
+        <div
+          class="jobtype-alta-header"
+          style="grid-template-columns: minmax(0, 1fr) 52px"
+        >
+          <h2
+            class="jobtype-alta-header__title"
+            style="margin-left: 20px"
+          >Alta Jobtype - Contrato</h2>
+
           <button
             type="button"
             class="jobtype-alta-header__close"
+            style="justify-self: center; margin-left: 0"
             title="Cerrar"
             aria-label="Cerrar"
             @click="cerrarAlta"
           >×</button>
-
-          <h2 class="jobtype-alta-header__title">Alta Jobtype - Contrato</h2>
-
-          <button
-            type="button"
-            class="jobtype-alta-header__maximize"
-            :title="altaMaximized ? 'Restaurar' : 'Maximizar'"
-            :aria-label="altaMaximized ? 'Restaurar' : 'Maximizar'"
-            @click="altaMaximized = !altaMaximized"
-          >
-            <span aria-hidden="true"></span>
-          </button>
         </div>
       </template>
 
@@ -340,7 +336,6 @@ import { FilterMatchMode } from '@primevue/core/api'
 const filtersExpanded = ref(true)
 const resultsExpanded = ref(false)
 const showAlta = ref(false)
-const altaMaximized = ref(false)
 const selectedRow = ref(null)
 const altaSelectedRow = ref(null)
 const mainFirst = ref(0)
@@ -350,10 +345,7 @@ const altaPageRows = ref(10)
 const mainRows = ref([])
 const altaRows = ref([])
 
-const altaDialogStyle = computed(() => altaMaximized.value
-  ? 'position: fixed !important; inset: 0 !important; width: 100vw !important; height: 100dvh !important; max-width: 100vw !important; max-height: 100dvh !important; margin: 0 !important; transform: none !important; border-radius: 0 !important;'
-  : 'width: calc(100vw - 48px) !important; max-width: 1440px !important; height: min(680px, calc(100dvh - 48px)) !important; max-height: calc(100dvh - 48px) !important; margin: 0 !important;'
-)
+const altaDialogStyle = 'width: calc(100vw - 48px) !important; max-width: 1440px !important; height: min(680px, calc(100dvh - 48px)) !important; max-height: calc(100dvh - 48px) !important; margin: 0 !important;'
 
 const mainColumns = [
   { field: 'codigoTarea', header: 'CODIGO_TAREA', width: '12.5%' },
@@ -424,7 +416,6 @@ const buscar = () => {
 
 const abrirAlta = () => {
   resetAlta()
-  altaMaximized.value = false
   showAlta.value = true
 }
 
@@ -433,7 +424,6 @@ const cerrarAlta = () => {
 }
 
 const onAltaHide = () => {
-  altaMaximized.value = false
   resetAlta()
 }
 
