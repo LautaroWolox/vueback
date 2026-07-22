@@ -1,5 +1,11 @@
 <template>
-  <div class="fm-custom-paginator fm-responsive-paginator">
+  <div
+    class="fm-custom-paginator fm-responsive-paginator"
+    :class="{
+      'fm-custom-paginator--no-counter': !showCounter,
+      'fm-custom-paginator--no-rows': !showRowsSelect
+    }"
+  >
     <div class="fm-custom-paginator__actions">
       <slot name="actions" />
     </div>
@@ -55,6 +61,7 @@
       >&gt;|</button>
 
       <select
+        v-if="showRowsSelect"
         class="fm-rows-select"
         :value="rows"
         :disabled="disabled"
@@ -67,7 +74,7 @@
       </select>
     </div>
 
-    <span class="fm-custom-paginator__counter">
+    <span v-if="showCounter" class="fm-custom-paginator__counter">
       Mostrando {{ totalRecords ? first + 1 : 0 }} - {{ last }} de {{ totalRecords }}
     </span>
   </div>
@@ -82,7 +89,9 @@ const props = defineProps({
   rows: { type: Number, default: 10 },
   totalRecords: { type: Number, default: 0 },
   rowsOptions: { type: Array, default: () => [10, 50, 100, 500] },
-  disabled: { type: Boolean, default: false }
+  disabled: { type: Boolean, default: false },
+  showRowsSelect: { type: Boolean, default: true },
+  showCounter: { type: Boolean, default: true }
 })
 
 const emit = defineEmits([
@@ -120,6 +129,7 @@ const changePage = (event) => {
 }
 
 .fm-custom-paginator__actions {
+  grid-column: 1;
   justify-self: start;
   min-width: 0;
   display: inline-flex;
@@ -127,6 +137,7 @@ const changePage = (event) => {
 }
 
 .fm-custom-paginator__navigation {
+  grid-column: 2;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -137,11 +148,27 @@ const changePage = (event) => {
   white-space: nowrap;
 }
 
+.fm-custom-paginator__counter {
+  grid-column: 3;
+  justify-self: end;
+  color: #222;
+  white-space: nowrap;
+}
+
+.fm-custom-paginator--no-counter {
+  grid-template-columns: minmax(80px, 1fr) auto minmax(80px, 1fr);
+}
+
+.fm-custom-paginator--no-counter::after {
+  content: '';
+  grid-column: 3;
+}
+
 .fm-page-button {
   width: 22px;
   min-width: 22px;
-  height: 28px;
-  min-height: 28px;
+  height: 26px;
+  min-height: 26px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -151,7 +178,7 @@ const changePage = (event) => {
   background: transparent;
   color: #111;
   font-family: Arial, sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 400;
   line-height: 1;
   cursor: pointer;
@@ -219,26 +246,20 @@ const changePage = (event) => {
   color: #9aa5aa;
 }
 
-.fm-custom-paginator__counter {
-  justify-self: end;
-  color: #222;
-  font-size: 12px;
-  white-space: nowrap;
-}
-
 @media (max-width: 900px) {
-  .fm-custom-paginator {
+  .fm-custom-paginator:not(.fm-custom-paginator--no-counter) {
     min-height: 78px;
     grid-template-columns: 1fr 1fr;
     gap: 5px 10px;
     padding: 5px 8px;
   }
 
-  .fm-custom-paginator__counter {
+  .fm-custom-paginator:not(.fm-custom-paginator--no-counter) .fm-custom-paginator__counter {
+    grid-column: 2;
     justify-self: end;
   }
 
-  .fm-custom-paginator__navigation {
+  .fm-custom-paginator:not(.fm-custom-paginator--no-counter) .fm-custom-paginator__navigation {
     grid-column: 1 / -1;
     grid-row: 2;
     justify-self: center;
@@ -246,7 +267,7 @@ const changePage = (event) => {
 }
 
 @media (max-width: 600px) {
-  .fm-custom-paginator {
+  .fm-custom-paginator:not(.fm-custom-paginator--no-counter) {
     min-height: 112px;
     display: flex;
     flex-direction: column;
@@ -255,21 +276,8 @@ const changePage = (event) => {
   }
 
   .fm-custom-paginator__navigation {
-    width: 100%;
-    justify-content: flex-start;
+    max-width: 100%;
     overflow-x: auto;
-    padding: 2px 4px;
-  }
-
-  .fm-custom-paginator__counter {
-    align-self: center;
-  }
-}
-
-@media (pointer: coarse) {
-  .fm-page-button {
-    min-width: 40px;
-    min-height: 40px;
   }
 }
 </style>
