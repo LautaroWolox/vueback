@@ -229,18 +229,22 @@
 
 /* =========================
    Popup Alta Jobtype-Contrato
-   Medidas de referencia:
-   1164 x 735 px
+   Diseño base: 1164 x 735 px.
+   En viewports menores se reduce manteniendo la misma proporción.
    ========================= */
-body .p-dialog:has(.jobtype-alta-content) {
-  width: 1164px !important;
-  height: 735px !important;
+body .p-dialog.jobtype-alta-dialog,
+body [role="dialog"].jobtype-alta-dialog,
+body [data-pc-name="dialog"].jobtype-alta-dialog,
+body .p-dialog:has(.jobtype-alta-content),
+body [role="dialog"]:has(.jobtype-alta-content) {
+  width: min(1164px, calc(100vw - 16px)) !important;
+  height: min(735px, calc((100vw - 16px) * .631443), calc(100vh - 16px)) !important;
   min-width: 0 !important;
   min-height: 0 !important;
-  max-width: calc(100vw - 32px) !important;
-  max-height: calc(100vh - 32px) !important;
+  max-width: calc(100vw - 16px) !important;
+  max-height: calc(100vh - 16px) !important;
   display: grid !important;
-  grid-template-rows: 81px minmax(0, 1fr) 81px !important;
+  grid-template-rows: clamp(56px, 6.96vw, 81px) minmax(0, 1fr) clamp(56px, 6.96vw, 81px) !important;
   margin: 0 !important;
   border: 1px solid #c7c7c7 !important;
   border-radius: 3px !important;
@@ -250,40 +254,49 @@ body .p-dialog:has(.jobtype-alta-content) {
   box-sizing: border-box !important;
 }
 
-body .p-dialog:has(.jobtype-alta-content) .p-dialog-header {
+body .jobtype-alta-dialog .p-dialog-header,
+body .jobtype-alta-dialog [data-pc-section="header"],
+body [role="dialog"]:has(.jobtype-alta-content) [data-pc-section="header"] {
   width: 100% !important;
-  height: 81px !important;
-  min-height: 81px !important;
+  height: clamp(56px, 6.96vw, 81px) !important;
+  min-height: clamp(56px, 6.96vw, 81px) !important;
   display: flex !important;
   align-items: center !important;
-  padding: 0 20px !important;
+  padding: 0 clamp(14px, 1.72vw, 20px) !important;
   border-bottom: 1px solid #ddd !important;
   background: #fff !important;
   color: #333 !important;
   box-sizing: border-box !important;
 }
 
-body .p-dialog:has(.jobtype-alta-content) .p-dialog-title {
+body .jobtype-alta-dialog .p-dialog-title,
+body .jobtype-alta-dialog [data-pc-section="title"],
+body [role="dialog"]:has(.jobtype-alta-content) [data-pc-section="title"] {
   color: #333 !important;
-  font-size: 27px !important;
+  font-size: clamp(21px, 2.32vw, 27px) !important;
   font-weight: 400 !important;
   line-height: 1 !important;
 }
 
-body .p-dialog:has(.jobtype-alta-content) .p-dialog-header-actions,
-body .p-dialog:has(.jobtype-alta-content) .p-dialog-header-icons {
+body .jobtype-alta-dialog .p-dialog-header-actions,
+body .jobtype-alta-dialog .p-dialog-header-icons,
+body .jobtype-alta-dialog [data-pc-section="headeractions"],
+body [role="dialog"]:has(.jobtype-alta-content) [data-pc-section="headeractions"] {
   width: auto !important;
   min-width: 0 !important;
   height: auto !important;
   margin: 0 0 0 auto !important;
   padding: 0 !important;
+  border: 0 !important;
   background: transparent !important;
   box-shadow: none !important;
 }
 
-body .p-dialog:has(.jobtype-alta-content) .p-dialog-close-button,
-body .p-dialog:has(.jobtype-alta-content) .p-dialog-header-close,
-body .p-dialog:has(.jobtype-alta-content) button[data-pc-section="closebutton"] {
+body .jobtype-alta-dialog .p-dialog-close-button,
+body .jobtype-alta-dialog .p-dialog-header-close,
+body .jobtype-alta-dialog button[data-pc-section="closebutton"],
+body [role="dialog"]:has(.jobtype-alta-content) button[data-pc-section="closebutton"] {
+  all: unset !important;
   position: relative !important;
   width: 24px !important;
   min-width: 24px !important;
@@ -295,19 +308,14 @@ body .p-dialog:has(.jobtype-alta-content) button[data-pc-section="closebutton"] 
   align-items: center !important;
   justify-content: center !important;
   flex: 0 0 24px !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  color: #c6c6c6 !important;
-  box-shadow: none !important;
-  outline: 0 !important;
+  box-sizing: border-box !important;
+  cursor: pointer !important;
 }
 
-body .p-dialog:has(.jobtype-alta-content) .p-dialog-close-button::before,
-body .p-dialog:has(.jobtype-alta-content) .p-dialog-header-close::before,
-body .p-dialog:has(.jobtype-alta-content) button[data-pc-section="closebutton"]::before {
+body .jobtype-alta-dialog .p-dialog-close-button::before,
+body .jobtype-alta-dialog .p-dialog-header-close::before,
+body .jobtype-alta-dialog button[data-pc-section="closebutton"]::before,
+body [role="dialog"]:has(.jobtype-alta-content) button[data-pc-section="closebutton"]::before {
   content: "×";
   display: block;
   color: #c6c6c6;
@@ -317,16 +325,16 @@ body .p-dialog:has(.jobtype-alta-content) button[data-pc-section="closebutton"]:
   line-height: 22px;
 }
 
-body .p-dialog:has(.jobtype-alta-content) .p-dialog-close-button svg,
-body .p-dialog:has(.jobtype-alta-content) .p-dialog-close-button .p-icon,
-body .p-dialog:has(.jobtype-alta-content) .p-dialog-header-close svg,
-body .p-dialog:has(.jobtype-alta-content) .p-dialog-header-close .p-icon,
-body .p-dialog:has(.jobtype-alta-content) button[data-pc-section="closebutton"] svg,
-body .p-dialog:has(.jobtype-alta-content) button[data-pc-section="closebutton"] .p-icon {
+body .jobtype-alta-dialog button[data-pc-section="closebutton"] svg,
+body .jobtype-alta-dialog button[data-pc-section="closebutton"] .p-icon,
+body [role="dialog"]:has(.jobtype-alta-content) button[data-pc-section="closebutton"] svg,
+body [role="dialog"]:has(.jobtype-alta-content) button[data-pc-section="closebutton"] .p-icon {
   display: none !important;
 }
 
-body .p-dialog:has(.jobtype-alta-content) .p-dialog-content {
+body .jobtype-alta-dialog .p-dialog-content,
+body .jobtype-alta-dialog [data-pc-section="content"],
+body [role="dialog"]:has(.jobtype-alta-content) [data-pc-section="content"] {
   width: 100% !important;
   min-width: 0 !important;
   min-height: 0 !important;
@@ -342,9 +350,9 @@ body .p-dialog:has(.jobtype-alta-content) .p-dialog-content {
   min-width: 0;
   min-height: 0;
   display: grid;
-  grid-template-rows: 105px minmax(0, 1fr);
-  gap: 16px;
-  padding: 24px 20px 18px;
+  grid-template-rows: clamp(76px, 9.02vw, 105px) minmax(0, 1fr);
+  gap: clamp(10px, 1.37vw, 16px);
+  padding: clamp(12px, 2.06vw, 24px) clamp(12px, 1.72vw, 20px) clamp(10px, 1.55vw, 18px);
   overflow: hidden;
   box-sizing: border-box;
 }
@@ -353,9 +361,9 @@ body .p-dialog:has(.jobtype-alta-content) .p-dialog-content {
   width: 100%;
   min-width: 0;
   display: grid;
-  grid-template-columns: 166px 263px 263px 166px 120px;
+  grid-template-columns: minmax(0, .95fr) minmax(0, 1.5fr) minmax(0, 1.5fr) minmax(0, .95fr) minmax(82px, .72fr);
   align-items: end;
-  gap: 25px;
+  gap: clamp(8px, 2.15vw, 25px);
   padding: 0;
   box-sizing: border-box;
 }
@@ -364,13 +372,13 @@ body .p-dialog:has(.jobtype-alta-content) .p-dialog-content {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: clamp(5px, .69vw, 8px);
 }
 
 .jobtype-alta-field label {
   margin: 0;
   color: #111;
-  font-size: 18px;
+  font-size: clamp(13px, 1.55vw, 18px);
   font-weight: 700;
   white-space: nowrap;
 }
@@ -381,13 +389,13 @@ body .p-dialog:has(.jobtype-alta-content) .p-dialog-content {
   width: 100% !important;
   min-width: 0 !important;
   max-width: 100% !important;
-  height: 42px !important;
-  min-height: 42px !important;
+  height: clamp(32px, 3.61vw, 42px) !important;
+  min-height: clamp(32px, 3.61vw, 42px) !important;
   border: 1px solid #c5c5c5 !important;
   border-radius: 3px !important;
   background: #fff !important;
   color: #222 !important;
-  font-size: 16px !important;
+  font-size: clamp(13px, 1.37vw, 16px) !important;
   box-shadow: none !important;
   box-sizing: border-box !important;
 }
@@ -401,7 +409,7 @@ body .p-dialog:has(.jobtype-alta-content) .p-dialog-content {
 
 .jobtype-alta-control .p-select-label {
   min-width: 0 !important;
-  padding: 8px 38px 8px 12px !important;
+  padding: 8px 32px 8px 10px !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
@@ -409,19 +417,20 @@ body .p-dialog:has(.jobtype-alta-content) .p-dialog-content {
 
 .jobtype-primary-button,
 .jobtype-primary-button.p-button {
-  height: 42px !important;
-  min-height: 42px !important;
-  padding: 0 18px !important;
+  height: clamp(32px, 3.61vw, 42px) !important;
+  min-height: clamp(32px, 3.61vw, 42px) !important;
+  padding: 0 clamp(12px, 1.55vw, 18px) !important;
   border: 0 !important;
   border-radius: 22px !important;
   background: #00afc1 !important;
   color: #fff !important;
   box-shadow: none !important;
-  font-size: 17px !important;
+  font-size: clamp(13px, 1.46vw, 17px) !important;
   font-weight: 400 !important;
 }
 
-/* La captura de referencia mantiene los botones turquesa aun deshabilitados. */
+.jobtype-primary-button:disabled,
+.jobtype-primary-button[disabled],
 .jobtype-primary-button.p-button:disabled,
 .jobtype-primary-button.p-button.p-disabled {
   background: #00afc1 !important;
@@ -431,8 +440,8 @@ body .p-dialog:has(.jobtype-alta-content) .p-dialog-content {
 
 .jobtype-add-button,
 .jobtype-add-button.p-button {
-  width: 120px !important;
-  min-width: 120px !important;
+  width: 100% !important;
+  min-width: 82px !important;
   max-width: 120px !important;
   justify-self: end !important;
 }
@@ -461,9 +470,10 @@ body .p-dialog:has(.jobtype-alta-content) .p-dialog-content {
   background: #fff !important;
 }
 
-body .p-dialog:has(.jobtype-alta-content) .jobtype-alta-grid .p-datatable-table-container,
-body .p-dialog:has(.jobtype-alta-content) .jobtype-alta-grid .p-datatable-wrapper,
-body .p-dialog:has(.jobtype-alta-content) .jobtype-alta-grid [data-pc-section="tablecontainer"] {
+body .jobtype-alta-dialog .jobtype-alta-grid .p-datatable-table-container,
+body .jobtype-alta-dialog .jobtype-alta-grid .p-datatable-wrapper,
+body .jobtype-alta-dialog .jobtype-alta-grid [data-pc-section="tablecontainer"],
+body [role="dialog"]:has(.jobtype-alta-content) .jobtype-alta-grid [data-pc-section="tablecontainer"] {
   flex: 1 1 auto !important;
   width: 100% !important;
   min-width: 0 !important;
@@ -473,7 +483,8 @@ body .p-dialog:has(.jobtype-alta-content) .jobtype-alta-grid [data-pc-section="t
   background: #fff !important;
 }
 
-body .p-dialog:has(.jobtype-alta-content) .jobtype-alta-grid .p-datatable-table {
+body .jobtype-alta-dialog .jobtype-alta-grid .p-datatable-table,
+body [role="dialog"]:has(.jobtype-alta-content) .jobtype-alta-grid .p-datatable-table {
   width: 100% !important;
   min-width: 100% !important;
   max-width: 100% !important;
@@ -481,8 +492,10 @@ body .p-dialog:has(.jobtype-alta-content) .jobtype-alta-grid .p-datatable-table 
   border-collapse: collapse !important;
 }
 
-body .p-dialog:has(.jobtype-alta-content) .jobtype-alta-grid .p-datatable-thead > tr > th,
-body .p-dialog:has(.jobtype-alta-content) .jobtype-alta-grid .p-datatable-tbody > tr > td {
+body .jobtype-alta-dialog .jobtype-alta-grid .p-datatable-thead > tr > th,
+body .jobtype-alta-dialog .jobtype-alta-grid .p-datatable-tbody > tr > td,
+body [role="dialog"]:has(.jobtype-alta-content) .jobtype-alta-grid .p-datatable-thead > tr > th,
+body [role="dialog"]:has(.jobtype-alta-content) .jobtype-alta-grid .p-datatable-tbody > tr > td {
   min-width: 0 !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
@@ -490,20 +503,22 @@ body .p-dialog:has(.jobtype-alta-content) .jobtype-alta-grid .p-datatable-tbody 
   box-sizing: border-box !important;
 }
 
-body .p-dialog:has(.jobtype-alta-content) .jobtype-alta-grid .p-datatable-thead > tr > th {
-  height: 52px !important;
-  min-height: 52px !important;
-  padding: 0 12px !important;
+body .jobtype-alta-dialog .jobtype-alta-grid .p-datatable-thead > tr > th,
+body [role="dialog"]:has(.jobtype-alta-content) .jobtype-alta-grid .p-datatable-thead > tr > th {
+  height: clamp(38px, 4.47vw, 52px) !important;
+  min-height: clamp(38px, 4.47vw, 52px) !important;
+  padding: 0 clamp(8px, 1.03vw, 12px) !important;
   border-right: 1px solid #c0c0c0 !important;
   border-bottom: 3px solid #c9c9c9 !important;
   background: #f4f4f4 !important;
   color: #454545 !important;
-  font-size: 18px !important;
+  font-size: clamp(13px, 1.55vw, 18px) !important;
   font-weight: 700 !important;
   text-transform: uppercase !important;
 }
 
-body .p-dialog:has(.jobtype-alta-content) .jobtype-alta-grid .p-datatable-tbody > tr > td {
+body .jobtype-alta-dialog .jobtype-alta-grid .p-datatable-tbody > tr > td,
+body [role="dialog"]:has(.jobtype-alta-content) .jobtype-alta-grid .p-datatable-tbody > tr > td {
   height: 38px !important;
   padding: 0 12px !important;
   border-right: 1px solid #eee !important;
@@ -512,33 +527,37 @@ body .p-dialog:has(.jobtype-alta-content) .jobtype-alta-grid .p-datatable-tbody 
   font-size: 14px !important;
 }
 
-body .p-dialog:has(.jobtype-alta-content) .jobtype-alta-grid > .p-paginator,
-body .p-dialog:has(.jobtype-alta-content) .jobtype-alta-grid .p-datatable-paginator-bottom {
-  flex: 0 0 48px !important;
+body .jobtype-alta-dialog .jobtype-alta-grid > .p-paginator,
+body .jobtype-alta-dialog .jobtype-alta-grid .p-datatable-paginator-bottom,
+body [role="dialog"]:has(.jobtype-alta-content) .jobtype-alta-grid .p-datatable-paginator-bottom {
+  flex: 0 0 clamp(38px, 4.12vw, 48px) !important;
   width: 100% !important;
   min-width: 0 !important;
-  height: 48px !important;
-  min-height: 48px !important;
+  height: clamp(38px, 4.12vw, 48px) !important;
+  min-height: clamp(38px, 4.12vw, 48px) !important;
   padding: 0 !important;
   border-top: 1px solid #ddd !important;
   background: #fff !important;
   overflow: hidden !important;
 }
 
-body .p-dialog:has(.jobtype-alta-content) .fm-custom-paginator {
-  min-height: 48px !important;
-  height: 48px !important;
-  padding: 2px 10px !important;
+body .jobtype-alta-dialog .fm-custom-paginator,
+body [role="dialog"]:has(.jobtype-alta-content) .fm-custom-paginator {
+  min-height: clamp(38px, 4.12vw, 48px) !important;
+  height: clamp(38px, 4.12vw, 48px) !important;
+  padding: 2px clamp(6px, .86vw, 10px) !important;
 }
 
-body .p-dialog:has(.jobtype-alta-content) .p-dialog-footer {
+body .jobtype-alta-dialog .p-dialog-footer,
+body .jobtype-alta-dialog [data-pc-section="footer"],
+body [role="dialog"]:has(.jobtype-alta-content) [data-pc-section="footer"] {
   width: 100% !important;
-  height: 81px !important;
-  min-height: 81px !important;
+  height: clamp(56px, 6.96vw, 81px) !important;
+  min-height: clamp(56px, 6.96vw, 81px) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: flex-end !important;
-  padding: 0 20px !important;
+  padding: 0 clamp(14px, 1.72vw, 20px) !important;
   border-top: 1px solid #ddd !important;
   background: #fff !important;
   box-sizing: border-box !important;
@@ -546,59 +565,5 @@ body .p-dialog:has(.jobtype-alta-content) .p-dialog-footer {
 
 .jobtype-relate-button,
 .jobtype-relate-button.p-button {
-  min-width: 142px !important;
-}
-
-/* Ajuste únicamente cuando el viewport no permite 1164 px. */
-@media (max-width: 1195px) {
-  .jobtype-alta-form {
-    grid-template-columns: minmax(120px, 166px) minmax(170px, 263px) minmax(170px, 263px) minmax(120px, 166px) 120px;
-    gap: 25px;
-  }
-}
-
-@media (max-width: 900px) {
-  body .p-dialog:has(.jobtype-alta-content) {
-    width: calc(100vw - 16px) !important;
-    height: calc(100vh - 16px) !important;
-    max-width: calc(100vw - 16px) !important;
-    max-height: calc(100vh - 16px) !important;
-    grid-template-rows: 68px minmax(0, 1fr) 70px !important;
-  }
-
-  body .p-dialog:has(.jobtype-alta-content) .p-dialog-header {
-    height: 68px !important;
-    min-height: 68px !important;
-    padding: 0 16px !important;
-  }
-
-  body .p-dialog:has(.jobtype-alta-content) .p-dialog-title {
-    font-size: 23px !important;
-  }
-
-  .jobtype-alta-content {
-    grid-template-rows: auto minmax(280px, 1fr);
-    gap: 14px;
-    padding: 16px;
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
-
-  .jobtype-alta-form {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px 18px;
-  }
-
-  .jobtype-add-button,
-  .jobtype-add-button.p-button {
-    width: 100% !important;
-    max-width: none !important;
-    justify-self: stretch !important;
-  }
-
-  body .p-dialog:has(.jobtype-alta-content) .p-dialog-footer {
-    height: 70px !important;
-    min-height: 70px !important;
-    padding: 0 16px !important;
-  }
+  min-width: clamp(110px, 12.2vw, 142px) !important;
 }
