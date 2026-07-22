@@ -1,7 +1,7 @@
 <template>
   <div
     class="fm-popup-grid"
-    :class="{ 'fm-popup-grid--horizontal': !fitColumns }"
+    :class="popupGridClasses"
     :style="popupGridStyle"
   >
     <DataTable
@@ -15,7 +15,7 @@
       class="fm-popup-grid__table"
       :tableStyle="tableStyle"
       scrollable
-      :scrollHeight="scrollHeight"
+      :scrollHeight="effectiveScrollHeight"
       removableSort
       sortMode="multiple"
       filterDisplay="row"
@@ -165,14 +165,15 @@ const props = defineProps({
   rowClass: { type: Function, default: null },
   rowsPerPage: { type: Number, default: 10 },
   rowsOptions: { type: Array, default: () => [10, 20, 50] },
-  scrollHeight: { type: String, default: '210px' },
+  scrollHeight: { type: String, default: '320px' },
   emptyMessage: { type: String, default: 'No hay resultados' },
   loading: { type: Boolean, default: false },
+  fill: { type: Boolean, default: true },
   fitColumns: { type: Boolean, default: true },
   resizableColumns: { type: Boolean, default: true },
   showRowsSelect: { type: Boolean, default: false },
   showCounter: { type: Boolean, default: false },
-  actionSize: { type: String, default: 'compact' },
+  actionSize: { type: String, default: 'large' },
   showExport: { type: Boolean, default: false },
   showDelete: { type: Boolean, default: false },
   showEdit: { type: Boolean, default: false },
@@ -224,20 +225,25 @@ const selectionModel = computed({
   set: (value) => emit('update:selection', value)
 })
 
+const popupGridClasses = computed(() => ({
+  'fm-popup-grid--fill': props.fill,
+  'fm-popup-grid--horizontal': !props.fitColumns
+}))
+
 const popupGridStyle = computed(() => ({
   '--fm-popup-grid-height': props.scrollHeight
 }))
 
+const effectiveScrollHeight = computed(() => (props.fill ? 'flex' : props.scrollHeight))
+
 const tableStyle = computed(() => (
-  props.fitColumns
-    ? 'table-layout: fixed; width: 100%; min-width: 100%'
-    : 'table-layout: fixed; width: max-content; min-width: 100%'
+  'table-layout: fixed; width: max-content; min-width: 100%'
 ))
 
 const columnStyle = (column) => ({
-  width: column.width || '140px',
-  minWidth: props.fitColumns ? '0' : (column.minWidth || column.width || '100px'),
-  maxWidth: props.fitColumns ? (column.maxWidth || 'none') : 'none'
+  width: column.width || '180px',
+  minWidth: column.minWidth || column.width || '120px',
+  maxWidth: column.maxWidth || 'none'
 })
 
 defineExpose({ dataTable })
@@ -254,6 +260,13 @@ defineExpose({ dataTable })
   overflow: hidden;
 }
 
+.fm-popup-grid--fill {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 .fm-popup-grid .fm-popup-grid__table,
 .fm-popup-grid .p-datatable {
   width: 100% !important;
@@ -263,40 +276,53 @@ defineExpose({ dataTable })
   background: #fff !important;
 }
 
+.fm-popup-grid--fill .fm-popup-grid__table,
+.fm-popup-grid--fill .p-datatable {
+  flex: 1 1 auto !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
 .fm-popup-grid .p-datatable-table-container,
-.fm-popup-grid .p-datatable-wrapper {
+.fm-popup-grid .p-datatable-wrapper,
+.fm-popup-grid [data-pc-section="tablecontainer"] {
   width: 100% !important;
   max-width: 100% !important;
-  height: min(var(--fm-popup-grid-height), 210px) !important;
-  min-height: min(var(--fm-popup-grid-height), 210px) !important;
-  max-height: min(var(--fm-popup-grid-height), 210px) !important;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
+  height: var(--fm-popup-grid-height) !important;
+  min-height: var(--fm-popup-grid-height) !important;
+  max-height: var(--fm-popup-grid-height) !important;
+  overflow: auto !important;
   scrollbar-gutter: stable !important;
   border: 0 !important;
   border-bottom: 1px solid #9fb8c7 !important;
   background: #fff !important;
 }
 
-.fm-popup-grid--horizontal .p-datatable-table-container,
-.fm-popup-grid--horizontal .p-datatable-wrapper {
-  overflow-x: auto !important;
+.fm-popup-grid--fill .p-datatable-table-container,
+.fm-popup-grid--fill .p-datatable-wrapper,
+.fm-popup-grid--fill [data-pc-section="tablecontainer"] {
+  flex: 1 1 auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
 }
 
 .fm-popup-grid .p-datatable-table {
-  width: 100% !important;
+  width: max-content !important;
   min-width: 100% !important;
   table-layout: fixed !important;
   border-collapse: separate !important;
   border-spacing: 0 !important;
-  font-size: 12px !important;
+  font-size: 13px !important;
 }
 
 .fm-popup-grid .p-datatable-thead > tr > th,
 .fm-popup-grid .p-datatable-tbody > tr > td {
   box-sizing: border-box !important;
-  border-right: 1px solid #b8cad4 !important;
-  border-bottom: 1px solid #c7d5dd !important;
+  border-right: 1px solid #c2d1d9 !important;
+  border-bottom: 1px solid #d4dfe5 !important;
   vertical-align: middle !important;
 }
 
@@ -306,16 +332,15 @@ defineExpose({ dataTable })
 }
 
 .fm-popup-grid .p-datatable-thead > tr > th {
-  height: 31px !important;
-  min-height: 31px !important;
-  padding: 0 7px !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  padding: 0 10px !important;
   overflow: hidden !important;
-  background: #f8fafb !important;
+  background: #f1f4f6 !important;
   color: #163849 !important;
-  font-size: 10px !important;
+  font-size: 13px !important;
   font-weight: 700 !important;
-  line-height: 1.1 !important;
-  text-overflow: clip !important;
+  line-height: 1.15 !important;
   white-space: nowrap !important;
 }
 
@@ -323,7 +348,7 @@ defineExpose({ dataTable })
   min-width: 0 !important;
   display: flex !important;
   align-items: center !important;
-  gap: 4px !important;
+  gap: 7px !important;
   overflow: hidden !important;
 }
 
@@ -337,16 +362,16 @@ defineExpose({ dataTable })
 
 .fm-popup-grid .p-sortable-column-icon {
   flex: 0 0 auto !important;
-  width: 12px !important;
-  height: 12px !important;
-  font-size: 12px !important;
+  width: 15px !important;
+  height: 15px !important;
+  font-size: 15px !important;
 }
 
 .fm-popup-grid .p-datatable-thead > tr.p-datatable-filter-row > th,
 .fm-popup-grid .p-datatable-thead > tr.p-filter-row > th {
-  height: 31px !important;
-  min-height: 31px !important;
-  padding: 3px 5px !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  padding: 5px 7px !important;
   overflow: hidden !important;
   background: #fff !important;
 }
@@ -355,15 +380,15 @@ defineExpose({ dataTable })
   width: 100%;
   min-width: 0;
   display: grid;
-  grid-template-columns: 12px minmax(0, 1fr) 16px;
+  grid-template-columns: 14px minmax(0, 1fr) 20px;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
 }
 
 .fm-popup-grid__filter-prefix,
 .fm-popup-grid__filter-more {
-  color: #000;
-  font-size: 11px;
+  color: #0f2f3d;
+  font-size: 13px;
   line-height: 1;
   white-space: nowrap;
 }
@@ -373,36 +398,36 @@ defineExpose({ dataTable })
   width: 100% !important;
   min-width: 0 !important;
   max-width: 100% !important;
-  height: 22px !important;
-  min-height: 22px !important;
-  max-height: 22px !important;
-  padding: 0 5px !important;
-  border: 1px solid #c7d6df !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  max-height: 30px !important;
+  padding: 0 7px !important;
+  border: 1px solid #b8cad4 !important;
   border-radius: 2px !important;
   background: #fff !important;
   color: #0f2f3d !important;
-  font-size: 11px !important;
-  line-height: 22px !important;
+  font-size: 13px !important;
+  line-height: 30px !important;
   box-shadow: none !important;
   box-sizing: border-box !important;
 }
 
 .fm-popup-grid__filter-input:focus {
   border-color: #00a9bd !important;
-  box-shadow: 0 0 0 1px rgba(0, 169, 189, .14) !important;
+  box-shadow: 0 0 0 1px rgba(0, 169, 189, .16) !important;
   outline: none !important;
 }
 
 .fm-popup-grid .p-datatable-tbody > tr > td {
-  height: 31px !important;
-  min-height: 31px !important;
-  max-height: 31px !important;
-  padding: 0 7px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+  padding: 0 10px !important;
   overflow: hidden !important;
   background: #fff !important;
   color: #0f2f3d !important;
-  font-size: 12px !important;
-  line-height: 31px !important;
+  font-size: 13px !important;
+  line-height: 38px !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
 }
@@ -429,6 +454,7 @@ defineExpose({ dataTable })
 }
 
 .fm-popup-grid .p-datatable-empty-message > td {
+  height: 100% !important;
   padding: 0 !important;
   border-right: 0 !important;
   background: #eafcff !important;
@@ -436,26 +462,33 @@ defineExpose({ dataTable })
 
 .fm-popup-grid__empty {
   width: 100%;
-  min-height: 146px;
+  min-height: 190px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px;
+  padding: 16px;
   background: #eafcff;
-  color: #6f8594;
-  font-size: 12px;
+  color: #607887;
+  font-size: 14px;
   font-weight: 500;
   text-align: center;
   box-sizing: border-box;
+}
+
+.fm-popup-grid--fill .p-datatable-empty-message,
+.fm-popup-grid--fill .p-datatable-empty-message > td,
+.fm-popup-grid--fill .fm-popup-grid__empty {
+  height: 100% !important;
+  min-height: 100% !important;
 }
 
 .fm-popup-grid .p-paginator,
 .fm-popup-grid .p-datatable-paginator-bottom {
   width: 100% !important;
   min-width: 100% !important;
-  height: 34px !important;
-  min-height: 34px !important;
-  max-height: 34px !important;
+  height: 46px !important;
+  min-height: 46px !important;
+  max-height: 46px !important;
   display: block !important;
   padding: 0 !important;
   margin: 0 !important;
@@ -466,23 +499,29 @@ defineExpose({ dataTable })
   box-sizing: border-box !important;
 }
 
+.fm-popup-grid--fill .p-paginator,
+.fm-popup-grid--fill .p-datatable-paginator-bottom {
+  flex: 0 0 46px !important;
+}
+
 .fm-popup-grid .fm-custom-paginator {
-  height: 34px !important;
-  min-height: 34px !important;
-  padding: 0 10px !important;
-  font-size: 11px !important;
+  height: 46px !important;
+  min-height: 46px !important;
+  padding: 0 14px !important;
+  font-size: 13px !important;
 }
 
 .fm-popup-grid .fm-page-input {
-  width: 42px !important;
-  min-width: 42px !important;
-  height: 26px !important;
-  min-height: 26px !important;
+  width: 54px !important;
+  min-width: 54px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  font-size: 13px !important;
 }
 
 .fm-popup-grid .fm-page-label,
 .fm-popup-grid .fm-page-total {
-  font-size: 11px !important;
+  font-size: 13px !important;
 }
 
 .fm-popup-grid .p-column-resizer,
@@ -491,5 +530,19 @@ defineExpose({ dataTable })
   right: -4px !important;
   cursor: col-resize !important;
   background: transparent !important;
+}
+
+@media (max-width: 700px) {
+  .fm-popup-grid .p-datatable-thead > tr > th,
+  .fm-popup-grid .p-datatable-tbody > tr > td {
+    font-size: 12px !important;
+  }
+
+  .fm-popup-grid__filter-input,
+  .fm-popup-grid__filter-input.p-inputtext {
+    height: 28px !important;
+    min-height: 28px !important;
+    max-height: 28px !important;
+  }
 }
 </style>
