@@ -106,6 +106,16 @@
   min-height: 54px !important;
 }
 
+/*
+ * El CSS del componente se inyecta después de los estilos globales.
+ * Esta regla deliberadamente más específica garantiza el modo ancho real.
+ */
+html body .fm-grid-dialog.p-dialog:not(.fm-grid-dialog--maximized) {
+  width: calc(100vw - 48px) !important;
+  max-width: 1500px !important;
+  min-width: 0 !important;
+}
+
 @media (max-height: 700px) {
   .fm-grid-dialog.p-dialog:not(.fm-grid-dialog--maximized) {
     height: calc(100vh - 8px) !important;
@@ -114,7 +124,7 @@
 }
 
 @media (max-width: 700px) {
-  .fm-grid-dialog.p-dialog:not(.fm-grid-dialog--maximized) {
+  html body .fm-grid-dialog.p-dialog:not(.fm-grid-dialog--maximized) {
     width: calc(100vw - 6px) !important;
     max-width: calc(100vw - 6px) !important;
     height: calc(100vh - 6px) !important;
