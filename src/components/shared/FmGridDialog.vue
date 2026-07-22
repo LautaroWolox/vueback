@@ -62,12 +62,21 @@
 import { computed, provide, readonly, ref } from 'vue'
 import Dialog from 'primevue/dialog'
 
+defineOptions({ inheritAttrs: false })
+
 const props = defineProps({
   visible: { type: Boolean, default: false },
   title: { type: String, default: '' },
   modal: { type: Boolean, default: true },
   draggable: { type: Boolean, default: true },
-  maximizable: { type: Boolean, default: true }
+  maximizable: { type: Boolean, default: true },
+
+  // Compatibilidad con llamadas anteriores. El diseño global decide el tamaño.
+  width: { type: String, default: '' },
+  maxWidth: { type: String, default: '' },
+  height: { type: String, default: '' },
+  formColumns: { type: String, default: '' },
+  formGap: { type: String, default: '' }
 })
 
 const emit = defineEmits(['update:visible', 'close', 'maximize-change'])
