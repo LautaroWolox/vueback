@@ -22,9 +22,12 @@
             class="fm-grid-dialog__header-button"
             :title="maximized ? 'Restaurar' : 'Maximizar'"
             :aria-label="maximized ? 'Restaurar' : 'Maximizar'"
-            @click="maximized = !maximized"
+            @click="toggleMaximized"
           >
-            <i :class="maximized ? 'pi pi-window-minimize' : 'pi pi-window-maximize'" aria-hidden="true"></i>
+            <i
+              :class="maximized ? 'pi pi-window-minimize' : 'pi pi-window-maximize'"
+              aria-hidden="true"
+            ></i>
           </button>
 
           <button
@@ -81,7 +84,7 @@ const props = defineProps({
   formGap: { type: String, default: '12px' }
 })
 
-const emit = defineEmits(['update:visible', 'close'])
+const emit = defineEmits(['update:visible', 'close', 'maximize-change'])
 const maximized = ref(false)
 
 const visibleModel = computed({
@@ -99,12 +102,18 @@ const formStyle = computed(() => ({
   '--fm-grid-dialog-form-gap': props.formGap
 }))
 
+const toggleMaximized = () => {
+  maximized.value = !maximized.value
+  emit('maximize-change', maximized.value)
+}
+
 const close = () => {
   visibleModel.value = false
   emit('close')
 }
 
 const onHide = () => {
+  if (maximized.value) emit('maximize-change', false)
   maximized.value = false
 }
 </script>
@@ -209,6 +218,9 @@ const onHide = () => {
 
 .fm-grid-dialog--maximized .p-dialog-content {
   flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
 }
 
 .fm-grid-dialog__body {
@@ -224,11 +236,15 @@ const onHide = () => {
 }
 
 .fm-grid-dialog--maximized .fm-grid-dialog__body {
+  flex: 1 1 auto;
   height: 100%;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .fm-grid-dialog__form {
   width: 100%;
+  flex: 0 0 auto;
   display: grid;
   grid-template-columns: var(--fm-grid-dialog-form-columns);
   gap: var(--fm-grid-dialog-form-gap);
@@ -314,6 +330,65 @@ const onHide = () => {
   min-height: 0;
 }
 
+/*
+ * En pantalla completa la grilla es el contenido flexible central del popup.
+ * Esto evita el bloque blanco enorme que aparecía al mantenerla fija en 210px.
+ */
+.fm-grid-dialog--maximized .fm-grid-dialog__grid-area {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.fm-grid-dialog--maximized .fm-grid-dialog__grid-area > * {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.fm-grid-dialog--maximized .fm-popup-grid {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.fm-grid-dialog--maximized .fm-popup-grid .fm-popup-grid__table,
+.fm-grid-dialog--maximized .fm-popup-grid .p-datatable {
+  flex: 1 1 auto;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.fm-grid-dialog--maximized .fm-popup-grid .p-datatable-table-container,
+.fm-grid-dialog--maximized .fm-popup-grid .p-datatable-wrapper {
+  flex: 1 1 auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
+
+.fm-grid-dialog--maximized .fm-popup-grid .p-datatable-table {
+  height: 100% !important;
+}
+
+.fm-grid-dialog--maximized .fm-popup-grid .p-datatable-tbody,
+.fm-grid-dialog--maximized .fm-popup-grid .p-datatable-empty-message,
+.fm-grid-dialog--maximized .fm-popup-grid .p-datatable-empty-message > td {
+  height: 100% !important;
+}
+
+.fm-grid-dialog--maximized .fm-popup-grid__empty {
+  height: 100% !important;
+  min-height: 100% !important;
+}
+
+.fm-grid-dialog--maximized .fm-popup-grid .p-datatable-paginator-bottom {
+  flex: 0 0 34px !important;
+}
+
 .fm-grid-dialog .p-dialog-footer {
   flex: 0 0 50px !important;
   min-height: 50px !important;
@@ -376,6 +451,10 @@ const onHide = () => {
     width: calc(100vw - 12px) !important;
     max-width: calc(100vw - 12px) !important;
     max-height: calc(100vh - 12px) !important;
+  }
+
+  .fm-grid-dialog--maximized.p-dialog {
+    inset: 4px !important;
   }
 
   .fm-grid-dialog__body {
