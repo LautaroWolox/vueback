@@ -1,9 +1,5 @@
 <template>
-  <div
-    class="fm-popup-grid"
-    :class="popupGridClasses"
-    :style="popupGridStyle"
-  >
+  <div class="fm-popup-grid" :class="popupGridClasses">
     <DataTable
       ref="dataTable"
       v-model:filters="filtersModel"
@@ -15,7 +11,7 @@
       class="fm-popup-grid__table"
       :tableStyle="tableStyle"
       scrollable
-      :scrollHeight="effectiveScrollHeight"
+      scrollHeight="flex"
       removableSort
       sortMode="multiple"
       filterDisplay="row"
@@ -134,10 +130,7 @@
 
         <template #body="{ data }">
           <slot name="body" :data="data" :column="column">
-            <span
-              class="fm-popup-grid__cell"
-              :title="String(data?.[column.field] ?? '')"
-            >
+            <span class="fm-popup-grid__cell" :title="String(data?.[column.field] ?? '')">
               {{ data?.[column.field] ?? '' }}
             </span>
           </slot>
@@ -165,10 +158,8 @@ const props = defineProps({
   rowClass: { type: Function, default: null },
   rowsPerPage: { type: Number, default: 10 },
   rowsOptions: { type: Array, default: () => [10, 20, 50] },
-  scrollHeight: { type: String, default: '320px' },
   emptyMessage: { type: String, default: 'No hay resultados' },
   loading: { type: Boolean, default: false },
-  fill: { type: Boolean, default: true },
   fitColumns: { type: Boolean, default: true },
   resizableColumns: { type: Boolean, default: true },
   showRowsSelect: { type: Boolean, default: false },
@@ -226,125 +217,120 @@ const selectionModel = computed({
 })
 
 const popupGridClasses = computed(() => ({
-  'fm-popup-grid--fill': props.fill,
   'fm-popup-grid--horizontal': !props.fitColumns
 }))
 
-const popupGridStyle = computed(() => ({
-  '--fm-popup-grid-height': props.scrollHeight
-}))
-
-const effectiveScrollHeight = computed(() => (props.fill ? 'flex' : props.scrollHeight))
-
 const tableStyle = computed(() => (
-  'table-layout: fixed; width: max-content; min-width: 100%'
+  props.fitColumns
+    ? 'table-layout: fixed; width: 100%; min-width: 100%'
+    : 'table-layout: fixed; width: max-content; min-width: 100%'
 ))
 
 const columnStyle = (column) => ({
-  width: column.width || '180px',
-  minWidth: column.minWidth || column.width || '120px',
-  maxWidth: column.maxWidth || 'none'
+  width: column.width || 'auto',
+  minWidth: props.fitColumns ? '0' : (column.minWidth || column.width || '120px'),
+  maxWidth: props.fitColumns ? column.width || 'none' : (column.maxWidth || 'none')
 })
 
 defineExpose({ dataTable })
 </script>
 
 <style>
-.fm-popup-grid {
-  width: 100%;
-  min-width: 0;
-  border: 1px solid #9fb8c7;
-  border-left: 4px solid #00a9bd;
-  background: #fff;
-  box-sizing: border-box;
-  overflow: hidden;
-}
-
-.fm-popup-grid--fill {
-  height: 100%;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.fm-popup-grid .fm-popup-grid__table,
-.fm-popup-grid .p-datatable {
+html body .fm-popup-grid {
   width: 100% !important;
   min-width: 0 !important;
-  max-width: 100% !important;
-  border: 0 !important;
-  background: #fff !important;
-}
-
-.fm-popup-grid--fill .fm-popup-grid__table,
-.fm-popup-grid--fill .p-datatable {
-  flex: 1 1 auto !important;
   height: 100% !important;
   min-height: 0 !important;
   display: flex !important;
   flex-direction: column !important;
+  border: 1px solid #aab9c2 !important;
+  background: #fff !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
 }
 
-.fm-popup-grid .p-datatable-table-container,
-.fm-popup-grid .p-datatable-wrapper,
-.fm-popup-grid [data-pc-section="tablecontainer"] {
+html body .fm-popup-grid .fm-popup-grid__table,
+html body .fm-popup-grid .p-datatable {
   width: 100% !important;
+  min-width: 0 !important;
   max-width: 100% !important;
-  height: var(--fm-popup-grid-height) !important;
-  min-height: var(--fm-popup-grid-height) !important;
-  max-height: var(--fm-popup-grid-height) !important;
-  overflow: auto !important;
-  scrollbar-gutter: stable !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
   border: 0 !important;
-  border-bottom: 1px solid #9fb8c7 !important;
   background: #fff !important;
 }
 
-.fm-popup-grid--fill .p-datatable-table-container,
-.fm-popup-grid--fill .p-datatable-wrapper,
-.fm-popup-grid--fill [data-pc-section="tablecontainer"] {
-  flex: 1 1 auto !important;
+html body .fm-popup-grid .p-datatable-table-container,
+html body .fm-popup-grid .p-datatable-wrapper,
+html body .fm-popup-grid [data-pc-section="tablecontainer"] {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
   height: auto !important;
   min-height: 0 !important;
   max-height: none !important;
+  display: block !important;
+  flex: 1 1 auto !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  scrollbar-gutter: stable !important;
+  border: 0 !important;
+  background: #fff !important;
 }
 
-.fm-popup-grid .p-datatable-table {
-  width: max-content !important;
+html body .fm-popup-grid--horizontal .p-datatable-table-container,
+html body .fm-popup-grid--horizontal .p-datatable-wrapper,
+html body .fm-popup-grid--horizontal [data-pc-section="tablecontainer"] {
+  overflow-x: auto !important;
+}
+
+html body .fm-popup-grid .p-datatable-table {
+  width: 100% !important;
   min-width: 100% !important;
-  table-layout: fixed !important;
   border-collapse: separate !important;
   border-spacing: 0 !important;
+  table-layout: fixed !important;
   font-size: 13px !important;
 }
 
-.fm-popup-grid .p-datatable-thead > tr > th,
-.fm-popup-grid .p-datatable-tbody > tr > td {
+html body .fm-popup-grid .p-datatable-thead {
+  display: table-header-group !important;
+}
+
+html body .fm-popup-grid .p-datatable-thead > tr {
+  display: table-row !important;
+}
+
+html body .fm-popup-grid .p-datatable-thead > tr > th,
+html body .fm-popup-grid .p-datatable-tbody > tr > td {
   box-sizing: border-box !important;
-  border-right: 1px solid #c2d1d9 !important;
-  border-bottom: 1px solid #d4dfe5 !important;
+  border-right: 1px solid #c4d0d6 !important;
+  border-bottom: 1px solid #d7e0e5 !important;
   vertical-align: middle !important;
 }
 
-.fm-popup-grid .p-datatable-thead > tr > th:last-child,
-.fm-popup-grid .p-datatable-tbody > tr > td:last-child {
+html body .fm-popup-grid .p-datatable-thead > tr > th:last-child,
+html body .fm-popup-grid .p-datatable-tbody > tr > td:last-child {
   border-right: 0 !important;
 }
 
-.fm-popup-grid .p-datatable-thead > tr > th {
-  height: 42px !important;
-  min-height: 42px !important;
-  padding: 0 10px !important;
+html body .fm-popup-grid .p-datatable-thead > tr:first-child > th {
+  height: 54px !important;
+  min-height: 54px !important;
+  padding: 0 12px !important;
   overflow: hidden !important;
   background: #f1f4f6 !important;
-  color: #163849 !important;
-  font-size: 13px !important;
+  color: #173849 !important;
+  font-size: 14px !important;
   font-weight: 700 !important;
   line-height: 1.15 !important;
   white-space: nowrap !important;
 }
 
-.fm-popup-grid .p-column-header-content {
+html body .fm-popup-grid .p-column-header-content {
   min-width: 0 !important;
   display: flex !important;
   align-items: center !important;
@@ -352,7 +338,7 @@ defineExpose({ dataTable })
   overflow: hidden !important;
 }
 
-.fm-popup-grid .p-datatable-column-title {
+html body .fm-popup-grid .p-datatable-column-title {
   min-width: 0 !important;
   flex: 1 1 auto !important;
   overflow: hidden !important;
@@ -360,189 +346,148 @@ defineExpose({ dataTable })
   white-space: nowrap !important;
 }
 
-.fm-popup-grid .p-sortable-column-icon {
+html body .fm-popup-grid .p-sortable-column-icon {
   flex: 0 0 auto !important;
-  width: 15px !important;
-  height: 15px !important;
-  font-size: 15px !important;
+  width: 17px !important;
+  height: 17px !important;
+  font-size: 17px !important;
 }
 
-.fm-popup-grid .p-datatable-thead > tr.p-datatable-filter-row > th,
-.fm-popup-grid .p-datatable-thead > tr.p-filter-row > th {
-  height: 42px !important;
-  min-height: 42px !important;
-  padding: 5px 7px !important;
-  overflow: hidden !important;
+html body .fm-popup-grid .p-datatable-thead > tr.p-datatable-filter-row,
+html body .fm-popup-grid .p-datatable-thead > tr.p-filter-row,
+html body .fm-popup-grid .p-datatable-thead > tr:nth-child(2) {
+  display: table-row !important;
+  height: 54px !important;
+  min-height: 54px !important;
+  visibility: visible !important;
+}
+
+html body .fm-popup-grid .p-datatable-thead > tr.p-datatable-filter-row > th,
+html body .fm-popup-grid .p-datatable-thead > tr.p-filter-row > th,
+html body .fm-popup-grid .p-datatable-thead > tr:nth-child(2) > th {
+  height: 54px !important;
+  min-height: 54px !important;
+  padding: 7px 8px !important;
   background: #fff !important;
+  visibility: visible !important;
 }
 
-.fm-popup-grid__filter {
-  width: 100%;
-  min-width: 0;
-  display: grid;
-  grid-template-columns: 14px minmax(0, 1fr) 20px;
-  align-items: center;
-  gap: 4px;
+html body .fm-popup-grid__filter {
+  width: 100% !important;
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-columns: 16px minmax(0, 1fr) 22px !important;
+  align-items: center !important;
+  gap: 6px !important;
 }
 
-.fm-popup-grid__filter-prefix,
-.fm-popup-grid__filter-more {
-  color: #0f2f3d;
-  font-size: 13px;
-  line-height: 1;
-  white-space: nowrap;
+html body .fm-popup-grid__filter-prefix,
+html body .fm-popup-grid__filter-more {
+  color: #071e2a !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  text-align: center !important;
 }
 
-.fm-popup-grid__filter-input,
-.fm-popup-grid__filter-input.p-inputtext {
+html body .fm-popup-grid__filter-input,
+html body .fm-popup-grid__filter-input.p-inputtext {
   width: 100% !important;
   min-width: 0 !important;
   max-width: 100% !important;
-  height: 30px !important;
-  min-height: 30px !important;
-  max-height: 30px !important;
-  padding: 0 7px !important;
-  border: 1px solid #b8cad4 !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+  padding: 0 9px !important;
+  border: 1px solid #b9c7cf !important;
   border-radius: 2px !important;
   background: #fff !important;
   color: #0f2f3d !important;
-  font-size: 13px !important;
-  line-height: 30px !important;
+  font-size: 14px !important;
+  line-height: 38px !important;
   box-shadow: none !important;
   box-sizing: border-box !important;
 }
 
-.fm-popup-grid__filter-input:focus {
-  border-color: #00a9bd !important;
-  box-shadow: 0 0 0 1px rgba(0, 169, 189, .16) !important;
-  outline: none !important;
-}
-
-.fm-popup-grid .p-datatable-tbody > tr > td {
+html body .fm-popup-grid .p-datatable-tbody > tr > td {
   height: 38px !important;
   min-height: 38px !important;
-  max-height: 38px !important;
   padding: 0 10px !important;
   overflow: hidden !important;
   background: #fff !important;
-  color: #0f2f3d !important;
+  color: #111 !important;
   font-size: 13px !important;
-  line-height: 38px !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
 }
 
-.fm-popup-grid .p-datatable-tbody > tr:hover > td {
-  background: #eefbfc !important;
-}
-
-.fm-popup-grid .p-datatable-tbody > tr.p-highlight > td,
-.fm-popup-grid .p-datatable-tbody > tr.p-datatable-row-selected > td,
-.fm-popup-grid .p-datatable-tbody > tr.fm-selected-row > td {
+html body .fm-popup-grid .p-datatable-tbody > tr:hover > td,
+html body .fm-popup-grid .p-datatable-tbody > tr.p-highlight > td,
+html body .fm-popup-grid .p-datatable-tbody > tr.fm-selected-row > td {
   background: #e8f8fb !important;
   color: #0f2f3d !important;
-  font-weight: 600 !important;
 }
 
-.fm-popup-grid__cell {
-  width: 100%;
-  min-width: 0;
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.fm-popup-grid .p-datatable-empty-message > td {
-  height: 100% !important;
-  padding: 0 !important;
-  border-right: 0 !important;
-  background: #eafcff !important;
-}
-
-.fm-popup-grid__empty {
-  width: 100%;
-  min-height: 190px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  background: #eafcff;
-  color: #607887;
-  font-size: 14px;
-  font-weight: 500;
-  text-align: center;
-  box-sizing: border-box;
-}
-
-.fm-popup-grid--fill .p-datatable-empty-message,
-.fm-popup-grid--fill .p-datatable-empty-message > td,
-.fm-popup-grid--fill .fm-popup-grid__empty {
+html body .fm-popup-grid .p-datatable-tbody:has(.p-datatable-empty-message),
+html body .fm-popup-grid .p-datatable-empty-message,
+html body .fm-popup-grid .p-datatable-empty-message > td {
   height: 100% !important;
   min-height: 100% !important;
 }
 
-.fm-popup-grid .p-paginator,
-.fm-popup-grid .p-datatable-paginator-bottom {
+html body .fm-popup-grid .p-datatable-empty-message > td {
+  padding: 0 !important;
+  background: #eafcff !important;
+}
+
+html body .fm-popup-grid__empty {
   width: 100% !important;
   min-width: 100% !important;
-  height: 46px !important;
-  min-height: 46px !important;
-  max-height: 46px !important;
+  height: 100% !important;
+  min-height: 250px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  background: #eafcff !important;
+  color: #607887 !important;
+  font-size: 16px !important;
+  text-align: center !important;
+}
+
+html body .fm-popup-grid .p-paginator,
+html body .fm-popup-grid .p-datatable-paginator-bottom {
+  width: 100% !important;
+  height: 52px !important;
+  min-height: 52px !important;
+  max-height: 52px !important;
   display: block !important;
+  flex: 0 0 52px !important;
   padding: 0 !important;
-  margin: 0 !important;
   border: 0 !important;
-  border-radius: 0 !important;
+  border-top: 1px solid #aab9c2 !important;
   background: #fff !important;
-  overflow: visible !important;
-  box-sizing: border-box !important;
+  overflow: hidden !important;
 }
 
-.fm-popup-grid--fill .p-paginator,
-.fm-popup-grid--fill .p-datatable-paginator-bottom {
-  flex: 0 0 46px !important;
-}
-
-.fm-popup-grid .fm-custom-paginator {
-  height: 46px !important;
-  min-height: 46px !important;
+html body .fm-popup-grid .fm-custom-paginator {
+  width: 100% !important;
+  height: 52px !important;
+  min-height: 52px !important;
   padding: 0 14px !important;
-  font-size: 13px !important;
+  font-size: 14px !important;
 }
 
-.fm-popup-grid .fm-page-input {
-  width: 54px !important;
-  min-width: 54px !important;
-  height: 32px !important;
-  min-height: 32px !important;
-  font-size: 13px !important;
+html body .fm-popup-grid .fm-grid-action,
+html body .fm-popup-grid .fm-grid-action .pi,
+html body .fm-popup-grid .p-button-icon {
+  font-size: 20px !important;
 }
 
-.fm-popup-grid .fm-page-label,
-.fm-popup-grid .fm-page-total {
-  font-size: 13px !important;
-}
-
-.fm-popup-grid .p-column-resizer,
-.fm-popup-grid .p-datatable-column-resizer {
-  width: 8px !important;
-  right: -4px !important;
-  cursor: col-resize !important;
-  background: transparent !important;
-}
-
-@media (max-width: 700px) {
-  .fm-popup-grid .p-datatable-thead > tr > th,
-  .fm-popup-grid .p-datatable-tbody > tr > td {
-    font-size: 12px !important;
-  }
-
-  .fm-popup-grid__filter-input,
-  .fm-popup-grid__filter-input.p-inputtext {
-    height: 28px !important;
-    min-height: 28px !important;
-    max-height: 28px !important;
-  }
+html body .fm-popup-grid__cell {
+  display: block !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
 }
 </style>
