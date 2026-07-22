@@ -76,9 +76,9 @@ const props = defineProps({
   maximizable: { type: Boolean, default: true },
   formColumns: {
     type: String,
-    default: 'repeat(auto-fit, minmax(170px, 1fr))'
+    default: 'repeat(auto-fit, minmax(150px, 1fr))'
   },
-  formGap: { type: String, default: '16px' }
+  formGap: { type: String, default: '12px' }
 })
 
 const emit = defineEmits(['update:visible', 'close'])
@@ -113,19 +113,19 @@ const onHide = () => {
 .fm-grid-dialog.p-dialog {
   width: min(var(--fm-grid-dialog-width), var(--fm-grid-dialog-max-width)) !important;
   max-width: var(--fm-grid-dialog-max-width) !important;
-  max-height: calc(100vh - 32px) !important;
+  max-height: calc(100vh - 28px) !important;
   display: flex !important;
   flex-direction: column !important;
   border: 1px solid #d6e1e8 !important;
-  border-radius: 8px !important;
+  border-radius: 4px !important;
   background: #fff !important;
-  box-shadow: 0 18px 38px rgba(21, 37, 50, .22) !important;
+  box-shadow: 0 12px 28px rgba(21, 37, 50, .18) !important;
   overflow: hidden !important;
 }
 
 .fm-grid-dialog--maximized.p-dialog {
   position: fixed !important;
-  inset: 12px !important;
+  inset: 10px !important;
   width: auto !important;
   max-width: none !important;
   height: auto !important;
@@ -135,11 +135,11 @@ const onHide = () => {
 }
 
 .fm-grid-dialog .p-dialog-header {
-  flex: 0 0 46px !important;
-  height: 46px !important;
-  min-height: 46px !important;
-  padding: 0 18px !important;
-  border-bottom: 1px solid #d7e0e6 !important;
+  flex: 0 0 40px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  padding: 0 14px !important;
+  border-bottom: 1px solid #e2e9ee !important;
   background: #fff !important;
 }
 
@@ -149,14 +149,14 @@ const onHide = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 14px;
 }
 
 .fm-grid-dialog__title {
   min-width: 0;
   overflow: hidden;
-  color: #304b5d;
-  font-size: 18px;
+  color: #456273;
+  font-size: 17px;
   font-weight: 400;
   line-height: 1.2;
   text-overflow: ellipsis;
@@ -166,15 +166,15 @@ const onHide = () => {
 .fm-grid-dialog__header-actions {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex: 0 0 auto;
 }
 
 .fm-grid-dialog__header-button {
-  width: 24px;
-  min-width: 24px;
-  height: 24px;
-  min-height: 24px;
+  width: 22px;
+  min-width: 22px;
+  height: 22px;
+  min-height: 22px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -183,7 +183,7 @@ const onHide = () => {
   border: 0;
   border-radius: 0;
   background: transparent;
-  color: #304b5d;
+  color: #456273;
   box-shadow: none;
   cursor: pointer;
 }
@@ -195,29 +195,36 @@ const onHide = () => {
 }
 
 .fm-grid-dialog__header-button .pi {
-  font-size: 18px;
-  line-height: 18px;
+  font-size: 16px;
+  line-height: 16px;
 }
 
 .fm-grid-dialog .p-dialog-content {
-  flex: 1 1 auto !important;
+  flex: 0 1 auto !important;
   min-height: 0 !important;
   padding: 0 !important;
   overflow: hidden !important;
   background: #fff !important;
 }
 
+.fm-grid-dialog--maximized .p-dialog-content {
+  flex: 1 1 auto !important;
+}
+
 .fm-grid-dialog__body {
   width: 100%;
-  height: 100%;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 16px 18px;
+  gap: 12px;
+  padding: 12px 14px 10px;
   overflow: auto;
   box-sizing: border-box;
   container: fm-grid-dialog / inline-size;
+}
+
+.fm-grid-dialog--maximized .fm-grid-dialog__body {
+  height: 100%;
 }
 
 .fm-grid-dialog__form {
@@ -233,7 +240,7 @@ const onHide = () => {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 .fm-grid-dialog__field label {
@@ -242,7 +249,7 @@ const onHide = () => {
   color: #111;
   font-size: 12px;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.1;
   white-space: nowrap;
 }
 
@@ -252,41 +259,52 @@ const onHide = () => {
   width: 100% !important;
   min-width: 0 !important;
   max-width: 100% !important;
-  height: 34px !important;
-  min-height: 34px !important;
+  height: 31px !important;
+  min-height: 31px !important;
+  max-height: 31px !important;
   border-color: #b9cbd6 !important;
   border-radius: 3px !important;
   background: #fff !important;
-  font-size: 12px !important;
+  font-size: 13px !important;
   box-sizing: border-box !important;
 }
 
 .fm-grid-dialog__control.p-select .p-select-label {
   padding: 5px 28px 5px 9px !important;
-  line-height: 22px !important;
+  line-height: 19px !important;
+  font-size: 13px !important;
+}
+
+.fm-grid-dialog__control.p-select .p-select-dropdown {
+  width: 26px !important;
 }
 
 .fm-grid-dialog__form-action,
-.fm-grid-dialog__form-action.p-button {
+.fm-grid-dialog__form-action.p-button,
+.fm-grid-dialog__form-action.p-button:enabled:hover,
+.fm-grid-dialog__form-action.p-button:enabled:focus {
   width: 112px !important;
   min-width: 112px !important;
   max-width: 112px !important;
-  height: 34px !important;
-  min-height: 34px !important;
-  justify-self: end;
-  border: 0 !important;
-  border-radius: 17px !important;
+  height: 31px !important;
+  min-height: 31px !important;
+  justify-self: stretch;
+  padding: 0 16px !important;
+  border: 1px solid #00a9bd !important;
+  border-radius: 18px !important;
   background: #00a9bd !important;
   color: #fff !important;
-  box-shadow: none !important;
+  box-shadow: 0 3px 7px rgba(0, 169, 189, .18) !important;
   font-size: 12px !important;
   font-weight: 700 !important;
 }
 
 .fm-grid-dialog__form-action.p-button:disabled,
 .fm-grid-dialog__form-action.p-button.p-disabled {
-  background: #d8e0e5 !important;
-  color: #7d8d96 !important;
+  background: #b8c6ce !important;
+  border-color: #b8c6ce !important;
+  color: #fff !important;
+  box-shadow: none !important;
   opacity: 1 !important;
 }
 
@@ -297,10 +315,10 @@ const onHide = () => {
 }
 
 .fm-grid-dialog .p-dialog-footer {
-  flex: 0 0 58px !important;
-  min-height: 58px !important;
-  padding: 10px 18px !important;
-  border-top: 1px solid #d7e0e6 !important;
+  flex: 0 0 50px !important;
+  min-height: 50px !important;
+  padding: 9px 14px 10px !important;
+  border-top: 1px solid #edf2f5 !important;
   background: #fff !important;
 }
 
@@ -312,40 +330,42 @@ const onHide = () => {
   gap: 10px;
 }
 
-.fm-grid-dialog__footer .p-button {
-  min-width: 126px !important;
-  height: 34px !important;
-  border: 0 !important;
-  border-radius: 17px !important;
+.fm-grid-dialog__footer .p-button,
+.fm-grid-dialog__footer .p-button:enabled:hover,
+.fm-grid-dialog__footer .p-button:enabled:focus {
+  min-width: 112px !important;
+  height: 31px !important;
+  padding: 0 16px !important;
+  border: 1px solid #00a9bd !important;
+  border-radius: 18px !important;
   background: #00a9bd !important;
   color: #fff !important;
-  box-shadow: none !important;
+  box-shadow: 0 3px 7px rgba(0, 169, 189, .18) !important;
   font-size: 12px !important;
   font-weight: 700 !important;
 }
 
 .fm-grid-dialog__footer .p-button:disabled,
 .fm-grid-dialog__footer .p-button.p-disabled {
-  background: #d8e0e5 !important;
-  color: #7d8d96 !important;
+  background: #b8c6ce !important;
+  border-color: #b8c6ce !important;
+  color: #fff !important;
+  box-shadow: none !important;
   opacity: 1 !important;
 }
 
-@container fm-grid-dialog (max-width: 860px) {
+@container fm-grid-dialog (max-width: 790px) {
   .fm-grid-dialog__form {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 
   .fm-grid-dialog__form-action,
   .fm-grid-dialog__form-action.p-button {
-    justify-self: stretch;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: none !important;
+    justify-self: start;
   }
 }
 
-@container fm-grid-dialog (max-width: 520px) {
+@container fm-grid-dialog (max-width: 500px) {
   .fm-grid-dialog__form {
     grid-template-columns: 1fr !important;
   }
@@ -359,7 +379,7 @@ const onHide = () => {
   }
 
   .fm-grid-dialog__body {
-    padding: 12px 10px;
+    padding: 10px;
   }
 }
 </style>
