@@ -146,6 +146,7 @@
       :closable="false"
       :draggable="false"
       :resizable="false"
+      :style="altaDialogStyle"
       class="jobtype-alta-dialog"
       :class="{ 'jobtype-alta-dialog--maximized': altaMaximized }"
       @hide="onAltaHide"
@@ -348,6 +349,11 @@ const altaFirst = ref(0)
 const altaPageRows = ref(10)
 const mainRows = ref([])
 const altaRows = ref([])
+
+const altaDialogStyle = computed(() => altaMaximized.value
+  ? 'position: fixed !important; inset: 0 !important; width: 100vw !important; height: 100dvh !important; max-width: 100vw !important; max-height: 100dvh !important; margin: 0 !important; transform: none !important; border-radius: 0 !important;'
+  : 'width: calc(100vw - 48px) !important; max-width: 1440px !important; height: min(680px, calc(100dvh - 48px)) !important; max-height: calc(100dvh - 48px) !important; margin: 0 !important;'
+)
 
 const mainColumns = [
   { field: 'codigoTarea', header: 'CODIGO_TAREA', width: '12.5%' },
