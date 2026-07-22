@@ -21,15 +21,15 @@
         aria-label="Página anterior"
         :disabled="disabled || page === 0 || pageCount === 0"
         @click="$emit('prev-page')"
-      >&lt;</button>
+      >&lt;&lt;</button>
 
-      <span class="fm-page-label">Página</span>
+      <span class="fm-page-label">{{ pageLabel }}</span>
       <input
         class="fm-page-input"
         type="number"
         min="1"
         :max="Math.max(pageCount, 1)"
-        :value="pageCount ? page + 1 : 0"
+        :value="pageCount ? page + 1 : 1"
         :disabled="disabled || pageCount === 0"
         aria-label="Número de página"
         @change="changePage"
@@ -43,7 +43,7 @@
         aria-label="Página siguiente"
         :disabled="disabled || pageCount === 0 || page >= pageCount - 1"
         @click="$emit('next-page')"
-      >&gt;</button>
+      >&gt;&gt;</button>
 
       <button
         type="button"
@@ -55,6 +55,7 @@
       >&gt;|</button>
 
       <select
+        v-if="showRowsSelect"
         class="fm-rows-select"
         :value="rows"
         :disabled="disabled"
@@ -67,13 +68,15 @@
       </select>
     </div>
 
-    <span class="fm-custom-paginator__counter">
-      Mostrando {{ totalRecords ? first + 1 : 0 }} - {{ last }} de {{ totalRecords }}
+    <span v-if="showCounter" class="fm-custom-paginator__counter">
+      {{ resolvedCounterText }}
     </span>
   </div>
 </template>
 
 <script setup>
+import { computed } from 'vue'
+
 const props = defineProps({
   first: { type: Number, default: 0 },
   last: { type: Number, default: 0 },
@@ -82,7 +85,11 @@ const props = defineProps({
   rows: { type: Number, default: 10 },
   totalRecords: { type: Number, default: 0 },
   rowsOptions: { type: Array, default: () => [10, 50, 100, 500] },
-  disabled: { type: Boolean, default: false }
+  disabled: { type: Boolean, default: false },
+  showRowsSelect: { type: Boolean, default: true },
+  showCounter: { type: Boolean, default: true },
+  counterText: { type: String, default: '' },
+  pageLabel: { type: String, default: 'Página' }
 })
 
 const emit = defineEmits([
@@ -93,6 +100,11 @@ const emit = defineEmits([
   'page-change',
   'rows-change'
 ])
+
+const resolvedCounterText = computed(() => {
+  if (props.counterText) return props.counterText
+  return `Mostrando ${props.totalRecords ? props.first + 1 : 0} - ${props.last} de ${props.totalRecords}`
+})
 
 const changePage = (event) => {
   if (!props.pageCount) return
@@ -109,13 +121,14 @@ const changePage = (event) => {
 <style scoped>
 .fm-custom-paginator {
   width: 100%;
-  min-height: 38px;
+  min-height: 36px;
   display: grid;
-  grid-template-columns: minmax(110px, 1fr) auto minmax(160px, 1fr);
+  grid-template-columns: minmax(130px, 1fr) auto minmax(170px, 1fr);
   align-items: center;
-  padding: 3px 8px;
+  padding: 2px 9px;
   color: #111;
-  font-size: 12px;
+  font-size: 11px;
+  box-sizing: border-box;
 }
 
 .fm-custom-paginator__actions {
@@ -127,18 +140,17 @@ const changePage = (event) => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 4px;
   min-width: 0;
-  max-width: 100%;
   color: #111;
   white-space: nowrap;
 }
 
 .fm-page-button {
-  width: 22px;
-  min-width: 22px;
-  height: 28px;
-  min-height: 28px;
+  width: 20px;
+  min-width: 20px;
+  height: 24px;
+  min-height: 24px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -146,7 +158,8 @@ const changePage = (event) => {
   border: 0;
   background: transparent;
   color: #111;
-  font-size: 15px;
+  font-size: 13px;
+  font-weight: 700;
   cursor: pointer;
 }
 
@@ -155,92 +168,57 @@ const changePage = (event) => {
 }
 
 .fm-page-button:disabled {
-  color: #b7c0c4;
+  color: #b7b7b7;
   cursor: default;
 }
 
 .fm-page-input,
 .fm-rows-select {
-  height: 28px;
-  min-height: 28px;
-  border: 1px solid #cbd4db;
-  border-radius: 4px;
+  height: 25px;
+  min-height: 25px;
+  border: 1px solid #d5d5d5;
+  border-radius: 2px;
   background: #fff;
   color: #111;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .fm-page-input {
-  width: 46px;
-  min-width: 46px;
-  padding: 2px 6px;
-  text-align: center;
+  width: 58px;
+  min-width: 58px;
+  padding: 1px 5px;
+  text-align: left;
 }
 
 .fm-rows-select {
-  width: 58px;
-  min-width: 58px;
-  margin-left: 2px;
-  padding: 0 6px;
+  width: 48px;
+  min-width: 48px;
+  margin-left: 5px;
+  padding: 0 3px;
 }
 
 .fm-page-input:focus,
 .fm-rows-select:focus {
   outline: none;
   border-color: #00a9bd;
-  box-shadow: 0 0 0 2px rgba(0, 169, 189, .14);
 }
 
 .fm-custom-paginator__counter {
   justify-self: end;
-  color: #222;
+  color: #111;
   white-space: nowrap;
 }
 
 @media (max-width: 900px) {
   .fm-custom-paginator {
-    min-height: 78px;
-    grid-template-columns: 1fr 1fr;
-    gap: 5px 10px;
-    padding: 5px 8px;
+    grid-template-columns: 1fr;
+    gap: 4px;
   }
 
+  .fm-custom-paginator__actions,
+  .fm-custom-paginator__navigation,
   .fm-custom-paginator__counter {
-    justify-self: end;
-  }
-
-  .fm-custom-paginator__navigation {
-    grid-column: 1 / -1;
-    grid-row: 2;
     justify-self: center;
-  }
-}
-
-@media (max-width: 600px) {
-  .fm-custom-paginator {
-    min-height: 112px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 7px;
-  }
-
-  .fm-custom-paginator__navigation {
-    width: 100%;
-    justify-content: flex-start;
-    overflow-x: auto;
-    padding: 2px 4px;
-  }
-
-  .fm-custom-paginator__counter {
-    align-self: center;
-  }
-}
-
-@media (pointer: coarse) {
-  .fm-page-button {
-    min-width: 40px;
-    min-height: 40px;
   }
 }
 </style>
