@@ -1,0 +1,60 @@
+/*
+ * Preset global para ventanas de trabajo con grillas.
+ * Se aplica a FmGridDialog/FmPopupGrid y evita que cada pantalla repita
+ * tamaños, columnas y breakpoints.
+ */
+
+html body .fm-grid-dialog.p-dialog:not(.fm-grid-dialog--maximized) {
+  width: min(1500px, calc(100vw - 24px)) !important;
+  max-width: calc(100vw - 24px) !important;
+  height: min(780px, calc(100vh - 24px)) !important;
+  min-height: min(600px, calc(100vh - 24px)) !important;
+}
+
+html body .fm-grid-dialog .fm-grid-dialog__form {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+  column-gap: 16px !important;
+  row-gap: 14px !important;
+}
+
+html body .fm-grid-dialog .fm-grid-dialog__form-action,
+html body .fm-grid-dialog .fm-grid-dialog__form-action.p-button {
+  justify-self: end !important;
+}
+
+html body .fm-grid-dialog .fm-grid-dialog__grid-area,
+html body .fm-grid-dialog .fm-popup-grid,
+html body .fm-grid-dialog .fm-popup-grid .p-datatable {
+  min-width: 0 !important;
+  min-height: 0 !important;
+}
+
+html body .fm-grid-dialog .fm-popup-grid .p-datatable-table-container,
+html body .fm-grid-dialog .fm-popup-grid .p-datatable-wrapper,
+html body .fm-grid-dialog .fm-popup-grid [data-pc-section="tablecontainer"] {
+  scrollbar-gutter: stable both-edges !important;
+}
+
+@media (max-width: 820px) {
+  html body .fm-grid-dialog.p-dialog:not(.fm-grid-dialog--maximized) {
+    width: calc(100vw - 8px) !important;
+    max-width: calc(100vw - 8px) !important;
+    height: calc(100vh - 8px) !important;
+    min-height: 0 !important;
+  }
+
+  html body .fm-grid-dialog .fm-grid-dialog__form {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  html body .fm-grid-dialog .fm-grid-dialog__form-action,
+  html body .fm-grid-dialog .fm-grid-dialog__form-action.p-button {
+    justify-self: start !important;
+  }
+}
+
+@media (max-width: 480px) {
+  html body .fm-grid-dialog .fm-grid-dialog__form {
+    grid-template-columns: 1fr !important;
+  }
+}
