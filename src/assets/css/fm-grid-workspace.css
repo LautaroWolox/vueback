@@ -1,75 +1,100 @@
 /*
- * Ventana global de trabajo con grilla.
- * Este preset es compartido por FmGridDialog y FmPopupGrid.
+ * Ventana global para popups con grilla.
+ * Replica las proporciones de la ventana de trabajo de referencia y conserva
+ * los colores, filtros, acciones y componentes compartidos de vueback.
  */
 
-/* Ventana normal: casi todo el viewport, con un margen visual mínimo. */
+/* Ventana normal: ancha, centrada y con altura de trabajo controlada. */
 html body .fm-grid-dialog.p-dialog:not(.fm-grid-dialog--maximized) {
   position: fixed !important;
-  inset: 10px !important;
-  top: 10px !important;
-  right: 10px !important;
-  bottom: 10px !important;
-  left: 10px !important;
-  width: auto !important;
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: min(1360px, calc(100vw - 36px)) !important;
   min-width: 0 !important;
-  max-width: none !important;
-  height: auto !important;
-  min-height: 0 !important;
-  max-height: none !important;
+  max-width: calc(100vw - 36px) !important;
+  height: min(850px, calc(100vh - 20px)) !important;
+  min-height: min(620px, calc(100vh - 20px)) !important;
+  max-height: calc(100vh - 20px) !important;
   margin: 0 !important;
-  transform: none !important;
-}
-
-/* El diálogo conserva cabecera, cuerpo y pie como una ventana de trabajo. */
-html body .fm-grid-dialog.p-dialog {
-  display: grid !important;
-  grid-template-rows: 58px minmax(0, 1fr) 68px !important;
+  transform: translate(-50%, -50%) !important;
+  border: 1px solid #c8d2d8 !important;
+  border-radius: 3px !important;
+  box-shadow: 0 10px 28px rgba(20, 35, 45, .28) !important;
   overflow: hidden !important;
 }
 
-html body .fm-grid-dialog .p-dialog-header,
-html body .fm-grid-dialog .p-dialog-content,
-html body .fm-grid-dialog .p-dialog-footer,
-html body .fm-grid-dialog .fm-grid-dialog__body,
-html body .fm-grid-dialog .fm-grid-dialog__form,
-html body .fm-grid-dialog .fm-grid-dialog__grid-area {
+html body .fm-grid-dialog.p-dialog {
+  display: grid !important;
+  grid-template-rows: 70px minmax(0, 1fr) 90px !important;
+  background: #fff !important;
+}
+
+/* Cabecera. */
+html body .fm-grid-dialog .p-dialog-header {
   width: 100% !important;
-  min-width: 0 !important;
-  max-width: none !important;
+  height: 70px !important;
+  min-height: 70px !important;
+  padding: 0 22px !important;
+  border-bottom: 1px solid #d8e0e5 !important;
   box-sizing: border-box !important;
 }
 
+html body .fm-grid-dialog .fm-grid-dialog__title {
+  color: #344f61 !important;
+  font-size: 27px !important;
+  font-weight: 400 !important;
+}
+
+html body .fm-grid-dialog .fm-grid-dialog__header-actions {
+  gap: 18px !important;
+}
+
+html body .fm-grid-dialog .fm-grid-dialog__header-button {
+  width: 30px !important;
+  min-width: 30px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+}
+
+html body .fm-grid-dialog .fm-grid-dialog__header-button .pi {
+  font-size: 23px !important;
+}
+
+/* Cuerpo: formulario arriba y grilla en el espacio restante. */
 html body .fm-grid-dialog .p-dialog-content {
+  width: 100% !important;
   height: 100% !important;
   min-height: 0 !important;
+  padding: 0 !important;
   overflow: hidden !important;
+  box-sizing: border-box !important;
 }
 
 html body .fm-grid-dialog .fm-grid-dialog__body {
+  width: 100% !important;
   height: 100% !important;
   min-height: 0 !important;
   display: grid !important;
   grid-template-rows: auto minmax(0, 1fr) !important;
-  gap: 18px !important;
-  padding: 18px 22px 16px !important;
+  gap: 22px !important;
+  padding: 24px 22px 22px !important;
   overflow: hidden !important;
+  box-sizing: border-box !important;
 }
 
-/*
- * Formulario de escritorio:
- * País | Jobtype | Contrato | Origen | Agregar
- *
- * Se usan fracciones sin anchos mínimos rígidos para que nunca se corte el
- * último campo ni el botón.
- */
+/* País | Jobtype | Contrato | Origen | Agregar */
 html body .fm-grid-dialog .fm-grid-dialog__form {
+  width: 100% !important;
+  min-width: 0 !important;
   display: grid !important;
-  grid-template-columns: 1.05fr 1.6fr 1.6fr 1.05fr 150px !important;
-  column-gap: 22px !important;
+  grid-template-columns: .9fr 1.45fr 1.45fr .9fr 136px !important;
+  column-gap: 28px !important;
   row-gap: 14px !important;
   align-items: end !important;
   overflow: visible !important;
+  box-sizing: border-box !important;
 }
 
 html body .fm-grid-dialog .fm-grid-dialog__field {
@@ -77,10 +102,11 @@ html body .fm-grid-dialog .fm-grid-dialog__field {
 }
 
 html body .fm-grid-dialog .fm-grid-dialog__field label {
-  margin: 0 0 7px !important;
-  font-size: 15px !important;
-  line-height: 1.15 !important;
+  margin: 0 0 9px !important;
+  color: #151c21 !important;
+  font-size: 17px !important;
   font-weight: 700 !important;
+  line-height: 1.1 !important;
 }
 
 html body .fm-grid-dialog .fm-grid-dialog__control,
@@ -89,38 +115,58 @@ html body .fm-grid-dialog .fm-grid-dialog__control.p-select {
   width: 100% !important;
   min-width: 0 !important;
   max-width: 100% !important;
-  height: 42px !important;
-  min-height: 42px !important;
-  max-height: 42px !important;
-  font-size: 15px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+  border: 1px solid #bfcbd2 !important;
+  border-radius: 3px !important;
+  background: #fff !important;
+  color: #253846 !important;
+  font-size: 16px !important;
+  box-shadow: none !important;
   box-sizing: border-box !important;
 }
 
 html body .fm-grid-dialog .fm-grid-dialog__control.p-select .p-select-label {
-  padding: 9px 38px 9px 12px !important;
-  font-size: 15px !important;
-  line-height: 22px !important;
+  padding: 11px 40px 11px 12px !important;
+  font-size: 16px !important;
+  line-height: 24px !important;
 }
 
 html body .fm-grid-dialog .fm-grid-dialog__control.p-select .p-select-dropdown {
-  width: 36px !important;
+  width: 38px !important;
 }
 
 html body .fm-grid-dialog .fm-grid-dialog__form-action,
-html body .fm-grid-dialog .fm-grid-dialog__form-action.p-button {
-  width: 150px !important;
-  min-width: 150px !important;
-  max-width: 150px !important;
-  height: 42px !important;
-  min-height: 42px !important;
-  max-height: 42px !important;
+html body .fm-grid-dialog .fm-grid-dialog__form-action.p-button,
+html body .fm-grid-dialog .fm-grid-dialog__form-action.p-button:enabled:hover,
+html body .fm-grid-dialog .fm-grid-dialog__form-action.p-button:enabled:focus {
+  width: 136px !important;
+  min-width: 136px !important;
+  max-width: 136px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
   justify-self: stretch !important;
-  border-radius: 21px !important;
-  font-size: 14px !important;
+  padding: 0 18px !important;
+  border: 1px solid #00a9bd !important;
+  border-radius: 24px !important;
+  background: #00a9bd !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  font-size: 15px !important;
   font-weight: 700 !important;
 }
 
-/* La grilla ocupa todo el espacio restante del popup. */
+html body .fm-grid-dialog .fm-grid-dialog__form-action.p-button:disabled,
+html body .fm-grid-dialog .fm-grid-dialog__form-action.p-button.p-disabled {
+  border-color: #cbd5da !important;
+  background: #dbe2e6 !important;
+  color: #7f8f98 !important;
+  opacity: 1 !important;
+}
+
+/* La grilla ocupa todo el espacio central. */
 html body .fm-grid-dialog .fm-grid-dialog__grid-area,
 html body .fm-grid-dialog .fm-grid-dialog__grid-area > *,
 html body .fm-grid-dialog .fm-popup-grid,
@@ -133,11 +179,14 @@ html body .fm-grid-dialog .fm-popup-grid .p-datatable {
   min-height: 0 !important;
   max-height: none !important;
   flex: 1 1 auto !important;
+  box-sizing: border-box !important;
 }
 
 html body .fm-grid-dialog .fm-popup-grid {
   display: flex !important;
   flex-direction: column !important;
+  border: 1px solid #a7bbc7 !important;
+  border-left: 4px solid #00a9bd !important;
   overflow: hidden !important;
 }
 
@@ -146,7 +195,6 @@ html body .fm-grid-dialog .fm-popup-grid .p-datatable {
   flex-direction: column !important;
 }
 
-/* Las cinco columnas se ajustan al ancho disponible; no hay scroll horizontal. */
 html body .fm-grid-dialog .fm-popup-grid:not(.fm-popup-grid--horizontal) .p-datatable-table {
   width: 100% !important;
   min-width: 100% !important;
@@ -169,34 +217,33 @@ html body .fm-grid-dialog .fm-popup-grid:not(.fm-popup-grid--horizontal) [data-p
   scrollbar-gutter: stable !important;
 }
 
-html body .fm-grid-dialog .fm-popup-grid:not(.fm-popup-grid--horizontal) .p-datatable-thead > tr > th,
-html body .fm-grid-dialog .fm-popup-grid:not(.fm-popup-grid--horizontal) .p-datatable-tbody > tr > td {
-  min-width: 0 !important;
-  max-width: none !important;
-}
-
-/* Encabezados y filtros legibles, manteniendo el estilo actual del aplicativo. */
+/* Encabezados y filtros, respetando la estética actual. */
 html body .fm-grid-dialog .fm-popup-grid .p-datatable-thead > tr > th {
-  height: 44px !important;
-  min-height: 44px !important;
+  height: 50px !important;
+  min-height: 50px !important;
   padding: 0 12px !important;
+  color: #173849 !important;
   font-size: 14px !important;
+  font-weight: 700 !important;
+  background: #f1f4f6 !important;
+  overflow: hidden !important;
 }
 
 html body .fm-grid-dialog .fm-popup-grid .p-datatable-thead > tr.p-datatable-filter-row > th,
 html body .fm-grid-dialog .fm-popup-grid .p-datatable-thead > tr.p-filter-row > th {
-  height: 46px !important;
-  min-height: 46px !important;
-  padding: 6px 8px !important;
+  height: 54px !important;
+  min-height: 54px !important;
+  padding: 7px 9px !important;
+  background: #fff !important;
 }
 
 html body .fm-grid-dialog .fm-popup-grid__filter {
   width: 100% !important;
   min-width: 0 !important;
   display: grid !important;
-  grid-template-columns: 15px minmax(0, 1fr) 20px !important;
-  gap: 5px !important;
+  grid-template-columns: 16px minmax(0, 1fr) 22px !important;
   align-items: center !important;
+  gap: 6px !important;
 }
 
 html body .fm-grid-dialog .fm-popup-grid__filter-prefix,
@@ -209,12 +256,16 @@ html body .fm-grid-dialog .fm-popup-grid__filter-input.p-inputtext {
   width: 100% !important;
   min-width: 0 !important;
   max-width: 100% !important;
-  height: 32px !important;
-  min-height: 32px !important;
-  max-height: 32px !important;
-  padding: 0 9px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+  padding: 0 10px !important;
+  border: 1px solid #b8cad4 !important;
+  border-radius: 2px !important;
+  background: #fff !important;
+  color: #0f2f3d !important;
   font-size: 14px !important;
-  line-height: 32px !important;
+  line-height: 38px !important;
   box-sizing: border-box !important;
 }
 
@@ -242,7 +293,8 @@ html body .fm-grid-dialog .fm-popup-grid--fill [data-pc-section="tablecontainer"
 html body .fm-grid-dialog .fm-popup-grid--fill .p-datatable-table:has(.p-datatable-empty-message),
 html body .fm-grid-dialog .fm-popup-grid--fill .p-datatable-tbody:has(.p-datatable-empty-message),
 html body .fm-grid-dialog .fm-popup-grid--fill .p-datatable-empty-message,
-html body .fm-grid-dialog .fm-popup-grid--fill .p-datatable-empty-message > td {
+html body .fm-grid-dialog .fm-popup-grid--fill .p-datatable-empty-message > td,
+html body .fm-grid-dialog .fm-popup-grid--fill .fm-popup-grid__empty {
   height: 100% !important;
   min-height: 100% !important;
 }
@@ -255,41 +307,76 @@ html body .fm-grid-dialog .fm-popup-grid--fill .p-datatable-empty-message > td {
 html body .fm-grid-dialog .fm-popup-grid--fill .fm-popup-grid__empty {
   width: 100% !important;
   min-width: 100% !important;
-  height: 100% !important;
-  min-height: 100% !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   overflow: hidden !important;
   background: #eafcff !important;
-  font-size: 15px !important;
+  color: #607887 !important;
+  font-size: 16px !important;
   text-align: center !important;
 }
 
-/* Paginador e iconos fijos debajo de la tabla. */
+/* Paginador y acciones. */
 html body .fm-grid-dialog .fm-popup-grid .p-paginator,
 html body .fm-grid-dialog .fm-popup-grid .p-datatable-paginator-bottom {
-  flex: 0 0 48px !important;
+  flex: 0 0 52px !important;
   width: 100% !important;
-  height: 48px !important;
-  min-height: 48px !important;
-  max-height: 48px !important;
+  height: 52px !important;
+  min-height: 52px !important;
+  max-height: 52px !important;
+  border-top: 1px solid #a7bbc7 !important;
+  background: #fff !important;
 }
 
 html body .fm-grid-dialog .fm-popup-grid .fm-custom-paginator {
-  height: 48px !important;
-  min-height: 48px !important;
-  padding: 0 14px !important;
+  height: 52px !important;
+  min-height: 52px !important;
+  padding: 0 16px !important;
   font-size: 14px !important;
 }
 
 html body .fm-grid-dialog .fm-popup-grid .fm-grid-action,
 html body .fm-grid-dialog .fm-popup-grid .fm-grid-action .pi,
 html body .fm-grid-dialog .fm-popup-grid .p-button-icon {
-  font-size: 20px !important;
+  font-size: 21px !important;
 }
 
-/* Maximizado: ocupa literalmente todo el viewport. */
+/* Pie. */
+html body .fm-grid-dialog .p-dialog-footer {
+  width: 100% !important;
+  height: 90px !important;
+  min-height: 90px !important;
+  padding: 18px 22px !important;
+  border-top: 1px solid #d8e0e5 !important;
+  background: #fff !important;
+  box-sizing: border-box !important;
+}
+
+html body .fm-grid-dialog .fm-grid-dialog__footer .p-button,
+html body .fm-grid-dialog .fm-grid-dialog__footer .p-button:enabled:hover,
+html body .fm-grid-dialog .fm-grid-dialog__footer .p-button:enabled:focus {
+  min-width: 164px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  padding: 0 22px !important;
+  border: 1px solid #00a9bd !important;
+  border-radius: 24px !important;
+  background: #00a9bd !important;
+  color: #fff !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+}
+
+html body .fm-grid-dialog .fm-grid-dialog__footer .p-button:disabled,
+html body .fm-grid-dialog .fm-grid-dialog__footer .p-button.p-disabled {
+  border-color: #d5dde1 !important;
+  background: #e5eaed !important;
+  color: #91a0a8 !important;
+  opacity: 1 !important;
+}
+
+/* Maximizado real. */
 html body .fm-grid-dialog.fm-grid-dialog--maximized.p-dialog {
   position: fixed !important;
   inset: 0 !important;
@@ -305,23 +392,30 @@ html body .fm-grid-dialog.fm-grid-dialog--maximized.p-dialog {
   max-height: none !important;
   margin: 0 !important;
   transform: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
 }
 
-/* Ventanas intermedias: dos filas limpias, sin recortes. */
-@media (max-width: 1050px) {
+@media (max-width: 900px) {
+  html body .fm-grid-dialog.p-dialog:not(.fm-grid-dialog--maximized) {
+    width: calc(100vw - 12px) !important;
+    max-width: calc(100vw - 12px) !important;
+    height: calc(100vh - 12px) !important;
+    max-height: calc(100vh - 12px) !important;
+  }
+
   html body .fm-grid-dialog .fm-grid-dialog__form {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    column-gap: 18px !important;
   }
 
   html body .fm-grid-dialog .fm-grid-dialog__form-action,
   html body .fm-grid-dialog .fm-grid-dialog__form-action.p-button {
-    width: 150px !important;
-    max-width: 150px !important;
     justify-self: start !important;
   }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 520px) {
   html body .fm-grid-dialog .fm-grid-dialog__form {
     grid-template-columns: 1fr !important;
   }
