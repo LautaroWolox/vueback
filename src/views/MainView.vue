@@ -2,6 +2,7 @@
   <div class="main-layout">
     <CustomMenu />
     <JobtypeContrato v-if="showJobtypeContrato" />
+    <ConfiguraCmoActividad v-else-if="showConfiguraCmoActividad" />
     <RouterView v-else />
 
     <div v-show="showLogo" class="main-home" aria-label="Field Manager">
@@ -17,10 +18,12 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import CustomMenu from '@/components/CustomMenu.vue'
 import JobtypeContrato from '@/modules/parametrizaciones/jobtypeContrato/JobtypeContrato.vue'
+import ConfiguraCmoActividad from '@/modules/parametrizaciones/configuraCmoActividad/ConfiguraCmoActividad.vue'
 
 const route = useRoute()
 const showLogo = computed(() => route.name === 'main')
 const showJobtypeContrato = computed(() => route.name === 'JOCO')
+const showConfiguraCmoActividad = computed(() => route.name === 'CMOA')
 </script>
 
 <style scoped>
