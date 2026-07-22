@@ -30,7 +30,6 @@
       <div v-show="resultsExpanded" class="jobtype-results-body">
         <DataTable
           id="tabla-jobtype-contrato"
-          ref="mainTable"
           v-model:filters="mainFilters"
           v-model:selection="selectedRow"
           v-model:first="mainFirst"
@@ -149,7 +148,6 @@
       :resizable="false"
       class="jobtype-alta-dialog"
       :class="{ 'jobtype-alta-dialog--maximized': altaMaximized }"
-      :style="altaDialogStyle"
       @hide="onAltaHide"
     >
       <template #header>
@@ -178,7 +176,7 @@
 
       <div class="jobtype-alta-content">
         <div class="jobtype-alta-form">
-          <div class="jobtype-alta-field jobtype-alta-field--pais">
+          <div class="jobtype-alta-field fm-field">
             <label for="alta-pais">Pais</label>
             <Select
               id="alta-pais"
@@ -190,7 +188,7 @@
             />
           </div>
 
-          <div class="jobtype-alta-field jobtype-alta-field--jobtype">
+          <div class="jobtype-alta-field fm-field">
             <label for="alta-jobtype">Jobtype</label>
             <InputText
               id="alta-jobtype"
@@ -200,7 +198,7 @@
             />
           </div>
 
-          <div class="jobtype-alta-field jobtype-alta-field--contrato">
+          <div class="jobtype-alta-field fm-field">
             <label for="alta-contrato">Contrato</label>
             <InputText
               id="alta-contrato"
@@ -210,7 +208,7 @@
             />
           </div>
 
-          <div class="jobtype-alta-field jobtype-alta-field--origen">
+          <div class="jobtype-alta-field fm-field">
             <label for="alta-origen">Origen</label>
             <Select
               id="alta-origen"
@@ -223,20 +221,20 @@
             />
           </div>
 
-          <Button
+          <FmButton
             label="AGREGAR"
-            class="jobtype-primary-button jobtype-add-button"
+            class="jobtype-add-button"
             :disabled="!canAgregar"
             @click="agregarPreview"
           />
         </div>
 
-        <div class="jobtype-alta-grid-wrap">
+        <div class="jobtype-alta-grid-wrap fm-grid-shell">
           <DataTable
             v-model:selection="altaSelectedRow"
             v-model:first="altaFirst"
             v-model:rows="altaPageRows"
-            class="jobtype-alta-grid"
+            class="jobtype-alta-grid fm-pass-grid"
             :value="altaRows"
             dataKey="id"
             tableStyle="table-layout: fixed; width: 100%; min-width: 100%"
@@ -248,6 +246,10 @@
             showGridlines
             @row-click="onAltaRowClick"
           >
+            <template #empty>
+              <div class="fm-grid-empty jobtype-alta-empty">No hay relaciones agregadas</div>
+            </template>
+
             <template
               #paginatorcontainer="{
                 first,
@@ -284,6 +286,7 @@
               >
                 <template #actions>
                   <FmGridActions
+                    size="large"
                     :show-export="false"
                     :show-delete="true"
                     :show-refresh="false"
@@ -305,7 +308,7 @@
               :bodyStyle="{ width: column.width }"
             >
               <template #body="{ data }">
-                <span class="jobtype-cell-text" :title="String(data[column.field] ?? '')">
+                <span class="fm-cell-text" :title="String(data[column.field] ?? '')">
                   {{ data[column.field] ?? '' }}
                 </span>
               </template>
@@ -315,9 +318,9 @@
       </div>
 
       <template #footer>
-        <Button
+        <FmButton
           label="RELACIONAR"
-          class="jobtype-primary-button jobtype-relate-button"
+          class="jobtype-relate-button"
           :disabled="altaRows.length === 0"
           @click="relacionar"
         />
@@ -328,7 +331,6 @@
 
 <script setup>
 import { computed, reactive, ref, watch } from 'vue'
-import Button from 'primevue/button'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
@@ -346,11 +348,6 @@ const altaFirst = ref(0)
 const altaPageRows = ref(10)
 const mainRows = ref([])
 const altaRows = ref([])
-
-const altaDialogStyle = computed(() => altaMaximized.value
-  ? 'width:100vw !important;height:100vh !important;max-width:100vw !important;max-height:100vh !important;margin:0 !important;border-radius:0 !important;'
-  : 'width:calc(100vw - 22px) !important;height:calc(100vh - 12px) !important;max-width:none !important;max-height:none !important;margin:0 !important;'
-)
 
 const mainColumns = [
   { field: 'codigoTarea', header: 'CODIGO_TAREA', width: '12.5%' },
@@ -383,6 +380,13 @@ const paisOptions = [
   { label: 'PY', value: 'PY' }
 ]
 
+const altaForm = reactive({
+  pais: '',
+  jobtype: '',
+  contrato: '',
+  origen: ''
+})
+
 const origenOptions = computed(() => {
   if (altaForm.pais === 'PY') return [{ label: 'FAN', value: 'FAN' }]
   return [
@@ -390,13 +394,6 @@ const origenOptions = computed(() => {
     { label: 'FAN', value: 'FAN' },
     { label: 'MXM', value: 'MXM' }
   ]
-})
-
-const altaForm = reactive({
-  pais: '',
-  jobtype: '',
-  contrato: '',
-  origen: ''
 })
 
 watch(() => altaForm.pais, (pais) => {
