@@ -7,6 +7,7 @@ import './assets/css/fm-menu-responsive.css'
 import './assets/css/fm-select.css'
 import './assets/css/jobtype-contrato-ocp.css'
 import './assets/css/jobtype-contrato-grid-final.css'
+import './assets/css/fm-grid-workspace.css'
 
 import Lara from '@primeuix/themes/lara'
 import { definePreset } from '@primeuix/themes'
