@@ -23,19 +23,17 @@
         :aria-expanded="resultsExpanded"
         @click="resultsExpanded = !resultsExpanded"
       >
-        <span>RELACIONES JOBTYPE-CONTRATO</span>
+        <span>RELACIONES CMO-ACTIVIDAD</span>
         <span class="jobtype-panel__toggle">{{ resultsExpanded ? '−' : '+' }}</span>
       </button>
 
       <div v-show="resultsExpanded" class="jobtype-results-body">
         <DataTable
-          id="tabla-jobtype-contrato"
-          ref="mainTable"
           v-model:filters="mainFilters"
           v-model:selection="selectedRow"
           v-model:first="mainFirst"
           v-model:rows="mainPageRows"
-          class="jobtype-main-grid"
+          class="jobtype-main-grid fm-pass-grid"
           :value="mainRows"
           dataKey="id"
           tableStyle="table-layout: fixed; width: 100%; min-width: 100%"
@@ -52,6 +50,10 @@
           showGridlines
           @row-click="onMainRowClick"
         >
+          <template #empty>
+            <div class="fm-grid-empty">No hay resultados</div>
+          </template>
+
           <template
             #paginatorcontainer="{
               first,
@@ -162,7 +164,7 @@
             @click="cerrarAlta"
           >×</button>
 
-          <h2 class="jobtype-alta-header__title">Alta Jobtype - Contrato</h2>
+          <h2 class="jobtype-alta-header__title">Alta CMO - Actividad</h2>
 
           <button
             type="button"
@@ -177,66 +179,42 @@
       </template>
 
       <div class="jobtype-alta-content">
-        <div class="jobtype-alta-form">
-          <div class="jobtype-alta-field jobtype-alta-field--pais">
-            <label for="alta-pais">Pais</label>
-            <Select
-              id="alta-pais"
-              v-model="altaForm.pais"
-              :options="paisOptions"
-              optionLabel="label"
-              optionValue="value"
-              class="jobtype-alta-control"
-            />
-          </div>
-
-          <div class="jobtype-alta-field jobtype-alta-field--jobtype">
-            <label for="alta-jobtype">Jobtype</label>
+        <div
+          class="jobtype-alta-form"
+          style="grid-template-columns:minmax(0,1fr) minmax(0,1fr) 170px"
+        >
+          <div class="jobtype-alta-field fm-field">
+            <label for="alta-actividad">Actividad</label>
             <InputText
-              id="alta-jobtype"
-              v-model="altaForm.jobtype"
+              id="alta-actividad"
+              v-model="altaForm.actividad"
               class="jobtype-alta-control"
-              :disabled="!altaForm.pais"
             />
           </div>
 
-          <div class="jobtype-alta-field jobtype-alta-field--contrato">
-            <label for="alta-contrato">Contrato</label>
+          <div class="jobtype-alta-field fm-field">
+            <label for="alta-cmo">CMO</label>
             <InputText
-              id="alta-contrato"
-              v-model="altaForm.contrato"
+              id="alta-cmo"
+              v-model="altaForm.cmo"
               class="jobtype-alta-control"
-              :disabled="!altaForm.pais"
             />
           </div>
 
-          <div class="jobtype-alta-field jobtype-alta-field--origen">
-            <label for="alta-origen">Origen</label>
-            <Select
-              id="alta-origen"
-              v-model="altaForm.origen"
-              :options="origenOptions"
-              optionLabel="label"
-              optionValue="value"
-              class="jobtype-alta-control"
-              :disabled="!altaForm.pais"
-            />
-          </div>
-
-          <Button
+          <FmButton
             label="AGREGAR"
-            class="jobtype-primary-button jobtype-add-button"
+            class="jobtype-add-button"
             :disabled="!canAgregar"
             @click="agregarPreview"
           />
         </div>
 
-        <div class="jobtype-alta-grid-wrap">
+        <div class="jobtype-alta-grid-wrap fm-grid-shell">
           <DataTable
             v-model:selection="altaSelectedRow"
             v-model:first="altaFirst"
             v-model:rows="altaPageRows"
-            class="jobtype-alta-grid"
+            class="jobtype-alta-grid fm-pass-grid"
             :value="altaRows"
             dataKey="id"
             tableStyle="table-layout: fixed; width: 100%; min-width: 100%"
@@ -248,6 +226,10 @@
             showGridlines
             @row-click="onAltaRowClick"
           >
+            <template #empty>
+              <div class="fm-grid-empty jobtype-alta-empty">No hay relaciones agregadas</div>
+            </template>
+
             <template
               #paginatorcontainer="{
                 first,
@@ -284,6 +266,7 @@
               >
                 <template #actions>
                   <FmGridActions
+                    size="large"
                     :show-export="false"
                     :show-delete="true"
                     :show-refresh="false"
@@ -305,7 +288,7 @@
               :bodyStyle="{ width: column.width }"
             >
               <template #body="{ data }">
-                <span class="jobtype-cell-text" :title="String(data[column.field] ?? '')">
+                <span class="fm-cell-text" :title="String(data[column.field] ?? '')">
                   {{ data[column.field] ?? '' }}
                 </span>
               </template>
@@ -315,9 +298,9 @@
       </div>
 
       <template #footer>
-        <Button
+        <FmButton
           label="RELACIONAR"
-          class="jobtype-primary-button jobtype-relate-button"
+          class="jobtype-relate-button"
           :disabled="altaRows.length === 0"
           @click="relacionar"
         />
@@ -327,11 +310,9 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref, watch } from 'vue'
-import Button from 'primevue/button'
+import { computed, reactive, ref } from 'vue'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
-import Select from 'primevue/select'
 import { FilterMatchMode } from '@primevue/core/api'
 
 const filtersExpanded = ref(true)
@@ -353,22 +334,20 @@ const altaDialogStyle = computed(() => altaMaximized.value
 )
 
 const mainColumns = [
-  { field: 'codigoTarea', header: 'CODIGO_TAREA', width: '12.5%' },
-  { field: 'tarea', header: 'TAREA', width: '12.5%' },
-  { field: 'origen', header: 'ORIGEN', width: '12.5%' },
-  { field: 'nombreContrato', header: 'NOMBRE_CONTRATO', width: '12.5%' },
-  { field: 'usuarioModificacion', header: 'USUARIO_MODIFICACION', width: '12.5%' },
-  { field: 'fechaModificacion', header: 'FECHA_MODIFICACION', width: '12.5%' },
-  { field: 'activo', header: 'ACTIVO', width: '12.5%' },
-  { field: 'pais', header: 'PAIS', width: '12.5%' }
+  { field: 'codigoActividad', header: 'CODIGO_ACTIVIDAD', width: '14.285%' },
+  { field: 'descActividad', header: 'DESC_ACTIVIDAD', width: '14.285%' },
+  { field: 'codigoS4', header: 'CODIGO_S4', width: '14.285%' },
+  { field: 'cmo', header: 'CMO', width: '14.285%' },
+  { field: 'usuarioModificacion', header: 'USUARIO_MODIFICACION', width: '14.285%' },
+  { field: 'fechaModificacion', header: 'FECHA_MODIFICACION', width: '14.285%' },
+  { field: 'activo', header: 'ACTIVO', width: '14.29%' }
 ]
 
 const altaColumns = [
-  { field: 'codigoTarea', header: 'CODIGO_TAREA', width: '20%' },
-  { field: 'tarea', header: 'TAREA', width: '20%' },
-  { field: 'origen', header: 'ORIGEN', width: '20%' },
-  { field: 'nombreContrato', header: 'NOMBRE_CONTRATO', width: '20%' },
-  { field: 'pais', header: 'PAIS', width: '20%' }
+  { field: 'codigoActividad', header: 'CODIGO_ACTIVIDAD', width: '25%' },
+  { field: 'descActividad', header: 'DESC_ACTIVIDAD', width: '25%' },
+  { field: 'codigoS4', header: 'CODIGO_S4', width: '25%' },
+  { field: 'cmo', header: 'CMO', width: '25%' }
 ]
 
 const buildFilters = (columns) => Object.fromEntries(
@@ -377,41 +356,13 @@ const buildFilters = (columns) => Object.fromEntries(
 
 const mainFilters = ref(buildFilters(mainColumns))
 
-const paisOptions = [
-  { label: '', value: '' },
-  { label: 'ARG/UY', value: 'ARG/UY' },
-  { label: 'PY', value: 'PY' }
-]
-
-const origenOptions = computed(() => {
-  if (altaForm.pais === 'PY') return [{ label: 'FAN', value: 'FAN' }]
-  return [
-    { label: '', value: '' },
-    { label: 'FAN', value: 'FAN' },
-    { label: 'MXM', value: 'MXM' }
-  ]
-})
-
 const altaForm = reactive({
-  pais: '',
-  jobtype: '',
-  contrato: '',
-  origen: ''
-})
-
-watch(() => altaForm.pais, (pais) => {
-  if (!pais) {
-    altaForm.origen = ''
-    return
-  }
-  if (pais === 'PY') altaForm.origen = 'FAN'
+  actividad: '',
+  cmo: ''
 })
 
 const canAgregar = computed(() => Boolean(
-  altaForm.pais &&
-  altaForm.jobtype.trim() &&
-  altaForm.contrato.trim() &&
-  altaForm.origen
+  altaForm.actividad.trim() && altaForm.cmo.trim()
 ))
 
 const buscar = () => {
@@ -435,10 +386,8 @@ const onAltaHide = () => {
 }
 
 const resetAlta = () => {
-  altaForm.pais = ''
-  altaForm.jobtype = ''
-  altaForm.contrato = ''
-  altaForm.origen = ''
+  altaForm.actividad = ''
+  altaForm.cmo = ''
   altaRows.value = []
   altaSelectedRow.value = null
   altaFirst.value = 0
@@ -447,23 +396,23 @@ const resetAlta = () => {
 const agregarPreview = () => {
   if (!canAgregar.value) return
 
-  const codigo = altaForm.jobtype.trim().toUpperCase()
-  if (altaRows.value.some((row) => row.codigoTarea === codigo)) return
+  const actividad = altaForm.actividad.trim()
+  const codigo = actividad.toUpperCase().replace(/\s+/g, '_')
+
+  if (altaRows.value.some((row) => row.codigoActividad === codigo && row.cmo === altaForm.cmo.trim())) return
 
   const row = {
     id: `${Date.now()}-${codigo}`,
-    codigoTarea: codigo,
-    tarea: altaForm.jobtype.trim(),
-    origen: altaForm.origen,
-    nombreContrato: altaForm.contrato.trim(),
-    pais: altaForm.pais
+    codigoActividad: codigo,
+    descActividad: actividad,
+    codigoS4: codigo,
+    cmo: altaForm.cmo.trim()
   }
 
   altaRows.value = [...altaRows.value, row]
   altaSelectedRow.value = row
-  altaForm.jobtype = ''
-  altaForm.contrato = ''
-  altaForm.origen = altaForm.pais === 'PY' ? 'FAN' : ''
+  altaForm.actividad = ''
+  altaForm.cmo = ''
 }
 
 const eliminarPreview = () => {
@@ -496,10 +445,8 @@ const eliminarSeleccionado = () => {
 const editarSeleccionado = () => {
   if (!selectedRow.value) return
   abrirAlta()
-  altaForm.pais = selectedRow.value.pais
-  altaForm.jobtype = selectedRow.value.tarea
-  altaForm.contrato = selectedRow.value.nombreContrato
-  altaForm.origen = selectedRow.value.origen
+  altaForm.actividad = selectedRow.value.descActividad
+  altaForm.cmo = selectedRow.value.cmo
 }
 
 const onMainRowClick = ({ data }) => {
@@ -526,7 +473,7 @@ const exportarCsv = () => {
   const url = URL.createObjectURL(blob)
   const anchor = document.createElement('a')
   anchor.href = url
-  anchor.download = 'jobtype-contrato.csv'
+  anchor.download = 'cmo-actividad.csv'
   anchor.click()
   URL.revokeObjectURL(url)
 }
