@@ -53,7 +53,7 @@
       </div>
 
       <div class="fm-grid-dialog__grid-area">
-        <slot />
+        <slot :maximized="maximized" />
       </div>
     </div>
 
@@ -66,14 +66,14 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, provide, readonly, ref } from 'vue'
 import Dialog from 'primevue/dialog'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
   title: { type: String, default: '' },
-  width: { type: String, default: '980px' },
-  maxWidth: { type: String, default: 'calc(100vw - 32px)' },
+  width: { type: String, default: '1180px' },
+  maxWidth: { type: String, default: 'calc(100vw - 40px)' },
   modal: { type: Boolean, default: true },
   draggable: { type: Boolean, default: true },
   maximizable: { type: Boolean, default: true },
@@ -81,11 +81,13 @@ const props = defineProps({
     type: String,
     default: 'repeat(auto-fit, minmax(150px, 1fr))'
   },
-  formGap: { type: String, default: '12px' }
+  formGap: { type: String, default: '14px' }
 })
 
 const emit = defineEmits(['update:visible', 'close', 'maximize-change'])
 const maximized = ref(false)
+
+provide('fmGridDialogMaximized', readonly(maximized))
 
 const visibleModel = computed({
   get: () => props.visible,
@@ -122,33 +124,25 @@ const onHide = () => {
 .fm-grid-dialog.p-dialog {
   width: min(var(--fm-grid-dialog-width), var(--fm-grid-dialog-max-width)) !important;
   max-width: var(--fm-grid-dialog-max-width) !important;
-  max-height: calc(100vh - 28px) !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: calc(100vh - 32px) !important;
   display: flex !important;
   flex-direction: column !important;
+  margin: 0 !important;
   border: 1px solid #d6e1e8 !important;
   border-radius: 4px !important;
   background: #fff !important;
-  box-shadow: 0 12px 28px rgba(21, 37, 50, .18) !important;
+  box-shadow: 0 16px 38px rgba(21, 37, 50, .22) !important;
   overflow: hidden !important;
 }
 
-.fm-grid-dialog--maximized.p-dialog {
-  position: fixed !important;
-  inset: 10px !important;
-  width: auto !important;
-  max-width: none !important;
-  height: auto !important;
-  max-height: none !important;
-  margin: 0 !important;
-  transform: none !important;
-}
-
 .fm-grid-dialog .p-dialog-header {
-  flex: 0 0 40px !important;
-  height: 40px !important;
-  min-height: 40px !important;
-  padding: 0 14px !important;
-  border-bottom: 1px solid #e2e9ee !important;
+  flex: 0 0 56px !important;
+  height: 56px !important;
+  min-height: 56px !important;
+  padding: 0 22px !important;
+  border-bottom: 1px solid #dce6ec !important;
   background: #fff !important;
 }
 
@@ -158,14 +152,14 @@ const onHide = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
+  gap: 16px;
 }
 
 .fm-grid-dialog__title {
   min-width: 0;
   overflow: hidden;
   color: #456273;
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 400;
   line-height: 1.2;
   text-overflow: ellipsis;
@@ -175,15 +169,15 @@ const onHide = () => {
 .fm-grid-dialog__header-actions {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex: 0 0 auto;
 }
 
 .fm-grid-dialog__header-button {
-  width: 22px;
-  min-width: 22px;
-  height: 22px;
-  min-height: 22px;
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  min-height: 28px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -204,23 +198,18 @@ const onHide = () => {
 }
 
 .fm-grid-dialog__header-button .pi {
-  font-size: 16px;
-  line-height: 16px;
+  font-size: 19px;
+  line-height: 19px;
 }
 
 .fm-grid-dialog .p-dialog-content {
   flex: 0 1 auto !important;
+  height: auto !important;
   min-height: 0 !important;
+  max-height: calc(100vh - 150px) !important;
   padding: 0 !important;
-  overflow: hidden !important;
+  overflow: auto !important;
   background: #fff !important;
-}
-
-.fm-grid-dialog--maximized .p-dialog-content {
-  flex: 1 1 auto !important;
-  display: flex !important;
-  flex-direction: column !important;
-  min-height: 0 !important;
 }
 
 .fm-grid-dialog__body {
@@ -228,23 +217,14 @@ const onHide = () => {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 12px 14px 10px;
-  overflow: auto;
+  gap: 18px;
+  padding: 22px 24px 18px;
   box-sizing: border-box;
-  container: fm-grid-dialog / inline-size;
-}
-
-.fm-grid-dialog--maximized .fm-grid-dialog__body {
-  flex: 1 1 auto;
-  height: 100%;
-  min-height: 0;
-  overflow: hidden;
+  container-type: inline-size;
 }
 
 .fm-grid-dialog__form {
   width: 100%;
-  flex: 0 0 auto;
   display: grid;
   grid-template-columns: var(--fm-grid-dialog-form-columns);
   gap: var(--fm-grid-dialog-form-gap);
@@ -256,14 +236,14 @@ const onHide = () => {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
 }
 
 .fm-grid-dialog__field label {
   display: block;
   margin: 0;
   color: #111;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   line-height: 1.1;
   white-space: nowrap;
@@ -275,9 +255,9 @@ const onHide = () => {
   width: 100% !important;
   min-width: 0 !important;
   max-width: 100% !important;
-  height: 31px !important;
-  min-height: 31px !important;
-  max-height: 31px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
   border-color: #b9cbd6 !important;
   border-radius: 3px !important;
   background: #fff !important;
@@ -286,28 +266,28 @@ const onHide = () => {
 }
 
 .fm-grid-dialog__control.p-select .p-select-label {
-  padding: 5px 28px 5px 9px !important;
-  line-height: 19px !important;
+  padding: 6px 30px 6px 10px !important;
+  line-height: 20px !important;
   font-size: 13px !important;
 }
 
 .fm-grid-dialog__control.p-select .p-select-dropdown {
-  width: 26px !important;
+  width: 28px !important;
 }
 
 .fm-grid-dialog__form-action,
 .fm-grid-dialog__form-action.p-button,
 .fm-grid-dialog__form-action.p-button:enabled:hover,
 .fm-grid-dialog__form-action.p-button:enabled:focus {
-  width: 112px !important;
-  min-width: 112px !important;
-  max-width: 112px !important;
-  height: 31px !important;
-  min-height: 31px !important;
+  width: 124px !important;
+  min-width: 124px !important;
+  max-width: 124px !important;
+  height: 34px !important;
+  min-height: 34px !important;
   justify-self: stretch;
   padding: 0 16px !important;
   border: 1px solid #00a9bd !important;
-  border-radius: 18px !important;
+  border-radius: 17px !important;
   background: #00a9bd !important;
   color: #fff !important;
   box-shadow: 0 3px 7px rgba(0, 169, 189, .18) !important;
@@ -317,9 +297,9 @@ const onHide = () => {
 
 .fm-grid-dialog__form-action.p-button:disabled,
 .fm-grid-dialog__form-action.p-button.p-disabled {
-  background: #b8c6ce !important;
-  border-color: #b8c6ce !important;
-  color: #fff !important;
+  background: #dbe2e6 !important;
+  border-color: #cbd5da !important;
+  color: #7f8f98 !important;
   box-shadow: none !important;
   opacity: 1 !important;
 }
@@ -330,70 +310,12 @@ const onHide = () => {
   min-height: 0;
 }
 
-/*
- * En pantalla completa la grilla es el contenido flexible central del popup.
- * Esto evita el bloque blanco enorme que aparecía al mantenerla fija en 210px.
- */
-.fm-grid-dialog--maximized .fm-grid-dialog__grid-area {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.fm-grid-dialog--maximized .fm-grid-dialog__grid-area > * {
-  flex: 1 1 auto;
-  min-height: 0;
-}
-
-.fm-grid-dialog--maximized .fm-popup-grid {
-  height: 100%;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.fm-grid-dialog--maximized .fm-popup-grid .fm-popup-grid__table,
-.fm-grid-dialog--maximized .fm-popup-grid .p-datatable {
-  flex: 1 1 auto;
-  min-height: 0 !important;
-  display: flex !important;
-  flex-direction: column !important;
-}
-
-.fm-grid-dialog--maximized .fm-popup-grid .p-datatable-table-container,
-.fm-grid-dialog--maximized .fm-popup-grid .p-datatable-wrapper {
-  flex: 1 1 auto !important;
-  height: auto !important;
-  min-height: 0 !important;
-  max-height: none !important;
-}
-
-.fm-grid-dialog--maximized .fm-popup-grid .p-datatable-table {
-  height: 100% !important;
-}
-
-.fm-grid-dialog--maximized .fm-popup-grid .p-datatable-tbody,
-.fm-grid-dialog--maximized .fm-popup-grid .p-datatable-empty-message,
-.fm-grid-dialog--maximized .fm-popup-grid .p-datatable-empty-message > td {
-  height: 100% !important;
-}
-
-.fm-grid-dialog--maximized .fm-popup-grid__empty {
-  height: 100% !important;
-  min-height: 100% !important;
-}
-
-.fm-grid-dialog--maximized .fm-popup-grid .p-datatable-paginator-bottom {
-  flex: 0 0 34px !important;
-}
-
 .fm-grid-dialog .p-dialog-footer {
-  flex: 0 0 50px !important;
-  min-height: 50px !important;
-  padding: 9px 14px 10px !important;
-  border-top: 1px solid #edf2f5 !important;
+  flex: 0 0 62px !important;
+  height: 62px !important;
+  min-height: 62px !important;
+  padding: 12px 24px !important;
+  border-top: 1px solid #dce6ec !important;
   background: #fff !important;
 }
 
@@ -408,28 +330,102 @@ const onHide = () => {
 .fm-grid-dialog__footer .p-button,
 .fm-grid-dialog__footer .p-button:enabled:hover,
 .fm-grid-dialog__footer .p-button:enabled:focus {
-  min-width: 112px !important;
-  height: 31px !important;
-  padding: 0 16px !important;
+  min-width: 150px !important;
+  height: 38px !important;
+  padding: 0 18px !important;
   border: 1px solid #00a9bd !important;
-  border-radius: 18px !important;
+  border-radius: 8px !important;
   background: #00a9bd !important;
   color: #fff !important;
-  box-shadow: 0 3px 7px rgba(0, 169, 189, .18) !important;
-  font-size: 12px !important;
+  box-shadow: none !important;
+  font-size: 14px !important;
   font-weight: 700 !important;
 }
 
 .fm-grid-dialog__footer .p-button:disabled,
 .fm-grid-dialog__footer .p-button.p-disabled {
-  background: #b8c6ce !important;
-  border-color: #b8c6ce !important;
-  color: #fff !important;
-  box-shadow: none !important;
+  background: #e5eaed !important;
+  border-color: #d5dde1 !important;
+  color: #91a0a8 !important;
   opacity: 1 !important;
 }
 
-@container fm-grid-dialog (max-width: 790px) {
+.fm-grid-dialog--maximized.p-dialog {
+  position: fixed !important;
+  inset: 8px !important;
+  width: auto !important;
+  max-width: none !important;
+  height: auto !important;
+  max-height: none !important;
+  display: grid !important;
+  grid-template-rows: 56px minmax(0, 1fr) 62px;
+  transform: none !important;
+}
+
+.fm-grid-dialog--maximized .p-dialog-content {
+  min-height: 0 !important;
+  max-height: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.fm-grid-dialog--maximized .fm-grid-dialog__body {
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.fm-grid-dialog--maximized .fm-grid-dialog__form {
+  flex: 0 0 auto;
+}
+
+.fm-grid-dialog--maximized .fm-grid-dialog__grid-area {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.fm-grid-dialog--maximized .fm-grid-dialog__grid-area > * {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.fm-grid-dialog--maximized .fm-popup-grid,
+.fm-grid-dialog--maximized .fm-popup-grid .fm-popup-grid__table,
+.fm-grid-dialog--maximized .fm-popup-grid .p-datatable {
+  flex: 1 1 auto !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.fm-grid-dialog--maximized .fm-popup-grid .p-datatable-table-container,
+.fm-grid-dialog--maximized .fm-popup-grid .p-datatable-wrapper,
+.fm-grid-dialog--maximized .fm-popup-grid [data-pc-section="tablecontainer"] {
+  flex: 1 1 auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
+
+.fm-grid-dialog--maximized .fm-popup-grid__empty {
+  height: 100% !important;
+  min-height: 100% !important;
+  max-height: none !important;
+}
+
+.fm-grid-dialog--maximized .fm-popup-grid .p-datatable-paginator-bottom,
+.fm-grid-dialog--maximized .fm-popup-grid .p-paginator {
+  flex: 0 0 34px !important;
+}
+
+@container (max-width: 720px) {
   .fm-grid-dialog__form {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
@@ -440,7 +436,7 @@ const onHide = () => {
   }
 }
 
-@container fm-grid-dialog (max-width: 500px) {
+@container (max-width: 470px) {
   .fm-grid-dialog__form {
     grid-template-columns: 1fr !important;
   }
@@ -448,9 +444,9 @@ const onHide = () => {
 
 @media (max-width: 600px) {
   .fm-grid-dialog.p-dialog {
-    width: calc(100vw - 12px) !important;
-    max-width: calc(100vw - 12px) !important;
-    max-height: calc(100vh - 12px) !important;
+    width: calc(100vw - 8px) !important;
+    max-width: calc(100vw - 8px) !important;
+    max-height: calc(100vh - 8px) !important;
   }
 
   .fm-grid-dialog--maximized.p-dialog {
@@ -458,7 +454,7 @@ const onHide = () => {
   }
 
   .fm-grid-dialog__body {
-    padding: 10px;
+    padding: 16px;
   }
 }
 </style>
