@@ -74,11 +74,44 @@ html body .fm-grid-dialog .fm-popup-grid .fm-popup-grid__cell {
   white-space: nowrap !important;
 }
 
-html body .fm-grid-dialog .fm-popup-grid__empty {
+/*
+ * Estado vacío: ocupa toda el área útil de la tabla.
+ * El fondo celeste se aplica también al contenedor para que nunca quede una
+ * franja blanca entre el mensaje y el paginador.
+ */
+html body .fm-grid-dialog .fm-popup-grid--fill .p-datatable-table-container:has(.p-datatable-empty-message),
+html body .fm-grid-dialog .fm-popup-grid--fill .p-datatable-wrapper:has(.p-datatable-empty-message),
+html body .fm-grid-dialog .fm-popup-grid--fill [data-pc-section="tablecontainer"]:has(.p-datatable-empty-message) {
+  background: #eafcff !important;
+}
+
+html body .fm-grid-dialog .fm-popup-grid--fill .p-datatable-table:has(.p-datatable-empty-message) {
+  height: 100% !important;
+  min-height: 100% !important;
+}
+
+html body .fm-grid-dialog .fm-popup-grid--fill .p-datatable-tbody:has(.p-datatable-empty-message),
+html body .fm-grid-dialog .fm-popup-grid--fill .p-datatable-empty-message,
+html body .fm-grid-dialog .fm-popup-grid--fill .p-datatable-empty-message > td {
+  height: 100% !important;
+  min-height: 100% !important;
+}
+
+html body .fm-grid-dialog .fm-popup-grid--fill .p-datatable-empty-message > td {
+  padding: 0 !important;
+  background: #eafcff !important;
+}
+
+html body .fm-grid-dialog .fm-popup-grid--fill .fm-popup-grid__empty {
   width: 100% !important;
   min-width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
   justify-content: center !important;
   overflow: hidden !important;
+  background: #eafcff !important;
   text-align: center !important;
 }
 
