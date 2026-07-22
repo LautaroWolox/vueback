@@ -145,35 +145,17 @@
       </AccordionPanel>
     </Accordion>
 
-    <Dialog
+    <FmGridDialog
       v-model:visible="showAlta"
-      class="jobtype-modal jobtype-modal--alta"
-      appendTo="body"
-      :modal="true"
-      :draggable="true"
-      :resizable="false"
-      :closable="false"
-      :style="{ width: '980px', maxWidth: 'calc(100vw - 48px)' }"
+      title="Alta Jobtype - Contrato"
+      width="980px"
+      max-width="calc(100vw - 24px)"
+      form-columns="220px minmax(150px, 1fr) minmax(170px, 1fr) 160px 112px"
+      form-gap="12px"
+      @close="cerrarAlta"
     >
-      <template #header>
-        <div class="jobtype-modal-header">
-          <span class="jobtype-modal-title">Alta Jobtype - Contrato</span>
-          <span
-            role="button"
-            tabindex="0"
-            class="jobtype-modal-close"
-            aria-label="Cerrar"
-            @click="cerrarAlta"
-            @keydown.enter.prevent="cerrarAlta"
-            @keydown.space.prevent="cerrarAlta"
-          >
-            <i class="pi pi-times" aria-hidden="true"></i>
-          </span>
-        </div>
-      </template>
-
-      <div class="jobtype-modal-form jobtype-modal-form--origen">
-        <div class="jobtype-modal-field jobtype-modal-field--pais">
+      <template #form>
+        <div class="fm-grid-dialog__field">
           <label for="alta-pais">Pais</label>
           <Select
             id="alta-pais"
@@ -181,21 +163,29 @@
             :options="paisOptions"
             optionLabel="label"
             optionValue="value"
-            class="jobtype-modal-select"
+            class="fm-grid-dialog__control"
           />
         </div>
 
-        <div class="jobtype-modal-field">
+        <div class="fm-grid-dialog__field">
           <label for="alta-jobtype">Jobtype</label>
-          <InputText id="alta-jobtype" v-model="altaForm.jobtype" class="jobtype-modal-input" />
+          <InputText
+            id="alta-jobtype"
+            v-model="altaForm.jobtype"
+            class="fm-grid-dialog__control"
+          />
         </div>
 
-        <div class="jobtype-modal-field">
+        <div class="fm-grid-dialog__field">
           <label for="alta-contrato">Contrato</label>
-          <InputText id="alta-contrato" v-model="altaForm.contrato" class="jobtype-modal-input" />
+          <InputText
+            id="alta-contrato"
+            v-model="altaForm.contrato"
+            class="fm-grid-dialog__control"
+          />
         </div>
 
-        <div class="jobtype-modal-field">
+        <div class="fm-grid-dialog__field">
           <label for="alta-origen">Origen</label>
           <Select
             id="alta-origen"
@@ -203,105 +193,47 @@
             :options="origenOptions"
             optionLabel="label"
             optionValue="value"
-            class="jobtype-modal-select"
+            class="fm-grid-dialog__control"
           />
         </div>
 
         <Button
           label="AGREGAR"
-          class="jobtype-modal-button jobtype-modal-button--add"
+          class="fm-grid-dialog__form-action"
           :disabled="!canAgregarRelacion"
           @click="agregarRelacionPreview"
         />
-      </div>
+      </template>
 
-      <div class="jobtype-alta-grid-shell">
-        <DataTable
-          id="tabla-jobtype-alta"
-          class="fm-pass-grid jobtype-alta-datatable"
-          :value="altaRows"
-          dataKey="id"
-          tableStyle="table-layout: fixed; width: 100%; min-width: 100%"
-          scrollable
-          scrollHeight="210px"
-          removableSort
-          sortMode="multiple"
-          filterDisplay="row"
-          v-model:filters="altaTableFilters"
-          v-model:selection="altaSelectedRow"
-          selectionMode="single"
-          :rowClass="altaRowClass"
-          paginator
-          :rows="10"
-          :rowsPerPageOptions="[10, 20, 50]"
-          paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
-          currentPageReportTemplate="Página {currentPage} de {totalPages}"
-          :resizableColumns="true"
-          columnResizeMode="expand"
-          showGridlines
-          @row-click="onAltaRowClick"
-        >
-          <template #empty>
-            <div class="fm-grid-empty jobtype-alta-empty">No hay relaciones agregadas</div>
-          </template>
-
-          <Column
-            v-for="col in altaColumns"
-            :key="col.field"
-            :field="col.field"
-            :sortField="col.field"
-            :filterField="col.field"
-            :header="col.header"
-            sortable
-            filter
-            :showFilterMenu="false"
-            :style="altaColumnStyle(col)"
-            :headerStyle="altaColumnStyle(col)"
-            :bodyStyle="altaColumnStyle(col)"
-          >
-            <template #filter="{ filterModel, filterCallback }">
-              <div class="fm-filter-cell jobtype-filter-cell jobtype-filter-cell--alta">
-                <span class="fm-filter-prefix">~</span>
-                <InputText
-                  v-model="filterModel.value"
-                  type="text"
-                  class="fm-column-filter"
-                  @input="filterCallback()"
-                />
-                <span class="fm-filter-more">...</span>
-              </div>
-            </template>
-
-            <template #body="{ data }">
-              <span class="fm-cell-text jobtype-cell-text" :title="String(data[col.field] ?? '')">
-                {{ data[col.field] ?? '' }}
-              </span>
-            </template>
-          </Column>
-        </DataTable>
-
-        <button
-          type="button"
-          class="jobtype-alta-trash-left"
-          :disabled="!altaSelectedRow"
-          title="Eliminar"
-          aria-label="Eliminar"
-          v-tooltip.top="'Eliminar'"
-          @click="eliminarAltaPreview"
-        >
-          <i class="pi pi-trash" aria-hidden="true"></i>
-        </button>
-      </div>
+      <FmPopupGrid
+        v-model:filters="altaTableFilters"
+        v-model:selection="altaSelectedRow"
+        :rows="altaRows"
+        :columns="altaColumns"
+        data-key="id"
+        selection-mode="single"
+        :row-class="altaRowClass"
+        :rows-per-page="10"
+        :rows-options="[10, 20, 50]"
+        scroll-height="230px"
+        empty-message="No hay relaciones agregadas"
+        :loading="store.loading"
+        :fit-columns="true"
+        :show-delete="true"
+        :delete-disabled="!altaSelectedRow"
+        delete-title="Eliminar"
+        @delete="eliminarAltaPreview"
+        @row-click="onAltaRowClick"
+      />
 
       <template #footer>
         <Button
           label="RELACIONAR"
-          class="jobtype-modal-button jobtype-modal-button--relacionar"
           :disabled="altaRows.length === 0 || store.loading"
           @click="relacionar"
         />
       </template>
-    </Dialog>
+    </FmGridDialog>
 
     <Dialog
       v-model:visible="showEdicion"
@@ -515,11 +447,11 @@ const pageFirst = ref(0)
 const pageRows = ref(10)
 
 const altaColumns = ref([
-  { field: 'codigoTarea', header: 'CODIGO_TAREA', width: '20%', minWidth: '145px' },
-  { field: 'tarea', header: 'TAREA', width: '24%', minWidth: '180px' },
-  { field: 'origen', header: 'ORIGEN', width: '16%', minWidth: '130px' },
-  { field: 'nombreContrato', header: 'NOMBRE_CONTRATO', width: '24%', minWidth: '180px' },
-  { field: 'pais', header: 'PAIS', width: '16%', minWidth: '120px' }
+  { field: 'codigoTarea', header: 'CODIGO_TAREA', width: '20%' },
+  { field: 'tarea', header: 'TAREA', width: '24%' },
+  { field: 'origen', header: 'ORIGEN', width: '16%' },
+  { field: 'nombreContrato', header: 'NOMBRE_CONTRATO', width: '24%' },
+  { field: 'pais', header: 'PAIS', width: '16%' }
 ])
 
 const paisOptions = [
@@ -628,20 +560,13 @@ const columnStyle = (col) => ({
   maxWidth: 'none'
 })
 
-const altaColumnStyle = (col) => ({
-  width: col.width || '140px',
-  minWidth: col.minWidth || col.width || '100px',
-  maxWidth: col.width || 'none'
-})
-
 const rowClass = (data) => ({
   'fm-selected-row': store.selectedRow?.id === data?.id,
   'jobtype-row-selected': store.selectedRow?.id === data?.id
 })
 
 const altaRowClass = (data) => ({
-  'fm-selected-row': altaSelectedRow.value?.id === data?.id,
-  'jobtype-row-selected': altaSelectedRow.value?.id === data?.id
+  'fm-selected-row': altaSelectedRow.value?.id === data?.id
 })
 
 const onRowClick = (event) => {
