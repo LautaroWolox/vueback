@@ -1,11 +1,7 @@
 import { defineStore } from 'pinia'
-import { EncryptStorage } from 'encrypt-storage'
 import { useFetch } from '@vueuse/core'
 import type { Filters, Row, StoreState, ActionResponse, ExcluirRequest, IncluirRequest } from './types'
 import { emptyFilters } from './types'
-
-const clave = import.meta.env.VITE_PARAMETER1 as string;
-export const fallidasCtStore = new EncryptStorage(clave, { storageType: 'sessionStorage' });
 
 const EMPTY_NOTE_VALUES = new Set([
     '',
