@@ -88,10 +88,22 @@ const reset = () => {
 }
 
 const confirmar = async () => {
+  const nroOT = store.nroOT
   emit('update:visibleInc', false)
-  await store.sendIncluir(store.nroOT, motivoSelected.value.nombreCorto, comentario.value)
+
+  const response = await store.sendIncluir(
+    String(nroOT ?? ''),
+    motivoSelected.value.nombreCorto,
+    comentario.value
+  )
+
+  if (response?.status) {
+    store.markIncluded(nroOT)
+    await store.setData()
+    store.markIncluded(nroOT)
+  }
+
   reset()
-  await store.setData()
 }
 
 const cerrar = () => {
