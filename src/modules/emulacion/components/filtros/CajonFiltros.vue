@@ -8,13 +8,11 @@
       <div class="fm-actions fm-filter-actions emulation-filter-actions">
         <FmButton
           label="BUSCAR"
-          icon="pi-search"
           :disabled="storeEmulacion.toggleLoader"
           @click="onSearch"
         />
         <FmButton
           label="LIMPIAR"
-          icon="pi-filter-slash"
           variant="outline"
           :disabled="storeEmulacion.toggleLoader"
           @click="onClear"
