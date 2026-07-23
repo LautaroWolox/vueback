@@ -1,5 +1,6 @@
 <template>
   <Dialog
+    v-if="!processing"
     :visible="visible"
     modal
     :header="dialogTitle"
@@ -12,24 +13,13 @@
     <div class="fm-dialog-body otf-reprocess-body">
       <div
         class="otf-reprocess-icon"
-        :class="{
-          'otf-reprocess-icon--processing': processing,
-          'otf-reprocess-icon--error': Boolean(errorMessage)
-        }"
+        :class="{ 'otf-reprocess-icon--error': Boolean(errorMessage) }"
       >
         <i :class="errorMessage ? 'pi pi-exclamation-triangle' : 'pi pi-refresh'"></i>
       </div>
 
       <div class="otf-reprocess-message">
-        <template v-if="processing">
-          <h3>Reprocesando...</h3>
-          <p>
-            Se están reprocesando {{ count }}
-            OT{{ count === 1 ? '' : 's' }}. Aguarde un momento.
-          </p>
-        </template>
-
-        <template v-else-if="errorMessage">
+        <template v-if="errorMessage">
           <h3>No se pudo completar el reproceso</h3>
           <p>{{ errorMessage }}</p>
         </template>
@@ -44,7 +34,6 @@
       <FmButton
         label="CERRAR"
         variant="outline"
-        :disabled="processing"
         @click="cerrar"
       />
     </template>
@@ -63,16 +52,11 @@ const props = defineProps({
 
 const emit = defineEmits(['close'])
 
-const dialogTitle = computed(() => {
-  if (props.processing) return 'Reprocesando'
-  if (props.errorMessage) return 'Error de reproceso'
-  return 'Reproceso'
-})
+const dialogTitle = computed(() => (
+  props.errorMessage ? 'Error de reproceso' : 'Reproceso'
+))
 
-const cerrar = () => {
-  if (props.processing) return
-  emit('close')
-}
+const cerrar = () => emit('close')
 </script>
 
 <style scoped>
@@ -97,10 +81,6 @@ const cerrar = () => {
 
 .otf-reprocess-icon i {
   font-size: 24px;
-}
-
-.otf-reprocess-icon--processing i {
-  animation: otf-reprocess-spin .9s linear infinite;
 }
 
 .otf-reprocess-icon--error {
@@ -130,11 +110,6 @@ const cerrar = () => {
   color: #203947 !important;
   font-size: 16px !important;
   font-weight: 500;
-}
-
-@keyframes otf-reprocess-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
 }
 
 :global(.otf-reprocess-dialog .p-dialog-footer) {
