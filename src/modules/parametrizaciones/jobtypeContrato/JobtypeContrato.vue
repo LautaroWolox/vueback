@@ -181,7 +181,10 @@
               :options="paisOptions"
               optionLabel="label"
               optionValue="value"
+              overlayClass="jobtype-alta-select-overlay"
+              :pt="compactSelectPt"
               class="jobtype-alta-control"
+              style="width: 120px !important; min-width: 120px !important; max-width: 120px !important"
             />
           </div>
 
@@ -217,13 +220,17 @@
               :options="origenOptions"
               optionLabel="label"
               optionValue="value"
+              overlayClass="jobtype-alta-select-overlay"
+              :pt="compactSelectPt"
               class="jobtype-alta-control"
+              style="width: 120px !important; min-width: 120px !important; max-width: 120px !important"
             />
           </div>
 
           <FmButton
             label="AGREGAR"
             class="jobtype-add-button"
+            style="width: 140px !important; min-width: 140px !important; max-width: 140px !important; border-radius: 2px !important"
             @click="agregarPreview"
           />
         </div>
@@ -320,6 +327,7 @@
         <FmButton
           label="RELACIONAR"
           class="jobtype-relate-button"
+          style="min-width: 124px !important; border-radius: 2px !important"
           :disabled="altaRows.length === 0"
           @click="relacionar"
         />
@@ -350,6 +358,17 @@ const altaValidationAttempted = ref(false)
 
 const altaDialogStyle = 'width: calc(100vw - 48px) !important; max-width: 1440px !important; height: min(680px, calc(100dvh - 48px)) !important; max-height: calc(100dvh - 48px) !important; margin: 0 !important;'
 const invalidFieldStyle = 'border-color: #d32f2f !important; box-shadow: 0 0 0 1px #d32f2f inset !important;'
+const compactSelectPt = {
+  label: {
+    style: 'font-size: 12px !important; padding: 0 8px !important;'
+  },
+  list: {
+    style: 'padding: 2px 0 !important;'
+  },
+  option: {
+    style: 'font-size: 12px !important; min-height: 30px !important; padding: 5px 10px !important; line-height: 1.2 !important;'
+  }
+}
 
 const mainColumns = [
   { field: 'codigoTarea', header: 'CODIGO_TAREA', width: '12.5%' },
