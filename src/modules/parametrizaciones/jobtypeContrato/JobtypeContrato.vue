@@ -191,7 +191,9 @@
               id="alta-jobtype"
               v-model="altaForm.jobtype"
               class="jobtype-alta-control"
-              required
+              aria-required="true"
+              :aria-invalid="jobtypeInvalid"
+              :style="jobtypeInvalid ? invalidFieldStyle : ''"
             />
           </div>
 
@@ -201,7 +203,9 @@
               id="alta-contrato"
               v-model="altaForm.contrato"
               class="jobtype-alta-control"
-              required
+              aria-required="true"
+              :aria-invalid="contratoInvalid"
+              :style="contratoInvalid ? invalidFieldStyle : ''"
             />
           </div>
 
@@ -220,7 +224,6 @@
           <FmButton
             label="AGREGAR"
             class="jobtype-add-button"
-            :disabled="!canAgregar"
             @click="agregarPreview"
           />
         </div>
@@ -343,8 +346,10 @@ const altaFirst = ref(0)
 const altaPageRows = ref(10)
 const mainRows = ref([])
 const altaRows = ref([])
+const altaValidationAttempted = ref(false)
 
 const altaDialogStyle = 'width: calc(100vw - 48px) !important; max-width: 1440px !important; height: min(680px, calc(100dvh - 48px)) !important; max-height: calc(100dvh - 48px) !important; margin: 0 !important;'
+const invalidFieldStyle = 'border-color: #d32f2f !important; box-shadow: 0 0 0 1px #d32f2f inset !important;'
 
 const mainColumns = [
   { field: 'codigoTarea', header: 'CODIGO_TAREA', width: '12.5%' },
@@ -383,6 +388,9 @@ const altaForm = reactive({
   contrato: '',
   origen: ''
 })
+
+const jobtypeInvalid = computed(() => altaValidationAttempted.value && !altaForm.jobtype.trim())
+const contratoInvalid = computed(() => altaValidationAttempted.value && !altaForm.contrato.trim())
 
 const origenOptions = computed(() => {
   if (altaForm.pais === 'PY') return [{ label: 'FAN', value: 'FAN' }]
@@ -434,9 +442,13 @@ const resetAlta = () => {
   altaRows.value = []
   altaSelectedRow.value = null
   altaFirst.value = 0
+  altaValidationAttempted.value = false
 }
 
 const agregarPreview = () => {
+  altaValidationAttempted.value = true
+
+  if (jobtypeInvalid.value || contratoInvalid.value) return
   if (!canAgregar.value) return
 
   const codigo = altaForm.jobtype.trim().toUpperCase()
@@ -456,6 +468,7 @@ const agregarPreview = () => {
   altaForm.jobtype = ''
   altaForm.contrato = ''
   altaForm.origen = altaForm.pais === 'PY' ? 'FAN' : ''
+  altaValidationAttempted.value = false
 }
 
 const eliminarPreview = () => {
