@@ -10,6 +10,7 @@
       :options="paises"
       optionLabel="valor"
       placeholder="Seleccione"
+      overlayClass="otf-filter-select-overlay"
       :disabled="disabled"
     />
   </div>
@@ -25,14 +26,13 @@ defineProps({
 
 const store = useFallidasCtStore()
 const paises = ref([
-  { valor: '' },
   { valor: 'ARG' },
   { valor: 'UY' },
   { valor: 'PY' }
 ])
 
 const pais = computed({
-  get: () => paises.value.find((item) => item.valor === store.filters.pais) ?? paises.value[0],
+  get: () => paises.value.find((item) => item.valor === store.filters.pais) ?? null,
   set: (value) => store.setFilter('pais', value?.valor ?? '')
 })
 </script>
