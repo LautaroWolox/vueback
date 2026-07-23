@@ -265,32 +265,35 @@ body .jobtype-alta-dialog .p-dialog-header {
   box-sizing: border-box;
 }
 
-.jobtype-alta-header__close {
-  width: 38px;
-  height: 34px;
+body .p-dialog.jobtype-alta-dialog .jobtype-alta-header__close {
+  width: 44px !important;
+  height: 40px !important;
+  min-width: 44px !important;
+  min-height: 40px !important;
   justify-self: center;
   margin-left: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid transparent;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  border: 1px solid transparent !important;
   border-radius: 7px;
   outline: 0;
-  background: #fff;
-  color: #111;
+  background: #fff !important;
+  color: #111 !important;
   box-shadow: none;
   cursor: pointer;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 18px;
+  font-size: 24px !important;
   font-weight: 700;
-  line-height: 1;
+  line-height: 1 !important;
   transition: border-color .15s ease, color .15s ease;
 }
 
-.jobtype-alta-header__close:hover,
-.jobtype-alta-header__close:focus-visible {
-  border-color: var(--fm-cyan);
-  color: #111;
+body .p-dialog.jobtype-alta-dialog .jobtype-alta-header__close:hover,
+body .p-dialog.jobtype-alta-dialog .jobtype-alta-header__close:focus-visible {
+  border-color: var(--fm-cyan) !important;
+  color: var(--fm-cyan) !important;
 }
 
 .jobtype-alta-header__title {
@@ -388,6 +391,10 @@ body .p-dialog.jobtype-alta-dialog .jobtype-add-button.p-button {
   width: 140px !important;
   min-width: 140px !important;
   max-width: 140px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
   align-self: end;
   border-radius: 2px !important;
 }
@@ -499,5 +506,9 @@ body .jobtype-alta-dialog .p-dialog-footer {
 body .p-dialog.jobtype-alta-dialog .jobtype-relate-button,
 body .p-dialog.jobtype-alta-dialog .jobtype-relate-button.p-button {
   min-width: 124px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
   border-radius: 2px !important;
 }
