@@ -20,23 +20,58 @@ import JobtypeRelacion from '../jobtypeRelacion/JobtypeRelacion.vue'
 }
 
 /*
- * En CMO-Actividad la grilla no utiliza ORIGEN ni PAÍS.
- * Se eliminan visualmente sus columnas y se redistribuye el ancho entre
- * las seis columnas restantes sin modificar Jobtype-Contrato.
+ * Columnas de la grilla CMO-Actividad:
+ * 1 CODIGO_ACTIVIDAD
+ * 2 DESC_ACTIVIDAD
+ * 3 CODIGO_S4
+ * 4 CMO
+ * 5 USUARIO_MODIFICACION
+ * 6 FECHA_MODIFICACION
+ * 7 ACTIVO
+ *
+ * La última columna de la estructura común corresponde a PAÍS y no aplica
+ * a esta pantalla, por eso se elimina solamente en esta variante.
  */
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo col:nth-child(3)),
 .cmo-actividad-screen :deep(#tabla-jobtype-cmo col:nth-child(8)),
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr > th:nth-child(3)),
 .cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr > th:nth-child(8)),
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-tbody > tr > td:nth-child(3)),
 .cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-tbody > tr > td:nth-child(8)) {
   display: none !important;
 }
 
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr > th:not(:nth-child(3)):not(:nth-child(8))),
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-tbody > tr > td:not(:nth-child(3)):not(:nth-child(8))) {
-  width: 16.6667% !important;
+/* Reemplazo de los encabezados propios de la relación común. */
+.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(1)),
+.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(2)),
+.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(3)),
+.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(4)) {
+  font-size: 0 !important;
+}
+
+.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(1))::before {
+  content: 'CODIGO_ACTIVIDAD';
+  font-size: 10px;
+}
+
+.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(2))::before {
+  content: 'DESC_ACTIVIDAD';
+  font-size: 10px;
+}
+
+.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(3))::before {
+  content: 'CODIGO_S4';
+  font-size: 10px;
+}
+
+.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(4))::before {
+  content: 'CMO';
+  font-size: 10px;
+}
+
+/* Las siete columnas visibles ocupan todo el ancho disponible. */
+.cmo-actividad-screen :deep(#tabla-jobtype-cmo col:not(:nth-child(8))),
+.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr > th:not(:nth-child(8))),
+.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-tbody > tr > td:not(:nth-child(8))) {
+  width: 14.2857% !important;
   min-width: 0 !important;
-  max-width: 16.6667% !important;
+  max-width: 14.2857% !important;
 }
 </style>
