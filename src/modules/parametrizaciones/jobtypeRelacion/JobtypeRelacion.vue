@@ -153,7 +153,7 @@
       <template #header>
         <div class="jobtype-alta-header" style="grid-template-columns: minmax(0, 1fr) 52px">
           <h2 class="jobtype-alta-header__title" style="margin-left: 20px">
-            Alta Jobtype - {{ relationLabel }}
+            {{ altaTitle }}
           </h2>
 
           <button
@@ -168,60 +168,94 @@
       </template>
 
       <div class="jobtype-alta-content">
-        <div class="jobtype-alta-form">
-          <div class="jobtype-alta-field fm-field">
-            <label :for="`alta-pais-${relationSlug}`">Pais</label>
-            <Select
-              :id="`alta-pais-${relationSlug}`"
-              v-model="altaForm.pais"
-              :options="paisOptions"
-              optionLabel="label"
-              optionValue="value"
-              overlayClass="jobtype-alta-select-overlay"
-              :pt="compactSelectPt"
-              class="jobtype-alta-control"
-              style="width: 100px !important; min-width: 100px !important; max-width: 100px !important"
-            />
-          </div>
+        <div class="jobtype-alta-form" :style="isActividad ? activityFormStyle : undefined">
+          <template v-if="isActividad">
+            <div
+              class="jobtype-alta-field fm-field"
+              style="width: 100% !important; min-width: 0 !important; max-width: none !important"
+            >
+              <label for="alta-actividad-cmo">Actividad</label>
+              <InputText
+                id="alta-actividad-cmo"
+                v-model="altaForm.actividad"
+                class="jobtype-alta-control"
+                aria-required="true"
+                :aria-invalid="actividadInvalid"
+                :style="actividadInvalid ? invalidFieldStyle : ''"
+              />
+            </div>
 
-          <div class="jobtype-alta-field fm-field">
-            <label :for="`alta-jobtype-${relationSlug}`">Jobtype</label>
-            <InputText
-              :id="`alta-jobtype-${relationSlug}`"
-              v-model="altaForm.jobtype"
-              class="jobtype-alta-control"
-              aria-required="true"
-              :aria-invalid="jobtypeInvalid"
-              :style="jobtypeInvalid ? invalidFieldStyle : ''"
-            />
-          </div>
+            <div
+              class="jobtype-alta-field fm-field"
+              style="width: 100% !important; min-width: 0 !important; max-width: none !important"
+            >
+              <label for="alta-cmo-actividad">CMO</label>
+              <InputText
+                id="alta-cmo-actividad"
+                v-model="altaForm.cmo"
+                class="jobtype-alta-control"
+                aria-required="true"
+                :aria-invalid="cmoInvalid"
+                :style="cmoInvalid ? invalidFieldStyle : ''"
+              />
+            </div>
+          </template>
 
-          <div class="jobtype-alta-field fm-field">
-            <label :for="`alta-relacion-${relationSlug}`">{{ relationLabel }}</label>
-            <InputText
-              :id="`alta-relacion-${relationSlug}`"
-              v-model="altaForm.relacion"
-              class="jobtype-alta-control"
-              aria-required="true"
-              :aria-invalid="relationInvalid"
-              :style="relationInvalid ? invalidFieldStyle : ''"
-            />
-          </div>
+          <template v-else>
+            <div class="jobtype-alta-field fm-field">
+              <label :for="`alta-pais-${relationSlug}`">Pais</label>
+              <Select
+                :id="`alta-pais-${relationSlug}`"
+                v-model="altaForm.pais"
+                :options="paisOptions"
+                optionLabel="label"
+                optionValue="value"
+                overlayClass="jobtype-alta-select-overlay"
+                :pt="compactSelectPt"
+                class="jobtype-alta-control"
+                style="width: 100px !important; min-width: 100px !important; max-width: 100px !important"
+              />
+            </div>
 
-          <div class="jobtype-alta-field fm-field">
-            <label :for="`alta-origen-${relationSlug}`">Origen</label>
-            <Select
-              :id="`alta-origen-${relationSlug}`"
-              v-model="altaForm.origen"
-              :options="origenOptions"
-              optionLabel="label"
-              optionValue="value"
-              overlayClass="jobtype-alta-select-overlay"
-              :pt="compactSelectPt"
-              class="jobtype-alta-control"
-              style="width: 100px !important; min-width: 100px !important; max-width: 100px !important"
-            />
-          </div>
+            <div class="jobtype-alta-field fm-field">
+              <label :for="`alta-jobtype-${relationSlug}`">Jobtype</label>
+              <InputText
+                :id="`alta-jobtype-${relationSlug}`"
+                v-model="altaForm.jobtype"
+                class="jobtype-alta-control"
+                aria-required="true"
+                :aria-invalid="jobtypeInvalid"
+                :style="jobtypeInvalid ? invalidFieldStyle : ''"
+              />
+            </div>
+
+            <div class="jobtype-alta-field fm-field">
+              <label :for="`alta-relacion-${relationSlug}`">{{ relationLabel }}</label>
+              <InputText
+                :id="`alta-relacion-${relationSlug}`"
+                v-model="altaForm.relacion"
+                class="jobtype-alta-control"
+                aria-required="true"
+                :aria-invalid="relationInvalid"
+                :style="relationInvalid ? invalidFieldStyle : ''"
+              />
+            </div>
+
+            <div class="jobtype-alta-field fm-field">
+              <label :for="`alta-origen-${relationSlug}`">Origen</label>
+              <Select
+                :id="`alta-origen-${relationSlug}`"
+                v-model="altaForm.origen"
+                :options="origenOptions"
+                optionLabel="label"
+                optionValue="value"
+                overlayClass="jobtype-alta-select-overlay"
+                :pt="compactSelectPt"
+                class="jobtype-alta-control"
+                style="width: 100px !important; min-width: 100px !important; max-width: 100px !important"
+              />
+            </div>
+          </template>
 
           <FmButton
             label="AGREGAR"
@@ -347,10 +381,12 @@ const props = defineProps({
   }
 })
 
+const isActividad = computed(() => props.relation === 'cmo')
 const relationSlug = computed(() => props.relation.toLowerCase())
 const relationLabel = computed(() => props.relation === 'cmo' ? 'CMO' : 'Contrato')
 const relationUpper = computed(() => relationLabel.value.toUpperCase())
 const relationColumnHeader = computed(() => props.relation === 'cmo' ? 'CMO' : 'NOMBRE_CONTRATO')
+const altaTitle = computed(() => isActividad.value ? 'Alta CMO - Actividad' : `Alta Jobtype - ${relationLabel.value}`)
 
 const filtersExpanded = ref(true)
 const resultsExpanded = ref(false)
@@ -366,6 +402,7 @@ const altaRows = ref([])
 const altaValidationAttempted = ref(false)
 
 const altaDialogStyle = 'width: calc(100vw - 48px) !important; max-width: 1440px !important; height: min(680px, calc(100dvh - 48px)) !important; max-height: calc(100dvh - 48px) !important; margin: 0 !important;'
+const activityFormStyle = 'grid-template-columns: minmax(280px, 1fr) minmax(280px, 1fr) 120px !important; max-width: 860px !important; align-items: end !important;'
 const invalidFieldStyle = 'border-color: #d32f2f !important; box-shadow: 0 0 0 1px #d32f2f inset !important;'
 const compactSelectPt = {
   label: { style: 'font-size: 10px !important; padding: 0 6px !important;' },
@@ -384,13 +421,24 @@ const mainColumns = computed(() => [
   { field: 'pais', header: 'PAIS', width: '12.5%' }
 ])
 
-const altaColumns = computed(() => [
-  { field: 'codigoTarea', header: 'CODIGO_TAREA', width: '20%' },
-  { field: 'tarea', header: 'TAREA', width: '20%' },
-  { field: 'origen', header: 'ORIGEN', width: '20%' },
-  { field: 'relacion', header: relationColumnHeader.value, width: '20%' },
-  { field: 'pais', header: 'PAIS', width: '20%' }
-])
+const altaColumns = computed(() => {
+  if (isActividad.value) {
+    return [
+      { field: 'codigoActividad', header: 'CODIGO_ACTIVIDAD', width: '25%' },
+      { field: 'descActividad', header: 'DESC_ACTIVIDAD', width: '25%' },
+      { field: 'codigoS4', header: 'CODIGO_S4', width: '25%' },
+      { field: 'cmo', header: 'CMO', width: '25%' }
+    ]
+  }
+
+  return [
+    { field: 'codigoTarea', header: 'CODIGO_TAREA', width: '20%' },
+    { field: 'tarea', header: 'TAREA', width: '20%' },
+    { field: 'origen', header: 'ORIGEN', width: '20%' },
+    { field: 'relacion', header: relationColumnHeader.value, width: '20%' },
+    { field: 'pais', header: 'PAIS', width: '20%' }
+  ]
+})
 
 const buildFilters = (columns) => Object.fromEntries(
   columns.map(({ field }) => [field, { value: null, matchMode: FilterMatchMode.CONTAINS }])
@@ -408,11 +456,15 @@ const altaForm = reactive({
   pais: '',
   jobtype: '',
   relacion: '',
-  origen: ''
+  origen: '',
+  actividad: '',
+  cmo: ''
 })
 
 const jobtypeInvalid = computed(() => altaValidationAttempted.value && !altaForm.jobtype.trim())
 const relationInvalid = computed(() => altaValidationAttempted.value && !altaForm.relacion.trim())
+const actividadInvalid = computed(() => altaValidationAttempted.value && !altaForm.actividad.trim())
+const cmoInvalid = computed(() => altaValidationAttempted.value && !altaForm.cmo.trim())
 
 const origenOptions = computed(() => {
   if (altaForm.pais === 'PY') return [{ label: 'FAN', value: 'FAN' }]
@@ -431,12 +483,18 @@ watch(() => altaForm.pais, (pais) => {
   if (pais === 'PY') altaForm.origen = 'FAN'
 })
 
-const canAgregar = computed(() => Boolean(
-  altaForm.pais &&
-  altaForm.jobtype.trim() &&
-  altaForm.relacion.trim() &&
-  altaForm.origen
-))
+const canAgregar = computed(() => {
+  if (isActividad.value) {
+    return Boolean(altaForm.actividad.trim() && altaForm.cmo.trim())
+  }
+
+  return Boolean(
+    altaForm.pais &&
+    altaForm.jobtype.trim() &&
+    altaForm.relacion.trim() &&
+    altaForm.origen
+  )
+})
 
 const buscar = () => {
   resultsExpanded.value = true
@@ -461,6 +519,8 @@ const resetAlta = () => {
   altaForm.jobtype = ''
   altaForm.relacion = ''
   altaForm.origen = ''
+  altaForm.actividad = ''
+  altaForm.cmo = ''
   altaRows.value = []
   altaSelectedRow.value = null
   altaFirst.value = 0
@@ -469,8 +529,35 @@ const resetAlta = () => {
 
 const agregarPreview = () => {
   altaValidationAttempted.value = true
-  if (jobtypeInvalid.value || relationInvalid.value) return
-  if (!canAgregar.value) return
+
+  if (isActividad.value) {
+    if (actividadInvalid.value || cmoInvalid.value || !canAgregar.value) return
+
+    const codigoActividad = altaForm.actividad.trim().toUpperCase()
+    if (altaRows.value.some((row) => row.codigoActividad === codigoActividad && row.cmo === altaForm.cmo.trim())) return
+
+    const row = {
+      id: `${Date.now()}-${codigoActividad}`,
+      codigoActividad,
+      descActividad: altaForm.actividad.trim(),
+      codigoS4: '',
+      cmo: altaForm.cmo.trim(),
+      codigoTarea: codigoActividad,
+      tarea: altaForm.actividad.trim(),
+      origen: '',
+      relacion: altaForm.cmo.trim(),
+      pais: ''
+    }
+
+    altaRows.value = [...altaRows.value, row]
+    altaSelectedRow.value = row
+    altaForm.actividad = ''
+    altaForm.cmo = ''
+    altaValidationAttempted.value = false
+    return
+  }
+
+  if (jobtypeInvalid.value || relationInvalid.value || !canAgregar.value) return
 
   const codigo = altaForm.jobtype.trim().toUpperCase()
   if (altaRows.value.some((row) => row.codigoTarea === codigo)) return
@@ -522,6 +609,13 @@ const eliminarSeleccionado = () => {
 const editarSeleccionado = () => {
   if (!selectedRow.value) return
   abrirAlta()
+
+  if (isActividad.value) {
+    altaForm.actividad = selectedRow.value.descActividad || selectedRow.value.tarea || ''
+    altaForm.cmo = selectedRow.value.cmo || selectedRow.value.relacion || ''
+    return
+  }
+
   altaForm.pais = selectedRow.value.pais
   altaForm.jobtype = selectedRow.value.tarea
   altaForm.relacion = selectedRow.value.relacion
