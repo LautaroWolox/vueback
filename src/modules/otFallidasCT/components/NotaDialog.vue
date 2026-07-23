@@ -2,7 +2,7 @@
   <Dialog
     :visible="visible"
     modal
-    header="Nota de la OT"
+    header="Detalle de Nota"
     class="fm-dialog otf-note-dialog"
     :style="{ width: '38rem' }"
     @update:visible="$emit('update:visible', $event)"
@@ -49,5 +49,10 @@ defineEmits(['update:visible'])
   color: #314957;
   line-height: 1.55;
   white-space: pre-wrap;
+}
+
+:global(.otf-exclude-confirmation),
+:global(.otf-include-confirmation) {
+  display: none !important;
 }
 </style>
