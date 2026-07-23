@@ -48,6 +48,13 @@ const syncExclusionLabels = () => {
         title.textContent = 'Excluir orden técnica'
       }
     })
+
+  document
+    .querySelectorAll('.otf-row-action--include')
+    .forEach((button) => {
+      const unavailable = button.disabled || button.getAttribute('aria-disabled') === 'true'
+      button.style.display = unavailable ? 'none' : ''
+    })
 }
 
 onMounted(() => {
@@ -58,7 +65,7 @@ onMounted(() => {
     childList: true,
     subtree: true,
     attributes: true,
-    attributeFilter: ['title', 'aria-label']
+    attributeFilter: ['title', 'aria-label', 'disabled']
   })
 })
 
