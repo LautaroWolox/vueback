@@ -388,14 +388,15 @@ body .p-dialog.jobtype-alta-dialog .jobtype-alta-control.p-select .p-select-labe
 
 body .p-dialog.jobtype-alta-dialog .jobtype-add-button,
 body .p-dialog.jobtype-alta-dialog .jobtype-add-button.p-button {
-  width: 140px !important;
-  min-width: 140px !important;
-  max-width: 140px !important;
+  width: 120px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
   height: 30px !important;
   min-height: 30px !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
   align-self: end;
+  justify-self: end !important;
   border-radius: 2px !important;
 }
 
@@ -497,7 +498,7 @@ body .jobtype-alta-dialog .p-dialog-footer {
   display: flex !important;
   align-items: center !important;
   justify-content: flex-end !important;
-  padding: 0 18px !important;
+  padding: 0 16px !important;
   border-top: 1px solid var(--fm-border) !important;
   background: #fff !important;
   box-sizing: border-box !important;
@@ -505,7 +506,9 @@ body .jobtype-alta-dialog .p-dialog-footer {
 
 body .p-dialog.jobtype-alta-dialog .jobtype-relate-button,
 body .p-dialog.jobtype-alta-dialog .jobtype-relate-button.p-button {
-  min-width: 124px !important;
+  width: 120px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
   height: 30px !important;
   min-height: 30px !important;
   padding-top: 0 !important;
