@@ -93,30 +93,34 @@ defineEmits(['export', 'delete', 'edit', 'refresh', 'add'])
 
 <style scoped>
 .fm-grid-actions-final {
-  min-height: 22px;
+  min-height: 26px;
   display: inline-flex;
   align-items: center;
   gap: 9px;
+  padding: 1px 3px;
+  overflow: visible !important;
 }
 
 .fm-grid-actions-final :deep(.fm-grid-action-final),
 .fm-grid-actions-final :deep(.p-button) {
-  width: 20px !important;
-  min-width: 20px !important;
-  max-width: 20px !important;
-  height: 20px !important;
-  min-height: 20px !important;
-  max-height: 20px !important;
+  width: 24px !important;
+  min-width: 24px !important;
+  max-width: 24px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  max-height: 24px !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 0 !important;
+  padding: 2px !important;
   margin: 0 !important;
   border: 0 !important;
   border-radius: 0 !important;
   background: transparent !important;
   color: #111 !important;
   box-shadow: none !important;
+  overflow: visible !important;
+  flex: 0 0 24px !important;
 }
 
 .fm-grid-actions-final :deep(.p-button-label) {
@@ -125,33 +129,41 @@ defineEmits(['export', 'delete', 'edit', 'refresh', 'add'])
 
 .fm-grid-actions-final :deep(.p-button-icon),
 .fm-grid-actions-final :deep(.pi) {
-  width: 14px !important;
-  min-width: 14px !important;
-  height: 14px !important;
-  min-height: 14px !important;
-  font-size: 14px !important;
-  line-height: 14px !important;
+  width: 16px !important;
+  min-width: 16px !important;
+  height: 16px !important;
+  min-height: 16px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 16px !important;
+  line-height: 1 !important;
   color: currentColor !important;
+  overflow: visible !important;
+}
+
+.fm-grid-actions-final--large {
+  min-height: 30px;
 }
 
 .fm-grid-actions-final--large :deep(.fm-grid-action-final),
 .fm-grid-actions-final--large :deep(.p-button) {
-  width: 24px !important;
-  min-width: 24px !important;
-  max-width: 24px !important;
-  height: 24px !important;
-  min-height: 24px !important;
-  max-height: 24px !important;
+  width: 28px !important;
+  min-width: 28px !important;
+  max-width: 28px !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  max-height: 28px !important;
+  flex-basis: 28px !important;
 }
 
 .fm-grid-actions-final--large :deep(.p-button-icon),
 .fm-grid-actions-final--large :deep(.pi) {
-  width: 17px !important;
-  min-width: 17px !important;
-  height: 17px !important;
-  min-height: 17px !important;
-  font-size: 17px !important;
-  line-height: 17px !important;
+  width: 18px !important;
+  min-width: 18px !important;
+  height: 18px !important;
+  min-height: 18px !important;
+  font-size: 18px !important;
 }
 
 .fm-grid-actions-final :deep(.p-button:enabled:hover),
