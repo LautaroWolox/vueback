@@ -304,21 +304,35 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
 }
 
 :global(.otf-filter-select-overlay .p-select-option) {
-  min-height: 26px !important;
+  min-height: 22px !important;
+  height: 22px !important;
   margin: 0 !important;
-  padding: 4px 8px !important;
+  padding: 2px 8px !important;
   border-radius: 0 !important;
   background: #fff !important;
   color: #263746 !important;
   font-size: 10px !important;
   font-weight: 400 !important;
-  line-height: 1.15 !important;
+  line-height: 1 !important;
+  box-sizing: border-box !important;
 }
 
 :global(.otf-filter-select-overlay .p-select-option-label) {
   font-size: 10px !important;
   font-weight: 400 !important;
-  line-height: 1.15 !important;
+  line-height: 1 !important;
+}
+
+:global(.otf-filter-select-overlay .p-select-option.p-disabled),
+:global(.otf-filter-select-overlay .p-select-option[aria-disabled="true"]) {
+  min-height: 18px !important;
+  height: 18px !important;
+  padding: 0 8px !important;
+  background: #fff !important;
+  color: transparent !important;
+  opacity: 1 !important;
+  cursor: default !important;
+  pointer-events: none !important;
 }
 
 :global(.otf-filter-select-overlay .p-select-option:hover),
@@ -326,6 +340,14 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
 :global(.otf-filter-select-overlay .p-select-option.p-select-option-selected) {
   background: #dff8fb !important;
   color: #004f59 !important;
+}
+
+:global(.otf-filter-select-overlay .p-select-option.p-disabled:hover),
+:global(.otf-filter-select-overlay .p-select-option.p-disabled.p-focus),
+:global(.otf-filter-select-overlay .p-select-option[aria-disabled="true"]:hover),
+:global(.otf-filter-select-overlay .p-select-option[aria-disabled="true"].p-focus) {
+  background: #fff !important;
+  color: transparent !important;
 }
 
 @media (max-width: 900px) {
