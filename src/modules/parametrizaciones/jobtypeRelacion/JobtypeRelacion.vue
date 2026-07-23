@@ -45,7 +45,7 @@
           filterDisplay="row"
           selectionMode="single"
           paginator
-          :rowsPerPageOptions="[10, 50, 100, 500]"
+          :rowsPerPageOptions="[100, 250, 500]"
           :resizableColumns="true"
           columnResizeMode="fit"
           showGridlines
@@ -74,7 +74,9 @@
               :page-count="pageCount"
               :rows="rows"
               :total-records="totalRecords"
-              :rows-options="[10, 50, 100, 500]"
+              :rows-options="[100, 250, 500]"
+              :show-rows-select="true"
+              :show-counter="true"
               :counter-text="totalRecords === 0 ? 'No hay resultados' : ''"
               @first-page="firstPageCallback"
               @prev-page="prevPageCallback"
