@@ -228,6 +228,12 @@ const routes = [
         }
       },
       {
+        path: 'jobtypeCMO.html',
+        name: 'JOCM',
+        beforeEnter: allowed,
+        component: () => import('../modules/parametrizaciones/jobtypeCMO/JobtypeCMO.vue')
+      },
+      {
         path: 'configuraCmoActividad.html',
         name: 'CMOA',
         beforeEnter: allowed,
@@ -333,4 +339,3 @@ const router = createRouter({
 });
 
 export default router;
-
