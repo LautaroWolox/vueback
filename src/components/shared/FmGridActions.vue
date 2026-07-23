@@ -27,6 +27,7 @@
     />
     <Button
       v-if="showEdit"
+      icon="pi pi-pen-to-square"
       text
       rounded
       class="fm-grid-action-final"
@@ -34,11 +35,7 @@
       :title="editDisabled ? editDisabledTitle : editTitle"
       :aria-label="editDisabled ? editDisabledTitle : editTitle"
       @click="$emit('edit')"
-    >
-      <template #icon>
-        <PenToSquare class="fm-grid-action-svg" aria-hidden="true" />
-      </template>
-    </Button>
+    />
     <Button
       v-if="showRefresh"
       icon="pi pi-refresh"
@@ -66,7 +63,6 @@
 
 <script setup>
 import Button from 'primevue/button'
-import PenToSquare from '@primeicons/vue/pen-to-square';
 
 defineProps({
   showExport: { type: Boolean, default: true },
@@ -128,8 +124,7 @@ defineEmits(['export', 'delete', 'edit', 'refresh', 'add'])
 }
 
 .fm-grid-actions-final :deep(.p-button-icon),
-.fm-grid-actions-final :deep(.pi),
-.fm-grid-actions-final :deep(.fm-grid-action-svg) {
+.fm-grid-actions-final :deep(.pi) {
   width: 14px !important;
   min-width: 14px !important;
   height: 14px !important;
@@ -137,11 +132,6 @@ defineEmits(['export', 'delete', 'edit', 'refresh', 'add'])
   font-size: 14px !important;
   line-height: 14px !important;
   color: currentColor !important;
-}
-
-.fm-grid-actions-final :deep(.fm-grid-action-svg) {
-  display: block !important;
-  flex: 0 0 14px !important;
 }
 
 .fm-grid-actions-final--large :deep(.fm-grid-action-final),
@@ -155,18 +145,13 @@ defineEmits(['export', 'delete', 'edit', 'refresh', 'add'])
 }
 
 .fm-grid-actions-final--large :deep(.p-button-icon),
-.fm-grid-actions-final--large :deep(.pi),
-.fm-grid-actions-final--large :deep(.fm-grid-action-svg) {
+.fm-grid-actions-final--large :deep(.pi) {
   width: 17px !important;
   min-width: 17px !important;
   height: 17px !important;
   min-height: 17px !important;
   font-size: 17px !important;
   line-height: 17px !important;
-}
-
-.fm-grid-actions-final--large :deep(.fm-grid-action-svg) {
-  flex-basis: 17px !important;
 }
 
 .fm-grid-actions-final :deep(.p-button:enabled:hover),
