@@ -184,7 +184,7 @@
               overlayClass="jobtype-alta-select-overlay"
               :pt="compactSelectPt"
               class="jobtype-alta-control"
-              style="width: 120px !important; min-width: 120px !important; max-width: 120px !important"
+              style="width: 100px !important; min-width: 100px !important; max-width: 100px !important"
             />
           </div>
 
@@ -223,14 +223,14 @@
               overlayClass="jobtype-alta-select-overlay"
               :pt="compactSelectPt"
               class="jobtype-alta-control"
-              style="width: 120px !important; min-width: 120px !important; max-width: 120px !important"
+              style="width: 100px !important; min-width: 100px !important; max-width: 100px !important"
             />
           </div>
 
           <FmButton
             label="AGREGAR"
             class="jobtype-add-button"
-            style="width: 140px !important; min-width: 140px !important; max-width: 140px !important; border-radius: 2px !important"
+            style="width: 120px !important; min-width: 120px !important; max-width: 120px !important; border-radius: 0 !important"
             @click="agregarPreview"
           />
         </div>
@@ -327,7 +327,7 @@
         <FmButton
           label="RELACIONAR"
           class="jobtype-relate-button"
-          style="min-width: 124px !important; border-radius: 2px !important"
+          style="min-width: 110px !important; border-radius: 0 !important"
           :disabled="altaRows.length === 0"
           @click="relacionar"
         />
@@ -360,13 +360,13 @@ const altaDialogStyle = 'width: calc(100vw - 48px) !important; max-width: 1440px
 const invalidFieldStyle = 'border-color: #d32f2f !important; box-shadow: 0 0 0 1px #d32f2f inset !important;'
 const compactSelectPt = {
   label: {
-    style: 'font-size: 12px !important; padding: 0 8px !important;'
+    style: 'font-size: 10px !important; padding: 0 6px !important;'
   },
   list: {
-    style: 'padding: 2px 0 !important;'
+    style: 'padding: 1px 0 !important;'
   },
   option: {
-    style: 'font-size: 12px !important; min-height: 30px !important; padding: 5px 10px !important; line-height: 1.2 !important;'
+    style: 'font-size: 10px !important; min-height: 26px !important; padding: 3px 8px !important; line-height: 1.1 !important;'
   }
 }
 
