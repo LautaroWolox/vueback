@@ -14,7 +14,6 @@
         autocomplete="off"
         placeholder="Ingrese el legajo"
         :disabled="disable"
-        @blur="capturarLegajo"
         @keyup.enter="capturarLegajo"
       />
     </div>
@@ -31,8 +30,13 @@ const legajo = ref('')
 const disable = ref(false)
 
 watch(() => store.legajoSelected, (newValue) => {
-  legajo.value = newValue ?? ''
+  const normalizedValue = newValue ?? ''
+  if (legajo.value !== normalizedValue) legajo.value = normalizedValue
 }, { immediate: true })
+
+watch(legajo, (newValue) => {
+  store.$setlegajoSelected(newValue)
+})
 
 watch(() => store.toggleLoader, (newValue) => {
   disable.value = Boolean(newValue)
