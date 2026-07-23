@@ -30,7 +30,6 @@
       <div v-show="resultsExpanded" class="jobtype-results-body">
         <DataTable
           id="tabla-jobtype-contrato"
-          ref="mainTable"
           v-model:filters="mainFilters"
           v-model:selection="selectedRow"
           v-model:first="mainFirst"
@@ -147,38 +146,34 @@
       :closable="false"
       :draggable="false"
       :resizable="false"
-      class="jobtype-alta-dialog"
-      :class="{ 'jobtype-alta-dialog--maximized': altaMaximized }"
       :style="altaDialogStyle"
+      class="jobtype-alta-dialog"
       @hide="onAltaHide"
     >
       <template #header>
-        <div class="jobtype-alta-header">
+        <div
+          class="jobtype-alta-header"
+          style="grid-template-columns: minmax(0, 1fr) 52px"
+        >
+          <h2
+            class="jobtype-alta-header__title"
+            style="margin-left: 20px"
+          >Alta Jobtype - Contrato</h2>
+
           <button
             type="button"
             class="jobtype-alta-header__close"
+            style="justify-self: center; margin-left: 0"
             title="Cerrar"
             aria-label="Cerrar"
             @click="cerrarAlta"
           >×</button>
-
-          <h2 class="jobtype-alta-header__title">Alta Jobtype - Contrato</h2>
-
-          <button
-            type="button"
-            class="jobtype-alta-header__maximize"
-            :title="altaMaximized ? 'Restaurar' : 'Maximizar'"
-            :aria-label="altaMaximized ? 'Restaurar' : 'Maximizar'"
-            @click="altaMaximized = !altaMaximized"
-          >
-            <span aria-hidden="true"></span>
-          </button>
         </div>
       </template>
 
       <div class="jobtype-alta-content">
         <div class="jobtype-alta-form">
-          <div class="jobtype-alta-field jobtype-alta-field--pais">
+          <div class="jobtype-alta-field fm-field">
             <label for="alta-pais">Pais</label>
             <Select
               id="alta-pais"
@@ -186,31 +181,38 @@
               :options="paisOptions"
               optionLabel="label"
               optionValue="value"
+              overlayClass="jobtype-alta-select-overlay"
+              :pt="compactSelectPt"
               class="jobtype-alta-control"
+              style="width: 100px !important; min-width: 100px !important; max-width: 100px !important"
             />
           </div>
 
-          <div class="jobtype-alta-field jobtype-alta-field--jobtype">
+          <div class="jobtype-alta-field fm-field">
             <label for="alta-jobtype">Jobtype</label>
             <InputText
               id="alta-jobtype"
               v-model="altaForm.jobtype"
               class="jobtype-alta-control"
-              :disabled="!altaForm.pais"
+              aria-required="true"
+              :aria-invalid="jobtypeInvalid"
+              :style="jobtypeInvalid ? invalidFieldStyle : ''"
             />
           </div>
 
-          <div class="jobtype-alta-field jobtype-alta-field--contrato">
+          <div class="jobtype-alta-field fm-field">
             <label for="alta-contrato">Contrato</label>
             <InputText
               id="alta-contrato"
               v-model="altaForm.contrato"
               class="jobtype-alta-control"
-              :disabled="!altaForm.pais"
+              aria-required="true"
+              :aria-invalid="contratoInvalid"
+              :style="contratoInvalid ? invalidFieldStyle : ''"
             />
           </div>
 
-          <div class="jobtype-alta-field jobtype-alta-field--origen">
+          <div class="jobtype-alta-field fm-field">
             <label for="alta-origen">Origen</label>
             <Select
               id="alta-origen"
@@ -218,25 +220,27 @@
               :options="origenOptions"
               optionLabel="label"
               optionValue="value"
+              overlayClass="jobtype-alta-select-overlay"
+              :pt="compactSelectPt"
               class="jobtype-alta-control"
-              :disabled="!altaForm.pais"
+              style="width: 100px !important; min-width: 100px !important; max-width: 100px !important"
             />
           </div>
 
-          <Button
+          <FmButton
             label="AGREGAR"
-            class="jobtype-primary-button jobtype-add-button"
-            :disabled="!canAgregar"
+            class="jobtype-add-button"
+            style="width: 120px !important; min-width: 120px !important; max-width: 120px !important; border-radius: 0 !important"
             @click="agregarPreview"
           />
         </div>
 
-        <div class="jobtype-alta-grid-wrap">
+        <div class="jobtype-alta-grid-wrap fm-grid-shell">
           <DataTable
             v-model:selection="altaSelectedRow"
             v-model:first="altaFirst"
             v-model:rows="altaPageRows"
-            class="jobtype-alta-grid"
+            class="jobtype-alta-grid fm-pass-grid"
             :value="altaRows"
             dataKey="id"
             tableStyle="table-layout: fixed; width: 100%; min-width: 100%"
@@ -248,6 +252,10 @@
             showGridlines
             @row-click="onAltaRowClick"
           >
+            <template #empty>
+              <div class="fm-grid-empty jobtype-alta-empty">No hay relaciones agregadas</div>
+            </template>
+
             <template
               #paginatorcontainer="{
                 first,
@@ -284,6 +292,7 @@
               >
                 <template #actions>
                   <FmGridActions
+                    size="large"
                     :show-export="false"
                     :show-delete="true"
                     :show-refresh="false"
@@ -305,7 +314,7 @@
               :bodyStyle="{ width: column.width }"
             >
               <template #body="{ data }">
-                <span class="jobtype-cell-text" :title="String(data[column.field] ?? '')">
+                <span class="fm-cell-text" :title="String(data[column.field] ?? '')">
                   {{ data[column.field] ?? '' }}
                 </span>
               </template>
@@ -315,9 +324,10 @@
       </div>
 
       <template #footer>
-        <Button
+        <FmButton
           label="RELACIONAR"
-          class="jobtype-primary-button jobtype-relate-button"
+          class="jobtype-relate-button"
+          style="min-width: 110px !important; border-radius: 0 !important"
           :disabled="altaRows.length === 0"
           @click="relacionar"
         />
@@ -328,7 +338,6 @@
 
 <script setup>
 import { computed, reactive, ref, watch } from 'vue'
-import Button from 'primevue/button'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
@@ -337,7 +346,6 @@ import { FilterMatchMode } from '@primevue/core/api'
 const filtersExpanded = ref(true)
 const resultsExpanded = ref(false)
 const showAlta = ref(false)
-const altaMaximized = ref(false)
 const selectedRow = ref(null)
 const altaSelectedRow = ref(null)
 const mainFirst = ref(0)
@@ -346,11 +354,21 @@ const altaFirst = ref(0)
 const altaPageRows = ref(10)
 const mainRows = ref([])
 const altaRows = ref([])
+const altaValidationAttempted = ref(false)
 
-const altaDialogStyle = computed(() => altaMaximized.value
-  ? 'width:100vw !important;height:100vh !important;max-width:100vw !important;max-height:100vh !important;margin:0 !important;border-radius:0 !important;'
-  : 'width:calc(100vw - 22px) !important;height:calc(100vh - 12px) !important;max-width:none !important;max-height:none !important;margin:0 !important;'
-)
+const altaDialogStyle = 'width: calc(100vw - 48px) !important; max-width: 1440px !important; height: min(680px, calc(100dvh - 48px)) !important; max-height: calc(100dvh - 48px) !important; margin: 0 !important;'
+const invalidFieldStyle = 'border-color: #d32f2f !important; box-shadow: 0 0 0 1px #d32f2f inset !important;'
+const compactSelectPt = {
+  label: {
+    style: 'font-size: 10px !important; padding: 0 6px !important;'
+  },
+  list: {
+    style: 'padding: 1px 0 !important;'
+  },
+  option: {
+    style: 'font-size: 10px !important; min-height: 26px !important; padding: 3px 8px !important; line-height: 1.1 !important;'
+  }
+}
 
 const mainColumns = [
   { field: 'codigoTarea', header: 'CODIGO_TAREA', width: '12.5%' },
@@ -383,6 +401,16 @@ const paisOptions = [
   { label: 'PY', value: 'PY' }
 ]
 
+const altaForm = reactive({
+  pais: '',
+  jobtype: '',
+  contrato: '',
+  origen: ''
+})
+
+const jobtypeInvalid = computed(() => altaValidationAttempted.value && !altaForm.jobtype.trim())
+const contratoInvalid = computed(() => altaValidationAttempted.value && !altaForm.contrato.trim())
+
 const origenOptions = computed(() => {
   if (altaForm.pais === 'PY') return [{ label: 'FAN', value: 'FAN' }]
   return [
@@ -390,13 +418,6 @@ const origenOptions = computed(() => {
     { label: 'FAN', value: 'FAN' },
     { label: 'MXM', value: 'MXM' }
   ]
-})
-
-const altaForm = reactive({
-  pais: '',
-  jobtype: '',
-  contrato: '',
-  origen: ''
 })
 
 watch(() => altaForm.pais, (pais) => {
@@ -421,7 +442,6 @@ const buscar = () => {
 
 const abrirAlta = () => {
   resetAlta()
-  altaMaximized.value = false
   showAlta.value = true
 }
 
@@ -430,7 +450,6 @@ const cerrarAlta = () => {
 }
 
 const onAltaHide = () => {
-  altaMaximized.value = false
   resetAlta()
 }
 
@@ -442,9 +461,13 @@ const resetAlta = () => {
   altaRows.value = []
   altaSelectedRow.value = null
   altaFirst.value = 0
+  altaValidationAttempted.value = false
 }
 
 const agregarPreview = () => {
+  altaValidationAttempted.value = true
+
+  if (jobtypeInvalid.value || contratoInvalid.value) return
   if (!canAgregar.value) return
 
   const codigo = altaForm.jobtype.trim().toUpperCase()
@@ -464,6 +487,7 @@ const agregarPreview = () => {
   altaForm.jobtype = ''
   altaForm.contrato = ''
   altaForm.origen = altaForm.pais === 'PY' ? 'FAN' : ''
+  altaValidationAttempted.value = false
 }
 
 const eliminarPreview = () => {
