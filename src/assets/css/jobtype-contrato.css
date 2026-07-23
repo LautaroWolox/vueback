@@ -332,10 +332,10 @@ body .jobtype-alta-dialog .p-dialog-content {
   min-width: 0;
   display: grid;
   grid-template-columns:
-    minmax(110px, 220px)
-    minmax(240px, 1fr)
-    minmax(240px, 1fr)
-    minmax(110px, 220px)
+    160px
+    minmax(260px, 1fr)
+    minmax(260px, 1fr)
+    160px
     150px;
   align-items: end;
   gap: 14px;
@@ -344,6 +344,13 @@ body .jobtype-alta-dialog .p-dialog-content {
 
 .jobtype-alta-field {
   min-width: 0;
+}
+
+.jobtype-alta-form > .jobtype-alta-field:nth-child(1),
+.jobtype-alta-form > .jobtype-alta-field:nth-child(4) {
+  width: 160px !important;
+  min-width: 160px !important;
+  max-width: 160px !important;
 }
 
 .jobtype-alta-field .jobtype-alta-control,
@@ -368,13 +375,13 @@ body .jobtype-alta-dialog .p-dialog-content {
   box-shadow: 0 0 0 1px #d32f2f inset !important;
 }
 
-.jobtype-add-button,
-.jobtype-add-button.p-button {
+body .p-dialog.jobtype-alta-dialog .jobtype-add-button,
+body .p-dialog.jobtype-alta-dialog .jobtype-add-button.p-button {
   width: 150px !important;
   min-width: 150px !important;
   max-width: 150px !important;
   align-self: end;
-  border-radius: 4px !important;
+  border-radius: 2px !important;
 }
 
 .jobtype-alta-grid-wrap {
@@ -459,8 +466,8 @@ body .jobtype-alta-dialog .p-dialog-footer {
   box-sizing: border-box !important;
 }
 
-.jobtype-relate-button,
-.jobtype-relate-button.p-button {
+body .p-dialog.jobtype-alta-dialog .jobtype-relate-button,
+body .p-dialog.jobtype-alta-dialog .jobtype-relate-button.p-button {
   min-width: 124px !important;
-  border-radius: 4px !important;
+  border-radius: 2px !important;
 }
