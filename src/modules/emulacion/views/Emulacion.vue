@@ -7,23 +7,10 @@
       message="Consultando la información del legajo"
     />
 
-    <div class="emulation-page__intro">
-      <div>
-        <h1>Emulación de operador</h1>
-        <p>Busque un legajo, revise sus datos y confirme la emulación del perfil.</p>
-      </div>
-      <span class="emulation-page__badge">
-        <i class="pi pi-user-edit"></i>
-      </span>
-    </div>
-
     <Accordion v-model:value="active" multiple class="fm-accordion emulation-accordion">
       <AccordionPanel value="0">
         <AccordionHeader>
-          <span class="emulation-accordion__title">
-            <i class="pi pi-filter"></i>
-            FILTROS DE BÚSQUEDA
-          </span>
+          <span class="emulation-accordion__title">FILTROS DE BÚSQUEDA</span>
         </AccordionHeader>
         <AccordionContent>
           <CajonFiltros />
@@ -33,7 +20,6 @@
       <AccordionPanel value="1">
         <AccordionHeader>
           <span class="emulation-accordion__title">
-            <i class="pi pi-users"></i>
             OPERADORES
             <span v-if="store.data.length" class="emulation-accordion__count">
               {{ store.data.length }}
@@ -67,51 +53,8 @@ watch(() => store.activeTab, (newValue) => {
   min-height: calc(100vh - 82px);
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
   background: #f7fafb;
-}
-
-.emulation-page__intro {
-  min-height: 68px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  padding: 12px 18px;
-  border: 1px solid #d5e1e6;
-  border-left: 4px solid #00a9bd;
-  border-radius: 4px;
-  background: #fff;
-  box-sizing: border-box;
-}
-
-.emulation-page__intro h1 {
-  margin: 0 0 4px;
-  color: #203947;
-  font-size: 20px;
-  font-weight: 600;
-}
-
-.emulation-page__intro p {
-  margin: 0;
-  color: #607887;
-  font-size: 12px;
-}
-
-.emulation-page__badge {
-  width: 42px;
-  height: 42px;
-  flex: 0 0 42px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: #e4f9fc;
-  color: #00a9bd;
-}
-
-.emulation-page__badge i {
-  font-size: 20px;
 }
 
 .emulation-accordion {
@@ -127,11 +70,6 @@ watch(() => store.activeTab, (newValue) => {
   color: #203947;
   font-size: 12px;
   font-weight: 700;
-}
-
-.emulation-accordion__title > i {
-  color: #00a9bd;
-  font-size: 14px;
 }
 
 .emulation-accordion__count {
