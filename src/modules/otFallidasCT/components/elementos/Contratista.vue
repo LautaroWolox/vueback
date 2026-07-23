@@ -18,6 +18,7 @@
       :options="contratistaOptions"
       optionLabel="nombre"
       placeholder="Seleccione"
+      overlayClass="otf-filter-select-overlay"
       :disabled="disabled"
     />
     <span v-else-if="status.contratistas === 'error'" class="fm-field-error">
@@ -40,15 +41,12 @@ const store = useFallidasCtStore()
 const commonCT = useCommonCtStore()
 const { contratistas, status } = storeToRefs(commonCT)
 
-const contratistaOptions = computed(() => [
-  { empresaId: 0, codigo: '', nombre: '', tipo: 'Contratista', activo: 'S' },
-  ...(contratistas.value ?? [])
-])
+const contratistaOptions = computed(() => contratistas.value ?? [])
 
 const contratista = computed({
   get: () => {
-    if (!store.filters.contratista) return contratistaOptions.value[0]
-    return contratistaOptions.value.find((item) => item.codigo === store.filters.contratista)
+    if (!store.filters.contratista) return null
+    return contratistaOptions.value.find((item) => item.codigo === store.filters.contratista) ?? null
   },
   set: (value) => store.setFilter('contratista', value?.codigo ?? '')
 })
