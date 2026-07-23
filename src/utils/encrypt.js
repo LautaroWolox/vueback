@@ -1,4 +1,4 @@
-import { EncryptStorage } from 'encrypt-storage';
+/* import { EncryptStorageNoble } from 'encrypt-storage';
 const clave = import.meta.env.VITE_PARAMETER1;
 
 console.log(import.meta.env);
@@ -8,3 +8,9 @@ export const storageUsuario = new EncryptStorage(clave, { storageType: 'sessionS
 export const storageRutas = new EncryptStorage(clave, { storageType: 'sessionStorage' });
 export const storageToken = new EncryptStorage(clave, { storageType: 'sessionStorage' });
 export const auth = new EncryptStorage(clave,{ storageType: 'sessionStorage' });
+
+
+export const encryptStorage = new EncryptStorageNoble('secret-key-value', {
+  prefix: '@app',
+  storageType: 'sessionStorage',
+}); */
