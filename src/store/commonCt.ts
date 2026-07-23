@@ -4,6 +4,11 @@ import { useFetch } from '@vueuse/core'
 import type { StoreState, LoadStatus, Contratista, ActividadMotivo } from './interfaces/ctTypes.ts'
 
 const clave = import.meta.env.VITE_PARAMETER1 as string;
+export const commonCtStore = new EncryptStorageNoble('commonCerti', {
+  stateManagementUse: true,
+  prefix: '@app',
+  storageType: 'sessionStorage',
+});
 
 export const commonCtStore = new EncryptStorageNoble('commonCerti', {
     stateManagementUse: true,
