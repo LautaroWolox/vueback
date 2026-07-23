@@ -12,34 +12,17 @@
 
     <div class="fm-actions fm-filter-actions otf-filter-actions">
       <FmButton
-        class="fm-filter-action-button otf-search-button"
         label="BUSCAR"
         :disabled="store.loading"
         @click="store.setData"
-      >
-        <template #icon>
-          <svg class="otf-button-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="10.5" cy="10.5" r="6.5" />
-            <path d="m15.5 15.5 4.5 4.5" />
-          </svg>
-        </template>
-      </FmButton>
+      />
 
       <FmButton
-        class="fm-filter-action-button otf-clean-button"
         label="LIMPIAR"
         variant="outline"
         :disabled="store.loading"
         @click="store.clearFilters"
-      >
-        <template #icon>
-          <svg class="otf-button-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 6h14" />
-            <path d="M4 12h10" />
-            <path d="M4 18h6" />
-          </svg>
-        </template>
-      </FmButton>
+      />
     </div>
   </div>
 </template>
@@ -191,59 +174,6 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
   background: transparent !important;
 }
 
-.otf-filter-actions :deep(.fm-filter-action-button),
-.otf-filter-actions :deep(.fm-action-button),
-.otf-filter-actions :deep(.fm-ui-button),
-.otf-filter-actions :deep(.p-button) {
-  width: 120px !important;
-  min-width: 120px !important;
-  max-width: 120px !important;
-  height: 36px !important;
-  min-height: 36px !important;
-  max-height: 36px !important;
-  padding: 0 13px !important;
-  gap: 8px !important;
-  border-radius: 6px !important;
-  font-size: 13px !important;
-  font-weight: 400 !important;
-  line-height: 1 !important;
-  letter-spacing: 0 !important;
-  box-shadow: 0 4px 10px rgba(0, 78, 91, .16) !important;
-  transform: none !important;
-  white-space: nowrap !important;
-}
-
-.otf-filter-actions :deep(.otf-search-button.p-button),
-.otf-filter-actions :deep(.otf-search-button) {
-  border: 1px solid #00a9bd !important;
-  background: #00a9bd !important;
-  color: #fff !important;
-}
-
-.otf-filter-actions :deep(.otf-clean-button.p-button),
-.otf-filter-actions :deep(.otf-clean-button) {
-  border: 1px solid #00a9bd !important;
-  background: #fff !important;
-  color: #00a0b4 !important;
-}
-
-.otf-filter-actions :deep(.p-button-label) {
-  font-size: 13px !important;
-  font-weight: 400 !important;
-}
-
-.otf-filter-actions :deep(.otf-button-icon) {
-  width: 16px !important;
-  min-width: 16px !important;
-  height: 16px !important;
-  flex: 0 0 16px !important;
-  fill: none !important;
-  stroke: currentColor !important;
-  stroke-width: 2.2 !important;
-  stroke-linecap: round !important;
-  stroke-linejoin: round !important;
-}
-
 .otf-filters :deep(.otf-filter-element--disabled) {
   opacity: 1 !important;
 }
@@ -365,12 +295,6 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
 
   .otf-filter-actions {
     flex-wrap: wrap !important;
-  }
-
-  .otf-filter-actions :deep(.fm-filter-action-button),
-  .otf-filter-actions :deep(.p-button) {
-    width: min(120px, calc(50vw - 24px)) !important;
-    min-width: 0 !important;
   }
 }
 </style>
