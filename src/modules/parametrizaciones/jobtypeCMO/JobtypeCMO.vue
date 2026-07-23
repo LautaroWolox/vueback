@@ -1,18 +1,35 @@
 <template>
-  <div class="cmo-actividad-screen">
+  <div ref="screenRoot" class="cmo-actividad-screen">
     <JobtypeRelacion relation="cmo" />
   </div>
 </template>
 
 <script setup>
+import { nextTick, onMounted, ref } from 'vue'
 import JobtypeRelacion from '../jobtypeRelacion/JobtypeRelacion.vue'
+
+const screenRoot = ref(null)
+
+const openResultsAccordion = async () => {
+  await nextTick()
+
+  const resultsHeader = screenRoot.value?.querySelector(
+    '.jobtype-panel--results .jobtype-panel__header'
+  )
+
+  if (resultsHeader?.getAttribute('aria-expanded') !== 'true') {
+    resultsHeader?.click()
+  }
+}
+
+onMounted(openResultsAccordion)
 </script>
 
 <style scoped>
 /*
  * CMO-Actividad reutiliza el popup y la grilla común aprobados.
- * Esta capa adapta únicamente los títulos y la distribución de su grilla
- * sin afectar Jobtype-Contrato ni duplicar la estructura del componente.
+ * Esta capa adapta únicamente el título, las columnas visibles y el estado
+ * inicial del segundo acordeón, sin afectar Jobtype-Contrato.
  */
 .cmo-actividad-screen :deep(.jobtype-panel--results .jobtype-panel__header > span:first-child) {
   font-size: 0;
@@ -39,7 +56,11 @@ import JobtypeRelacion from '../jobtypeRelacion/JobtypeRelacion.vue'
   max-width: 14.2857% !important;
 }
 
-/* Nombres funcionales requeridos para CMO-Actividad. */
+/*
+ * Orden funcional visible:
+ * CODIGO_ACTIVIDAD, DESC_ACTIVIDAD, CODIGO_S4, CMO,
+ * USUARIO_MODIFICACION, FECHA_MODIFICACION y ACTIVO.
+ */
 .cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(1) .p-column-title),
 .cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(2) .p-column-title),
 .cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(3) .p-column-title) {
