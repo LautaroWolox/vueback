@@ -14,7 +14,7 @@ import JobtypeRelacion from '../jobtypeRelacion/JobtypeRelacion.vue'
   font-size: 0;
 }
 
-.cmo-actividad-screen :deep(.jobtype-panel--results .jobtype-panel__header > span:first-child::after) {
+.cmo-actividad-screen :deep(.jobtype-panel--results .jobtype-panel__header > span:first-child)::after {
   content: 'RELACIONES CMO-ACTIVIDAD';
   font-size: 12px;
 }
