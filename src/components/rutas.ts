@@ -139,11 +139,6 @@ export const getRutas = (rutas:any) => {
                             visible: hasMenu('JOCO')
                         },
                         {
-                            label: 'Configuración Jobtype-CMO',
-                            command: () => { router.push({ name: 'JOCM' }); },
-                            visible: hasMenu('JOCM') || hasMenu('JOCO')
-                        },
-                        {
                             label: 'Configuración CMO-Actividad',
                             command: () => { router.push({ name: 'CMOA' }); },
                             visible: hasMenu('CMOA')
