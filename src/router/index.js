@@ -14,7 +14,7 @@ const allowed = (to, from, next) => {
   } else if (!autenticado && !rutasLibres.includes(to.name)) {
     next({ name: '401' });
     return;
-  } else if (autenticado && rutasPermitidas.includes(to.name)) {
+  } else if (autenticado && (rutasPermitidas.includes(to.name) || (to.name === 'JOCM' && rutasPermitidas.includes('JOCO')))) {
     next();
     return;
   } else {
@@ -228,14 +228,10 @@ const routes = [
         }
       },
       {
-        path: 'configuraCmoActividad.html',
-        name: 'CMOA',
+        path: 'jobtypeCMO.html',
+        name: 'JOCM',
         beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/configuraCmoActividad.html',
-          titleParam: 'configuracion cmo-actividad'
-        }
+        component: () => import('../modules/parametrizaciones/jobtypeCMO/JobtypeCMO.vue')
       },
       {
         path: 'consultarActas.html',
@@ -333,4 +329,3 @@ const router = createRouter({
 });
 
 export default router;
-

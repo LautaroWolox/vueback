@@ -1,5 +1,5 @@
 <template>
-  <JobtypeRelacion relation="contrato" />
+  <JobtypeRelacion relation="cmo" />
 </template>
 
 <script setup>
