@@ -22,9 +22,11 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import Table from './components/Table.vue'
 import Filtros from './components/Filtros.vue'
+import {useFallidasCtStore} from './store/CtFallidaStore'
 
 const active = ref(['0', '1'])
 let exclusionLabelsObserver
+const store = useFallidasCtStore()
 
 const syncExclusionLabels = () => {
   document
@@ -72,6 +74,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   exclusionLabelsObserver?.disconnect()
   exclusionLabelsObserver = undefined
+  store.clearStore()
 })
 </script>
 
