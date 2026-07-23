@@ -1,0 +1,139 @@
+@layer fieldmanager {
+  @media (max-width: 1180px) {
+    .menu-container .fm-menu-link--root {
+      padding-right: 8px !important;
+      padding-left: 8px !important;
+    }
+
+    .menu-container .fm-menu-link--root .fm-menu-label {
+      font-size: 11px !important;
+    }
+
+    .menu-container .username {
+      display: none !important;
+    }
+  }
+
+  @media (max-width: 960px) {
+    .menu-container .main-menu.p-menubar {
+      height: auto !important;
+      min-height: 48px !important;
+      padding: 0 8px !important;
+    }
+
+    .menu-container .p-menubar-button {
+      width: 40px !important;
+      min-width: 40px !important;
+      height: 40px !important;
+      min-height: 40px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      border: 0 !important;
+      background: transparent !important;
+      color: #fff !important;
+    }
+
+    .menu-container .p-menubar-button:hover {
+      background: rgba(255, 255, 255, .14) !important;
+    }
+
+    .menu-container .p-menubar-root-list {
+      width: min(360px, calc(100dvw - 16px)) !important;
+      max-height: calc(100dvh - 62px) !important;
+      overflow-y: auto !important;
+      overscroll-behavior: contain;
+      padding: 5px 0 !important;
+      border: 1px solid #d5dee4 !important;
+      background: #fff !important;
+      box-shadow: 0 12px 32px rgba(18, 45, 57, .24) !important;
+    }
+
+    .menu-container .p-menubar-root-list > .p-menubar-item,
+    .menu-container .p-menubar-root-list > .p-menuitem,
+    .menu-container .p-menubar-root-list > .p-menubar-item > .p-menubar-item-content,
+    .menu-container .p-menubar-root-list > .p-menuitem > .p-menuitem-content {
+      width: 100% !important;
+      height: auto !important;
+      min-height: 40px !important;
+      background: #fff !important;
+    }
+
+    .menu-container .fm-menu-link--root {
+      width: 100% !important;
+      min-height: 40px !important;
+      height: auto !important;
+      justify-content: space-between !important;
+      padding: 8px 12px !important;
+      color: #213746 !important;
+    }
+
+    .menu-container .fm-menu-link--root .fm-menu-label,
+    .menu-container .fm-menu-link--root .fm-menu-chevron {
+      color: #213746 !important;
+    }
+
+    .menu-container .p-menubar-root-list > .p-menubar-item > .p-menubar-item-content:hover,
+    .menu-container .p-menubar-root-list > .p-menuitem > .p-menuitem-content:hover {
+      background: #e8fafd !important;
+    }
+
+    .menu-container .user-section {
+      height: 48px !important;
+      margin-left: auto !important;
+    }
+
+    .menu-container .dropdown-content {
+      max-width: calc(100dvw - 16px);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .menu-container .main-menu.p-menubar {
+      padding-right: max(5px, env(safe-area-inset-right, 0px)) !important;
+      padding-left: max(5px, env(safe-area-inset-left, 0px)) !important;
+    }
+
+    .menu-container .p-menubar-root-list {
+      width: calc(100dvw - 10px) !important;
+      max-width: none !important;
+    }
+
+    .menu-container .p-menubar-submenu,
+    .menu-container .p-submenu-list {
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: none !important;
+      position: static !important;
+      border-right: 0 !important;
+      border-left: 3px solid #00a9bd !important;
+      box-shadow: none !important;
+    }
+
+    .menu-container .dropdown-content {
+      position: fixed !important;
+      top: 52px !important;
+      right: 5px !important;
+      left: 5px !important;
+      width: auto !important;
+      min-width: 0 !important;
+    }
+
+    .menu-container .user-avatar {
+      width: 30px !important;
+      height: 30px !important;
+      flex-basis: 30px !important;
+    }
+
+    .menu-container .spacer {
+      height: 18px !important;
+    }
+  }
+
+  @media (pointer: coarse) and (max-width: 960px) {
+    .menu-container .fm-menu-link--root,
+    .menu-container .fm-menu-link--submenu {
+      min-height: 44px !important;
+    }
+  }
+}

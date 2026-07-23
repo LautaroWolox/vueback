@@ -1,11 +1,7 @@
 import { defineStore } from 'pinia'
-import { EncryptStorage } from 'encrypt-storage'
 import { useFetch } from '@vueuse/core'
 import type { Filters, Row, StoreState, ActionResponse, ExcluirRequest, IncluirRequest } from './types'
 import { emptyFilters } from './types'
-
-const clave = import.meta.env.VITE_PARAMETER1 as string;
-export const fallidasCtStore = new EncryptStorage(clave, { storageType: 'sessionStorage' });
 
 export const useFallidasCtStore = defineStore('fallidasCT', {
     state: (): StoreState => ({
@@ -23,9 +19,9 @@ export const useFallidasCtStore = defineStore('fallidasCT', {
         
         selectedNotExcludedRows: (state: StoreState): Row[] =>
             state.selectedRows
-                .map(id => state.rows.find(row => row.id === id))   // busca en todos los datos las filas con los ids seleccionados
-                .filter((row): row is Row => row !== undefined)     // elimina filas cuyo id no exista
-                .filter(row => row.excluida === 'N')                // elimina filas ya excluidas
+                .map(id => state.rows.find(row => row.id === id))
+                .filter((row): row is Row => row !== undefined)
+                .filter(row => row.excluida === 'N')
     },
 
     actions: {
@@ -34,16 +30,14 @@ export const useFallidasCtStore = defineStore('fallidasCT', {
         },        
         async setData() {
             this.loading = true;
-            const { data, error } = await useFetch('/pc/registroOTFallidasReproceso/searchFallidas.html')
+            const { data } = await useFetch('/pc/registroOTFallidasReproceso/searchFallidas.html')
                 .post(this.filters)
                 .json<Row[]>() 
             this.loading = false;    
             if (data.value) {
                 this.activeTab = ['1']
                 this.rows = data.value
-            } else {
-                console.log('error: ' + JSON.stringify(error.value))   
-            } 
+            }
         },
         setSelectedRows(rows: number[]): void {
             this.selectedRows = rows;
@@ -83,10 +77,7 @@ export const useFallidasCtStore = defineStore('fallidasCT', {
             }
         },
         async sendIncluir(ot:string, motivo: string, comentario: string): Promise<ActionResponse> {
-            console.log("incluir ot: ",ot)
-            console.log("incluir motivo: ",motivo)
-            console.log("incluir comentario: ",comentario)
-                        this.loading = true;
+            this.loading = true;
             try {
                 const payload: IncluirRequest = {
                     nroOts: [this.nroOT != null? this.nroOT : ''],

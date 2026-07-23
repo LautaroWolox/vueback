@@ -2,6 +2,10 @@ import 'primeicons/primeicons.css'
 import 'primeflex/primeflex.css'
 import './assets/css/fm-global.css'
 import './assets/css/fm-grid-resize.css'
+import './assets/css/fm-responsive.css'
+import './assets/css/fm-menu-responsive.css'
+import './assets/css/fm-select.css'
+import './assets/css/jobtype-contrato.css'
 
 import Lara from '@primeuix/themes/lara'
 import { definePreset } from '@primeuix/themes'
@@ -17,6 +21,7 @@ import App from './App.vue'
 import router from './router'
 import { strings } from './strings.js'
 import { fmPrimePassThrough } from './components/shared/primePassThrough.js'
+import { installResponsiveIframes } from './plugins/responsiveIframes.js'
 
 import FmButton from './components/shared/FmButton.vue'
 import FmPanel from './components/shared/FmPanel.vue'
@@ -24,7 +29,9 @@ import FmGridShell from './components/shared/FmGridShell.vue'
 import FmAlertDialog from './components/shared/FmAlertDialog.vue'
 import FmActionButton from './components/shared/FmActionButton.vue'
 import FmGridActions from './components/shared/FmGridActions.vue'
+import FmGridPaginator from './components/shared/FmGridPaginator.vue'
 import FmTypingLoader from './components/shared/FmTypingLoader.vue'
+import FmResponsivePage from './components/shared/FmResponsivePage.vue'
 
 import Accordion from 'primevue/accordion'
 import AccordionPanel from 'primevue/accordionpanel'
@@ -103,7 +110,10 @@ app.component('FmGridShell', FmGridShell)
 app.component('FmAlertDialog', FmAlertDialog)
 app.component('FmActionButton', FmActionButton)
 app.component('FmGridActions', FmGridActions)
+app.component('FmGridPaginator', FmGridPaginator)
 app.component('FmTypingLoader', FmTypingLoader)
+app.component('FmResponsivePage', FmResponsivePage)
 
 app.directive('tooltip', Tooltip)
 app.mount('#app')
+installResponsiveIframes()

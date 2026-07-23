@@ -27,9 +27,9 @@ interface SetPerfilParams {
 
 const clave = import.meta.env.VITE_PARAMETER1;
 export const authStore = new EncryptStorageNoble('autorizacion', {
-  stateManagementUse: true,
-  prefix: '@app',
-  storageType: 'sessionStorage',
+    stateManagementUse: true,
+    prefix: '@app',
+    storageType: 'sessionStorage',
 });
 
 export const useAuthStore = defineStore('auth', {
@@ -44,14 +44,14 @@ export const useAuthStore = defineStore('auth', {
     actions: {
         async fetchUserData() {
             const { data, error, response } = await useFetch(
-                `${window.location.origin}/pc/userData.html`,
-                { credentials: 'include' }
+              `${window.location.origin}/pc/userData.html`,
+              { credentials: 'include' }
             ).get().json()
             if (
-                response.value?.status === 401 ||
-                response.value?.status === 403 ||
-                error.value ||
-                !data.value?.autenticado
+              response.value?.status === 401 ||
+              response.value?.status === 403 ||
+              error.value ||
+              !data.value?.autenticado
             ) {
                 return null
             }
@@ -68,16 +68,16 @@ export const useAuthStore = defineStore('auth', {
         },
         logout() {
             this.autenticado=false,
-            this.rutas=[],
-            this.nombre="",
-            this.legajo="",
-            this.email="",
-            this.usuario=null
+              this.rutas=[],
+              this.nombre="",
+              this.legajo="",
+              this.email="",
+              this.usuario=null
         },
     },
     persist: [
         {
-            key: 'autorizacion',             
+            key: 'autorizacion',
             storage: {
                 getItem: (key) => authStore.getItem(key) ?? null,
                 setItem: (key, value) => authStore.setItem(key, value),
