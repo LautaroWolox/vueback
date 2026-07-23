@@ -8,6 +8,10 @@
     @update:visible="$emit('update:visibleInc', $event)"
   >
     <div class="otf-include-form">
+      <p class="otf-include-confirmation">
+        ¿Confirma que desea incluir OT seleccionada?
+      </p>
+
       <div class="fm-field otf-include-motivo-field">
         <label for="motivo-inclusion">Motivo</label>
         <FmCompactSelect
@@ -31,9 +35,9 @@
       </div>
 
       <div class="fm-field otf-include-comment-field">
-        <label for="comentario-inclusion">Comentario</label>
+        <label for="nota-inclusion">Nota</label>
         <textarea
-          id="comentario-inclusion"
+          id="nota-inclusion"
           v-model="comentario"
           class="otf-include-comment"
           rows="2"
@@ -84,10 +88,22 @@ const reset = () => {
 }
 
 const confirmar = async () => {
+  const nroOT = store.nroOT
   emit('update:visibleInc', false)
-  await store.sendIncluir(store.nroOT, motivoSelected.value.nombreCorto, comentario.value)
+
+  const response = await store.sendIncluir(
+    String(nroOT ?? ''),
+    motivoSelected.value.nombreCorto,
+    comentario.value
+  )
+
+  if (response?.status) {
+    store.markIncluded(nroOT)
+    await store.setData()
+    store.markIncluded(nroOT)
+  }
+
   reset()
-  await store.setData()
 }
 
 const cerrar = () => {
@@ -103,6 +119,14 @@ onMounted(() => commonCT.setMotivosExcInc())
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.otf-include-confirmation {
+  margin: 0 0 2px;
+  color: #263746;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
 }
 
 .otf-include-form .fm-field {

@@ -1,11 +1,41 @@
 import { defineStore } from 'pinia'
-import { EncryptStorage } from 'encrypt-storage'
 import { useFetch } from '@vueuse/core'
 import type { Filters, Row, StoreState, ActionResponse, ExcluirRequest, IncluirRequest } from './types'
 import { emptyFilters } from './types'
 
-const clave = import.meta.env.VITE_PARAMETER1 as string;
-export const fallidasCtStore = new EncryptStorage(clave, { storageType: 'sessionStorage' });
+const EMPTY_NOTE_VALUES = new Set([
+    '',
+    'null',
+    'undefined',
+    'n',
+    'no',
+    'false',
+    '0',
+    '-',
+    '--',
+    'sin nota'
+])
+
+const normalizeVisibleText = (value: unknown): string => String(value ?? '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;|&#160;/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+const normalizeNoteRow = (row: Row): Row => {
+    const noteText = normalizeVisibleText(row.nota)
+    const normalizedNote = noteText.toLowerCase()
+    const noteFlag = normalizeVisibleText(row.tieneNota).toLowerCase()
+    const explicitlyWithoutNote = ['n', 'no', 'false', '0'].includes(noteFlag)
+    const hasVisibleNote = !EMPTY_NOTE_VALUES.has(normalizedNote)
+    const hasNote = !explicitlyWithoutNote && hasVisibleNote
+
+    return {
+        ...row,
+        nota: hasNote ? row.nota : '',
+        tieneNota: hasNote ? 'S' : 'N'
+    }
+}
 
 export const useFallidasCtStore = defineStore('fallidasCT', {
     state: (): StoreState => ({
@@ -40,11 +70,21 @@ export const useFallidasCtStore = defineStore('fallidasCT', {
             this.loading = false;    
             if (data.value) {
                 this.activeTab = ['1']
-                this.rows = data.value
+                this.rows = data.value.map(normalizeNoteRow)
             }
         },
         setSelectedRows(rows: number[]): void {
             this.selectedRows = rows;
+        },
+        markIncluded(nroOT: string | number | null): void {
+            const target = String(nroOT ?? '').trim()
+            if (!target) return
+
+            this.rows = this.rows.map((row) => (
+                String(row.nroOrdenTrabajo ?? '').trim() === target
+                    ? { ...row, excluida: 'N' }
+                    : row
+            ))
         },
         async sendReproceso(): Promise<void> {
             const idsSeleccionados = [...this.selectedRows]

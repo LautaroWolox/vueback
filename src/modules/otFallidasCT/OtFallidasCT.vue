@@ -19,11 +19,63 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import Table from './components/Table.vue'
 import Filtros from './components/Filtros.vue'
+import {useFallidasCtStore} from './store/CtFallidaStore'
 
 const active = ref(['0', '1'])
+let exclusionLabelsObserver
+const store = useFallidasCtStore()
+
+const syncExclusionLabels = () => {
+  document
+    .querySelectorAll('.otf-grid-shell .fm-grid-actions-final button')
+    .forEach((button) => {
+      if (!button.querySelector('.pi-trash')) return
+
+      if (button.getAttribute('title') !== 'Excluir OTs') {
+        button.setAttribute('title', 'Excluir OTs')
+      }
+
+      if (button.getAttribute('aria-label') !== 'Excluir OTs') {
+        button.setAttribute('aria-label', 'Excluir OTs')
+      }
+    })
+
+  document
+    .querySelectorAll('.otf-exclude-header > span:first-child')
+    .forEach((title) => {
+      if (title.textContent !== 'Excluir orden técnica') {
+        title.textContent = 'Excluir orden técnica'
+      }
+    })
+
+  document
+    .querySelectorAll('.otf-row-action--include')
+    .forEach((button) => {
+      const unavailable = button.disabled || button.getAttribute('aria-disabled') === 'true'
+      button.style.display = unavailable ? 'none' : ''
+    })
+}
+
+onMounted(() => {
+  syncExclusionLabels()
+
+  exclusionLabelsObserver = new MutationObserver(syncExclusionLabels)
+  exclusionLabelsObserver.observe(document.body, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ['title', 'aria-label', 'disabled']
+  })
+})
+
+onBeforeUnmount(() => {
+  exclusionLabelsObserver?.disconnect()
+  exclusionLabelsObserver = undefined
+  store.clearStore()
+})
 </script>
 
 <style scoped>
