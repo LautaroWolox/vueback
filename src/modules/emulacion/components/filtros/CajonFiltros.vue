@@ -1,19 +1,21 @@
 <template>
   <div class="fm-panel-content fm-panel-content--accent fm-filters emulation-filters">
-    <div class="fm-filter-grid">
+    <div class="fm-filter-grid emulation-filter-grid">
       <Legajo />
     </div>
 
-    <div class="fm-actions fm-filter-actions">
+    <p class="emulation-filter-help">
+      Ingrese el legajo del operador que desea emular.
+    </p>
+
+    <div class="fm-actions fm-filter-actions emulation-filter-actions">
       <FmButton
         label="BUSCAR"
-        icon="pi-search"
         :disabled="storeEmulacion.toggleLoader"
         @click="onSearch"
       />
       <FmButton
         label="LIMPIAR"
-        icon="pi-filter-slash"
         variant="outline"
         :disabled="storeEmulacion.toggleLoader"
         @click="onClear"
@@ -39,33 +41,47 @@ const onClear = () => {
 }
 
 const onSearch = async () => {
+  toast.removeAllGroups()
+
   await storeEmulacion.$fetchData()
-  if (storeEmulacion.error_code === 500 || storeEmulacion.error_code === 404) {
+
+  if (storeEmulacion.error_code) {
     toast.add({
-      severity: 'info',
-      summary: 'No se obtuvo información',
-      detail: 'Contacte al administrador'
+      severity: storeEmulacion.error_code === 400 ? 'warn' : 'info',
+      summary: storeEmulacion.error_code === 400 ? 'Legajo requerido' : 'No se obtuvo información',
+      detail: storeEmulacion.error_message || 'Contacte al administrador',
+      life: 4500
     })
-    return
   }
-  storeEmulacion.$setActiveTab(1)
 }
 </script>
 
 <style scoped>
+.emulation-filters {
+  padding: 18px 20px 14px;
+}
+
+.emulation-filter-grid {
+  width: min(100%, 520px);
+  margin: 0 auto;
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .emulation-filters :deep(.fm-field--span-4) {
-  grid-column: span 4;
+  grid-column: auto;
 }
 
-@media (max-width: 900px) {
-  .emulation-filters :deep(.fm-field--span-4) {
-    grid-column: span 6;
-  }
+.emulation-filter-help {
+  width: min(100%, 520px);
+  margin: 8px auto 0;
+  color: #607887;
+  font-size: 12px;
+  text-align: left;
 }
 
-@media (max-width: 620px) {
-  .emulation-filters :deep(.fm-field--span-4) {
-    grid-column: span 12;
-  }
+.emulation-filter-actions {
+  justify-content: center;
+  margin-top: 14px;
+  padding-bottom: 0;
 }
 </style>

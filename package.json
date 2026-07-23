@@ -28,7 +28,7 @@
     "axios": "^1.16.0",
     "dayjs": "^1.11.13",
     "dotenv": "^17.2.0",
-    "encrypt-storage": "^2.16.6",
+    "encrypt-storage": "^3.0.2",
     "exceljs": "^3.4.0",
     "pinia": "^3.0.3",
     "pinia-plugin-persistedstate": "^4.4.1",

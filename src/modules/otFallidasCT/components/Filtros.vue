@@ -12,34 +12,17 @@
 
     <div class="fm-actions fm-filter-actions otf-filter-actions">
       <FmButton
-        class="fm-filter-action-button otf-search-button"
         label="BUSCAR"
         :disabled="store.loading"
         @click="store.setData"
-      >
-        <template #icon>
-          <svg class="otf-button-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="10.5" cy="10.5" r="6.5" />
-            <path d="m15.5 15.5 4.5 4.5" />
-          </svg>
-        </template>
-      </FmButton>
+      />
 
       <FmButton
-        class="fm-filter-action-button otf-clean-button"
         label="LIMPIAR"
         variant="outline"
         :disabled="store.loading"
         @click="store.clearFilters"
-      >
-        <template #icon>
-          <svg class="otf-button-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 6h14" />
-            <path d="M4 12h10" />
-            <path d="M4 18h6" />
-          </svg>
-        </template>
-      </FmButton>
+      />
     </div>
   </div>
 </template>
@@ -151,7 +134,7 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
   min-height: calc(var(--otf-control-height) - 2px) !important;
   max-height: calc(var(--otf-control-height) - 2px) !important;
   padding: 0 8px !important;
-  font-size: 12px !important;
+  font-size: 11px !important;
   line-height: normal !important;
 }
 
@@ -189,59 +172,6 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
   padding: 9px 0 1px !important;
   border-top: 1px solid #e4e8eb !important;
   background: transparent !important;
-}
-
-.otf-filter-actions :deep(.fm-filter-action-button),
-.otf-filter-actions :deep(.fm-action-button),
-.otf-filter-actions :deep(.fm-ui-button),
-.otf-filter-actions :deep(.p-button) {
-  width: 120px !important;
-  min-width: 120px !important;
-  max-width: 120px !important;
-  height: 36px !important;
-  min-height: 36px !important;
-  max-height: 36px !important;
-  padding: 0 13px !important;
-  gap: 8px !important;
-  border-radius: 6px !important;
-  font-size: 13px !important;
-  font-weight: 400 !important;
-  line-height: 1 !important;
-  letter-spacing: 0 !important;
-  box-shadow: 0 4px 10px rgba(0, 78, 91, .16) !important;
-  transform: none !important;
-  white-space: nowrap !important;
-}
-
-.otf-filter-actions :deep(.otf-search-button.p-button),
-.otf-filter-actions :deep(.otf-search-button) {
-  border: 1px solid #00a9bd !important;
-  background: #00a9bd !important;
-  color: #fff !important;
-}
-
-.otf-filter-actions :deep(.otf-clean-button.p-button),
-.otf-filter-actions :deep(.otf-clean-button) {
-  border: 1px solid #00a9bd !important;
-  background: #fff !important;
-  color: #00a0b4 !important;
-}
-
-.otf-filter-actions :deep(.p-button-label) {
-  font-size: 13px !important;
-  font-weight: 400 !important;
-}
-
-.otf-filter-actions :deep(.otf-button-icon) {
-  width: 16px !important;
-  min-width: 16px !important;
-  height: 16px !important;
-  flex: 0 0 16px !important;
-  fill: none !important;
-  stroke: currentColor !important;
-  stroke-width: 2.2 !important;
-  stroke-linecap: round !important;
-  stroke-linejoin: round !important;
 }
 
 .otf-filters :deep(.otf-filter-element--disabled) {
@@ -285,6 +215,71 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
   font-size: 11px !important;
 }
 
+:global(.otf-filter-select-overlay.p-select-overlay),
+:global(.otf-filter-select-overlay .p-select-list-container),
+:global(.otf-filter-select-overlay .p-select-list) {
+  background: #fff !important;
+}
+
+:global(.otf-filter-select-overlay.p-select-overlay) {
+  padding: 0 !important;
+  border: 1px solid #c7d1d8 !important;
+  border-radius: 2px !important;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, .12) !important;
+}
+
+:global(.otf-filter-select-overlay .p-select-list) {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+:global(.otf-filter-select-overlay .p-select-option) {
+  min-height: 22px !important;
+  height: 22px !important;
+  margin: 0 !important;
+  padding: 2px 8px !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+  color: #263746 !important;
+  font-size: 10px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+  box-sizing: border-box !important;
+}
+
+:global(.otf-filter-select-overlay .p-select-option-label) {
+  font-size: 10px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+}
+
+:global(.otf-filter-select-overlay .p-select-option.p-disabled),
+:global(.otf-filter-select-overlay .p-select-option[aria-disabled="true"]) {
+  min-height: 18px !important;
+  height: 18px !important;
+  padding: 0 8px !important;
+  background: #fff !important;
+  color: transparent !important;
+  opacity: 1 !important;
+  cursor: default !important;
+  pointer-events: none !important;
+}
+
+:global(.otf-filter-select-overlay .p-select-option:hover),
+:global(.otf-filter-select-overlay .p-select-option.p-focus),
+:global(.otf-filter-select-overlay .p-select-option.p-select-option-selected) {
+  background: #dff8fb !important;
+  color: #004f59 !important;
+}
+
+:global(.otf-filter-select-overlay .p-select-option.p-disabled:hover),
+:global(.otf-filter-select-overlay .p-select-option.p-disabled.p-focus),
+:global(.otf-filter-select-overlay .p-select-option[aria-disabled="true"]:hover),
+:global(.otf-filter-select-overlay .p-select-option[aria-disabled="true"].p-focus) {
+  background: #fff !important;
+  color: transparent !important;
+}
+
 @media (max-width: 900px) {
   .otf-filter-grid :deep(.fm-field--span-2),
   .otf-filter-grid :deep(.fm-field--span-4) {
@@ -300,12 +295,6 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
 
   .otf-filter-actions {
     flex-wrap: wrap !important;
-  }
-
-  .otf-filter-actions :deep(.fm-filter-action-button),
-  .otf-filter-actions :deep(.p-button) {
-    width: min(120px, calc(50vw - 24px)) !important;
-    min-width: 0 !important;
   }
 }
 </style>

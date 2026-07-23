@@ -140,8 +140,8 @@ export const getRutas = (rutas:any) => {
                         },
                         {
                             label: 'Configuración CMO-Actividad',
-                            command: () => { router.push({ name: 'CMOA' }); },
-                            visible: hasMenu('CMOA')
+                            command: () => { router.push({ name: 'JOCM' }); },
+                            visible: hasMenu('JOCM') || hasMenu('JOCO')
                         }
                     ]
                 },
