@@ -9,34 +9,6 @@
             <span>Error al cargar los datos del reporte SAS.</span>
           </div>
 
-          <div class="report-sas-toolbar">
-            <div class="report-column-field fm-field">
-              <label for="report-sas-columns">Columnas visibles</label>
-              <MultiSelect
-                id="report-sas-columns"
-                v-model="selectedColumnFields"
-                :options="reporteSasColumns"
-                optionLabel="header"
-                optionValue="field"
-                dataKey="field"
-                filter
-                filterPlaceholder="Buscar columna"
-                placeholder="Seleccionar columnas"
-                :maxSelectedLabels="1"
-                selectedItemsLabel="{0} columnas seleccionadas"
-                class="report-column-selector"
-                appendTo="body"
-                @change="onColumnSelectionChange"
-              />
-            </div>
-
-            <FmButton
-              label="RESTABLECER"
-              class="report-reset-columns"
-              @click="resetColumns"
-            />
-          </div>
-
           <FmGridShell
             class="report-sas-grid-shell"
             :loading="isFetching"
@@ -87,6 +59,9 @@
                   :rows="rows"
                   :total-records="totalRecords"
                   :rows-options="rowsOptions"
+                  :show-rows-select="true"
+                  :show-counter="true"
+                  :counter-text="totalRecords === 0 ? 'No hay resultados' : ''"
                   @first-page="firstPageCallback"
                   @prev-page="prevPageCallback"
                   @next-page="nextPageCallback"
@@ -111,7 +86,7 @@
               </template>
 
               <Column
-                v-for="column in visibleColumns"
+                v-for="column in gridColumns"
                 :key="column.field"
                 :field="column.field"
                 :header="column.header"
@@ -183,7 +158,6 @@ import { computed, ref } from 'vue'
 import { useFetch } from '@vueuse/core'
 import { FilterMatchMode } from '@primevue/core/api'
 import InputText from 'primevue/inputtext'
-import MultiSelect from 'primevue/multiselect'
 import type { IDataReportSass } from './interfaces/index'
 import { reporteSasColumns } from './columns/reporteSas'
 import { useExcelExport } from '../../composables/useExportExcel'
@@ -198,11 +172,10 @@ interface ColumnFilterModel {
 
 type ReportColumn = (typeof reporteSasColumns)[number]
 
-const rowsOptions = [10, 20, 50, 100, 200]
+const rowsOptions = [100, 250, 500]
 const first = ref(0)
-const pageRows = ref(10)
+const pageRows = ref(100)
 const dt = ref()
-const selectedColumnFields = ref<string[]>(reporteSasColumns.map((column) => column.field))
 const expandedCells = ref<ExpandedState>({})
 const { exportToExcel, parseDataFromTable } = useExcelExport()
 
@@ -228,27 +201,24 @@ const columnWidths: Record<string, number> = {
   fechaNotificacionSAP: 175
 }
 
-const visibleColumns = computed<ReportColumn[]>(() => {
-  const selectedFields = new Set(selectedColumnFields.value)
-  return reporteSasColumns.filter((column) => selectedFields.has(column.field))
-})
+const gridColumns = computed<ReportColumn[]>(() => [...reporteSasColumns])
 
 const gridTableStyle = computed(() => {
-  const selectedWidth = visibleColumns.value.reduce(
+  const totalWidth = gridColumns.value.reduce(
     (total, column) => total + (columnWidths[column.field] ?? 130),
     0
   )
 
   return {
     width: '100%',
-    minWidth: `${Math.max(selectedWidth, 900)}px`,
+    minWidth: `${Math.max(totalWidth, 900)}px`,
     tableLayout: 'fixed'
   }
 })
 
 const filters = ref(
   Object.fromEntries(
-    reporteSasColumns.map((column) => [
+    gridColumns.value.map((column) => [
       column.field,
       { value: null, matchMode: FilterMatchMode.CONTAINS }
     ])
@@ -274,26 +244,6 @@ const processedData = computed<IDataReportSass[]>(() =>
   })
 )
 
-const onColumnSelectionChange = (event: { value: string[] }) => {
-  if (!event.value.length) {
-    selectedColumnFields.value = [reporteSasColumns[0].field]
-  }
-
-  const visibleFields = new Set(selectedColumnFields.value)
-  reporteSasColumns.forEach((column) => {
-    if (!visibleFields.has(column.field) && filters.value[column.field]) {
-      filters.value[column.field].value = null
-    }
-  })
-
-  first.value = 0
-}
-
-const resetColumns = () => {
-  selectedColumnFields.value = reporteSasColumns.map((column) => column.field)
-  first.value = 0
-}
-
 const clearColumnFilter = (
   filterModel: ColumnFilterModel,
   filterCallback: () => void
@@ -307,7 +257,7 @@ const exportarExcel = () => {
   exportToExcel({
     rows,
     fields,
-    columns: visibleColumns.value,
+    columns: gridColumns.value,
     filename: 'reporteSAS.xlsx',
     columnTypes: {},
     groupField: 'codTarea'
@@ -375,42 +325,6 @@ const getPreview = (value: unknown) => {
   flex-direction: column;
   gap: 8px;
   overflow: hidden;
-}
-
-.report-sas-toolbar {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: end;
-  justify-content: flex-end;
-  gap: 8px;
-  padding: 0 0 4px;
-}
-
-.report-column-field {
-  width: min(360px, 100%);
-}
-
-.report-column-selector {
-  width: 100%;
-  height: 30px;
-  min-height: 30px;
-}
-
-.report-column-selector :deep(.p-multiselect-label) {
-  display: flex;
-  align-items: center;
-  min-height: 28px;
-  padding: 0 8px;
-  font-size: 11px;
-}
-
-.report-reset-columns,
-.report-reset-columns.p-button {
-  height: 30px !important;
-  min-height: 30px !important;
-  padding: 0 12px !important;
-  border-radius: 2px !important;
-  font-size: 11px !important;
 }
 
 .report-sas-grid-shell {
@@ -518,18 +432,5 @@ const getPreview = (value: unknown) => {
 
 .legajo-preview.expanded span {
   white-space: normal;
-}
-
-@media (max-width: 700px) {
-  .report-sas-toolbar {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .report-column-field,
-  .report-reset-columns,
-  .report-reset-columns.p-button {
-    width: 100% !important;
-  }
 }
 </style>
