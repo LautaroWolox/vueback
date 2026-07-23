@@ -151,7 +151,7 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
   min-height: calc(var(--otf-control-height) - 2px) !important;
   max-height: calc(var(--otf-control-height) - 2px) !important;
   padding: 0 8px !important;
-  font-size: 12px !important;
+  font-size: 11px !important;
   line-height: normal !important;
 }
 
@@ -283,6 +283,49 @@ const disableNroOt = computed(() => !hasNroOt.value && hasAdvancedFilters.value)
 .otf-filters :deep(.ct-days button) {
   height: 25px !important;
   font-size: 11px !important;
+}
+
+:global(.otf-filter-select-overlay.p-select-overlay),
+:global(.otf-filter-select-overlay .p-select-list-container),
+:global(.otf-filter-select-overlay .p-select-list) {
+  background: #fff !important;
+}
+
+:global(.otf-filter-select-overlay.p-select-overlay) {
+  padding: 0 !important;
+  border: 1px solid #c7d1d8 !important;
+  border-radius: 2px !important;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, .12) !important;
+}
+
+:global(.otf-filter-select-overlay .p-select-list) {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+:global(.otf-filter-select-overlay .p-select-option) {
+  min-height: 26px !important;
+  margin: 0 !important;
+  padding: 4px 8px !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+  color: #263746 !important;
+  font-size: 10px !important;
+  font-weight: 400 !important;
+  line-height: 1.15 !important;
+}
+
+:global(.otf-filter-select-overlay .p-select-option-label) {
+  font-size: 10px !important;
+  font-weight: 400 !important;
+  line-height: 1.15 !important;
+}
+
+:global(.otf-filter-select-overlay .p-select-option:hover),
+:global(.otf-filter-select-overlay .p-select-option.p-focus),
+:global(.otf-filter-select-overlay .p-select-option.p-select-option-selected) {
+  background: #dff8fb !important;
+  color: #004f59 !important;
 }
 
 @media (max-width: 900px) {
