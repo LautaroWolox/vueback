@@ -10,6 +10,7 @@
       :options="excluida"
       optionLabel="valor"
       placeholder="Seleccione"
+      overlayClass="otf-filter-select-overlay"
       :disabled="disabled"
     />
   </div>
@@ -25,13 +26,12 @@ defineProps({
 
 const store = useFallidasCtStore()
 const excluida = ref([
-  { id: '', valor: '' },
   { id: 'S', valor: 'SI' },
   { id: 'N', valor: 'NO' }
 ])
 
 const exc = computed({
-  get: () => excluida.value.find((item) => item.id === store.filters.excluida) ?? excluida.value[0],
+  get: () => excluida.value.find((item) => item.id === store.filters.excluida) ?? null,
   set: (value) => store.setFilter('excluida', value?.id ?? '')
 })
 </script>
