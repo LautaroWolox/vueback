@@ -14,7 +14,7 @@ const allowed = (to, from, next) => {
   } else if (!autenticado && !rutasLibres.includes(to.name)) {
     next({ name: '401' });
     return;
-  } else if (autenticado && rutasPermitidas.includes(to.name)) {
+  } else if (autenticado && (rutasPermitidas.includes(to.name) || (to.name === 'JOCM' && rutasPermitidas.includes('JOCO')))) {
     next();
     return;
   } else {
