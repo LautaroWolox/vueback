@@ -9,6 +9,7 @@
       v-model="pais"
       :options="paises"
       optionLabel="valor"
+      optionDisabled="disabled"
       placeholder="Seleccione"
       overlayClass="otf-filter-select-overlay"
       :disabled="disabled"
@@ -26,13 +27,14 @@ defineProps({
 
 const store = useFallidasCtStore()
 const paises = ref([
+  { valor: '', disabled: true },
   { valor: 'ARG' },
   { valor: 'UY' },
   { valor: 'PY' }
 ])
 
 const pais = computed({
-  get: () => paises.value.find((item) => item.valor === store.filters.pais) ?? null,
+  get: () => paises.value.find((item) => item.valor === store.filters.pais && !item.disabled) ?? null,
   set: (value) => store.setFilter('pais', value?.valor ?? '')
 })
 </script>
