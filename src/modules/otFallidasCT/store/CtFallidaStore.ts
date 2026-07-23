@@ -80,6 +80,16 @@ export const useFallidasCtStore = defineStore('fallidasCT', {
         setSelectedRows(rows: number[]): void {
             this.selectedRows = rows;
         },
+        markIncluded(nroOT: string | number | null): void {
+            const target = String(nroOT ?? '').trim()
+            if (!target) return
+
+            this.rows = this.rows.map((row) => (
+                String(row.nroOrdenTrabajo ?? '').trim() === target
+                    ? { ...row, excluida: 'N' }
+                    : row
+            ))
+        },
         async sendReproceso(): Promise<void> {
             const idsSeleccionados = [...this.selectedRows]
 
