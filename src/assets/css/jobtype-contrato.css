@@ -332,11 +332,11 @@ body .jobtype-alta-dialog .p-dialog-content {
   min-width: 0;
   display: grid;
   grid-template-columns:
-    160px
+    120px
     minmax(260px, 1fr)
     minmax(260px, 1fr)
-    160px
-    150px;
+    120px
+    140px;
   align-items: end;
   gap: 14px;
   box-sizing: border-box;
@@ -348,9 +348,9 @@ body .jobtype-alta-dialog .p-dialog-content {
 
 .jobtype-alta-form > .jobtype-alta-field:nth-child(1),
 .jobtype-alta-form > .jobtype-alta-field:nth-child(4) {
-  width: 160px !important;
-  min-width: 160px !important;
-  max-width: 160px !important;
+  width: 120px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
 }
 
 .jobtype-alta-field .jobtype-alta-control,
@@ -365,6 +365,14 @@ body .jobtype-alta-dialog .p-dialog-content {
   opacity: 1 !important;
 }
 
+body .p-dialog.jobtype-alta-dialog .jobtype-alta-control.p-select .p-select-label {
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 8px !important;
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+}
+
 .jobtype-alta-form .jobtype-alta-control.p-inputtext:invalid {
   border-color: #d32f2f !important;
   box-shadow: 0 0 0 1px #d32f2f inset !important;
@@ -377,11 +385,33 @@ body .jobtype-alta-dialog .p-dialog-content {
 
 body .p-dialog.jobtype-alta-dialog .jobtype-add-button,
 body .p-dialog.jobtype-alta-dialog .jobtype-add-button.p-button {
-  width: 150px !important;
-  min-width: 150px !important;
-  max-width: 150px !important;
+  width: 140px !important;
+  min-width: 140px !important;
+  max-width: 140px !important;
   align-self: end;
   border-radius: 2px !important;
+}
+
+body .jobtype-alta-select-overlay {
+  width: auto !important;
+  min-width: 120px !important;
+  max-width: 180px !important;
+}
+
+body .jobtype-alta-select-overlay .p-select-list {
+  padding: 2px 0 !important;
+}
+
+body .jobtype-alta-select-overlay .p-select-option {
+  min-height: 30px !important;
+  padding: 5px 10px !important;
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+}
+
+body .jobtype-alta-select-overlay .p-select-option-label {
+  font-size: 12px !important;
+  line-height: 1.2 !important;
 }
 
 .jobtype-alta-grid-wrap {
