@@ -28,7 +28,8 @@
       filterDisplay="row"
       selectionMode="multiple"
       paginator
-      :rowsPerPageOptions="[10, 50, 100, 500]"
+      :rowsPerPageOptions="[100, 250, 500]"
+      :rows="500"
       showGridlines
       @select-all-change="onSelectAllChange"
       @value-change="onValueChange"
@@ -116,7 +117,7 @@
               aria-label="Filas por página"
               @change="changeRows($event, rowChangeCallback)"
             >
-              <option v-for="option in [10, 50, 100, 500]" :key="option" :value="option">
+              <option v-for="option in [100, 250, 500]" :key="option" :value="option">
                 {{ option }}
               </option>
             </select>
