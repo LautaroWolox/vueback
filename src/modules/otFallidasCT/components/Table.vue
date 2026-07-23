@@ -28,7 +28,8 @@
       filterDisplay="row"
       selectionMode="multiple"
       paginator
-      :rowsPerPageOptions="[10, 50, 100, 500]"
+      :rowsPerPageOptions="[100, 250, 500]"
+      :rows="500"
       showGridlines
       @select-all-change="onSelectAllChange"
       @value-change="onValueChange"
@@ -116,7 +117,7 @@
               aria-label="Filas por página"
               @change="changeRows($event, rowChangeCallback)"
             >
-              <option v-for="option in [10, 50, 100, 500]" :key="option" :value="option">
+              <option v-for="option in [100, 250, 500]" :key="option" :value="option">
                 {{ option }}
               </option>
             </select>
@@ -166,10 +167,9 @@
         <template #body="{ data }">
           <template v-if="col.field === 'tieneNota'">
             <button
-              v-if="hasNote(data)"
+              v-if="data.excluida !== 'S' && hasNote(data)"
               type="button"
               class="otf-row-action otf-row-action--note"
-              :class="{ 'otf-row-action--note-excluded': data.excluida === 'S' }"
               title="Ver nota"
               aria-label="Ver nota"
               @click.stop="showNote(data)"
@@ -183,12 +183,11 @@
 
           <template v-else-if="col.field === 'incluir'">
             <button
+              v-if="data.excluida === 'S'"
               type="button"
               class="otf-row-action otf-row-action--include"
-              :class="{ 'otf-row-action--disabled': data.excluida !== 'S' }"
-              :disabled="data.excluida !== 'S'"
-              :title="data.excluida === 'S' ? 'Incluir OT' : 'OT no disponible para incluir'"
-              :aria-label="data.excluida === 'S' ? 'Incluir OT' : 'OT no disponible para incluir'"
+              title="Incluir OT"
+              aria-label="Incluir OT"
               @click.stop="openInclude(data)"
             >
               <svg class="otf-row-action__icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -375,7 +374,7 @@ const showMessage = (message) => {
 }
 
 const showNote = (data) => {
-  if (!hasNote(data)) return
+  if (data?.excluida === 'S' || !hasNote(data)) return
   selectedNote.value = data.nota
   showNota.value = true
 }
