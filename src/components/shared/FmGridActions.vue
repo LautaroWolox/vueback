@@ -20,6 +20,7 @@
       text
       rounded
       class="fm-grid-action-final"
+      :class="{ 'fm-grid-action-final--disabled': deleteDisabled }"
       :disabled="deleteDisabled"
       :title="deleteDisabled ? deleteDisabledTitle : deleteTitle"
       :aria-label="deleteDisabled ? deleteDisabledTitle : deleteTitle"
@@ -31,6 +32,7 @@
       text
       rounded
       class="fm-grid-action-final"
+      :class="{ 'fm-grid-action-final--disabled': editDisabled }"
       :disabled="editDisabled"
       :title="editDisabled ? editDisabledTitle : editTitle"
       :aria-label="editDisabled ? editDisabledTitle : editTitle"
@@ -174,9 +176,14 @@ defineEmits(['export', 'delete', 'edit', 'refresh', 'add'])
 }
 
 .fm-grid-actions-final :deep(.p-button:disabled),
-.fm-grid-actions-final :deep(.p-button.p-disabled) {
+.fm-grid-actions-final :deep(.p-button.p-disabled),
+.fm-grid-actions-final :deep(.fm-grid-action-final--disabled),
+.fm-grid-actions-final :deep(.fm-grid-action-final--disabled .p-button-icon),
+.fm-grid-actions-final :deep(.fm-grid-action-final--disabled .pi) {
   background: transparent !important;
-  color: #b4b4b4 !important;
+  color: #aeb7bd !important;
   opacity: 1 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
 }
 </style>
