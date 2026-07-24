@@ -4,7 +4,7 @@
     appendTo="body"
     modal
     :closable="false"
-    :draggable="false"
+    :draggable="true"
     :resizable="false"
     class="cmo-edit-dialog"
     :style="dialogStyle"
