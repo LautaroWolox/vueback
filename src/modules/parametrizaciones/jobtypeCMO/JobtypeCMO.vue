@@ -19,7 +19,13 @@
     >
       <template #header>
         <div class="cmo-delete-confirm__header">
-          <span>Alerta</span>
+          <div class="cmo-delete-confirm__header-main">
+            <span class="cmo-delete-confirm__icon-circle cmo-delete-confirm__icon-circle--header">
+              <i class="pi pi-bell cmo-delete-confirm__header-icon" aria-hidden="true" />
+            </span>
+            <span class="cmo-delete-confirm__title">Confirmar Accion</span>
+          </div>
+
           <button
             type="button"
             class="cmo-delete-confirm__close"
@@ -31,8 +37,12 @@
       </template>
 
       <div class="cmo-delete-confirm__content">
-        <i class="pi pi-exclamation-triangle cmo-delete-confirm__icon" aria-hidden="true" />
-        <span>¿Confirma que desea desactivar la relación seleccionada?</span>
+        <span class="cmo-delete-confirm__icon-circle cmo-delete-confirm__icon-circle--body">
+          <i class="pi pi-question-circle cmo-delete-confirm__question-icon" aria-hidden="true" />
+        </span>
+        <span class="cmo-delete-confirm__message">
+          ¿Confirma que desea desactivar la relación seleccionada?
+        </span>
       </div>
 
       <template #footer>
@@ -332,9 +342,49 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  color: #404040;
-  font-size: 16px;
-  font-weight: 400;
+}
+
+.cmo-delete-confirm__header-main {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.cmo-delete-confirm__title {
+  color: #252b33;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.cmo-delete-confirm__icon-circle {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #e9f8fa;
+}
+
+.cmo-delete-confirm__icon-circle--header {
+  width: 48px;
+  height: 48px;
+}
+
+.cmo-delete-confirm__icon-circle--body {
+  width: 42px;
+  height: 42px;
+}
+
+.cmo-delete-confirm__header-icon {
+  color: #11aabd;
+  font-size: 23px;
+}
+
+.cmo-delete-confirm__question-icon {
+  color: #11aabd;
+  font-size: 22px;
 }
 
 .cmo-delete-confirm__close {
@@ -358,19 +408,17 @@ onBeforeUnmount(() => {
 }
 
 .cmo-delete-confirm__content {
-  min-height: 52px;
+  min-height: 72px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 4px;
-  color: #202020;
-  font-size: 13px;
+  gap: 16px;
+  padding: 18px 4px;
 }
 
-.cmo-delete-confirm__icon {
-  flex: 0 0 auto;
-  color: #f0ad4e;
-  font-size: 24px;
+.cmo-delete-confirm__message {
+  color: #4b5563;
+  font-size: 15px;
+  line-height: 1.35;
 }
 
 .cmo-delete-confirm__actions {
@@ -389,14 +437,14 @@ onBeforeUnmount(() => {
 }
 
 :global(.cmo-delete-confirm-dialog .p-dialog-header) {
-  min-height: 48px;
-  padding: 10px 14px;
+  min-height: 68px;
+  padding: 12px 18px;
   border-bottom: 1px solid #dedede;
   background: #fff;
 }
 
 :global(.cmo-delete-confirm-dialog .p-dialog-content) {
-  padding: 0 14px;
+  padding: 0 18px;
   background: #fff;
 }
 
@@ -404,7 +452,7 @@ onBeforeUnmount(() => {
   min-height: 60px;
   display: flex;
   align-items: center;
-  padding: 10px 14px;
+  padding: 10px 18px;
   border-top: 1px solid #dedede;
   background: #fff;
 }
@@ -421,9 +469,14 @@ onBeforeUnmount(() => {
   font-weight: 500 !important;
 }
 
-:global(.cmo-delete-confirm-dialog .cmo-delete-confirm__cancel) {
+:global(.cmo-delete-confirm-dialog .cmo-delete-confirm__cancel),
+:global(.cmo-delete-confirm-dialog .cmo-delete-confirm__cancel:hover),
+:global(.cmo-delete-confirm-dialog .cmo-delete-confirm__cancel:focus),
+:global(.cmo-delete-confirm-dialog .cmo-delete-confirm__cancel:active) {
   border: 1px solid #00acc1 !important;
   background: #fff !important;
+  background-color: #fff !important;
+  background-image: none !important;
   color: #0097a7 !important;
   box-shadow: none !important;
 }
