@@ -9,7 +9,7 @@
   >
     <template #header>
       <div class="otf-exclude-header">
-        <span>Alerta</span>
+        <span>Excluir Orden de Trabajo</span>
         <button
           type="button"
           class="otf-exclude-close"
@@ -41,6 +41,7 @@
           class="otf-motivo-select"
           :options="motivoOptions"
           option-label="nombre"
+          placeholder="Seleccione un motivo"
           :max-panel-height="150"
         />
         <span v-else-if="status.motivos === 'error'" class="fm-field-error">Error al cargar.</span>
