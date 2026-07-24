@@ -16,36 +16,22 @@
           <CajonFiltros />
         </AccordionContent>
       </AccordionPanel>
-
-      <AccordionPanel value="1">
-        <AccordionHeader>
-          <span class="emulation-accordion__title">
-            OPERADORES
-            <span v-if="store.data.length" class="emulation-accordion__count">
-              {{ store.data.length }}
-            </span>
-          </span>
-        </AccordionHeader>
-        <AccordionContent>
-          <TablaEmulacion />
-        </AccordionContent>
-      </AccordionPanel>
     </Accordion>
+
+    <div class="emulation-results">
+      <TablaEmulacion />
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import CajonFiltros from '../components/filtros/CajonFiltros.vue'
 import TablaEmulacion from '../components/TablaEmulacion.vue'
 import emulacionStore from '../store/emulacionStore.js'
 
 const active = ref(['0'])
 const store = emulacionStore()
-
-watch(() => store.activeTab, (newValue) => {
-  active.value = Array.isArray(newValue) ? newValue.map(String) : [String(newValue)]
-}, { immediate: true, deep: true })
 </script>
 
 <style scoped>
@@ -58,18 +44,11 @@ watch(() => store.activeTab, (newValue) => {
 }
 
 .emulation-accordion {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  flex: 0 0 auto;
 }
 
 .emulation-filter-panel {
-  position: relative;
-  z-index: 1;
   border-radius: 4px;
-  box-shadow:
-    0 10px 28px rgba(32, 57, 71, .34),
-    0 3px 8px rgba(32, 57, 71, .2);
 }
 
 .emulation-filter-panel :deep(.p-accordionheader) {
@@ -91,22 +70,13 @@ watch(() => store.activeTab, (newValue) => {
   font-weight: 700;
 }
 
-.emulation-accordion__count {
-  min-width: 22px;
-  height: 20px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 6px;
-  border-radius: 10px;
-  background: #00a9bd;
-  color: #fff;
-  font-size: 10px;
-  box-sizing: border-box;
-}
-
 .emulation-accordion :deep(.p-accordioncontent-content) {
   padding: 0;
+}
+
+.emulation-results {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 :global(.emulation-confirm-dialog .emulation-confirm-warning) {
