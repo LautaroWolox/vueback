@@ -32,7 +32,10 @@ const excluida = ref([
 ])
 
 const exc = computed({
-  get: () => excluida.value.find((item) => item.id === store.filters.excluida) ?? null,
+  get: () => {
+    if (!store.filters.excluida) return null
+    return excluida.value.find((item) => item.id === store.filters.excluida) ?? null
+  },
   set: (value) => store.setFilter('excluida', value?.id ?? '')
 })
 </script>
