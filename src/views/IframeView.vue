@@ -60,11 +60,8 @@ onUnmounted(() => {
 
 <style scoped>
 .legacy-iframe {
+ position: absolute;
+  height: 100%;
   width: 100%;
-  height: calc(100vh - 64px);
-  min-height: 520px;
-  display: block;
-  margin: -4px 0 0;
-  border: 0;
 }
 </style>
