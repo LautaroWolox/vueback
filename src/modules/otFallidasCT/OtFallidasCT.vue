@@ -83,6 +83,17 @@ const syncExistingNotes = () => {
   notesContainer.append(labelElement, contentElement)
 }
 
+const syncDefaultPageSize = () => {
+  const select = document.querySelector('.ot-fallidas-ct .otf-rows-select')
+  if (!select || select.dataset.defaultRowsApplied === 'true') return
+
+  select.dataset.defaultRowsApplied = 'true'
+  if (select.value === '500') return
+
+  select.value = '500'
+  select.dispatchEvent(new Event('change', { bubbles: true }))
+}
+
 const syncExclusionLabels = () => {
   document
     .querySelectorAll('.otf-grid-shell .fm-grid-actions-final button')
@@ -113,6 +124,7 @@ const syncExclusionLabels = () => {
       button.style.display = unavailable ? 'none' : ''
     })
 
+  syncDefaultPageSize()
   syncExistingNotes()
 }
 
@@ -173,7 +185,7 @@ onBeforeUnmount(() => {
   border-radius: 0 !important;
   background: #f7f7f7 !important;
   color: #000 !important;
-  font-size: 12px !important;
+  font-size: 13px !important;
   font-weight: 500 !important;
   line-height: 18px !important;
   box-shadow: none !important;
@@ -185,6 +197,58 @@ onBeforeUnmount(() => {
   border: 0 !important;
   background: #fff !important;
   overflow: visible !important;
+}
+
+.ot-fallidas-ct :deep(.otf-filters .fm-field label) {
+  font-size: 12px !important;
+}
+
+.ot-fallidas-ct :deep(.otf-filters .p-inputtext),
+.ot-fallidas-ct :deep(.otf-filters input),
+.ot-fallidas-ct :deep(.otf-filters .p-select-label),
+.ot-fallidas-ct :deep(.otf-filters .ct-date-button) {
+  font-size: 13px !important;
+}
+
+.ot-fallidas-ct :deep(.ct-calendar-title),
+.ot-fallidas-ct :deep(.ct-year-select .fm-compact-select__trigger),
+.ot-fallidas-ct :deep(.ct-year-select .fm-compact-select__option),
+.ot-fallidas-ct :deep(.ct-days button),
+.ot-fallidas-ct :deep(.ct-calendar-actions button) {
+  font-size: 12px !important;
+}
+
+.ot-fallidas-ct :deep(.ct-weekdays) {
+  font-size: 11px !important;
+}
+
+.ot-fallidas-ct :deep(#tabla .p-datatable-thead > tr > th) {
+  font-size: 12px !important;
+}
+
+.ot-fallidas-ct :deep(#tabla .p-datatable-tbody > tr > td) {
+  font-size: 13px !important;
+}
+
+.ot-fallidas-ct :deep(#tabla .fm-column-filter),
+.ot-fallidas-ct :deep(#tabla .fm-filter-prefix),
+.ot-fallidas-ct :deep(#tabla .fm-filter-more) {
+  font-size: 12px !important;
+}
+
+.ot-fallidas-ct :deep(.otf-custom-paginator),
+.ot-fallidas-ct :deep(.otf-custom-paginator__navigation),
+.ot-fallidas-ct :deep(.otf-page-label),
+.ot-fallidas-ct :deep(.otf-page-total),
+.ot-fallidas-ct :deep(.otf-page-input),
+.ot-fallidas-ct :deep(.otf-rows-select),
+.ot-fallidas-ct :deep(.otf-custom-paginator__counter) {
+  font-size: 13px !important;
+}
+
+:global(.otf-filter-select-overlay .p-select-option),
+:global(.otf-filter-select-overlay .p-select-option-label) {
+  font-size: 12px !important;
 }
 
 :global(.otf-existing-notes) {
