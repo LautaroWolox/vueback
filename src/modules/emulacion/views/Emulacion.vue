@@ -17,17 +17,12 @@
         </AccordionContent>
       </AccordionPanel>
     </Accordion>
-
-    <div class="emulation-results">
-      <TablaEmulacion />
-    </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import CajonFiltros from '../components/filtros/CajonFiltros.vue'
-import TablaEmulacion from '../components/TablaEmulacion.vue'
 import emulacionStore from '../store/emulacionStore.js'
 
 const active = ref(['0'])
@@ -39,7 +34,6 @@ const store = emulacionStore()
   min-height: calc(100vh - 82px);
   display: flex;
   flex-direction: column;
-  gap: 10px;
   background: #f7fafb;
 }
 
@@ -72,11 +66,6 @@ const store = emulacionStore()
 
 .emulation-accordion :deep(.p-accordioncontent-content) {
   padding: 0;
-}
-
-.emulation-results {
-  flex: 1 1 auto;
-  min-height: 0;
 }
 
 :global(.emulation-confirm-dialog .emulation-confirm-warning) {
