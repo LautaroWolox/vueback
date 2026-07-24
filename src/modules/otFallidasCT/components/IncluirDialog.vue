@@ -41,6 +41,7 @@
           v-model="comentario"
           class="otf-include-comment"
           rows="2"
+          placeholder="Opcional"
         ></textarea>
       </div>
     </div>
