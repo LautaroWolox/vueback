@@ -87,11 +87,9 @@ const syncDefaultPageSize = () => {
   const select = document.querySelector('.ot-fallidas-ct .otf-rows-select')
   if (!select || select.dataset.defaultRowsApplied === 'true') return
 
-  select.dataset.defaultRowsApplied = 'true'
-  if (select.value === '500') return
-
   select.value = '500'
   select.dispatchEvent(new Event('change', { bubbles: true }))
+  select.dataset.defaultRowsApplied = 'true'
 }
 
 const syncExclusionLabels = () => {
