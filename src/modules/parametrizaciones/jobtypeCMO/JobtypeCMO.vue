@@ -46,16 +46,18 @@
         <div class="cmo-delete-confirm__actions">
           <button
             type="button"
-            class="cmo-delete-confirm__cancel"
+            class="cmo-delete-confirm__button cmo-delete-confirm__button--cancel"
             @click="cancelDelete"
           >
             CANCELAR
           </button>
-          <FmButton
-            label="ACEPTAR"
-            class="cmo-delete-confirm__accept"
+          <button
+            type="button"
+            class="cmo-delete-confirm__button cmo-delete-confirm__button--accept"
             @click="acceptDelete"
-          />
+          >
+            ACEPTAR
+          </button>
         </div>
       </template>
     </Dialog>
@@ -445,42 +447,40 @@ onBeforeUnmount(() => {
   background: #fff;
 }
 
-.cmo-delete-confirm__cancel,
-:global(.cmo-delete-confirm-dialog .cmo-delete-confirm__accept) {
-  width: auto !important;
-  min-width: 88px !important;
-  height: 30px !important;
-  min-height: 30px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 0 12px !important;
-  border-radius: 16px !important;
-  font-family: inherit !important;
-  font-size: 12px !important;
-  font-weight: 500 !important;
-  line-height: 1 !important;
+.cmo-delete-confirm__button {
+  appearance: none;
+  width: 100px;
+  min-width: 100px;
+  height: 30px;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border: 1px solid #00acc1;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: none;
+  outline: none;
   cursor: pointer;
 }
 
-.cmo-delete-confirm__cancel,
-.cmo-delete-confirm__cancel:hover,
-.cmo-delete-confirm__cancel:focus,
-.cmo-delete-confirm__cancel:active {
-  appearance: none;
-  border: 1px solid #00acc1 !important;
-  background: #fff !important;
-  background-color: #fff !important;
-  background-image: none !important;
-  color: #0097a7 !important;
-  box-shadow: none !important;
-  outline: none;
+.cmo-delete-confirm__button--cancel,
+.cmo-delete-confirm__button--cancel:hover,
+.cmo-delete-confirm__button--cancel:focus,
+.cmo-delete-confirm__button--cancel:active {
+  background: #fff;
+  color: #0097a7;
 }
 
-:global(.cmo-delete-confirm-dialog .cmo-delete-confirm__accept) {
-  border: 1px solid #00acc1 !important;
-  background: #00acc1 !important;
-  color: #fff !important;
-  box-shadow: none !important;
+.cmo-delete-confirm__button--accept,
+.cmo-delete-confirm__button--accept:hover,
+.cmo-delete-confirm__button--accept:focus,
+.cmo-delete-confirm__button--accept:active {
+  background: #00acc1;
+  color: #fff;
 }
 </style>
