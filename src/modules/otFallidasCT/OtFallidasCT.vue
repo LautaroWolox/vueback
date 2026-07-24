@@ -46,8 +46,8 @@ const syncExclusionLabels = () => {
   document
     .querySelectorAll('.otf-exclude-header > span:first-child')
     .forEach((title) => {
-      if (title.textContent !== 'Excluir orden técnica') {
-        title.textContent = 'Excluir orden técnica'
+      if (title.textContent !== 'Excluir Orden de Trabajo') {
+        title.textContent = 'Excluir Orden de Trabajo'
       }
     })
 

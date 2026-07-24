@@ -2,7 +2,7 @@
   <Dialog
     :visible="visibleInc"
     modal
-    header="Incluir orden de trabajo"
+    header="Incluir Orden de Trabajo"
     class="fm-dialog otf-action-dialog otf-include-dialog"
     :style="{ width: '42rem' }"
     @update:visible="$emit('update:visibleInc', $event)"
@@ -41,6 +41,7 @@
           v-model="comentario"
           class="otf-include-comment"
           rows="2"
+          placeholder="Opcional"
         ></textarea>
       </div>
     </div>
