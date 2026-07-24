@@ -81,5 +81,19 @@ const capturarLegajo = () => {
   width: 100%;
   height: 32px;
   min-height: 32px;
+  border-color: #b8cbd3;
+  box-shadow: 0 4px 12px rgba(32, 57, 71, .24);
+  transition: border-color .16s ease, box-shadow .16s ease;
+}
+
+.emulation-legajo-control :deep(.p-inputtext:hover) {
+  border-color: #8fb3bf;
+}
+
+.emulation-legajo-control :deep(.p-inputtext:focus) {
+  border-color: #00a9bd;
+  box-shadow:
+    0 0 0 2px rgba(0, 169, 189, .14),
+    0 6px 16px rgba(32, 57, 71, .28);
 }
 </style>
