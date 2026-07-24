@@ -44,6 +44,31 @@ const customizeContratoDialog = () => {
   setImportantStyle(dialog, 'height', 'min(560px, calc(100dvh - 48px))')
   setImportantStyle(dialog, 'max-height', 'calc(100dvh - 48px)')
 
+  const form = dialog.querySelector('.jobtype-alta-form')
+  if (form) {
+    setImportantStyle(form, 'width', '100%')
+    setImportantStyle(form, 'max-width', '100%')
+    setImportantStyle(form, 'box-sizing', 'border-box')
+    setImportantStyle(form, 'grid-template-columns', '100px minmax(0, 1fr) minmax(0, 1fr) 100px 120px')
+    setImportantStyle(form, 'column-gap', '14px')
+    setImportantStyle(form, 'align-items', 'end')
+
+    form.querySelectorAll('.jobtype-alta-field').forEach((field) => {
+      setImportantStyle(field, 'width', '100%')
+      setImportantStyle(field, 'min-width', '0')
+      setImportantStyle(field, 'max-width', 'none')
+    })
+
+    form.querySelectorAll('.jobtype-alta-control').forEach((control) => {
+      if (control.closest('.jobtype-alta-field')?.querySelector('label')?.textContent?.trim() === 'Jobtype' ||
+          control.closest('.jobtype-alta-field')?.querySelector('label')?.textContent?.trim() === 'Contrato') {
+        setImportantStyle(control, 'width', '100%')
+        setImportantStyle(control, 'min-width', '0')
+        setImportantStyle(control, 'max-width', 'none')
+      }
+    })
+  }
+
   dialog.querySelectorAll('.jobtype-add-button, .jobtype-relate-button').forEach((button) => {
     setImportantStyle(button, 'width', '120px')
     setImportantStyle(button, 'min-width', '120px')
@@ -57,6 +82,7 @@ const customizeContratoDialog = () => {
     setImportantStyle(button, 'font-weight', '600')
     setImportantStyle(button, 'box-shadow', '0 2px 6px rgba(0, 91, 104, .14)')
     setImportantStyle(button, 'transform', 'none')
+    setImportantStyle(button, 'box-sizing', 'border-box')
   })
 }
 
@@ -79,7 +105,7 @@ onMounted(async () => {
 
       const target = mutation.target
       return target instanceof Element && Boolean(
-        target.matches('.p-dialog.jobtype-alta-dialog, .jobtype-add-button, .jobtype-relate-button') ||
+        target.matches('.p-dialog.jobtype-alta-dialog, .jobtype-add-button, .jobtype-relate-button, .jobtype-alta-form, .jobtype-alta-field, .jobtype-alta-control') ||
         target.closest('.p-dialog.jobtype-alta-dialog')
       )
     })
@@ -93,10 +119,13 @@ onMounted(async () => {
     attributes: true,
     attributeFilter: ['style']
   })
+
+  window.addEventListener('resize', scheduleDialogCustomization)
 })
 
 onBeforeUnmount(() => {
   dialogObserver?.disconnect()
+  window.removeEventListener('resize', scheduleDialogCustomization)
 
   if (dialogRefreshFrame !== null) {
     cancelAnimationFrame(dialogRefreshFrame)
