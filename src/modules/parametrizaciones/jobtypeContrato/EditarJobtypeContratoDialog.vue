@@ -56,14 +56,24 @@
       </div>
 
       <div class="jobtype-contrato-edit-field jobtype-contrato-edit-field--nuevo">
-        <label for="jobtype-contrato-edit-nuevo">Nuevo Contrato</label>
-        <InputText
-          id="jobtype-contrato-edit-nuevo"
-          v-model="nuevoContrato"
-          class="jobtype-contrato-edit-control jobtype-contrato-edit-control--new"
-          aria-label="Nuevo Contrato"
-          @keyup.enter="actualizar"
-        />
+        <div
+          class="jobtype-contrato-edit-float-field"
+          :class="{
+            'jobtype-contrato-edit-float-field--active':
+              nuevoContratoFocused || nuevoContrato.length > 0
+          }"
+        >
+          <InputText
+            id="jobtype-contrato-edit-nuevo"
+            v-model="nuevoContrato"
+            class="jobtype-contrato-edit-control jobtype-contrato-edit-control--new"
+            aria-label="Nuevo Contrato"
+            @focus="nuevoContratoFocused = true"
+            @blur="nuevoContratoFocused = false"
+            @keyup.enter="actualizar"
+          />
+          <label for="jobtype-contrato-edit-nuevo">Nuevo Contrato</label>
+        </div>
       </div>
 
       <div class="jobtype-contrato-edit-field jobtype-contrato-edit-field--origen">
@@ -163,6 +173,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:visible', 'actualizar'])
 const nuevoContrato = ref('')
+const nuevoContratoFocused = ref(false)
 const origenSeleccionado = ref('')
 const mostrarConfirmacionCierre = ref(false)
 
@@ -191,6 +202,7 @@ const puedeActualizar = computed(() => Boolean(
 
 const limpiarFormulario = () => {
   nuevoContrato.value = ''
+  nuevoContratoFocused.value = false
   origenSeleccionado.value = props.origenActual.trim()
   mostrarConfirmacionCierre.value = false
 }
@@ -303,7 +315,7 @@ const actualizar = () => {
   gap: 7px;
 }
 
-.jobtype-contrato-edit-field label {
+.jobtype-contrato-edit-field > label {
   color: #202020;
   font-size: 13px;
   font-weight: 600;
@@ -321,6 +333,34 @@ const actualizar = () => {
   background: #eeeeee;
   color: #444;
   opacity: 1;
+}
+
+.jobtype-contrato-edit-float-field {
+  position: relative;
+  margin-top: 20px;
+}
+
+.jobtype-contrato-edit-float-field label {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 11px;
+  padding: 0 4px;
+  background: #fff;
+  color: #74848e;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1;
+  pointer-events: none;
+  transform: translateY(-50%);
+  transition: top .16s ease, color .16s ease, font-size .16s ease, transform .16s ease;
+}
+
+.jobtype-contrato-edit-float-field--active label {
+  top: 0;
+  color: #008fa1;
+  font-size: 10px;
+  transform: translateY(-50%);
 }
 
 .jobtype-contrato-edit-control--new:focus,
@@ -512,6 +552,10 @@ const actualizar = () => {
       'origen';
     row-gap: 14px;
     padding: 16px 0 22px;
+  }
+
+  .jobtype-contrato-edit-float-field {
+    margin-top: 0;
   }
 
   :global(.jobtype-contrato-edit-dialog .jobtype-contrato-edit-update) {
