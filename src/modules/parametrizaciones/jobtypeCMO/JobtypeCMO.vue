@@ -37,9 +37,6 @@
       </template>
 
       <div class="cmo-delete-confirm__content">
-        <span class="cmo-delete-confirm__icon-circle cmo-delete-confirm__icon-circle--body">
-          <i class="pi pi-question-circle cmo-delete-confirm__question-icon" aria-hidden="true" />
-        </span>
         <span class="cmo-delete-confirm__message">
           ¿Confirma que desea desactivar la relación seleccionada?
         </span>
@@ -47,11 +44,13 @@
 
       <template #footer>
         <div class="cmo-delete-confirm__actions">
-          <FmButton
-            label="CANCELAR"
+          <button
+            type="button"
             class="cmo-delete-confirm__cancel"
             @click="cancelDelete"
-          />
+          >
+            CANCELAR
+          </button>
           <FmButton
             label="ACEPTAR"
             class="cmo-delete-confirm__accept"
@@ -372,19 +371,9 @@ onBeforeUnmount(() => {
   height: 48px;
 }
 
-.cmo-delete-confirm__icon-circle--body {
-  width: 42px;
-  height: 42px;
-}
-
 .cmo-delete-confirm__header-icon {
   color: #11aabd;
   font-size: 23px;
-}
-
-.cmo-delete-confirm__question-icon {
-  color: #11aabd;
-  font-size: 22px;
 }
 
 .cmo-delete-confirm__close {
@@ -411,7 +400,6 @@ onBeforeUnmount(() => {
   min-height: 72px;
   display: flex;
   align-items: center;
-  gap: 16px;
   padding: 18px 4px;
 }
 
@@ -457,28 +445,36 @@ onBeforeUnmount(() => {
   background: #fff;
 }
 
-:global(.cmo-delete-confirm-dialog .cmo-delete-confirm__cancel),
+.cmo-delete-confirm__cancel,
 :global(.cmo-delete-confirm-dialog .cmo-delete-confirm__accept) {
   width: auto !important;
   min-width: 88px !important;
   height: 30px !important;
   min-height: 30px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   padding: 0 12px !important;
   border-radius: 16px !important;
+  font-family: inherit !important;
   font-size: 12px !important;
   font-weight: 500 !important;
+  line-height: 1 !important;
+  cursor: pointer;
 }
 
-:global(.cmo-delete-confirm-dialog .cmo-delete-confirm__cancel),
-:global(.cmo-delete-confirm-dialog .cmo-delete-confirm__cancel:hover),
-:global(.cmo-delete-confirm-dialog .cmo-delete-confirm__cancel:focus),
-:global(.cmo-delete-confirm-dialog .cmo-delete-confirm__cancel:active) {
+.cmo-delete-confirm__cancel,
+.cmo-delete-confirm__cancel:hover,
+.cmo-delete-confirm__cancel:focus,
+.cmo-delete-confirm__cancel:active {
+  appearance: none;
   border: 1px solid #00acc1 !important;
   background: #fff !important;
   background-color: #fff !important;
   background-image: none !important;
   color: #0097a7 !important;
   box-shadow: none !important;
+  outline: none;
 }
 
 :global(.cmo-delete-confirm-dialog .cmo-delete-confirm__accept) {
