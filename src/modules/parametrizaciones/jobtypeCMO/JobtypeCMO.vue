@@ -23,7 +23,7 @@
             <span class="cmo-delete-confirm__icon-circle cmo-delete-confirm__icon-circle--header">
               <i class="pi pi-bell cmo-delete-confirm__header-icon" aria-hidden="true" />
             </span>
-            <span class="cmo-delete-confirm__title">Confirmar Accion</span>
+            <span class="cmo-delete-confirm__title">Confirmar Acción</span>
           </div>
 
           <button
