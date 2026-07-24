@@ -131,6 +131,7 @@
                 <span class="jobtype-filter-clear" @click="clearFilter(filterModel, filterCallback)">x</span>
               </div>
             </template>
+
             <template #body="{ data }">
               <span class="jobtype-cell-text" :title="String(data[column.field] ?? '')">
                 {{ data[column.field] ?? '' }}
@@ -365,6 +366,24 @@
         />
       </template>
     </Dialog>
+
+    <EditarCmoActividadDialog
+      v-if="isActividad"
+      v-model:visible="showEditActividad"
+      :actividad="editActividadForm.actividad"
+      :cmo-actual="editActividadForm.cmoActual"
+      @actualizar="actualizarCmoActividad"
+    />
+
+    <EditarJobtypeContratoDialog
+      v-else
+      v-model:visible="showEditContrato"
+      :jobtype="editContratoForm.jobtype"
+      :contrato-actual="editContratoForm.contratoActual"
+      :pais="editContratoForm.pais"
+      :origen-actual="editContratoForm.origenActual"
+      @actualizar="actualizarJobtypeContrato"
+    />
   </div>
 </template>
 
@@ -374,6 +393,8 @@ import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
 import { FilterMatchMode } from '@primevue/core/api'
+import EditarCmoActividadDialog from '../cmoActividad/EditarCmoActividadDialog.vue'
+import EditarJobtypeContratoDialog from '../jobtypeContrato/EditarJobtypeContratoDialog.vue'
 
 const props = defineProps({
   relation: {
@@ -393,6 +414,8 @@ const altaTitle = computed(() => isActividad.value ? 'Alta CMO - Actividad' : `A
 const filtersExpanded = ref(true)
 const resultsExpanded = ref(false)
 const showAlta = ref(false)
+const showEditActividad = ref(false)
+const showEditContrato = ref(false)
 const selectedRow = ref(null)
 const altaSelectedRow = ref(null)
 const mainFirst = ref(0)
@@ -402,6 +425,20 @@ const altaPageRows = ref(10)
 const mainRows = ref([])
 const altaRows = ref([])
 const altaValidationAttempted = ref(false)
+
+const editActividadForm = reactive({
+  id: '',
+  actividad: '',
+  cmoActual: ''
+})
+
+const editContratoForm = reactive({
+  id: '',
+  jobtype: '',
+  contratoActual: '',
+  pais: '',
+  origenActual: ''
+})
 
 const altaDialogStyle = 'width: calc(100vw - 48px) !important; max-width: 1440px !important; height: min(680px, calc(100dvh - 48px)) !important; max-height: calc(100dvh - 48px) !important; margin: 0 !important;'
 const activityFormStyle = 'grid-template-columns: minmax(280px, 1fr) minmax(280px, 1fr) 120px !important; max-width: 860px !important; align-items: end !important;'
@@ -470,6 +507,7 @@ const cmoInvalid = computed(() => altaValidationAttempted.value && !altaForm.cmo
 
 const origenOptions = computed(() => {
   if (altaForm.pais === 'PY') return [{ label: 'FAN', value: 'FAN' }]
+
   return [
     { label: '', value: '' },
     { label: 'FAN', value: 'FAN' },
@@ -482,6 +520,7 @@ watch(() => altaForm.pais, (pais) => {
     altaForm.origen = ''
     return
   }
+
   if (pais === 'PY') altaForm.origen = 'FAN'
 })
 
@@ -527,6 +566,20 @@ const resetAlta = () => {
   altaSelectedRow.value = null
   altaFirst.value = 0
   altaValidationAttempted.value = false
+}
+
+const resetEditActividad = () => {
+  editActividadForm.id = ''
+  editActividadForm.actividad = ''
+  editActividadForm.cmoActual = ''
+}
+
+const resetEditContrato = () => {
+  editContratoForm.id = ''
+  editContratoForm.jobtype = ''
+  editContratoForm.contratoActual = ''
+  editContratoForm.pais = ''
+  editContratoForm.origenActual = ''
 }
 
 const agregarPreview = () => {
@@ -583,6 +636,7 @@ const agregarPreview = () => {
 
 const eliminarPreview = () => {
   if (!altaSelectedRow.value) return
+
   altaRows.value = altaRows.value.filter((row) => row.id !== altaSelectedRow.value.id)
   altaSelectedRow.value = null
 }
@@ -604,24 +658,90 @@ const relacionar = () => {
 
 const eliminarSeleccionado = () => {
   if (!selectedRow.value) return
+
   mainRows.value = mainRows.value.filter((row) => row.id !== selectedRow.value.id)
   selectedRow.value = null
 }
 
 const editarSeleccionado = () => {
   if (!selectedRow.value) return
-  abrirAlta()
 
   if (isActividad.value) {
-    altaForm.actividad = selectedRow.value.descActividad || selectedRow.value.tarea || ''
-    altaForm.cmo = selectedRow.value.cmo || selectedRow.value.relacion || ''
+    editActividadForm.id = selectedRow.value.id
+    editActividadForm.actividad = selectedRow.value.descActividad || selectedRow.value.tarea || ''
+    editActividadForm.cmoActual = selectedRow.value.cmo || selectedRow.value.relacion || ''
+    showEditActividad.value = true
     return
   }
 
-  altaForm.pais = selectedRow.value.pais
-  altaForm.jobtype = selectedRow.value.tarea
-  altaForm.relacion = selectedRow.value.relacion
-  altaForm.origen = selectedRow.value.origen
+  editContratoForm.id = selectedRow.value.id
+  editContratoForm.jobtype = selectedRow.value.tarea || selectedRow.value.codigoTarea || ''
+  editContratoForm.contratoActual = selectedRow.value.relacion || ''
+  editContratoForm.pais = selectedRow.value.pais || ''
+  editContratoForm.origenActual = selectedRow.value.origen || ''
+  showEditContrato.value = true
+}
+
+const actualizarCmoActividad = (nuevoCmo) => {
+  const normalizedCmo = String(nuevoCmo ?? '').trim()
+  if (!editActividadForm.id || !normalizedCmo) return
+
+  const now = new Date().toLocaleString('es-AR')
+  let updatedRow = null
+
+  mainRows.value = mainRows.value.map((row) => {
+    if (row.id !== editActividadForm.id) return row
+
+    updatedRow = {
+      ...row,
+      cmo: normalizedCmo,
+      relacion: normalizedCmo,
+      usuarioModificacion: 'usuario',
+      fechaModificacion: now
+    }
+
+    return updatedRow
+  })
+
+  selectedRow.value = updatedRow
+  showEditActividad.value = false
+  resetEditActividad()
+}
+
+const actualizarJobtypeContrato = (cambios = {}) => {
+  const payload = typeof cambios === 'string'
+    ? { contrato: cambios, origen: editContratoForm.origenActual }
+    : cambios
+
+  const normalizedContrato = String(
+    payload.contrato ?? editContratoForm.contratoActual
+  ).trim()
+  const normalizedOrigen = String(
+    payload.origen ?? editContratoForm.origenActual
+  ).trim()
+
+  if (!editContratoForm.id || !normalizedContrato || !normalizedOrigen) return
+
+  const now = new Date().toLocaleString('es-AR')
+  let updatedRow = null
+
+  mainRows.value = mainRows.value.map((row) => {
+    if (row.id !== editContratoForm.id) return row
+
+    updatedRow = {
+      ...row,
+      relacion: normalizedContrato,
+      origen: normalizedOrigen,
+      usuarioModificacion: 'usuario',
+      fechaModificacion: now
+    }
+
+    return updatedRow
+  })
+
+  selectedRow.value = updatedRow
+  showEditContrato.value = false
+  resetEditContrato()
 }
 
 const onMainRowClick = ({ data }) => {
@@ -639,6 +759,7 @@ const clearFilter = (filterModel, filterCallback) => {
 
 const exportarCsv = () => {
   if (!mainRows.value.length) return
+
   const headers = mainColumns.value.map((column) => column.header)
   const lines = mainRows.value.map((row) =>
     mainColumns.value.map((column) => JSON.stringify(row[column.field] ?? '')).join(',')
@@ -647,6 +768,7 @@ const exportarCsv = () => {
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
   const url = URL.createObjectURL(blob)
   const anchor = document.createElement('a')
+
   anchor.href = url
   anchor.download = `jobtype-${relationSlug.value}.csv`
   anchor.click()
