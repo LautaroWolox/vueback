@@ -1,5 +1,8 @@
 <template>
-  <div class="fm-screen fm-screen--pad ot-fallidas-ct">
+  <div
+    class="fm-screen fm-screen--pad ot-fallidas-ct"
+    :class="{ 'ot-fallidas-ct--grid-expanded': gridExpanded }"
+  >
     <Accordion v-model:value="active" multiple class="fm-accordion">
       <AccordionPanel value="0">
         <AccordionHeader>FILTROS DE BÚSQUEDA</AccordionHeader>
@@ -19,12 +22,16 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import Table from './components/Table.vue'
 import Filtros from './components/Filtros.vue'
 import {useFallidasCtStore} from './store/CtFallidaStore'
 
 const active = ref(['0', '1'])
+const gridExpanded = computed(() => {
+  const values = (Array.isArray(active.value) ? active.value : [active.value]).map(String)
+  return !values.includes('0') && values.includes('1')
+})
 let exclusionLabelsObserver
 const store = useFallidasCtStore()
 
@@ -147,13 +154,22 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .ot-fallidas-ct {
-  min-height: calc(100vh - 82px);
+  width: 100%;
+  height: calc(100vh - 68px);
+  min-height: calc(100vh - 68px);
+  margin: -8px 0 0 !important;
+  padding: 0 6px 4px !important;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .ot-fallidas-ct :deep(.fm-accordion) {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
   display: flex !important;
   flex-direction: column !important;
-  gap: 10px !important;
+  gap: 4px !important;
 }
 
 .ot-fallidas-ct :deep(.p-accordionpanel) {
@@ -167,11 +183,29 @@ onBeforeUnmount(() => {
 .ot-fallidas-ct :deep(.p-accordionpanel:first-child) {
   position: relative !important;
   z-index: 20 !important;
+  flex: 0 0 auto;
 }
 
 .ot-fallidas-ct :deep(.p-accordionpanel:last-child) {
   position: relative !important;
   z-index: 10 !important;
+  min-height: 0;
+}
+
+.ot-fallidas-ct--grid-expanded :deep(.p-accordionpanel:last-child) {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.ot-fallidas-ct--grid-expanded :deep(.p-accordionpanel:last-child .p-accordioncontent),
+.ot-fallidas-ct--grid-expanded :deep(.p-accordionpanel:last-child .p-accordioncontent-content) {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
 }
 
 .ot-fallidas-ct :deep(.p-accordionheader) {
@@ -195,6 +229,35 @@ onBeforeUnmount(() => {
   border: 0 !important;
   background: #fff !important;
   overflow: visible !important;
+}
+
+:global(.ot-fallidas-ct--grid-expanded .otf-grid-shell) {
+  width: 100% !important;
+  height: calc(100vh - 135px) !important;
+  min-height: 0 !important;
+  max-height: calc(100vh - 135px) !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+:global(.ot-fallidas-ct--grid-expanded #tabla),
+:global(.ot-fallidas-ct--grid-expanded #tabla.p-datatable) {
+  height: 100% !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+:global(.ot-fallidas-ct--grid-expanded #tabla .p-datatable-table-container),
+:global(.ot-fallidas-ct--grid-expanded #tabla .p-datatable-wrapper),
+:global(.ot-fallidas-ct--grid-expanded #tabla [data-pc-section="tablecontainer"]) {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 1 1 auto !important;
+  overflow: auto !important;
 }
 
 .ot-fallidas-ct :deep(.otf-filters .fm-field label) {
