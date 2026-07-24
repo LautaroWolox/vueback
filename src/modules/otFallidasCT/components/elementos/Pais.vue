@@ -33,7 +33,10 @@ const paises = ref([
 ])
 
 const pais = computed({
-  get: () => paises.value.find((item) => item.valor === store.filters.pais) ?? null,
+  get: () => {
+    if (!store.filters.pais) return null
+    return paises.value.find((item) => item.valor === store.filters.pais) ?? null
+  },
   set: (value) => store.setFilter('pais', value?.valor ?? '')
 })
 </script>
