@@ -1,28 +1,16 @@
 <template>
   <iframe
-    ref="iframeRef"
     :src="iframeSrc"
     :title="titulo"
     width="100%"
     frameborder="0"
     allowfullscreen
-    class="legacy-iframe"
-    @load="onIframeLoad"
+    style="width: 100%; height: calc(100vh - 82px); min-height: 520px; display: block; border: 0;"
   />
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
-import { useLegacyIframeLayout } from '@/composables/useLegacyIframeLayout'
-import { useLegacyIframeViewport } from '@/composables/useLegacyIframeViewport'
-
-const iframeRef = ref(null)
-const { onIframeLoad: applyLegacyLayout } = useLegacyIframeLayout(iframeRef)
-const { onIframeLoad: applyLegacyViewport } = useLegacyIframeViewport(iframeRef)
-const onIframeLoad = () => {
-  applyLegacyLayout()
-  applyLegacyViewport()
-}
+import { computed } from 'vue'
 
 const iframeSrc = computed(() =>
   `${window.location.origin}/pc${sessionStorage.getItem('urlDetalle')}?nroActa=${sessionStorage.getItem('nroActa')}`
@@ -30,11 +18,3 @@ const iframeSrc = computed(() =>
 
 const titulo = `Detalle Acta - ${sessionStorage.getItem('nroActa') || ''}`
 </script>
-
-<style scoped>
-.legacy-iframe {
-  position: absolute;
-  height: 100%;
-  width: 100%;
-} 
-</style>
