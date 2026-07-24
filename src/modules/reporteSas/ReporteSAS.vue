@@ -3,38 +3,11 @@
     <Accordion value="0" class="fm-accordion report-sas-accordion">
       <AccordionPanel value="0">
         <AccordionHeader>REPORTE SAS</AccordionHeader>
+
         <AccordionContent>
           <div v-if="error" class="report-error">
-            <i class="pi pi-exclamation-triangle"></i>
+            <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
             <span>Error al cargar los datos del reporte SAS.</span>
-          </div>
-
-          <div class="report-sas-toolbar">
-            <div class="report-column-field fm-field">
-              <label for="report-sas-columns">Columnas visibles</label>
-              <MultiSelect
-                id="report-sas-columns"
-                v-model="selectedColumnFields"
-                :options="reporteSasColumns"
-                optionLabel="header"
-                optionValue="field"
-                dataKey="field"
-                filter
-                filterPlaceholder="Buscar columna"
-                placeholder="Seleccionar columnas"
-                :maxSelectedLabels="1"
-                selectedItemsLabel="{0} columnas seleccionadas"
-                class="report-column-selector"
-                appendTo="body"
-                @change="onColumnSelectionChange"
-              />
-            </div>
-
-            <FmButton
-              label="RESTABLECER"
-              class="report-reset-columns"
-              @click="resetColumns"
-            />
           </div>
 
           <FmGridShell
@@ -87,6 +60,8 @@
                   :rows="rows"
                   :total-records="totalRecords"
                   :rows-options="rowsOptions"
+                  :show-counter="true"
+                  :counter-text="totalRecords === 0 ? 'No hay resultados' : ''"
                   @first-page="firstPageCallback"
                   @prev-page="prevPageCallback"
                   @next-page="nextPageCallback"
@@ -111,7 +86,7 @@
               </template>
 
               <Column
-                v-for="column in visibleColumns"
+                v-for="column in dynamicColumns"
                 :key="column.field"
                 :field="column.field"
                 :header="column.header"
@@ -161,6 +136,7 @@
                         v-if="isExpandable(row[column.field])"
                         class="pi"
                         :class="isExpanded(index, column.field) ? 'pi-chevron-up' : 'pi-chevron-down'"
+                        aria-hidden="true"
                       ></i>
                     </button>
                   </div>
@@ -179,11 +155,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useFetch } from '@vueuse/core'
 import { FilterMatchMode } from '@primevue/core/api'
 import InputText from 'primevue/inputtext'
-import MultiSelect from 'primevue/multiselect'
 import type { IDataReportSass } from './interfaces/index'
 import { reporteSasColumns } from './columns/reporteSas'
 import { useExcelExport } from '../../composables/useExportExcel'
@@ -196,17 +171,32 @@ interface ColumnFilterModel {
   value: string | null
 }
 
-type ReportColumn = (typeof reporteSasColumns)[number]
+interface ReportColumn {
+  field: string
+  header: string
+  filter?: boolean
+  exportable?: boolean
+}
+
+type ReportRow = IDataReportSass & Record<string, unknown>
+type FilterMap = Record<string, { value: string | null; matchMode: string }>
 
 const rowsOptions = [10, 20, 50, 100, 200]
 const first = ref(0)
 const pageRows = ref(10)
 const dt = ref()
-const selectedColumnFields = ref<string[]>(reporteSasColumns.map((column) => column.field))
 const expandedCells = ref<ExpandedState>({})
+const filters = ref<FilterMap>({})
 const { exportToExcel, parseDataFromTable } = useExcelExport()
 
-const columnWidths: Record<string, number> = {
+const configuredColumns: ReportColumn[] = reporteSasColumns.map((column) => ({
+  field: column.field,
+  header: column.header,
+  filter: column.filter,
+  exportable: 'exportable' in column ? column.exportable : true
+}))
+
+const configuredColumnWidths: Record<string, number> = {
   nroOT: 125,
   estadoOT: 110,
   gestionada: 105,
@@ -228,41 +218,15 @@ const columnWidths: Record<string, number> = {
   fechaNotificacionSAP: 175
 }
 
-const visibleColumns = computed<ReportColumn[]>(() => {
-  const selectedFields = new Set(selectedColumnFields.value)
-  return reporteSasColumns.filter((column) => selectedFields.has(column.field))
-})
-
-const gridTableStyle = computed(() => {
-  const selectedWidth = visibleColumns.value.reduce(
-    (total, column) => total + (columnWidths[column.field] ?? 130),
-    0
-  )
-
-  return {
-    width: '100%',
-    minWidth: `${Math.max(selectedWidth, 900)}px`,
-    tableLayout: 'fixed'
-  }
-})
-
-const filters = ref(
-  Object.fromEntries(
-    reporteSasColumns.map((column) => [
-      column.field,
-      { value: null, matchMode: FilterMatchMode.CONTAINS }
-    ])
-  )
-)
-
 const { data, isFetching, error } = useFetch(
   '/pc/extraccionDatosGM/searchMatDescargados.html',
   { immediate: true }
-).json<IDataReportSass[]>()
+).json<ReportRow[]>()
 
-const processedData = computed<IDataReportSass[]>(() =>
+const processedData = computed<ReportRow[]>(() =>
   (data.value ?? []).map((item) => {
-    const processedItem = { ...item }
+    const processedItem: ReportRow = { ...item }
+
     if (processedItem.legajoNOLDAP && typeof processedItem.legajoNOLDAP === 'string') {
       processedItem.legajoNOLDAP = processedItem.legajoNOLDAP
         .split(',')
@@ -270,29 +234,111 @@ const processedData = computed<IDataReportSass[]>(() =>
         .filter(Boolean)
         .join(',')
     }
+
     return processedItem
   })
 )
 
-const onColumnSelectionChange = (event: { value: string[] }) => {
-  if (!event.value.length) {
-    selectedColumnFields.value = [reporteSasColumns[0].field]
-  }
+const returnedFields = computed<string[]>(() => {
+  const fields: string[] = []
+  const seen = new Set<string>()
 
-  const visibleFields = new Set(selectedColumnFields.value)
-  reporteSasColumns.forEach((column) => {
-    if (!visibleFields.has(column.field) && filters.value[column.field]) {
-      filters.value[column.field].value = null
-    }
+  processedData.value.forEach((row) => {
+    Object.keys(row).forEach((field) => {
+      if (!seen.has(field)) {
+        seen.add(field)
+        fields.push(field)
+      }
+    })
   })
 
-  first.value = 0
+  return fields
+})
+
+const formatColumnHeader = (field: string) => {
+  const acronyms = new Set(['id', 'ot', 'sap', 'noldap'])
+
+  return field
+    .replace(/_/g, ' ')
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .trim()
+    .split(/\s+/)
+    .map((word) => {
+      const normalized = word.toLowerCase()
+      if (acronyms.has(normalized)) return normalized.toUpperCase()
+      return normalized.charAt(0).toUpperCase() + normalized.slice(1)
+    })
+    .join(' ')
 }
 
-const resetColumns = () => {
-  selectedColumnFields.value = reporteSasColumns.map((column) => column.field)
-  first.value = 0
+const dynamicColumns = computed<ReportColumn[]>(() => {
+  if (!returnedFields.value.length) return configuredColumns
+
+  const returnedFieldSet = new Set(returnedFields.value)
+  const configuredFieldSet = new Set(configuredColumns.map((column) => column.field))
+
+  const knownColumns = configuredColumns.filter((column) => returnedFieldSet.has(column.field))
+  const additionalColumns = returnedFields.value
+    .filter((field) => !configuredFieldSet.has(field))
+    .map((field) => ({
+      field,
+      header: formatColumnHeader(field),
+      filter: true,
+      exportable: true
+    }))
+
+  return [...knownColumns, ...additionalColumns]
+})
+
+const calculateColumnWidth = (column: ReportColumn) => {
+  const configuredWidth = configuredColumnWidths[column.field] ?? 110
+  const sampleLengths = processedData.value
+    .slice(0, 100)
+    .map((row) => String(row[column.field] ?? '').length)
+
+  const longestContent = Math.max(column.header.length, ...sampleLengths, 0)
+  const estimatedWidth = longestContent * 7 + 44
+
+  return Math.min(320, Math.max(configuredWidth, estimatedWidth))
 }
+
+const dynamicColumnWidths = computed<Record<string, number>>(() =>
+  Object.fromEntries(
+    dynamicColumns.value.map((column) => [column.field, calculateColumnWidth(column)])
+  )
+)
+
+const gridTableStyle = computed(() => {
+  const totalWidth = dynamicColumns.value.reduce(
+    (total, column) => total + (dynamicColumnWidths.value[column.field] ?? 130),
+    0
+  )
+
+  return {
+    width: totalWidth > 900 ? `${totalWidth}px` : '100%',
+    minWidth: `${Math.max(totalWidth, 900)}px`,
+    tableLayout: 'fixed'
+  }
+})
+
+watch(
+  dynamicColumns,
+  (columns) => {
+    const currentFilters = filters.value
+    const nextFilters: FilterMap = {}
+
+    columns.forEach((column) => {
+      nextFilters[column.field] = currentFilters[column.field] ?? {
+        value: null,
+        matchMode: FilterMatchMode.CONTAINS
+      }
+    })
+
+    filters.value = nextFilters
+    first.value = 0
+  },
+  { immediate: true }
+)
 
 const clearColumnFilter = (
   filterModel: ColumnFilterModel,
@@ -304,10 +350,11 @@ const clearColumnFilter = (
 
 const exportarExcel = () => {
   const { rows, fields } = parseDataFromTable(dt)
+
   exportToExcel({
     rows,
     fields,
-    columns: visibleColumns.value,
+    columns: dynamicColumns.value,
     filename: 'reporteSAS.xlsx',
     columnTypes: {},
     groupField: 'codTarea'
@@ -315,16 +362,18 @@ const exportarExcel = () => {
 }
 
 const getColumnStyle = (field: string) => {
-  const width = columnWidths[field] ?? 130
+  const width = dynamicColumnWidths.value[field] ?? 130
+
   return {
     width: `${width}px`,
-    minWidth: `${width}px`,
-    maxWidth: `${width}px`
+    minWidth: `${width}px`
   }
 }
 
 const getExpandKey = (rowIndex: number, fieldName: string) => `${rowIndex}_${fieldName}`
-const isExpanded = (rowIndex: number, fieldName: string) => Boolean(expandedCells.value[getExpandKey(rowIndex, fieldName)])
+const isExpanded = (rowIndex: number, fieldName: string) => Boolean(
+  expandedCells.value[getExpandKey(rowIndex, fieldName)]
+)
 const toggleExpand = (rowIndex: number, fieldName: string) => {
   const key = getExpandKey(rowIndex, fieldName)
   expandedCells.value[key] = !expandedCells.value[key]
@@ -334,7 +383,10 @@ const getLegajosArray = (value: unknown): string[] => {
   if (!value) return []
   if (Array.isArray(value)) return value.map(String)
   if (typeof value === 'string') {
-    return value.split(',').map((item) => item.trim()).filter(Boolean)
+    return value
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean)
   }
   return [String(value)]
 }
@@ -373,44 +425,7 @@ const getPreview = (value: unknown) => {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
   overflow: hidden;
-}
-
-.report-sas-toolbar {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: end;
-  justify-content: flex-end;
-  gap: 8px;
-  padding: 0 0 4px;
-}
-
-.report-column-field {
-  width: min(360px, 100%);
-}
-
-.report-column-selector {
-  width: 100%;
-  height: 30px;
-  min-height: 30px;
-}
-
-.report-column-selector :deep(.p-multiselect-label) {
-  display: flex;
-  align-items: center;
-  min-height: 28px;
-  padding: 0 8px;
-  font-size: 11px;
-}
-
-.report-reset-columns,
-.report-reset-columns.p-button {
-  height: 30px !important;
-  min-height: 30px !important;
-  padding: 0 12px !important;
-  border-radius: 2px !important;
-  font-size: 11px !important;
 }
 
 .report-sas-grid-shell {
@@ -479,7 +494,7 @@ const getPreview = (value: unknown) => {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 0;
+  margin: 0 0 8px;
   padding: 9px 12px;
   border: 1px solid #efd2d6;
   background: #fff6f7;
@@ -521,15 +536,9 @@ const getPreview = (value: unknown) => {
 }
 
 @media (max-width: 700px) {
-  .report-sas-toolbar {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .report-column-field,
-  .report-reset-columns,
-  .report-reset-columns.p-button {
-    width: 100% !important;
+  .report-sas-page {
+    height: calc(100dvh - 64px);
+    min-height: 420px;
   }
 }
 </style>
