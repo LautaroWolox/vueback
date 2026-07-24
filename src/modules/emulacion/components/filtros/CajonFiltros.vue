@@ -4,10 +4,6 @@
       <Legajo />
     </div>
 
-    <p class="emulation-filter-help">
-      Ingrese el legajo del operador que desea emular.
-    </p>
-
     <div class="fm-actions fm-filter-actions emulation-filter-actions">
       <FmButton
         label="BUSCAR"
@@ -58,7 +54,7 @@ const onSearch = async () => {
 
 <style scoped>
 .emulation-filters {
-  padding: 18px 20px 14px;
+  padding: 14px 20px 8px;
 }
 
 .emulation-filter-grid {
@@ -71,17 +67,9 @@ const onSearch = async () => {
   grid-column: auto;
 }
 
-.emulation-filter-help {
-  width: min(100%, 520px);
-  margin: 8px auto 0;
-  color: #607887;
-  font-size: 12px;
-  text-align: left;
-}
-
 .emulation-filter-actions {
   justify-content: center;
-  margin-top: 14px;
-  padding-bottom: 0;
+  margin-top: 10px;
+  padding: 0;
 }
 </style>
