@@ -54,7 +54,7 @@ const onSearch = async () => {
 
 <style scoped>
 .emulation-filters {
-  padding: 14px 20px 8px;
+  padding: 9px 16px 4px;
 }
 
 .emulation-filter-grid {
@@ -69,7 +69,7 @@ const onSearch = async () => {
 
 .emulation-filter-actions {
   justify-content: center;
-  margin-top: 10px;
+  margin-top: 6px;
   padding: 0;
 }
 </style>
