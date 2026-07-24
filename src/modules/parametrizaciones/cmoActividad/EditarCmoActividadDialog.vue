@@ -42,13 +42,18 @@
           disabled
           class="cmo-edit-control cmo-edit-control--readonly"
         />
-        <InputText
-          id="cmo-edit-nuevo"
-          v-model="nuevoCmo"
-          class="cmo-edit-control"
-          aria-label="Nuevo CMO"
-          @keyup.enter="actualizar"
-        />
+
+        <div class="cmo-edit-float-field">
+          <InputText
+            id="cmo-edit-nuevo"
+            v-model="nuevoCmo"
+            class="cmo-edit-control cmo-edit-control--new"
+            placeholder=" "
+            aria-label="Nuevo CMO"
+            @keyup.enter="actualizar"
+          />
+          <label for="cmo-edit-nuevo">Nuevo CMO</label>
+        </div>
       </div>
     </div>
 
@@ -76,7 +81,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:visible', 'actualizar'])
 const nuevoCmo = ref('')
-const dialogStyle = 'width: min(640px, calc(100vw - 32px)); max-width: 640px;'
+const dialogStyle = 'width: min(520px, calc(100vw - 32px)); max-width: 520px;'
 
 const puedeActualizar = computed(() => {
   const value = nuevoCmo.value.trim()
@@ -111,13 +116,13 @@ const actualizar = () => {
 .cmo-edit-header h2 {
   margin: 0;
   color: #263746;
-  font-size: 21px;
+  font-size: 20px;
   font-weight: 400;
 }
 
 .cmo-edit-close {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -125,7 +130,7 @@ const actualizar = () => {
   border: 0;
   background: transparent;
   color: #9aa4aa;
-  font-size: 26px;
+  font-size: 24px;
   line-height: 1;
   cursor: pointer;
 }
@@ -135,84 +140,113 @@ const actualizar = () => {
 }
 
 .cmo-edit-content {
-  min-height: 210px;
+  min-height: 150px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: start;
-  gap: 42px;
-  padding: 28px 14px 34px;
+  gap: 28px;
+  padding: 22px 8px 24px;
 }
 
 .cmo-edit-field {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .cmo-edit-field label {
   color: #202020;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
 }
 
 .cmo-edit-field--cmo {
-  gap: 14px;
-}
-
-.cmo-edit-field--cmo label {
-  margin-bottom: -4px;
+  gap: 12px;
 }
 
 .cmo-edit-control {
   width: 100%;
-  height: 42px;
+  height: 38px;
   box-sizing: border-box;
 }
 
 .cmo-edit-control--readonly:disabled {
   border-color: #d6dcdf;
-  background: #f6f7f7;
+  background: #f1f4f5;
   color: #8d969b;
   opacity: 1;
 }
 
+.cmo-edit-float-field {
+  position: relative;
+  margin-top: 2px;
+}
+
+.cmo-edit-float-field label {
+  position: absolute;
+  top: 50%;
+  left: 11px;
+  padding: 0 4px;
+  background: #fff;
+  color: #74848e;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1;
+  pointer-events: none;
+  transform: translateY(-50%);
+  transition: top .16s ease, color .16s ease, font-size .16s ease;
+}
+
+.cmo-edit-control--new:focus + label,
+.cmo-edit-control--new:not(:placeholder-shown) + label {
+  top: 0;
+  color: #008fa1;
+  font-size: 10px;
+}
+
+.cmo-edit-control--new:focus {
+  border-color: #00a9bd;
+  box-shadow: 0 0 0 2px rgba(0, 169, 189, .14);
+  outline: none;
+}
+
 :global(.p-dialog.cmo-edit-dialog) {
   overflow: hidden;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 :global(.cmo-edit-dialog .p-dialog-header) {
-  padding: 22px 28px;
+  padding: 16px 20px;
   border-bottom: 1px solid #d9dfe2;
 }
 
 :global(.cmo-edit-dialog .p-dialog-content) {
-  padding: 0 18px;
+  padding: 0 16px;
 }
 
 :global(.cmo-edit-dialog .p-dialog-footer) {
   display: flex;
   justify-content: flex-end;
-  padding: 16px 28px 22px;
+  padding: 12px 20px 16px;
   border-top: 1px solid #d9dfe2;
 }
 
 :global(.cmo-edit-dialog .cmo-edit-update) {
-  width: 150px !important;
-  min-width: 150px !important;
-  max-width: 150px !important;
+  width: 140px !important;
+  min-width: 140px !important;
+  max-width: 140px !important;
   height: 36px !important;
   min-height: 36px !important;
   max-height: 36px !important;
-  border-radius: 18px !important;
+  border-radius: 6px !important;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 560px) {
   .cmo-edit-content {
     grid-template-columns: 1fr;
-    gap: 24px;
-    padding: 22px 4px 28px;
+    gap: 20px;
+    padding: 18px 2px 22px;
   }
 
   :global(.cmo-edit-dialog .cmo-edit-update) {
