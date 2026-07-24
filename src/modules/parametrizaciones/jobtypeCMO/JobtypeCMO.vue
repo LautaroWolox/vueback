@@ -1,16 +1,71 @@
 <template>
-  <div ref="screenRoot" class="cmo-actividad-screen">
+  <div
+    ref="screenRoot"
+    class="cmo-actividad-screen"
+    @click.capture="interceptDeleteClick"
+  >
     <JobtypeRelacion relation="cmo" />
+
+    <Dialog
+      v-model:visible="showDeleteConfirm"
+      appendTo="body"
+      modal
+      :closable="false"
+      :draggable="true"
+      :resizable="false"
+      class="cmo-delete-confirm-dialog"
+      :style="deleteConfirmDialogStyle"
+      @hide="cancelDelete"
+    >
+      <template #header>
+        <div class="cmo-delete-confirm__header">
+          <span>Alerta</span>
+          <button
+            type="button"
+            class="cmo-delete-confirm__close"
+            title="Cerrar"
+            aria-label="Cerrar"
+            @click="cancelDelete"
+          >×</button>
+        </div>
+      </template>
+
+      <div class="cmo-delete-confirm__content">
+        <i class="pi pi-exclamation-triangle cmo-delete-confirm__icon" aria-hidden="true" />
+        <span>¿Confirma que desea desactivar la relación seleccionada?</span>
+      </div>
+
+      <template #footer>
+        <div class="cmo-delete-confirm__actions">
+          <FmButton
+            label="CANCELAR"
+            class="cmo-delete-confirm__cancel"
+            @click="cancelDelete"
+          />
+          <FmButton
+            label="ACEPTAR"
+            class="cmo-delete-confirm__accept"
+            @click="acceptDelete"
+          />
+        </div>
+      </template>
+    </Dialog>
   </div>
 </template>
 
 <script setup>
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import Dialog from 'primevue/dialog'
 import JobtypeRelacion from '../jobtypeRelacion/JobtypeRelacion.vue'
 
 const screenRoot = ref(null)
+const showDeleteConfirm = ref(false)
+const deleteConfirmDialogStyle = 'width: min(540px, calc(100vw - 32px)); max-width: 540px;'
+
 let dialogObserver = null
 let dialogRefreshFrame = null
+let pendingDeleteButton = null
+let allowDeleteOnce = false
 
 const openResultsAccordion = async () => {
   await nextTick()
@@ -69,6 +124,47 @@ const scheduleDialogCustomization = () => {
   })
 }
 
+const interceptDeleteClick = (event) => {
+  const target = event.target instanceof Element ? event.target : null
+  const button = target?.closest('button')
+
+  if (!button || button.disabled || !button.querySelector('.pi-trash')) return
+  if (button.closest('.jobtype-alta-dialog')) return
+
+  if (allowDeleteOnce) {
+    allowDeleteOnce = false
+    return
+  }
+
+  event.preventDefault()
+  event.stopPropagation()
+  event.stopImmediatePropagation()
+
+  pendingDeleteButton = button
+  showDeleteConfirm.value = true
+}
+
+const cancelDelete = () => {
+  showDeleteConfirm.value = false
+  pendingDeleteButton = null
+  allowDeleteOnce = false
+}
+
+const acceptDelete = () => {
+  const button = pendingDeleteButton
+
+  showDeleteConfirm.value = false
+  pendingDeleteButton = null
+
+  if (!button?.isConnected) {
+    allowDeleteOnce = false
+    return
+  }
+
+  allowDeleteOnce = true
+  button.click()
+}
+
 onMounted(async () => {
   await openResultsAccordion()
   scheduleDialogCustomization()
@@ -97,6 +193,7 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   dialogObserver?.disconnect()
+  pendingDeleteButton = null
 
   if (dialogRefreshFrame !== null) {
     cancelAnimationFrame(dialogRefreshFrame)
@@ -227,5 +324,114 @@ onBeforeUnmount(() => {
 .cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(7) .p-column-title)::after {
   content: 'ACTIVO';
   font-size: 11px;
+}
+
+.cmo-delete-confirm__header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: #404040;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.cmo-delete-confirm__close {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #c7c7c7;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.cmo-delete-confirm__close:hover {
+  color: #00a9bd;
+}
+
+.cmo-delete-confirm__content {
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 4px;
+  color: #202020;
+  font-size: 13px;
+}
+
+.cmo-delete-confirm__icon {
+  flex: 0 0 auto;
+  color: #f0ad4e;
+  font-size: 24px;
+}
+
+.cmo-delete-confirm__actions {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+:global(.p-dialog.cmo-delete-confirm-dialog) {
+  overflow: hidden;
+  border: 1px solid #bdbdbd;
+  border-radius: 0;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .28);
+}
+
+:global(.cmo-delete-confirm-dialog .p-dialog-header) {
+  min-height: 48px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #dedede;
+  background: #fff;
+}
+
+:global(.cmo-delete-confirm-dialog .p-dialog-content) {
+  padding: 0 14px;
+  background: #fff;
+}
+
+:global(.cmo-delete-confirm-dialog .p-dialog-footer) {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  border-top: 1px solid #dedede;
+  background: #fff;
+}
+
+:global(.cmo-delete-confirm-dialog .cmo-delete-confirm__cancel),
+:global(.cmo-delete-confirm-dialog .cmo-delete-confirm__accept) {
+  width: auto !important;
+  min-width: 88px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 12px !important;
+  border-radius: 16px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+}
+
+:global(.cmo-delete-confirm-dialog .cmo-delete-confirm__cancel) {
+  border: 1px solid #00acc1 !important;
+  background: #fff !important;
+  color: #0097a7 !important;
+  box-shadow: none !important;
+}
+
+:global(.cmo-delete-confirm-dialog .cmo-delete-confirm__accept) {
+  border: 1px solid #00acc1 !important;
+  background: #00acc1 !important;
+  color: #fff !important;
+  box-shadow: none !important;
 }
 </style>
