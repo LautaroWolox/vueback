@@ -5,10 +5,11 @@
 </template>
 
 <script setup>
-import { nextTick, onMounted, ref } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import JobtypeRelacion from '../jobtypeRelacion/JobtypeRelacion.vue'
 
 const screenRoot = ref(null)
+let dialogObserver = null
 
 const openResultsAccordion = async () => {
   await nextTick()
@@ -22,7 +23,35 @@ const openResultsAccordion = async () => {
   }
 }
 
-onMounted(openResultsAccordion)
+const customizeActivityDialog = () => {
+  const dialog = document.querySelector('.p-dialog.jobtype-alta-dialog')
+  if (!dialog) return
+
+  dialog.style.setProperty('width', 'min(980px, calc(100vw - 48px))', 'important')
+  dialog.style.setProperty('max-width', '980px', 'important')
+  dialog.style.setProperty('height', 'min(560px, calc(100dvh - 48px))', 'important')
+  dialog.style.setProperty('max-height', 'calc(100dvh - 48px)', 'important')
+
+  dialog.querySelectorAll('.jobtype-add-button, .jobtype-relate-button').forEach((button) => {
+    button.style.setProperty('height', '32px', 'important')
+    button.style.setProperty('min-height', '32px', 'important')
+    button.style.setProperty('max-height', '32px', 'important')
+    button.style.setProperty('border-radius', '4px', 'important')
+    button.style.setProperty('padding', '0 14px', 'important')
+  })
+}
+
+onMounted(async () => {
+  await openResultsAccordion()
+  customizeActivityDialog()
+
+  dialogObserver = new MutationObserver(customizeActivityDialog)
+  dialogObserver.observe(document.body, { childList: true, subtree: true })
+})
+
+onBeforeUnmount(() => {
+  dialogObserver?.disconnect()
+})
 </script>
 
 <style scoped>
