@@ -131,6 +131,7 @@
                 <span class="jobtype-filter-clear" @click="clearFilter(filterModel, filterCallback)">x</span>
               </div>
             </template>
+
             <template #body="{ data }">
               <span class="jobtype-cell-text" :title="String(data[column.field] ?? '')">
                 {{ data[column.field] ?? '' }}
@@ -379,6 +380,8 @@
       v-model:visible="showEditContrato"
       :jobtype="editContratoForm.jobtype"
       :contrato-actual="editContratoForm.contratoActual"
+      :pais="editContratoForm.pais"
+      :origen-actual="editContratoForm.origenActual"
       @actualizar="actualizarJobtypeContrato"
     />
   </div>
@@ -432,7 +435,9 @@ const editActividadForm = reactive({
 const editContratoForm = reactive({
   id: '',
   jobtype: '',
-  contratoActual: ''
+  contratoActual: '',
+  pais: '',
+  origenActual: ''
 })
 
 const altaDialogStyle = 'width: calc(100vw - 48px) !important; max-width: 1440px !important; height: min(680px, calc(100dvh - 48px)) !important; max-height: calc(100dvh - 48px) !important; margin: 0 !important;'
@@ -502,6 +507,7 @@ const cmoInvalid = computed(() => altaValidationAttempted.value && !altaForm.cmo
 
 const origenOptions = computed(() => {
   if (altaForm.pais === 'PY') return [{ label: 'FAN', value: 'FAN' }]
+
   return [
     { label: '', value: '' },
     { label: 'FAN', value: 'FAN' },
@@ -514,6 +520,7 @@ watch(() => altaForm.pais, (pais) => {
     altaForm.origen = ''
     return
   }
+
   if (pais === 'PY') altaForm.origen = 'FAN'
 })
 
@@ -571,6 +578,8 @@ const resetEditContrato = () => {
   editContratoForm.id = ''
   editContratoForm.jobtype = ''
   editContratoForm.contratoActual = ''
+  editContratoForm.pais = ''
+  editContratoForm.origenActual = ''
 }
 
 const agregarPreview = () => {
@@ -627,6 +636,7 @@ const agregarPreview = () => {
 
 const eliminarPreview = () => {
   if (!altaSelectedRow.value) return
+
   altaRows.value = altaRows.value.filter((row) => row.id !== altaSelectedRow.value.id)
   altaSelectedRow.value = null
 }
@@ -648,6 +658,7 @@ const relacionar = () => {
 
 const eliminarSeleccionado = () => {
   if (!selectedRow.value) return
+
   mainRows.value = mainRows.value.filter((row) => row.id !== selectedRow.value.id)
   selectedRow.value = null
 }
@@ -666,6 +677,8 @@ const editarSeleccionado = () => {
   editContratoForm.id = selectedRow.value.id
   editContratoForm.jobtype = selectedRow.value.tarea || selectedRow.value.codigoTarea || ''
   editContratoForm.contratoActual = selectedRow.value.relacion || ''
+  editContratoForm.pais = selectedRow.value.pais || ''
+  editContratoForm.origenActual = selectedRow.value.origen || ''
   showEditContrato.value = true
 }
 
@@ -695,9 +708,19 @@ const actualizarCmoActividad = (nuevoCmo) => {
   resetEditActividad()
 }
 
-const actualizarJobtypeContrato = (nuevoContrato) => {
-  const normalizedContrato = String(nuevoContrato ?? '').trim()
-  if (!editContratoForm.id || !normalizedContrato) return
+const actualizarJobtypeContrato = (cambios = {}) => {
+  const payload = typeof cambios === 'string'
+    ? { contrato: cambios, origen: editContratoForm.origenActual }
+    : cambios
+
+  const normalizedContrato = String(
+    payload.contrato ?? editContratoForm.contratoActual
+  ).trim()
+  const normalizedOrigen = String(
+    payload.origen ?? editContratoForm.origenActual
+  ).trim()
+
+  if (!editContratoForm.id || !normalizedContrato || !normalizedOrigen) return
 
   const now = new Date().toLocaleString('es-AR')
   let updatedRow = null
@@ -708,6 +731,7 @@ const actualizarJobtypeContrato = (nuevoContrato) => {
     updatedRow = {
       ...row,
       relacion: normalizedContrato,
+      origen: normalizedOrigen,
       usuarioModificacion: 'usuario',
       fechaModificacion: now
     }
@@ -735,6 +759,7 @@ const clearFilter = (filterModel, filterCallback) => {
 
 const exportarCsv = () => {
   if (!mainRows.value.length) return
+
   const headers = mainColumns.value.map((column) => column.header)
   const lines = mainRows.value.map((row) =>
     mainColumns.value.map((column) => JSON.stringify(row[column.field] ?? '')).join(',')
@@ -743,6 +768,7 @@ const exportarCsv = () => {
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
   const url = URL.createObjectURL(blob)
   const anchor = document.createElement('a')
+
   anchor.href = url
   anchor.download = `jobtype-${relationSlug.value}.csv`
   anchor.click()
