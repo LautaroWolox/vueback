@@ -365,6 +365,14 @@
         />
       </template>
     </Dialog>
+
+    <EditarCmoActividadDialog
+      v-if="isActividad"
+      v-model:visible="showEditActividad"
+      :actividad="editActividadForm.actividad"
+      :cmo-actual="editActividadForm.cmoActual"
+      @actualizar="actualizarCmoActividad"
+    />
   </div>
 </template>
 
@@ -374,6 +382,7 @@ import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
 import { FilterMatchMode } from '@primevue/core/api'
+import EditarCmoActividadDialog from '../cmoActividad/EditarCmoActividadDialog.vue'
 
 const props = defineProps({
   relation: {
@@ -393,6 +402,7 @@ const altaTitle = computed(() => isActividad.value ? 'Alta CMO - Actividad' : `A
 const filtersExpanded = ref(true)
 const resultsExpanded = ref(false)
 const showAlta = ref(false)
+const showEditActividad = ref(false)
 const selectedRow = ref(null)
 const altaSelectedRow = ref(null)
 const mainFirst = ref(0)
@@ -402,6 +412,12 @@ const altaPageRows = ref(10)
 const mainRows = ref([])
 const altaRows = ref([])
 const altaValidationAttempted = ref(false)
+
+const editActividadForm = reactive({
+  id: '',
+  actividad: '',
+  cmoActual: ''
+})
 
 const altaDialogStyle = 'width: calc(100vw - 48px) !important; max-width: 1440px !important; height: min(680px, calc(100dvh - 48px)) !important; max-height: calc(100dvh - 48px) !important; margin: 0 !important;'
 const activityFormStyle = 'grid-template-columns: minmax(280px, 1fr) minmax(280px, 1fr) 120px !important; max-width: 860px !important; align-items: end !important;'
@@ -529,6 +545,12 @@ const resetAlta = () => {
   altaValidationAttempted.value = false
 }
 
+const resetEditActividad = () => {
+  editActividadForm.id = ''
+  editActividadForm.actividad = ''
+  editActividadForm.cmoActual = ''
+}
+
 const agregarPreview = () => {
   altaValidationAttempted.value = true
 
@@ -610,18 +632,46 @@ const eliminarSeleccionado = () => {
 
 const editarSeleccionado = () => {
   if (!selectedRow.value) return
-  abrirAlta()
 
   if (isActividad.value) {
-    altaForm.actividad = selectedRow.value.descActividad || selectedRow.value.tarea || ''
-    altaForm.cmo = selectedRow.value.cmo || selectedRow.value.relacion || ''
+    editActividadForm.id = selectedRow.value.id
+    editActividadForm.actividad = selectedRow.value.descActividad || selectedRow.value.tarea || ''
+    editActividadForm.cmoActual = selectedRow.value.cmo || selectedRow.value.relacion || ''
+    showEditActividad.value = true
     return
   }
 
+  abrirAlta()
   altaForm.pais = selectedRow.value.pais
   altaForm.jobtype = selectedRow.value.tarea
   altaForm.relacion = selectedRow.value.relacion
   altaForm.origen = selectedRow.value.origen
+}
+
+const actualizarCmoActividad = (nuevoCmo) => {
+  const normalizedCmo = String(nuevoCmo ?? '').trim()
+  if (!editActividadForm.id || !normalizedCmo) return
+
+  const now = new Date().toLocaleString('es-AR')
+  let updatedRow = null
+
+  mainRows.value = mainRows.value.map((row) => {
+    if (row.id !== editActividadForm.id) return row
+
+    updatedRow = {
+      ...row,
+      cmo: normalizedCmo,
+      relacion: normalizedCmo,
+      usuarioModificacion: 'usuario',
+      fechaModificacion: now
+    }
+
+    return updatedRow
+  })
+
+  selectedRow.value = updatedRow
+  showEditActividad.value = false
+  resetEditActividad()
 }
 
 const onMainRowClick = ({ data }) => {
