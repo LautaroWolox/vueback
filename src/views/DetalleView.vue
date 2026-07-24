@@ -14,9 +14,15 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useLegacyIframeLayout } from '@/composables/useLegacyIframeLayout'
+import { useLegacyIframeViewport } from '@/composables/useLegacyIframeViewport'
 
 const iframeRef = ref(null)
-const { onIframeLoad } = useLegacyIframeLayout(iframeRef)
+const { onIframeLoad: applyLegacyLayout } = useLegacyIframeLayout(iframeRef)
+const { onIframeLoad: applyLegacyViewport } = useLegacyIframeViewport(iframeRef)
+const onIframeLoad = () => {
+  applyLegacyLayout()
+  applyLegacyViewport()
+}
 
 const iframeSrc = computed(() =>
   `${window.location.origin}/pc${sessionStorage.getItem('urlDetalle')}?nroActa=${sessionStorage.getItem('nroActa')}`
