@@ -8,7 +8,7 @@
     />
 
     <Accordion v-model:value="active" multiple class="fm-accordion emulation-accordion">
-      <AccordionPanel value="0">
+      <AccordionPanel value="0" class="emulation-filter-panel">
         <AccordionHeader>
           <span class="emulation-accordion__title">FILTROS DE BÚSQUEDA</span>
         </AccordionHeader>
@@ -61,6 +61,21 @@ watch(() => store.activeTab, (newValue) => {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.emulation-filter-panel {
+  position: relative;
+  z-index: 1;
+  border-radius: 4px;
+  box-shadow: 0 6px 16px rgba(32, 57, 71, .2);
+}
+
+.emulation-filter-panel :deep(.p-accordionheader) {
+  border-radius: 4px 4px 0 0;
+}
+
+.emulation-filter-panel :deep(.p-accordioncontent-content) {
+  border-radius: 0 0 4px 4px;
 }
 
 .emulation-accordion__title {
