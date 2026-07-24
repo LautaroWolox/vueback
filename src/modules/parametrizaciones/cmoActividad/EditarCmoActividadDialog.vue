@@ -43,13 +43,17 @@
           class="cmo-edit-control cmo-edit-control--readonly"
         />
 
-        <div class="cmo-edit-float-field">
+        <div
+          class="cmo-edit-float-field"
+          :class="{ 'cmo-edit-float-field--active': nuevoCmoFocused || nuevoCmo.length > 0 }"
+        >
           <InputText
             id="cmo-edit-nuevo"
             v-model="nuevoCmo"
             class="cmo-edit-control cmo-edit-control--new"
-            placeholder=" "
             aria-label="Nuevo CMO"
+            @focus="nuevoCmoFocused = true"
+            @blur="nuevoCmoFocused = false"
             @keyup.enter="actualizar"
           />
           <label for="cmo-edit-nuevo">Nuevo CMO</label>
@@ -81,6 +85,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:visible', 'actualizar'])
 const nuevoCmo = ref('')
+const nuevoCmoFocused = ref(false)
 const dialogStyle = 'width: min(520px, calc(100vw - 32px)); max-width: 520px;'
 
 const puedeActualizar = computed(() => {
@@ -89,11 +94,15 @@ const puedeActualizar = computed(() => {
 })
 
 watch(() => props.visible, (visible) => {
-  if (visible) nuevoCmo.value = ''
+  if (visible) {
+    nuevoCmo.value = ''
+    nuevoCmoFocused.value = false
+  }
 })
 
 const cerrar = () => {
   nuevoCmo.value = ''
+  nuevoCmoFocused.value = false
   emit('update:visible', false)
 }
 
@@ -101,6 +110,7 @@ const actualizar = () => {
   if (!puedeActualizar.value) return
   emit('actualizar', nuevoCmo.value.trim())
   nuevoCmo.value = ''
+  nuevoCmoFocused.value = false
 }
 </script>
 
@@ -185,6 +195,7 @@ const actualizar = () => {
 
 .cmo-edit-float-field label {
   position: absolute;
+  z-index: 1;
   top: 50%;
   left: 11px;
   padding: 0 4px;
@@ -195,14 +206,14 @@ const actualizar = () => {
   line-height: 1;
   pointer-events: none;
   transform: translateY(-50%);
-  transition: top .16s ease, color .16s ease, font-size .16s ease;
+  transition: top .16s ease, color .16s ease, font-size .16s ease, transform .16s ease;
 }
 
-.cmo-edit-control--new:focus + label,
-.cmo-edit-control--new:not(:placeholder-shown) + label {
+.cmo-edit-float-field--active label {
   top: 0;
   color: #008fa1;
   font-size: 10px;
+  transform: translateY(-50%);
 }
 
 .cmo-edit-control--new:focus {
