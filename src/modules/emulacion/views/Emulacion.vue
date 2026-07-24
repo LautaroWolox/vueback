@@ -67,10 +67,14 @@ watch(() => store.activeTab, (newValue) => {
   position: relative;
   z-index: 1;
   border-radius: 4px;
-  box-shadow: 0 6px 16px rgba(32, 57, 71, .2);
+  box-shadow:
+    0 10px 28px rgba(32, 57, 71, .34),
+    0 3px 8px rgba(32, 57, 71, .2);
 }
 
 .emulation-filter-panel :deep(.p-accordionheader) {
+  min-height: 32px;
+  padding: 6px 12px;
   border-radius: 4px 4px 0 0;
 }
 
@@ -103,5 +107,9 @@ watch(() => store.activeTab, (newValue) => {
 
 .emulation-accordion :deep(.p-accordioncontent-content) {
   padding: 0;
+}
+
+:global(.emulation-confirm-dialog .emulation-confirm-warning) {
+  display: none !important;
 }
 </style>
