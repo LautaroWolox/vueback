@@ -48,7 +48,7 @@ const contratistaOptions = computed(() => [
 
 const contratista = computed({
   get: () => {
-    if (!store.filters.contratista) return contratistaOptions.value[0] ?? null
+    if (!store.filters.contratista) return null
     return contratistaOptions.value.find(
       (item) => item.codigo === store.filters.contratista
     ) ?? null
