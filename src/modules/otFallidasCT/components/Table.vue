@@ -29,7 +29,6 @@
       selectionMode="multiple"
       paginator
       :rowsPerPageOptions="[100, 250, 500]"
-      :rows="500"
       showGridlines
       @select-all-change="onSelectAllChange"
       @value-change="onValueChange"
@@ -262,7 +261,7 @@ const reprocesoIds = ref([])
 const reprocesoCompleted = ref(false)
 const reprocessedRowIds = ref([])
 const currentFirst = ref(0)
-const currentRows = ref(10)
+const currentRows = ref(500)
 const processedRows = ref([])
 const hasProcessedRows = ref(false)
 const { exportToExcel, parseDataFromTable } = useExcelExport()
