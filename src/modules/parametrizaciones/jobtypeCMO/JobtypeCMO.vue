@@ -10,6 +10,7 @@ import JobtypeRelacion from '../jobtypeRelacion/JobtypeRelacion.vue'
 
 const screenRoot = ref(null)
 let dialogObserver = null
+let dialogRefreshFrame = null
 
 const openResultsAccordion = async () => {
   await nextTick()
@@ -23,41 +24,84 @@ const openResultsAccordion = async () => {
   }
 }
 
+const setImportantStyle = (element, property, value) => {
+  if (
+    element.style.getPropertyValue(property) === value &&
+    element.style.getPropertyPriority(property) === 'important'
+  ) {
+    return
+  }
+
+  element.style.setProperty(property, value, 'important')
+}
+
 const customizeActivityDialog = () => {
   const dialog = document.querySelector('.p-dialog.jobtype-alta-dialog')
   if (!dialog) return
 
-  dialog.style.setProperty('width', 'min(980px, calc(100vw - 48px))', 'important')
-  dialog.style.setProperty('max-width', '980px', 'important')
-  dialog.style.setProperty('height', 'min(560px, calc(100dvh - 48px))', 'important')
-  dialog.style.setProperty('max-height', 'calc(100dvh - 48px)', 'important')
+  setImportantStyle(dialog, 'width', 'min(980px, calc(100vw - 48px))')
+  setImportantStyle(dialog, 'max-width', '980px')
+  setImportantStyle(dialog, 'height', 'min(560px, calc(100dvh - 48px))')
+  setImportantStyle(dialog, 'max-height', 'calc(100dvh - 48px)')
 
   dialog.querySelectorAll('.jobtype-add-button, .jobtype-relate-button').forEach((button) => {
-    button.style.setProperty('width', '120px', 'important')
-    button.style.setProperty('min-width', '120px', 'important')
-    button.style.setProperty('max-width', '120px', 'important')
-    button.style.setProperty('height', '36px', 'important')
-    button.style.setProperty('min-height', '36px', 'important')
-    button.style.setProperty('max-height', '36px', 'important')
-    button.style.setProperty('padding', '0 13px', 'important')
-    button.style.setProperty('border-radius', '6px', 'important')
-    button.style.setProperty('font-size', '12px', 'important')
-    button.style.setProperty('font-weight', '600', 'important')
-    button.style.setProperty('box-shadow', '0 2px 6px rgba(0, 91, 104, .14)', 'important')
-    button.style.setProperty('transform', 'none', 'important')
+    setImportantStyle(button, 'width', '120px')
+    setImportantStyle(button, 'min-width', '120px')
+    setImportantStyle(button, 'max-width', '120px')
+    setImportantStyle(button, 'height', '36px')
+    setImportantStyle(button, 'min-height', '36px')
+    setImportantStyle(button, 'max-height', '36px')
+    setImportantStyle(button, 'padding', '0 13px')
+    setImportantStyle(button, 'border-radius', '6px')
+    setImportantStyle(button, 'font-size', '12px')
+    setImportantStyle(button, 'font-weight', '600')
+    setImportantStyle(button, 'box-shadow', '0 2px 6px rgba(0, 91, 104, .14)')
+    setImportantStyle(button, 'transform', 'none')
+  })
+}
+
+const scheduleDialogCustomization = () => {
+  if (dialogRefreshFrame !== null) return
+
+  dialogRefreshFrame = requestAnimationFrame(() => {
+    dialogRefreshFrame = null
+    customizeActivityDialog()
   })
 }
 
 onMounted(async () => {
   await openResultsAccordion()
-  customizeActivityDialog()
+  scheduleDialogCustomization()
 
-  dialogObserver = new MutationObserver(customizeActivityDialog)
-  dialogObserver.observe(document.body, { childList: true, subtree: true })
+  dialogObserver = new MutationObserver((mutations) => {
+    const dialogChanged = mutations.some((mutation) => {
+      if (mutation.type === 'childList') return true
+
+      const target = mutation.target
+      return target instanceof Element && Boolean(
+        target.matches('.p-dialog.jobtype-alta-dialog, .jobtype-add-button, .jobtype-relate-button') ||
+        target.closest('.p-dialog.jobtype-alta-dialog')
+      )
+    })
+
+    if (dialogChanged) scheduleDialogCustomization()
+  })
+
+  dialogObserver.observe(document.body, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ['style']
+  })
 })
 
 onBeforeUnmount(() => {
   dialogObserver?.disconnect()
+
+  if (dialogRefreshFrame !== null) {
+    cancelAnimationFrame(dialogRefreshFrame)
+    dialogRefreshFrame = null
+  }
 })
 </script>
 
