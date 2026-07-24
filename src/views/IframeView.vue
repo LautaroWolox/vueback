@@ -15,6 +15,7 @@
 import { computed, onUnmounted, ref, watchEffect } from 'vue'
 import router from '@/router'
 import { useLegacyIframeLayout } from '@/composables/useLegacyIframeLayout'
+import { useLegacyIframeViewport } from '@/composables/useLegacyIframeViewport'
 
 const props = defineProps({
   urlParam: { type: String, required: true },
@@ -22,7 +23,12 @@ const props = defineProps({
 })
 
 const iframeRef = ref(null)
-const { onIframeLoad } = useLegacyIframeLayout(iframeRef)
+const { onIframeLoad: applyLegacyLayout } = useLegacyIframeLayout(iframeRef)
+const { onIframeLoad: applyLegacyViewport } = useLegacyIframeViewport(iframeRef)
+const onIframeLoad = () => {
+  applyLegacyLayout()
+  applyLegacyViewport()
+}
 const titulo = computed(() => props.titleParam || sessionStorage.getItem('titleParam') || '')
 
 watchEffect(() => {
