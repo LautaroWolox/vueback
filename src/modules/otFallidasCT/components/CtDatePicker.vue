@@ -275,6 +275,18 @@ onBeforeUnmount(() => document.removeEventListener('mousedown', close))
   background: #fff;
   color: #263746;
   font-size: 12px;
+  accent-color: #00a9bd;
+}
+
+.ct-calendar-title select:focus {
+  outline: none;
+  border-color: #00a9bd;
+  box-shadow: 0 0 0 1px rgba(0, 169, 189, .18);
+}
+
+.ct-calendar-title select option:checked {
+  background: #00a9bd linear-gradient(0deg, #00a9bd 0%, #00a9bd 100%);
+  color: #fff;
 }
 
 .ct-weekdays,
