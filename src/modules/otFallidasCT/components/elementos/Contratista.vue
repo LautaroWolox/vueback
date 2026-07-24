@@ -17,7 +17,6 @@
       v-model="contratista"
       :options="contratistaOptions"
       optionLabel="nombre"
-      optionDisabled="disabled"
       placeholder="Seleccione"
       overlayClass="otf-filter-select-overlay"
       :disabled="disabled"
@@ -43,15 +42,15 @@ const commonCT = useCommonCtStore()
 const { contratistas, status } = storeToRefs(commonCT)
 
 const contratistaOptions = computed(() => [
-  { empresaId: 0, codigo: '', nombre: '', tipo: 'Contratista', activo: 'S', disabled: true },
+  { empresaId: 0, codigo: '', nombre: '', tipo: 'Contratista', activo: 'S' },
   ...(contratistas.value ?? [])
 ])
 
 const contratista = computed({
   get: () => {
-    if (!store.filters.contratista) return null
+    if (!store.filters.contratista) return contratistaOptions.value[0] ?? null
     return contratistaOptions.value.find(
-      (item) => item.codigo === store.filters.contratista && !item.disabled
+      (item) => item.codigo === store.filters.contratista
     ) ?? null
   },
   set: (value) => store.setFilter('contratista', value?.codigo ?? '')
