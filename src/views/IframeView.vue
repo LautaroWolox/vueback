@@ -1,23 +1,34 @@
 <template>
   <iframe
+    ref="iframeRef"
     :src="iframeSrc"
     :title="titulo"
     width="100%"
     frameborder="0"
     allowfullscreen
-    style="width: 100%; height: calc(100vh - 82px); min-height: 520px; display: block; border: 0;"
+    class="legacy-iframe"
+    @load="onIframeLoad"
   />
 </template>
 
 <script setup>
-import { computed, onUnmounted, watchEffect } from 'vue'
+import { computed, onUnmounted, ref, watchEffect } from 'vue'
 import router from '@/router'
+import { useLegacyIframeLayout } from '@/composables/useLegacyIframeLayout'
+import { useLegacyIframeViewport } from '@/composables/useLegacyIframeViewport'
 
 const props = defineProps({
   urlParam: { type: String, required: true },
   titleParam: { type: String, required: true }
 })
 
+const iframeRef = ref(null)
+const { onIframeLoad: applyLegacyLayout } = useLegacyIframeLayout(iframeRef)
+const { onIframeLoad: applyLegacyViewport } = useLegacyIframeViewport(iframeRef)
+const onIframeLoad = () => {
+  applyLegacyLayout()
+  applyLegacyViewport()
+}
 const titulo = computed(() => props.titleParam || sessionStorage.getItem('titleParam') || '')
 
 watchEffect(() => {
@@ -46,3 +57,11 @@ onUnmounted(() => {
   window.removeEventListener('message', handleRedirect)
 })
 </script>
+
+<style scoped>
+.legacy-iframe {
+ position: absolute;
+  height: 100%;
+  width: 100%;
+}
+</style>

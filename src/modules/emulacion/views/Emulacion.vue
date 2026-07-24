@@ -17,12 +17,15 @@
         </AccordionContent>
       </AccordionPanel>
     </Accordion>
+
+    <ConfirmarEmulacionDialog />
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import CajonFiltros from '../components/filtros/CajonFiltros.vue'
+import ConfirmarEmulacionDialog from '../components/ConfirmarEmulacionDialog.vue'
 import emulacionStore from '../store/emulacionStore.js'
 
 const active = ref(['0'])
@@ -66,9 +69,5 @@ const store = emulacionStore()
 
 .emulation-accordion :deep(.p-accordioncontent-content) {
   padding: 0;
-}
-
-:global(.emulation-confirm-dialog .emulation-confirm-warning) {
-  display: none !important;
 }
 </style>

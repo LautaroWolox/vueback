@@ -1,5 +1,8 @@
 <template>
-  <div class="fm-screen fm-screen--pad ot-fallidas-ct">
+  <div
+    class="fm-screen fm-screen--pad ot-fallidas-ct"
+    :class="{ 'ot-fallidas-ct--grid-expanded': gridExpanded }"
+  >
     <Accordion v-model:value="active" multiple class="fm-accordion">
       <AccordionPanel value="0">
         <AccordionHeader>FILTROS DE BÚSQUEDA</AccordionHeader>
@@ -19,12 +22,16 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import Table from './components/Table.vue'
 import Filtros from './components/Filtros.vue'
 import {useFallidasCtStore} from './store/CtFallidaStore'
 
 const active = ref(['0', '1'])
+const gridExpanded = computed(() => {
+  const values = (Array.isArray(active.value) ? active.value : [active.value]).map(String)
+  return !values.includes('0') && values.includes('1')
+})
 let exclusionLabelsObserver
 const store = useFallidasCtStore()
 
@@ -83,6 +90,15 @@ const syncExistingNotes = () => {
   notesContainer.append(labelElement, contentElement)
 }
 
+const syncDefaultPageSize = () => {
+  const select = document.querySelector('.ot-fallidas-ct .otf-rows-select')
+  if (!select || select.dataset.defaultRowsApplied === 'true') return
+
+  select.value = '500'
+  select.dispatchEvent(new Event('change', { bubbles: true }))
+  select.dataset.defaultRowsApplied = 'true'
+}
+
 const syncExclusionLabels = () => {
   document
     .querySelectorAll('.otf-grid-shell .fm-grid-actions-final button')
@@ -113,6 +129,7 @@ const syncExclusionLabels = () => {
       button.style.display = unavailable ? 'none' : ''
     })
 
+  syncDefaultPageSize()
   syncExistingNotes()
 }
 
@@ -137,13 +154,22 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .ot-fallidas-ct {
-  min-height: calc(100vh - 82px);
+  width: 100%;
+  height: calc(100vh - 64px);
+  min-height: calc(100vh - 64px);
+  margin: -12px 0 0 !important;
+  padding: 0 6px 4px !important;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .ot-fallidas-ct :deep(.fm-accordion) {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
   display: flex !important;
   flex-direction: column !important;
-  gap: 10px !important;
+  gap: 4px !important;
 }
 
 .ot-fallidas-ct :deep(.p-accordionpanel) {
@@ -157,11 +183,29 @@ onBeforeUnmount(() => {
 .ot-fallidas-ct :deep(.p-accordionpanel:first-child) {
   position: relative !important;
   z-index: 20 !important;
+  flex: 0 0 auto;
 }
 
 .ot-fallidas-ct :deep(.p-accordionpanel:last-child) {
   position: relative !important;
   z-index: 10 !important;
+  min-height: 0;
+}
+
+.ot-fallidas-ct--grid-expanded :deep(.p-accordionpanel:last-child) {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.ot-fallidas-ct--grid-expanded :deep(.p-accordionpanel:last-child .p-accordioncontent),
+.ot-fallidas-ct--grid-expanded :deep(.p-accordionpanel:last-child .p-accordioncontent-content) {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
 }
 
 .ot-fallidas-ct :deep(.p-accordionheader) {
@@ -173,7 +217,7 @@ onBeforeUnmount(() => {
   border-radius: 0 !important;
   background: #f7f7f7 !important;
   color: #000 !important;
-  font-size: 12px !important;
+  font-size: 13px !important;
   font-weight: 500 !important;
   line-height: 18px !important;
   box-shadow: none !important;
@@ -185,6 +229,87 @@ onBeforeUnmount(() => {
   border: 0 !important;
   background: #fff !important;
   overflow: visible !important;
+}
+
+:global(.ot-fallidas-ct--grid-expanded .otf-grid-shell) {
+  width: 100% !important;
+  height: calc(100vh - 135px) !important;
+  min-height: 0 !important;
+  max-height: calc(100vh - 135px) !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+:global(.ot-fallidas-ct--grid-expanded #tabla),
+:global(.ot-fallidas-ct--grid-expanded #tabla.p-datatable) {
+  height: 100% !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+:global(.ot-fallidas-ct--grid-expanded #tabla .p-datatable-table-container),
+:global(.ot-fallidas-ct--grid-expanded #tabla .p-datatable-wrapper),
+:global(.ot-fallidas-ct--grid-expanded #tabla [data-pc-section="tablecontainer"]) {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 1 1 auto !important;
+  overflow: auto !important;
+}
+
+.ot-fallidas-ct :deep(.otf-filters .fm-field label) {
+  font-size: 12px !important;
+}
+
+.ot-fallidas-ct :deep(.otf-filters .p-inputtext),
+.ot-fallidas-ct :deep(.otf-filters input),
+.ot-fallidas-ct :deep(.otf-filters .p-select-label),
+.ot-fallidas-ct :deep(.otf-filters .ct-date-button) {
+  font-size: 13px !important;
+}
+
+.ot-fallidas-ct :deep(.ct-calendar-title),
+.ot-fallidas-ct :deep(.ct-year-select .fm-compact-select__trigger),
+.ot-fallidas-ct :deep(.ct-year-select .fm-compact-select__option),
+.ot-fallidas-ct :deep(.ct-days button),
+.ot-fallidas-ct :deep(.ct-calendar-actions button) {
+  font-size: 12px !important;
+}
+
+.ot-fallidas-ct :deep(.ct-weekdays) {
+  font-size: 11px !important;
+}
+
+.ot-fallidas-ct :deep(#tabla .p-datatable-thead > tr > th) {
+  font-size: 12px !important;
+}
+
+.ot-fallidas-ct :deep(#tabla .p-datatable-tbody > tr > td) {
+  font-size: 13px !important;
+}
+
+.ot-fallidas-ct :deep(#tabla .fm-column-filter),
+.ot-fallidas-ct :deep(#tabla .fm-filter-prefix),
+.ot-fallidas-ct :deep(#tabla .fm-filter-more) {
+  font-size: 12px !important;
+}
+
+.ot-fallidas-ct :deep(.otf-custom-paginator),
+.ot-fallidas-ct :deep(.otf-custom-paginator__navigation),
+.ot-fallidas-ct :deep(.otf-page-label),
+.ot-fallidas-ct :deep(.otf-page-total),
+.ot-fallidas-ct :deep(.otf-page-input),
+.ot-fallidas-ct :deep(.otf-rows-select),
+.ot-fallidas-ct :deep(.otf-custom-paginator__counter) {
+  font-size: 13px !important;
+}
+
+:global(.otf-filter-select-overlay .p-select-option),
+:global(.otf-filter-select-overlay .p-select-option-label) {
+  font-size: 12px !important;
 }
 
 :global(.otf-existing-notes) {
