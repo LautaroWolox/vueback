@@ -2,7 +2,7 @@
   <Dialog
     :visible="visibleInc"
     modal
-    header="Incluir orden de trabajo"
+    header="Incluir Orden de Trabajo"
     class="fm-dialog otf-action-dialog otf-include-dialog"
     :style="{ width: '42rem' }"
     @update:visible="$emit('update:visibleInc', $event)"
