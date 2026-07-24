@@ -23,9 +23,14 @@
         >‹</button>
         <div class="ct-calendar-title">
           <strong>{{ monthNames[viewMonth] }}</strong>
-          <select v-model.number="viewYear" aria-label="Año">
-            <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
-          </select>
+          <FmCompactSelect
+            v-model="viewYear"
+            class="ct-year-select"
+            :options="yearOptions"
+            option-label="label"
+            option-value="value"
+            :max-panel-height="120"
+          />
         </div>
         <button
           type="button"
@@ -68,6 +73,7 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import FmCompactSelect from '@/components/shared/FmCompactSelect.vue'
 
 const MINIMUM_YEAR = 2025
 
@@ -100,6 +106,10 @@ const years = computed(() => Array.from(
   { length: Math.max(maximumYear.value - MINIMUM_YEAR + 1, 1) },
   (_, index) => MINIMUM_YEAR + index
 ))
+const yearOptions = computed(() => years.value.map((year) => ({
+  label: String(year),
+  value: year
+})))
 const isAtMinimumMonth = computed(() => viewYear.value === MINIMUM_YEAR && viewMonth.value === 0)
 const isAtMaximumMonth = computed(() => viewYear.value === maximumYear.value && viewMonth.value === 11)
 const two = (value) => String(value).padStart(2, '0')
@@ -268,24 +278,44 @@ onBeforeUnmount(() => document.removeEventListener('mousedown', close))
   font-size: 12px;
 }
 
-.ct-calendar-title select {
+.ct-year-select {
+  width: 58px;
+  flex: 0 0 58px;
+}
+
+.ct-year-select :deep(.fm-compact-select__trigger) {
   height: 26px;
-  border: 1px solid #c5d1d8;
+  min-height: 26px;
+  padding: 0 6px;
   border-radius: 3px;
-  background: #fff;
-  color: #263746;
   font-size: 12px;
-  accent-color: #00a9bd;
 }
 
-.ct-calendar-title select:focus {
-  outline: none;
-  border-color: #00a9bd;
-  box-shadow: 0 0 0 1px rgba(0, 169, 189, .18);
+.ct-year-select :deep(.fm-compact-select__chevron) {
+  width: 7px;
+  height: 7px;
+  flex-basis: 7px;
+  border-right-width: 1.5px;
+  border-bottom-width: 1.5px;
 }
 
-.ct-calendar-title select option:checked {
-  background: #00a9bd linear-gradient(0deg, #00a9bd 0%, #00a9bd 100%);
+.ct-year-select :deep(.fm-compact-select__panel) {
+  min-width: 58px;
+  padding: 0;
+}
+
+.ct-year-select :deep(.fm-compact-select__option) {
+  min-height: 27px;
+  justify-content: center;
+  padding: 4px 6px;
+  font-size: 12px;
+  text-align: center;
+}
+
+.ct-year-select :deep(.fm-compact-select__option--selected),
+.ct-year-select :deep(.fm-compact-select__option--active),
+.ct-year-select :deep(.fm-compact-select__option:hover) {
+  background: #00a9bd;
   color: #fff;
 }
 
