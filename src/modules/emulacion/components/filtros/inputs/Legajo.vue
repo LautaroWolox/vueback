@@ -70,6 +70,7 @@ const capturarLegajo = () => {
   border-radius: 4px;
   background: #eafcff;
   color: #00a9bd;
+  box-shadow: 0 5px 14px rgba(32, 57, 71, .3);
   box-sizing: border-box;
 }
 
@@ -81,5 +82,20 @@ const capturarLegajo = () => {
   width: 100%;
   height: 32px;
   min-height: 32px;
+  border-color: #b8cbd3;
+  box-shadow: 0 5px 14px rgba(32, 57, 71, .32);
+  transition: border-color .16s ease, box-shadow .16s ease;
+}
+
+.emulation-legajo-control :deep(.p-inputtext:hover) {
+  border-color: #8fb3bf;
+  box-shadow: 0 6px 17px rgba(32, 57, 71, .36);
+}
+
+.emulation-legajo-control :deep(.p-inputtext:focus) {
+  border-color: #00a9bd;
+  box-shadow:
+    0 0 0 2px rgba(0, 169, 189, .16),
+    0 7px 19px rgba(32, 57, 71, .4);
 }
 </style>

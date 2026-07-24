@@ -118,18 +118,6 @@
       :style="{ width: 'min(650px, calc(100vw - 32px))' }"
       @hide="cancelarConfirmacion"
     >
-      <template #header>
-        <div class="emulation-confirm-header">
-          <div class="emulation-confirm-header__icon" aria-hidden="true">
-            <i class="pi pi-user-edit"></i>
-          </div>
-          <div>
-            <span class="emulation-confirm-header__eyebrow">EMULAR</span>
-            <h2>Está por emular</h2>
-          </div>
-        </div>
-      </template>
-
       <div class="emulation-confirm-body">
         <p class="emulation-confirm-message">
           Está por iniciar una sesión con los permisos del siguiente operador:
@@ -426,13 +414,11 @@ watch(() => store.confirmationVersion, () => {
 }
 
 :global(.emulation-confirm-dialog .p-dialog-header) {
-  padding: 18px 22px 12px !important;
-  border-bottom: 1px solid #d8e3e7 !important;
-  background: #fff !important;
+  display: none !important;
 }
 
 :global(.emulation-confirm-dialog .p-dialog-content) {
-  padding: 0 22px 20px !important;
+  padding: 20px 22px !important;
   background: #fff !important;
 }
 
@@ -442,46 +428,8 @@ watch(() => store.confirmationVersion, () => {
   background: #fff !important;
 }
 
-.emulation-confirm-header {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.emulation-confirm-header__icon {
-  width: 50px;
-  height: 50px;
-  flex: 0 0 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: #e4f9fc;
-  color: #00a9bd;
-}
-
-.emulation-confirm-header__icon i {
-  font-size: 23px;
-}
-
-.emulation-confirm-header__eyebrow {
-  display: block;
-  margin-bottom: 3px;
-  color: #00a9bd;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .08em;
-}
-
-.emulation-confirm-header h2 {
-  margin: 0;
-  color: #203947;
-  font-size: 20px;
-  font-weight: 600;
-}
-
 .emulation-confirm-body {
-  padding-top: 18px;
+  padding-top: 0;
 }
 
 .emulation-confirm-message {
