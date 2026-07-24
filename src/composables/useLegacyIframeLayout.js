@@ -209,8 +209,6 @@ export function useLegacyIframeLayout(iframeRef) {
     const view = doc?.defaultView
     if (!doc?.body || !view) return
 
-    clearMarkers(doc)
-
     const headers = [...doc.querySelectorAll(HEADER_SELECTORS)]
       .filter((header) => header.closest('.ui-accordion, .accordion, .accordion-group, .accordion-item, .panel'))
 
@@ -226,10 +224,12 @@ export function useLegacyIframeLayout(iframeRef) {
     const firstContent = getContent(firstHeader, firstItem)
     const secondContent = getContent(secondHeader, secondItem)
     const accordionRoot = findAccordionRoot(headers)
+    const firstLayoutItem = firstItem === firstHeader ? firstHeader : firstItem
+    const secondLayoutItem = secondItem === secondHeader ? (secondContent || secondHeader) : secondItem
 
     accordionRoot?.classList.add('fm-legacy-accordion-root')
-    firstItem?.classList.add('fm-legacy-accordion-first')
-    secondItem?.classList.add('fm-legacy-accordion-grid')
+    firstLayoutItem?.classList.add('fm-legacy-accordion-first')
+    secondLayoutItem?.classList.add('fm-legacy-accordion-grid')
     secondContent?.classList.add('fm-legacy-grid-content')
 
     const gridShell = secondContent?.querySelector(GRID_SHELL_SELECTORS)
