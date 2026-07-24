@@ -373,6 +373,14 @@
       :cmo-actual="editActividadForm.cmoActual"
       @actualizar="actualizarCmoActividad"
     />
+
+    <EditarJobtypeContratoDialog
+      v-else
+      v-model:visible="showEditContrato"
+      :jobtype="editContratoForm.jobtype"
+      :contrato-actual="editContratoForm.contratoActual"
+      @actualizar="actualizarJobtypeContrato"
+    />
   </div>
 </template>
 
@@ -383,6 +391,7 @@ import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
 import { FilterMatchMode } from '@primevue/core/api'
 import EditarCmoActividadDialog from '../cmoActividad/EditarCmoActividadDialog.vue'
+import EditarJobtypeContratoDialog from '../jobtypeContrato/EditarJobtypeContratoDialog.vue'
 
 const props = defineProps({
   relation: {
@@ -403,6 +412,7 @@ const filtersExpanded = ref(true)
 const resultsExpanded = ref(false)
 const showAlta = ref(false)
 const showEditActividad = ref(false)
+const showEditContrato = ref(false)
 const selectedRow = ref(null)
 const altaSelectedRow = ref(null)
 const mainFirst = ref(0)
@@ -417,6 +427,12 @@ const editActividadForm = reactive({
   id: '',
   actividad: '',
   cmoActual: ''
+})
+
+const editContratoForm = reactive({
+  id: '',
+  jobtype: '',
+  contratoActual: ''
 })
 
 const altaDialogStyle = 'width: calc(100vw - 48px) !important; max-width: 1440px !important; height: min(680px, calc(100dvh - 48px)) !important; max-height: calc(100dvh - 48px) !important; margin: 0 !important;'
@@ -551,6 +567,12 @@ const resetEditActividad = () => {
   editActividadForm.cmoActual = ''
 }
 
+const resetEditContrato = () => {
+  editContratoForm.id = ''
+  editContratoForm.jobtype = ''
+  editContratoForm.contratoActual = ''
+}
+
 const agregarPreview = () => {
   altaValidationAttempted.value = true
 
@@ -641,11 +663,10 @@ const editarSeleccionado = () => {
     return
   }
 
-  abrirAlta()
-  altaForm.pais = selectedRow.value.pais
-  altaForm.jobtype = selectedRow.value.tarea
-  altaForm.relacion = selectedRow.value.relacion
-  altaForm.origen = selectedRow.value.origen
+  editContratoForm.id = selectedRow.value.id
+  editContratoForm.jobtype = selectedRow.value.tarea || selectedRow.value.codigoTarea || ''
+  editContratoForm.contratoActual = selectedRow.value.relacion || ''
+  showEditContrato.value = true
 }
 
 const actualizarCmoActividad = (nuevoCmo) => {
@@ -672,6 +693,31 @@ const actualizarCmoActividad = (nuevoCmo) => {
   selectedRow.value = updatedRow
   showEditActividad.value = false
   resetEditActividad()
+}
+
+const actualizarJobtypeContrato = (nuevoContrato) => {
+  const normalizedContrato = String(nuevoContrato ?? '').trim()
+  if (!editContratoForm.id || !normalizedContrato) return
+
+  const now = new Date().toLocaleString('es-AR')
+  let updatedRow = null
+
+  mainRows.value = mainRows.value.map((row) => {
+    if (row.id !== editContratoForm.id) return row
+
+    updatedRow = {
+      ...row,
+      relacion: normalizedContrato,
+      usuarioModificacion: 'usuario',
+      fechaModificacion: now
+    }
+
+    return updatedRow
+  })
+
+  selectedRow.value = updatedRow
+  showEditContrato.value = false
+  resetEditContrato()
 }
 
 const onMainRowClick = ({ data }) => {
