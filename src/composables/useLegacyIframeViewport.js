@@ -1,6 +1,7 @@
 import { onBeforeUnmount } from 'vue'
 
 const STYLE_ID = 'fm-legacy-viewport-fix'
+const HEIGHT_PROPERTY = '--fm-legacy-available-height'
 
 const VIEWPORT_CSS = `
   html.fm-legacy-viewport-root {
@@ -17,9 +18,9 @@ const VIEWPORT_CSS = `
   }
 
   body.fm-legacy-layout.fm-legacy-grid-expanded .fm-legacy-accordion-root {
-    height: var(--fm-legacy-available-height, calc(100vh - 6px)) !important;
+    height: var(${HEIGHT_PROPERTY}, calc(100vh - 6px)) !important;
     min-height: 0 !important;
-    max-height: var(--fm-legacy-available-height, calc(100vh - 6px)) !important;
+    max-height: var(${HEIGHT_PROPERTY}, calc(100vh - 6px)) !important;
     box-sizing: border-box !important;
     overflow: hidden !important;
   }
@@ -46,8 +47,14 @@ export function useLegacyIframeViewport(iframeRef) {
 
   const resetViewport = () => {
     const root = currentDocument?.querySelector('.fm-legacy-accordion-root')
-    root?.style.removeProperty('--fm-legacy-available-height')
-    currentDocument?.documentElement?.classList.remove('fm-legacy-viewport-root')
+    if (root?.style.getPropertyValue(HEIGHT_PROPERTY)) {
+      root.style.removeProperty(HEIGHT_PROPERTY)
+    }
+
+    const documentElement = currentDocument?.documentElement
+    if (documentElement?.classList.contains('fm-legacy-viewport-root')) {
+      documentElement.classList.remove('fm-legacy-viewport-root')
+    }
   }
 
   const cleanup = () => {
@@ -84,9 +91,15 @@ export function useLegacyIframeViewport(iframeRef) {
     const viewportHeight = view.innerHeight || doc.documentElement.clientHeight || 0
     const rootTop = Math.max(0, root.getBoundingClientRect().top)
     const availableHeight = Math.max(Math.floor(viewportHeight - rootTop - 6), 180)
+    const nextHeight = `${availableHeight}px`
 
-    root.style.setProperty('--fm-legacy-available-height', `${availableHeight}px`)
-    doc.documentElement.classList.add('fm-legacy-viewport-root')
+    if (root.style.getPropertyValue(HEIGHT_PROPERTY) !== nextHeight) {
+      root.style.setProperty(HEIGHT_PROPERTY, nextHeight)
+    }
+
+    if (!doc.documentElement.classList.contains('fm-legacy-viewport-root')) {
+      doc.documentElement.classList.add('fm-legacy-viewport-root')
+    }
   }
 
   const scheduleViewport = () => {
