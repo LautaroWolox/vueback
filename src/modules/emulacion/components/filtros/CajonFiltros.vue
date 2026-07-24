@@ -7,12 +7,14 @@
     <div class="fm-actions fm-filter-actions emulation-filter-actions">
       <FmButton
         label="BUSCAR"
+        class="emulation-filter-button"
         :disabled="storeEmulacion.toggleLoader"
         @click="onSearch"
       />
       <FmButton
         label="LIMPIAR"
         variant="outline"
+        class="emulation-filter-button"
         :disabled="storeEmulacion.toggleLoader"
         @click="onClear"
       />
@@ -54,7 +56,7 @@ const onSearch = async () => {
 
 <style scoped>
 .emulation-filters {
-  padding: 9px 16px 4px;
+  padding: 9px 16px 5px;
 }
 
 .emulation-filter-grid {
@@ -69,7 +71,21 @@ const onSearch = async () => {
 
 .emulation-filter-actions {
   justify-content: center;
+  gap: 8px;
   margin-top: 6px;
   padding: 0;
+}
+
+.emulation-filter-actions :deep(.emulation-filter-button),
+.emulation-filter-actions :deep(.emulation-filter-button.p-button) {
+  width: 100px !important;
+  min-width: 100px !important;
+  max-width: 100px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  max-height: 30px !important;
+  padding: 0 9px !important;
+  font-size: 11px !important;
+  border-radius: 5px !important;
 }
 </style>
