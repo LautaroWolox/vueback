@@ -28,6 +28,61 @@ const active = ref(['0', '1'])
 let exclusionLabelsObserver
 const store = useFallidasCtStore()
 
+const normalizeVisibleNote = (value) => String(value ?? '')
+  .replace(/<[^>]*>/g, ' ')
+  .replace(/&nbsp;|&#160;/gi, ' ')
+  .replace(/\s+/g, ' ')
+  .trim()
+
+const syncExistingNotes = () => {
+  const excludeContent = document.querySelector('.otf-exclude-content')
+  if (!excludeContent) return
+
+  const selectedRows = store.rows.filter((row) => store.selectedRows.includes(row.id))
+  const notes = selectedRows
+    .map((row) => ({
+      ot: String(row.nroOrdenTrabajo ?? '').trim(),
+      note: normalizeVisibleNote(row.nota)
+    }))
+    .filter(({ note }) => note.length > 0)
+
+  let notesContainer = excludeContent.querySelector('.otf-existing-notes')
+
+  if (!notes.length) {
+    notesContainer?.remove()
+    return
+  }
+
+  if (!notesContainer) {
+    notesContainer = document.createElement('div')
+    notesContainer.className = 'otf-existing-notes'
+
+    const noteField = excludeContent.querySelector('.otf-nota-field')
+    excludeContent.insertBefore(notesContainer, noteField ?? null)
+  }
+
+  const label = notes.length === 1 ? 'Nota existente' : 'Notas existentes'
+  const content = notes.length === 1
+    ? notes[0].note
+    : notes.map(({ ot, note }) => `${ot ? `OT ${ot}: ` : ''}${note}`).join('\n')
+  const signature = `${label}\n${content}`
+
+  if (notesContainer.dataset.signature === signature) return
+
+  notesContainer.dataset.signature = signature
+  notesContainer.replaceChildren()
+
+  const labelElement = document.createElement('span')
+  labelElement.className = 'otf-existing-notes__label'
+  labelElement.textContent = label
+
+  const contentElement = document.createElement('div')
+  contentElement.className = 'otf-existing-notes__content'
+  contentElement.textContent = content
+
+  notesContainer.append(labelElement, contentElement)
+}
+
 const syncExclusionLabels = () => {
   document
     .querySelectorAll('.otf-grid-shell .fm-grid-actions-final button')
@@ -46,8 +101,8 @@ const syncExclusionLabels = () => {
   document
     .querySelectorAll('.otf-exclude-header > span:first-child')
     .forEach((title) => {
-      if (title.textContent !== 'Excluir orden técnica') {
-        title.textContent = 'Excluir orden técnica'
+      if (title.textContent !== 'Excluir Orden de Trabajo') {
+        title.textContent = 'Excluir Orden de Trabajo'
       }
     })
 
@@ -57,6 +112,8 @@ const syncExclusionLabels = () => {
       const unavailable = button.disabled || button.getAttribute('aria-disabled') === 'true'
       button.style.display = unavailable ? 'none' : ''
     })
+
+  syncExistingNotes()
 }
 
 onMounted(() => {
@@ -128,5 +185,44 @@ onBeforeUnmount(() => {
   border: 0 !important;
   background: #fff !important;
   overflow: visible !important;
+}
+
+:global(.otf-existing-notes) {
+  width: 100%;
+  min-width: 0;
+}
+
+:global(.otf-existing-notes__label) {
+  display: block;
+  margin: 0 0 4px;
+  color: #202020;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+:global(.otf-existing-notes__content) {
+  width: min(620px, 100%);
+  max-width: calc(100vw - 40px);
+  max-height: 112px;
+  padding: 8px 9px;
+  overflow: auto;
+  border: 1px solid #c8d8df;
+  border-left: 3px solid #00a9bd;
+  border-radius: 2px;
+  background: #f5fbfc;
+  color: #263746;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  :global(.otf-existing-notes__content) {
+    width: 100%;
+    max-width: 100%;
+  }
 }
 </style>

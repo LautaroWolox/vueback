@@ -167,7 +167,7 @@
         <template #body="{ data }">
           <template v-if="col.field === 'tieneNota'">
             <button
-              v-if="data.excluida !== 'S' && hasNote(data)"
+              v-if="hasNote(data)"
               type="button"
               class="otf-row-action otf-row-action--note"
               title="Ver nota"
@@ -374,7 +374,7 @@ const showMessage = (message) => {
 }
 
 const showNote = (data) => {
-  if (data?.excluida === 'S' || !hasNote(data)) return
+  if (!hasNote(data)) return
   selectedNote.value = data.nota
   showNota.value = true
 }
