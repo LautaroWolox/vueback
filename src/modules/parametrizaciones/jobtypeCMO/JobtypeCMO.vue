@@ -136,6 +136,48 @@ onBeforeUnmount(() => {
   max-width: 14.2857% !important;
 }
 
+/* Estado vacío de la grilla principal. */
+.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-emptymessage > td),
+.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-empty-message > td) {
+  position: relative !important;
+  height: 120px !important;
+  padding: 0 !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  background: #e8f9fc !important;
+  color: transparent !important;
+}
+
+.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-emptymessage > td)::after,
+.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-empty-message > td)::after {
+  content: 'No hay resultados';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #075f6d;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+/* Fila seleccionada: fondo turquesa y texto negro. */
+.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-tbody > tr.p-datatable-row-selected > td),
+.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-tbody > tr.p-datatable-row-selected:hover > td),
+.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-tbody > tr[data-p-selected='true'] > td),
+.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-tbody > tr[data-p-selected='true']:hover > td),
+.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-tbody > tr[aria-selected='true'] > td),
+.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-tbody > tr[aria-selected='true']:hover > td) {
+  background: #9ee7ee !important;
+  color: #111 !important;
+}
+
+.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-tbody > tr.p-datatable-row-selected > td *),
+.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-tbody > tr[data-p-selected='true'] > td *),
+.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-tbody > tr[aria-selected='true'] > td *) {
+  color: #111 !important;
+}
+
 /*
  * PrimeVue 4 usa .p-datatable-column-title. Se conserva también
  * .p-column-title por compatibilidad con cualquier tema anterior.
