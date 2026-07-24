@@ -155,9 +155,9 @@ onBeforeUnmount(() => {
 <style scoped>
 .ot-fallidas-ct {
   width: 100%;
-  height: calc(100vh - 68px);
-  min-height: calc(100vh - 68px);
-  margin: -8px 0 0 !important;
+  height: calc(100vh - 64px);
+  min-height: calc(100vh - 64px);
+  margin: -12px 0 0 !important;
   padding: 0 6px 4px !important;
   overflow: hidden;
   box-sizing: border-box;
