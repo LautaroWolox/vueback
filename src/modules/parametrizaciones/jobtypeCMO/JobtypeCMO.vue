@@ -33,11 +33,18 @@ const customizeActivityDialog = () => {
   dialog.style.setProperty('max-height', 'calc(100dvh - 48px)', 'important')
 
   dialog.querySelectorAll('.jobtype-add-button, .jobtype-relate-button').forEach((button) => {
-    button.style.setProperty('height', '32px', 'important')
-    button.style.setProperty('min-height', '32px', 'important')
-    button.style.setProperty('max-height', '32px', 'important')
-    button.style.setProperty('border-radius', '4px', 'important')
-    button.style.setProperty('padding', '0 14px', 'important')
+    button.style.setProperty('width', '120px', 'important')
+    button.style.setProperty('min-width', '120px', 'important')
+    button.style.setProperty('max-width', '120px', 'important')
+    button.style.setProperty('height', '36px', 'important')
+    button.style.setProperty('min-height', '36px', 'important')
+    button.style.setProperty('max-height', '36px', 'important')
+    button.style.setProperty('padding', '0 13px', 'important')
+    button.style.setProperty('border-radius', '6px', 'important')
+    button.style.setProperty('font-size', '12px', 'important')
+    button.style.setProperty('font-weight', '600', 'important')
+    button.style.setProperty('box-shadow', '0 2px 6px rgba(0, 91, 104, .14)', 'important')
+    button.style.setProperty('transform', 'none', 'important')
   })
 }
 
