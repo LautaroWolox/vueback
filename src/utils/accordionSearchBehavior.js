@@ -86,22 +86,6 @@ const findSearchAction = (target) => {
 
 const nearestAccordionRoot = (element) => element?.closest?.(ACCORDION_ROOT_SELECTOR) || null
 
-const findAccordionRoot = (trigger, doc) => {
-  const directRoot = nearestAccordionRoot(trigger)
-  if (directRoot) return directRoot
-
-  const scope = trigger?.closest?.('.fm-screen, main, [role="main"], form') || doc?.body
-  if (!scope) return null
-
-  return [...scope.querySelectorAll(ACCORDION_ROOT_SELECTOR)].find((root) => {
-    const headers = getTopLevelHeaders(root)
-    if (headers.length < 2) return false
-
-    const firstSection = getSection(headers[0])
-    return firstSection.container?.contains(trigger) || firstSection.content?.contains(trigger)
-  }) || null
-}
-
 const getTopLevelHeaders = (root) => [...root.querySelectorAll(ACCORDION_HEADER_SELECTOR)]
   .filter((header) => nearestAccordionRoot(header) === root)
 
@@ -117,6 +101,30 @@ const getSection = (header) => {
     content,
     container: panel || content || header
   }
+}
+
+const belongsToFirstSection = (root, trigger) => {
+  const firstHeader = getTopLevelHeaders(root)[0]
+  if (!firstHeader) return false
+
+  const firstSection = getSection(firstHeader)
+  return Boolean(
+    firstSection.container?.contains(trigger) ||
+    firstSection.content?.contains(trigger)
+  )
+}
+
+const findAccordionRoot = (trigger, doc) => {
+  const directRoot = nearestAccordionRoot(trigger)
+  if (directRoot && belongsToFirstSection(directRoot, trigger)) return directRoot
+
+  const scope = trigger?.closest?.('.fm-screen, main, [role="main"], form') || doc?.body
+  if (!scope) return null
+
+  return [...scope.querySelectorAll(ACCORDION_ROOT_SELECTOR)].find((root) => {
+    const headers = getTopLevelHeaders(root)
+    return headers.length >= 2 && belongsToFirstSection(root, trigger)
+  }) || null
 }
 
 const isVisible = (element, view) => {
@@ -233,13 +241,14 @@ export function installAccordionSearchBehavior(doc = document) {
 
     const form = event.target
     const root = findAccordionRoot(form, doc)
-    const firstHeader = root ? getTopLevelHeaders(root)[0] : null
-    const firstSection = firstHeader ? getSection(firstHeader) : null
-    const searchAction = firstSection?.container?.querySelector?.(ACTION_SELECTOR)
+    if (!root) return
 
-    if (searchAction && findSearchAction(searchAction)) {
-      scheduleTransition(form)
-    }
+    const firstHeader = getTopLevelHeaders(root)[0]
+    const firstSection = firstHeader ? getSection(firstHeader) : null
+    const actions = firstSection?.container?.querySelectorAll?.(ACTION_SELECTOR) || []
+    const hasSearchAction = [...actions].some((action) => Boolean(findSearchAction(action)))
+
+    if (hasSearchAction) scheduleTransition(form)
   }
 
   const handleKeydown = (event) => {
