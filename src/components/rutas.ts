@@ -51,6 +51,16 @@ export const getRutas = (rutas:any) => {
             visible: hasMenu('GEMA'),
             items: [
                 {
+                    label: 'Validación OT de Redes',
+                    command: () => { router.push({ name: 'VARE' }); },
+                    visible: hasMenu('VARE')
+                },
+                {
+                    label: 'Errores de Gestión Sucursal',
+                    command: () => { router.push({ name: 'ERGS' }); },
+                    visible: hasMenu('ERGS')
+                },
+                {
                     label: 'Gestionar Materiales en OTs',
                     command: () => { router.push({ name: 'GEOT' }); },
                     visible: hasMenu('GEOT')
@@ -69,16 +79,6 @@ export const getRutas = (rutas:any) => {
                     label: 'Materiales Descargados',
                     command: () => { router.push({ name: 'MADE' }); },
                     visible: hasMenu('MADE')
-                },
-                {
-                    label: 'Errores de Gestión Sucursal',
-                    command: () => { router.push({ name: 'ERGS' }); },
-                    visible: hasMenu('ERGS')
-                },
-                {
-                    label: 'Validación OT de Redes',
-                    command: () => { router.push({ name: 'VARE' }); },
-                    visible: hasMenu('VARE')
                 }
             ]
         },
