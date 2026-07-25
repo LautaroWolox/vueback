@@ -254,7 +254,7 @@ export function installAccordionSearchBehavior(doc = document) {
   const handleKeydown = (event) => {
     if (event.key !== 'Enter' || event.isComposing) return
     const target = event.target
-    if (!target?.matches?.('input, select, textarea')) return
+    if (!target?.matches?.('input, select')) return
 
     const root = findAccordionRoot(target, doc)
     if (!root) return
