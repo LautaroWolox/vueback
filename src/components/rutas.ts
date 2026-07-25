@@ -125,23 +125,28 @@ export const getRutas = (rutas:any) => {
             visible: hasMenu('CECO'),
             items: [
                 {
-                    label: 'WorkAround',
-                    command: () => { router.push({ name: 'WOAR' }); },
-                    visible: hasMenu('WOAR')
+                    label: 'Búsqueda de OTs',
+                    command: () => { router.push({ name: 'BUOT' }); },
+                    visible: hasMenu('BUOT')
                 },
                 {
-                    label: 'Parametrizaciones',
-                    visible: hasMenu('PARA'),
+                    label: 'Gestión de Reglas',
+                    visible: hasMenu('GERE'),
                     items: [
                         {
-                            label: 'Configuración Jobtype-Contrato',
-                            command: () => { router.push({ name: 'JOCO' }); },
-                            visible: hasMenu('JOCO')
+                            label: 'Consultar Reglas',
+                            command: () => { router.push({ name: 'CORE' }); },
+                            visible: hasMenu('CORE')
                         },
                         {
-                            label: 'Configuración CMO-Actividad',
-                            command: () => { router.push({ name: 'JOCM' }); },
-                            visible: hasMenu('JOCM') || hasMenu('JOCO')
+                            label: 'Monitoreo y Ejecución de Reglas',
+                            command: () => { router.push({ name: 'MORE' }); },
+                            visible: hasMenu('MORE')
+                        },
+                        {
+                            label: 'Regla Prueba Masiva',
+                            command: () => { router.push({ name: 'PUMA' }); },
+                            visible: hasMenu('PUMA')
                         }
                     ]
                 },
@@ -172,23 +177,18 @@ export const getRutas = (rutas:any) => {
                     ]
                 },
                 {
-                    label: 'Gestión de Reglas',
-                    visible: hasMenu('GERE'),
+                    label: 'Parametrizaciones',
+                    visible: hasMenu('PARA'),
                     items: [
                         {
-                            label: 'Consultar Reglas',
-                            command: () => { router.push({ name: 'CORE' }); },
-                            visible: hasMenu('CORE')
+                            label: 'Configuración Jobtype-Contrato',
+                            command: () => { router.push({ name: 'JOCO' }); },
+                            visible: hasMenu('JOCO')
                         },
                         {
-                            label: 'Monitoreo y Ejecución de Reglas',
-                            command: () => { router.push({ name: 'MORE' }); },
-                            visible: hasMenu('MORE')
-                        },
-                        {
-                            label: 'Regla Prueba Masiva',
-                            command: () => { router.push({ name: 'PUMA' }); },
-                            visible: hasMenu('PUMA')
+                            label: 'Configuración CMO-Actividad',
+                            command: () => { router.push({ name: 'JOCM' }); },
+                            visible: hasMenu('JOCM') || hasMenu('JOCO')
                         }
                     ]
                 },
@@ -196,11 +196,6 @@ export const getRutas = (rutas:any) => {
                     label: 'Registro OTs Fallidas',
                     command: () => { router.push({ name: 'ROTF' }); },
                     visible: hasMenu('ROTF')
-                },
-                {
-                    label: 'Búsqueda de Ots',
-                    command: () => { router.push({ name: 'BUOT' }); },
-                    visible: hasMenu('BUOT')
                 }
             ]
         }
