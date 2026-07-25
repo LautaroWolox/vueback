@@ -73,6 +73,10 @@ const findSearchAction = (target) => {
   const element = target?.closest?.(ACTION_SELECTOR)
   if (!element || isDisabled(element)) return null
 
+  // Un encabezado puede contener palabras como "BUSCAR" en su título, pero
+  // abrir o cerrar un acordeón nunca debe interpretarse como una búsqueda.
+  if (element.closest?.(ACCORDION_HEADER_SELECTOR)) return null
+
   const actionText = getActionText(element)
   if (EXCLUDED_ACTION_PATTERN.test(actionText)) return null
 
