@@ -1,15 +1,19 @@
 import { onBeforeUnmount, onMounted } from 'vue'
 import { installAccordionSearchBehavior } from '@/utils/accordionSearchBehavior'
+import { installMigratedAccordionSearchBehavior } from '@/utils/migratedAccordionSearchBehavior'
 
 export function useGlobalAccordionSearch() {
-  let removeBehavior = null
+  let removeBehaviors = []
 
   onMounted(() => {
-    removeBehavior = installAccordionSearchBehavior(document)
+    removeBehaviors = [
+      installAccordionSearchBehavior(document),
+      installMigratedAccordionSearchBehavior(document)
+    ]
   })
 
   onBeforeUnmount(() => {
-    removeBehavior?.()
-    removeBehavior = null
+    removeBehaviors.forEach((removeBehavior) => removeBehavior?.())
+    removeBehaviors = []
   })
 }
