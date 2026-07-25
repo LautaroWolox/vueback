@@ -265,7 +265,7 @@ export function installMigratedAccordionSearchBehavior(doc = document) {
   const handleKeydown = (event) => {
     if (event.key !== 'Enter' || event.isComposing) return
     const target = event.target
-    if (!target?.matches?.('input, select, textarea')) return
+    if (!target?.matches?.('input, select')) return
 
     const root = findSupportedRoot(target, doc)
     if (!root) return
