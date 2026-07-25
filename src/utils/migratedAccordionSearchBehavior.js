@@ -72,6 +72,10 @@ const findSearchAction = (target) => {
   const element = target?.closest?.(ACTION_SELECTOR)
   if (!element || isDisabled(element)) return null
 
+  // Los títulos de paneles pueden contener BUSCAR o FILTRAR. El clic del
+  // encabezado solo cambia su apertura y nunca representa una búsqueda.
+  if (element.closest?.(HEADER_SELECTOR)) return null
+
   const actionText = getActionText(element)
   if (EXCLUDED_ACTION_PATTERN.test(actionText)) return null
 
