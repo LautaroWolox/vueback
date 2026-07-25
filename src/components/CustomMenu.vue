@@ -6,6 +6,7 @@
           v-bind="props.action"
           class="fm-menu-link"
           :class="root ? 'fm-menu-link--root' : 'fm-menu-link--submenu'"
+          @click="closeDropdown"
         >
           <span class="fm-menu-label">{{ item.label }}</span>
           <i
@@ -18,39 +19,82 @@
       </template>
 
       <template #end>
-        <div class="user-section">
-          <Button class="user-profile" text type="button" @click="toggleDropdown">
+        <div ref="userSectionRef" class="user-section">
+          <Button
+            class="user-profile"
+            text
+            type="button"
+            aria-haspopup="menu"
+            :aria-expanded="showDropdown"
+            aria-controls="fm-user-menu"
+            @click="toggleDropdown"
+          >
             <span class="user-avatar" aria-hidden="true">{{ userInitials }}</span>
-            <span class="username">{{ userLabel }}</span>
-            <i class="pi pi-chevron-down dropdown-icon" :class="{ rotated: showDropdown }"></i>
+            <span class="user-profile-copy">
+              <span class="username">{{ userLabel }}</span>
+              <span class="user-caption">Mi cuenta</span>
+            </span>
+            <i
+              class="pi pi-chevron-down dropdown-icon"
+              :class="{ rotated: showDropdown }"
+              aria-hidden="true"
+            ></i>
           </Button>
 
-          <div v-if="showDropdown" class="dropdown-content">
-            <div class="user-info">
-              <div v-if="email" class="info-item">
-                <i class="pi pi-envelope"></i>
-                <span>{{ email }}</span>
-              </div>
-              <div v-if="legajo" class="info-item">
-                <i class="pi pi-id-card"></i>
-                <span>Legajo: {{ legajo }}</span>
+          <div
+            v-if="showDropdown"
+            id="fm-user-menu"
+            class="dropdown-content"
+            role="menu"
+            aria-label="Opciones de usuario"
+          >
+            <div class="account-summary">
+              <span class="account-avatar" aria-hidden="true">{{ userInitials }}</span>
+              <div class="account-summary__copy">
+                <strong>{{ accountTitle }}</strong>
+                <span>Sesión activa</span>
               </div>
             </div>
 
-            <Button
-              class="logout-btn"
-              text
-              type="button"
-              icon="pi pi-sign-out"
-              label="Cerrar Sesión"
-              @click="logout"
-            />
+            <div class="user-info">
+              <div v-if="legajo" class="info-item">
+                <span class="info-icon" aria-hidden="true">
+                  <i class="pi pi-id-card"></i>
+                </span>
+                <div class="info-copy">
+                  <small>Legajo</small>
+                  <span>{{ legajo }}</span>
+                </div>
+              </div>
+
+              <div v-if="email" class="info-item">
+                <span class="info-icon" aria-hidden="true">
+                  <i class="pi pi-envelope"></i>
+                </span>
+                <div class="info-copy">
+                  <small>Correo</small>
+                  <span :title="email">{{ email }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="logout-area">
+              <Button
+                class="logout-btn"
+                text
+                type="button"
+                icon="pi pi-sign-out"
+                label="Cerrar sesión"
+                role="menuitem"
+                @click="logout"
+              />
+            </div>
           </div>
         </div>
       </template>
     </Menubar>
 
-    <div class="color-gradient"></div>
+    <div class="menu-accent"></div>
     <div class="spacer"></div>
   </div>
 </template>
@@ -69,9 +113,11 @@ const email = authStore.usuario?.email ?? ''
 const legajo = authStore.usuario?.legajo ?? ''
 const rutas = authStore.rutas
 const showDropdown = ref(false)
+const userSectionRef = ref<HTMLElement | null>(null)
 const items = ref(getRutas(rutas))
 
 const userLabel = computed(() => legajo || nombre || 'Usuario')
+const accountTitle = computed(() => nombre || (legajo ? `Usuario ${legajo}` : 'Usuario'))
 const userInitials = computed(() => {
   const value = String(nombre || legajo || 'Usuario').trim()
   const parts = value.split(/\s+/).filter(Boolean)
@@ -80,6 +126,7 @@ const userInitials = computed(() => {
 })
 
 const logout = () => {
+  closeDropdown()
   authStore.logout()
   router.push({ name: 'login2fa' })
 }
@@ -94,12 +141,22 @@ const closeDropdown = () => {
 }
 
 const handleClickOutside = (event: MouseEvent) => {
-  const userSection = document.querySelector('.user-section')
-  if (!userSection?.contains(event.target as Node)) closeDropdown()
+  if (!userSectionRef.value?.contains(event.target as Node)) closeDropdown()
 }
 
-onMounted(() => document.addEventListener('click', handleClickOutside))
-onUnmounted(() => document.removeEventListener('click', handleClickOutside))
+const handleEscape = (event: KeyboardEvent) => {
+  if (event.key === 'Escape') closeDropdown()
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+  document.addEventListener('keydown', handleEscape)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+  document.removeEventListener('keydown', handleEscape)
+})
 </script>
 
 <style scoped>
@@ -113,7 +170,7 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
 :deep(.main-menu.p-menubar) {
   min-height: 48px !important;
   height: 48px !important;
-  padding: 0 10px !important;
+  padding: 0 12px !important;
   border: 0 !important;
   border-radius: 0 !important;
   background: #00a9bd !important;
@@ -135,6 +192,7 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
   height: 48px !important;
   border-radius: 0 !important;
   background: transparent !important;
+  transition: background-color .16s ease;
 }
 
 .fm-menu-link {
@@ -146,8 +204,8 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
 
 .fm-menu-link--root {
   height: 48px !important;
-  gap: 7px;
-  padding: 0 12px !important;
+  gap: 9px;
+  padding: 0 15px !important;
   color: #fff !important;
 }
 
@@ -158,64 +216,74 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
 
 .fm-menu-link--root .fm-menu-label {
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1;
   white-space: nowrap;
 }
 
 .fm-menu-link--root .fm-menu-chevron {
-  font-size: 8px;
+  font-size: 9px;
 }
 
 :deep(.p-menubar-root-list > .p-menubar-item > .p-menubar-item-content:hover),
 :deep(.p-menubar-root-list > .p-menubar-item.p-focus > .p-menubar-item-content),
+:deep(.p-menubar-root-list > .p-menubar-item.p-menubar-item-active > .p-menubar-item-content),
 :deep(.p-menubar-root-list > .p-menuitem > .p-menuitem-content:hover),
 :deep(.p-menubar-root-list > .p-menuitem.p-focus > .p-menuitem-content) {
-  background: rgba(255, 255, 255, .14) !important;
+  background: #0096aa !important;
 }
 
+/* Paneles de primer y segundo nivel: línea superior turquesa como referencia. */
 :deep(.p-menubar-submenu),
 :deep(.p-submenu-list) {
-  min-width: 210px !important;
+  min-width: 248px !important;
   width: max-content !important;
-  max-width: 340px !important;
-  padding: 5px 0 !important;
-  border: 1px solid #d5dee4 !important;
+  max-width: 360px !important;
+  padding: 0 !important;
+  border: 1px solid #d9e2e7 !important;
+  border-top: 3px solid #00a9bd !important;
   border-radius: 0 !important;
   background: #fff !important;
-  box-shadow: 0 9px 24px rgba(18, 45, 57, .20) !important;
+  box-shadow: 0 8px 22px rgba(18, 45, 57, .18) !important;
   overflow: visible !important;
   z-index: 3000 !important;
+}
+
+:deep(.p-menubar-submenu .p-menubar-submenu),
+:deep(.p-submenu-list .p-submenu-list) {
+  min-width: 278px !important;
+  margin-top: -3px !important;
 }
 
 :deep(.p-menubar-submenu .p-menubar-item),
 :deep(.p-submenu-list .p-menubar-item),
 :deep(.p-submenu-list .p-menuitem) {
-  min-height: 29px !important;
+  min-height: 35px !important;
   height: auto !important;
 }
 
 :deep(.p-menubar-submenu .p-menubar-item-content),
 :deep(.p-submenu-list .p-menubar-item-content),
 :deep(.p-submenu-list .p-menuitem-content) {
-  min-height: 29px !important;
+  min-height: 35px !important;
   height: auto !important;
   border-radius: 0 !important;
   background: #fff !important;
+  transition: background-color .14s ease;
 }
 
 .fm-menu-link--submenu {
   width: 100%;
-  min-height: 29px !important;
-  gap: 10px;
-  padding: 5px 13px !important;
-  color: #213746 !important;
-  background: #fff !important;
+  min-height: 35px !important;
+  gap: 12px;
+  padding: 8px 16px !important;
+  color: #273b46 !important;
+  background: transparent !important;
 }
 
 .fm-menu-link--submenu .fm-menu-label {
   flex: 1 1 auto;
-  color: #213746 !important;
+  color: #273b46 !important;
   font-size: 12px;
   font-weight: 400;
   line-height: 1.25;
@@ -227,30 +295,37 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
 .fm-menu-link--submenu .fm-menu-chevron {
   flex: 0 0 auto;
   margin-left: auto;
-  color: #91a1ab !important;
+  color: #8da0aa !important;
   font-size: 9px;
 }
 
 :deep(.p-menubar-submenu .p-menubar-item-content:hover),
 :deep(.p-menubar-submenu .p-menubar-item.p-focus > .p-menubar-item-content),
+:deep(.p-menubar-submenu .p-menubar-item.p-menubar-item-active > .p-menubar-item-content),
 :deep(.p-submenu-list .p-menubar-item-content:hover),
 :deep(.p-submenu-list .p-menubar-item.p-focus > .p-menubar-item-content),
 :deep(.p-submenu-list .p-menuitem-content:hover),
 :deep(.p-submenu-list .p-menuitem.p-focus > .p-menuitem-content) {
-  background: #e8fafd !important;
+  background: #dff7fa !important;
 }
 
 :deep(.p-menubar-submenu .p-menubar-item-content:hover .fm-menu-link--submenu),
+:deep(.p-menubar-submenu .p-menubar-item.p-focus > .p-menubar-item-content .fm-menu-link--submenu),
+:deep(.p-menubar-submenu .p-menubar-item.p-menubar-item-active > .p-menubar-item-content .fm-menu-link--submenu),
 :deep(.p-submenu-list .p-menubar-item-content:hover .fm-menu-link--submenu),
+:deep(.p-submenu-list .p-menubar-item.p-focus > .p-menubar-item-content .fm-menu-link--submenu),
 :deep(.p-submenu-list .p-menuitem-content:hover .fm-menu-link--submenu) {
-  color: #006f7d !important;
-  background: #e8fafd !important;
+  color: #007f91 !important;
+  background: #dff7fa !important;
 }
 
 :deep(.p-menubar-submenu .p-menubar-item-content:hover .fm-menu-label),
+:deep(.p-menubar-submenu .p-menubar-item-content:hover .fm-menu-chevron),
+:deep(.p-menubar-submenu .p-menubar-item.p-focus > .p-menubar-item-content .fm-menu-label),
+:deep(.p-menubar-submenu .p-menubar-item.p-focus > .p-menubar-item-content .fm-menu-chevron),
 :deep(.p-submenu-list .p-menubar-item-content:hover .fm-menu-label),
-:deep(.p-submenu-list .p-menuitem-content:hover .fm-menu-label) {
-  color: #006f7d !important;
+:deep(.p-submenu-list .p-menubar-item-content:hover .fm-menu-chevron) {
+  color: #007f91 !important;
 }
 
 .user-section {
@@ -263,30 +338,34 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
 
 .user-profile,
 :deep(.user-profile.p-button) {
-  min-width: 0 !important;
-  min-height: 34px !important;
-  height: 34px !important;
+  min-width: 172px !important;
+  min-height: 38px !important;
+  height: 38px !important;
   display: flex !important;
   align-items: center !important;
-  gap: 7px !important;
-  padding: 0 8px !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
+  gap: 9px !important;
+  padding: 0 10px 0 6px !important;
+  border: 1px solid rgba(255, 255, 255, .20) !important;
+  border-radius: 11px !important;
+  background: rgba(0, 111, 127, .20) !important;
   color: #fff !important;
-  box-shadow: none !important;
+  box-shadow: 0 4px 12px rgba(0, 77, 89, .10) !important;
+  transition: background-color .16s ease, border-color .16s ease !important;
 }
 
 .user-profile:hover,
-:deep(.user-profile.p-button:hover) {
-  background: rgba(255, 255, 255, .13) !important;
+:deep(.user-profile.p-button:hover),
+.user-profile[aria-expanded="true"],
+:deep(.user-profile.p-button[aria-expanded="true"]) {
+  border-color: rgba(255, 255, 255, .38) !important;
+  background: rgba(0, 105, 120, .36) !important;
   transform: none !important;
 }
 
 .user-avatar {
-  width: 27px;
-  height: 27px;
-  flex: 0 0 27px;
+  width: 29px;
+  height: 29px;
+  flex: 0 0 29px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -294,17 +373,35 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
   background: #fff;
   color: #008fa1;
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(0, 65, 76, .14);
+}
+
+.user-profile-copy {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
 }
 
 .username {
-  max-width: 128px;
+  max-width: 112px;
   overflow: hidden;
   color: #fff;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
+  line-height: 1.1;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.user-caption {
+  color: rgba(255, 255, 255, .72);
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1;
 }
 
 .dropdown-icon {
@@ -320,83 +417,164 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
 .dropdown-content {
   position: absolute;
   z-index: 3100;
-  top: calc(100% + 4px);
+  top: calc(100% + 7px);
   right: 0;
-  min-width: 220px;
+  width: 286px;
   overflow: hidden;
-  border: 1px solid #dce5e9;
+  border: 1px solid #d9e3e7;
+  border-top: 3px solid #00a9bd;
+  border-radius: 10px;
   background: #fff;
-  box-shadow: 0 9px 24px rgba(18, 45, 57, .18);
+  box-shadow: 0 15px 34px rgba(17, 48, 61, .23);
   animation: dropdown-in .16s ease-out;
 }
 
 @keyframes dropdown-in {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(-5px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.account-summary {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 15px;
+  background: linear-gradient(135deg, #f2fcfd 0%, #e6f8fb 100%);
+  border-bottom: 1px solid #dbeaec;
+}
+
+.account-avatar {
+  width: 43px;
+  height: 43px;
+  flex: 0 0 43px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #00a9bd;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  box-shadow: 0 4px 10px rgba(0, 126, 143, .23);
+}
+
+.account-summary__copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.account-summary__copy strong {
+  max-width: 190px;
+  overflow: hidden;
+  color: #183744;
+  font-size: 13px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-summary__copy span {
+  color: #5a7681;
+  font-size: 10px;
 }
 
 .user-info {
-  padding: 7px 9px;
-  border-bottom: 1px solid #e5ecef;
+  display: grid;
+  gap: 6px;
+  padding: 11px 12px;
+  background: #fff;
 }
 
 .info-item {
-  min-height: 28px;
+  min-height: 47px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 4px 5px;
-  color: #4e6572;
-  font-size: 11px;
+  gap: 10px;
+  padding: 7px 9px;
+  border: 1px solid #edf1f3;
+  border-radius: 7px;
+  background: #fafcfd;
+  color: #344f5b;
 }
 
-.info-item i {
-  width: 14px;
-  color: #008fa1;
-  font-size: 11px;
+.info-icon {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  background: #dff7fa;
+  color: #008b9d;
 }
 
-.info-item span {
-  max-width: 180px;
+.info-icon i {
+  font-size: 12px;
+}
+
+.info-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.info-copy small {
+  color: #82959d;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.info-copy span {
+  max-width: 196px;
   overflow: hidden;
+  color: #344f5b;
+  font-size: 11px;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.logout-area {
+  padding: 9px 12px 11px;
+  border-top: 1px solid #edf1f3;
+  background: #fff;
 }
 
 .logout-btn,
 :deep(.logout-btn.p-button) {
   width: 100% !important;
-  min-height: 34px !important;
-  height: 34px !important;
-  justify-content: flex-start !important;
-  gap: 8px !important;
+  min-height: 38px !important;
+  height: 38px !important;
+  justify-content: center !important;
+  gap: 9px !important;
   padding: 0 12px !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: #fff !important;
-  color: #d92932 !important;
-  font-size: 11px !important;
-  font-weight: 600 !important;
+  border: 1px solid #f1c9cc !important;
+  border-radius: 7px !important;
+  background: #fff7f7 !important;
+  color: #d82331 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
   box-shadow: none !important;
 }
 
 .logout-btn:hover,
 :deep(.logout-btn.p-button:hover) {
-  background: #eafcfe !important;
-  color: #008fa1 !important;
+  border-color: #e99ba1 !important;
+  background: #ffeded !important;
+  color: #b91824 !important;
 }
 
-.color-gradient {
+.menu-accent {
   width: 100%;
   height: 4px;
-  background: linear-gradient(90deg, #00b4b5, #00d4ff, #024da1, #91268f, #e30f72, #ff7a00, #ebbb1d, #97c93d, #00a65a, #00b4b5);
-  background-size: 300% 100%;
-  animation: fm-color-flow 22s linear infinite;
-}
-
-@keyframes fm-color-flow {
-  from { background-position: 0 50%; }
-  to { background-position: 100% 50%; }
+  background: linear-gradient(90deg, #008fa1 0%, #00a9bd 50%, #26c6d5 100%);
 }
 
 .spacer {
@@ -405,7 +583,17 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
 }
 
 @media (max-width: 900px) {
-  .username { display: none; }
-  .fm-menu-link--root { padding: 0 8px !important; }
+  .user-profile,
+  :deep(.user-profile.p-button) {
+    min-width: 0 !important;
+  }
+
+  .user-profile-copy {
+    display: none;
+  }
+
+  .fm-menu-link--root {
+    padding: 0 9px !important;
+  }
 }
 </style>
