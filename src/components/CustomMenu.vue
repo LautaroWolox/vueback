@@ -163,11 +163,10 @@ onUnmounted(() => {
   height: 42px !important;
   border-radius: 0 !important;
   background: transparent !important;
-  box-shadow: inset 0 -1px 0 rgba(0, 104, 119, .16);
+  box-shadow: inset 0 -1px 0 rgba(0, 104, 119, .12);
   transition:
     background-color .13s ease,
-    box-shadow .13s ease,
-    transform .13s ease;
+    box-shadow .13s ease;
 }
 
 .fm-menu-link {
@@ -190,7 +189,7 @@ onUnmounted(() => {
 }
 
 .fm-menu-link--root .fm-menu-label {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   line-height: 1;
   white-space: nowrap;
@@ -205,11 +204,10 @@ onUnmounted(() => {
 :deep(.p-menubar-root-list > .p-menubar-item.p-menubar-item-active > .p-menubar-item-content),
 :deep(.p-menubar-root-list > .p-menuitem > .p-menuitem-content:hover),
 :deep(.p-menubar-root-list > .p-menuitem.p-focus > .p-menuitem-content) {
-  background: #0095a9 !important;
+  background: #0098ab !important;
   box-shadow:
-    inset 0 3px 6px rgba(0, 66, 76, .28),
-    inset 0 0 0 1px rgba(255, 255, 255, .08) !important;
-  transform: translateY(1px);
+    inset 0 1px 2px rgba(0, 66, 76, .13),
+    inset 0 0 0 1px rgba(255, 255, 255, .05) !important;
 }
 
 :deep(.p-menubar-submenu),
@@ -250,12 +248,11 @@ onUnmounted(() => {
   margin: 1px 2px !important;
   background: #fff !important;
   box-shadow:
-    0 1px 1px rgba(18, 45, 57, .05),
-    inset 0 -1px 0 #e6ecef;
+    0 1px 1px rgba(18, 45, 57, .035),
+    inset 0 -1px 0 #edf1f3;
   transition:
     background-color .13s ease,
-    box-shadow .13s ease,
-    transform .13s ease;
+    box-shadow .13s ease;
 }
 
 .fm-menu-link--submenu {
@@ -270,7 +267,7 @@ onUnmounted(() => {
 .fm-menu-link--submenu .fm-menu-label {
   flex: 1 1 auto;
   color: #273b46 !important;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 400;
   line-height: 1.2;
   white-space: nowrap;
@@ -290,11 +287,10 @@ onUnmounted(() => {
 :deep(.p-submenu-list .p-menubar-item.p-focus > .p-menubar-item-content),
 :deep(.p-submenu-list .p-menuitem-content:hover),
 :deep(.p-submenu-list .p-menuitem.p-focus > .p-menuitem-content) {
-  background: #dff7fa !important;
+  background: #e4f7f9 !important;
   box-shadow:
-    inset 0 3px 6px rgba(26, 78, 90, .18),
-    inset 0 0 0 1px rgba(0, 169, 189, .17) !important;
-  transform: translateY(1px);
+    inset 0 1px 2px rgba(26, 78, 90, .08),
+    inset 0 0 0 1px rgba(0, 169, 189, .10) !important;
 }
 
 :deep(.p-menubar-submenu .p-menubar-item-content:hover .fm-menu-label),
@@ -334,10 +330,9 @@ onUnmounted(() => {
 :deep(.user-profile.p-button:hover),
 .user-profile[aria-expanded="true"],
 :deep(.user-profile.p-button[aria-expanded="true"]) {
-  border-color: rgba(255, 255, 255, .48) !important;
-  background: rgba(0, 105, 120, .35) !important;
-  box-shadow: inset 0 3px 6px rgba(0, 66, 76, .22) !important;
-  transform: translateY(1px) !important;
+  border-color: rgba(255, 255, 255, .44) !important;
+  background: rgba(0, 105, 120, .31) !important;
+  box-shadow: inset 0 1px 2px rgba(0, 66, 76, .12) !important;
 }
 
 .user-profile-icon {
@@ -359,7 +354,7 @@ onUnmounted(() => {
   flex: 1 1 auto;
   overflow: hidden;
   color: #fff;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   text-align: left;
   text-overflow: ellipsis;
@@ -477,8 +472,7 @@ onUnmounted(() => {
   border-color: #008fa1 !important;
   background: #e8fafd !important;
   color: #006f7d !important;
-  box-shadow: inset 0 2px 5px rgba(26, 78, 90, .14) !important;
-  transform: translateY(1px) !important;
+  box-shadow: inset 0 1px 2px rgba(26, 78, 90, .08) !important;
 }
 
 .menu-accent {
