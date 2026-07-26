@@ -74,6 +74,7 @@
   height: 34px !important;
   flex: 0 0 34px !important;
   margin-top: 1px;
+  border-radius: 6px !important;
   background: #dff7fa !important;
   color: #007f90 !important;
 }
@@ -103,7 +104,7 @@
 #app .main-menu .fm-user-extra-fields {
   width: calc(100% + 45px);
   display: grid;
-  gap: 7px;
+  gap: 8px;
   margin-top: 9px;
   margin-left: -45px;
   padding-top: 9px;
@@ -115,23 +116,23 @@
   display: grid;
   grid-template-columns: 34px 55px minmax(0, 1fr);
   align-items: center;
-  gap: 5px;
+  gap: 11px;
 }
 
 #app .main-menu .fm-user-profile-field__icon {
-  width: 20px;
-  height: 20px;
+  width: 34px;
+  height: 34px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   justify-self: center;
-  border-radius: 4px;
-  background: #e4f8fa;
-  color: #008b9d;
+  border-radius: 6px;
+  background: #dff7fa;
+  color: #007f90;
 }
 
 #app .main-menu .fm-user-profile-field__icon i {
-  font-size: 10px !important;
+  font-size: 16px !important;
 }
 
 #app .main-menu .fm-user-profile-field small {
@@ -143,12 +144,12 @@
 
 #app .main-menu .fm-user-profile-field__value {
   min-width: 0;
-  min-height: 17px;
+  min-height: 18px;
   overflow: hidden;
-  color: #314e5a !important;
-  font-size: 12px !important;
-  font-weight: 500 !important;
-  line-height: 17px;
+  color: #203f4b !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 18px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
