@@ -1,0 +1,6 @@
+/* Ajustes visuales específicos del menú principal.
+ * Se mantiene separado para no alterar los estilos generales de PrimeVue.
+ */
+#app .main-menu .fm-menu-link--submenu .fm-menu-label {
+  font-size: 12px !important;
+}
