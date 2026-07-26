@@ -47,7 +47,7 @@ const splitName = (displayName, storedSurname, legajo) => {
   }
 }
 
-const ensureProfileField = (container, field, label) => {
+const ensureProfileField = (container, field, label, iconClass) => {
   let wrapper = container.querySelector(`[data-fm-user-field="${field}"]`)
 
   if (!wrapper) {
@@ -55,13 +55,21 @@ const ensureProfileField = (container, field, label) => {
     wrapper.className = 'fm-user-profile-field'
     wrapper.dataset.fmUserField = field
 
+    const fieldIcon = document.createElement('span')
+    fieldIcon.className = 'fm-user-profile-field__icon'
+    fieldIcon.setAttribute('aria-hidden', 'true')
+
+    const icon = document.createElement('i')
+    icon.className = `pi ${iconClass}`
+    fieldIcon.append(icon)
+
     const fieldLabel = document.createElement('small')
     fieldLabel.textContent = label
 
     const fieldValue = document.createElement('span')
     fieldValue.className = 'fm-user-profile-field__value'
 
-    wrapper.append(fieldLabel, fieldValue)
+    wrapper.append(fieldIcon, fieldLabel, fieldValue)
     container.append(wrapper)
   }
 
@@ -108,8 +116,8 @@ export const installUserMenuProfile = () => {
         copy.append(extraFields)
       }
 
-      const nombreElement = ensureProfileField(extraFields, 'nombre', 'Nombre')
-      const apellidoElement = ensureProfileField(extraFields, 'apellido', 'Apellido')
+      const nombreElement = ensureProfileField(extraFields, 'nombre', 'Nombre', 'pi-user')
+      const apellidoElement = ensureProfileField(extraFields, 'apellido', 'Apellido', 'pi-users')
 
       setProfileFieldValue(nombreElement, nombre)
       setProfileFieldValue(apellidoElement, apellido)
