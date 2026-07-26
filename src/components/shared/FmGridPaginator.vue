@@ -57,10 +57,10 @@
       <select
         v-if="showRowsSelect"
         class="fm-rows-select"
-        :value="resolvedRows"
+        :value="displayRows"
         :disabled="disabled"
         aria-label="Filas por página"
-        @change="$emit('rows-change', Number($event.target.value))"
+        @change="changeRows"
       >
         <option v-for="option in normalizedRowsOptions" :key="option" :value="option">
           {{ option }}
@@ -75,7 +75,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, watch } from 'vue'
+import { computed, nextTick, onMounted, watch } from 'vue'
 
 const props = defineProps({
   first: { type: Number, default: 0 },
@@ -110,11 +110,9 @@ const maxRowsOption = computed(() => (
   normalizedRowsOptions.value.length ? Math.max(...normalizedRowsOptions.value) : 0
 ))
 
-const resolvedRows = computed(() => {
-  if (props.autoMaxRows && props.showRowsSelect && maxRowsOption.value) return maxRowsOption.value
-  if (props.rows > 0) return props.rows
-  return maxRowsOption.value
-})
+const displayRows = computed(() => (
+  props.rows > 0 ? props.rows : maxRowsOption.value
+))
 
 const resolvedCounterText = computed(() => {
   if (props.counterText) return props.counterText
@@ -128,6 +126,16 @@ const applyMaximumRows = () => {
   emit('rows-change', maxRowsOption.value)
 }
 
+const scheduleMaximumRows = () => {
+  nextTick(() => {
+    requestAnimationFrame(applyMaximumRows)
+  })
+}
+
+const changeRows = (event) => {
+  emit('rows-change', Number(event.target.value))
+}
+
 const changePage = (event) => {
   if (!props.pageCount) return
 
@@ -139,8 +147,8 @@ const changePage = (event) => {
   emit('page-change', normalizedPage - 1)
 }
 
-onMounted(applyMaximumRows)
-watch(() => props.rowsOptions, applyMaximumRows, { deep: true })
+onMounted(scheduleMaximumRows)
+watch(() => props.rowsOptions, scheduleMaximumRows, { deep: true })
 </script>
 
 <style scoped>
