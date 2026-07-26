@@ -25,6 +25,7 @@ import { useAuthStore } from './store/auth'
 import { fmPrimePassThrough } from './components/shared/primePassThrough.js'
 import { installResponsiveIframes } from './plugins/responsiveIframes.js'
 import { installUserMenuProfile } from './plugins/userMenuProfile.js'
+import { installOtFallidasPaginatorCounter } from './plugins/otFallidasPaginatorCounter.js'
 
 import FmButton from './components/shared/FmButton.vue'
 import FmPanel from './components/shared/FmPanel.vue'
@@ -122,3 +123,4 @@ app.directive('tooltip', Tooltip)
 app.mount('#app')
 installResponsiveIframes()
 installUserMenuProfile()
+installOtFallidasPaginatorCounter()
