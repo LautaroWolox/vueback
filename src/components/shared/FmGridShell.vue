@@ -29,7 +29,7 @@
 defineProps({
   title: { type: String, default: '' },
   loading: { type: Boolean, default: false },
-  loadingTitle: { type: String, default: 'Cargando' },
-  loadingMessage: { type: String, default: 'Cargando grilla' }
+  loadingTitle: { type: String, default: 'Cargando Información' },
+  loadingMessage: { type: String, default: 'Preparando Grilla' }
 })
 </script>
