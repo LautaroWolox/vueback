@@ -21,8 +21,10 @@ import Tooltip from 'primevue/tooltip'
 import App from './App.vue'
 import router from './router'
 import { strings } from './strings.js'
+import { useAuthStore } from './store/auth'
 import { fmPrimePassThrough } from './components/shared/primePassThrough.js'
 import { installResponsiveIframes } from './plugins/responsiveIframes.js'
+import { installUserMenuProfile } from './plugins/userMenuProfile.js'
 
 import FmButton from './components/shared/FmButton.vue'
 import FmPanel from './components/shared/FmPanel.vue'
@@ -71,6 +73,7 @@ const FieldManagerPreset = definePreset(Lara, {
 const app = createApp(App)
 
 app.use(pinia)
+useAuthStore().normalizeDisplayName()
 app.use(router)
 app.use(ToastService)
 app.use(ConfirmationService)
@@ -118,3 +121,4 @@ app.component('FmResponsivePage', FmResponsivePage)
 app.directive('tooltip', Tooltip)
 app.mount('#app')
 installResponsiveIframes()
+installUserMenuProfile()

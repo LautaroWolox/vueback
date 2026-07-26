@@ -58,7 +58,7 @@
 
       <strong v-if="showTitle && displayTitle" class="fm-typing-loader__title">{{ displayTitle }}</strong>
       <div v-if="showMessage" class="fm-typing-loader__message">
-        {{ message }}<span class="fm-typing-loader__dots" aria-hidden="true"></span>
+        {{ displayMessage }}<span class="fm-typing-loader__dots" aria-hidden="true"></span>
       </div>
     </div>
   </div>
@@ -66,10 +66,14 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+
+const GLOBAL_TITLE = 'Cargando Información'
+const GLOBAL_MESSAGE = 'Preparando Grilla'
 
 const props = defineProps({
-  title: { type: String, default: 'Cargando' },
-  message: { type: String, default: 'Procesando información' },
+  title: { type: String, default: GLOBAL_TITLE },
+  message: { type: String, default: GLOBAL_MESSAGE },
   variant: { type: String, default: 'inline' },
   fullscreen: { type: Boolean, default: false },
   overlay: { type: Boolean, default: false },
@@ -78,8 +82,23 @@ const props = defineProps({
   showMessage: { type: Boolean, default: true }
 })
 
-const displayTitle = computed(() => props.title || props.message)
-const accessibleMessage = computed(() => `${displayTitle.value}. ${props.message}`.trim())
+const route = useRoute()
+const isLoginRoute = computed(() => {
+  const routeName = String(route.name ?? '').toLowerCase()
+  const routePath = String(route.path ?? '').toLowerCase()
+
+  return routeName.includes('login') || routePath.includes('login') || routePath === '/'
+})
+
+const displayTitle = computed(() => (
+  isLoginRoute.value ? (props.title || props.message) : GLOBAL_TITLE
+))
+const displayMessage = computed(() => (
+  isLoginRoute.value ? props.message : GLOBAL_MESSAGE
+))
+const accessibleMessage = computed(() => (
+  `${displayTitle.value}. ${props.showMessage ? displayMessage.value : ''}`.trim()
+))
 const loaderClasses = computed(() => ({
   'fm-typing-loader--fullscreen': props.fullscreen,
   'fm-typing-loader--overlay': props.overlay,
