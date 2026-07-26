@@ -1,5 +1,8 @@
 <template>
-  <div class="fm-screen fm-screen--pad report-sas-page">
+  <div
+    class="fm-screen fm-screen--pad report-sas-page"
+    :class="{ 'report-sas-page--fullscreen': hasLoadedRows }"
+  >
     <Accordion value="0" class="fm-accordion report-sas-accordion">
       <AccordionPanel value="0">
         <AccordionHeader>REPORTE SAS</AccordionHeader>
@@ -61,6 +64,7 @@
                   :total-records="totalRecords"
                   :rows-options="rowsOptions"
                   :show-counter="true"
+                  :auto-max-rows="false"
                   :counter-text="totalRecords === 0 ? 'No hay resultados' : ''"
                   @first-page="firstPageCallback"
                   @prev-page="prevPageCallback"
@@ -183,7 +187,7 @@ type FilterMap = Record<string, { value: string | null; matchMode: string }>
 
 const rowsOptions = [10, 20, 50, 100, 200]
 const first = ref(0)
-const pageRows = ref(10)
+const pageRows = ref(Math.max(...rowsOptions))
 const dt = ref()
 const expandedCells = ref<ExpandedState>({})
 const filters = ref<FilterMap>({})
@@ -238,6 +242,8 @@ const processedData = computed<ReportRow[]>(() =>
     return processedItem
   })
 )
+
+const hasLoadedRows = computed(() => !isFetching.value && processedData.value.length > 0)
 
 const returnedFields = computed<string[]>(() => {
   const fields: string[] = []
@@ -406,12 +412,31 @@ const getPreview = (value: unknown) => {
   overflow: hidden;
 }
 
+.report-sas-page--fullscreen {
+  position: fixed;
+  inset: 82px 0 0;
+  z-index: 1;
+  width: 100vw;
+  max-width: 100vw;
+  height: calc(100dvh - 82px);
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #fff;
+}
+
 .report-sas-accordion,
 .report-sas-accordion :deep(.p-accordionpanel) {
   height: 100%;
   min-height: 0;
   display: flex;
   flex-direction: column;
+}
+
+.report-sas-page--fullscreen .report-sas-accordion {
+  width: 100%;
+  gap: 0;
 }
 
 .report-sas-accordion :deep(.p-accordioncontent) {
@@ -425,11 +450,14 @@ const getPreview = (value: unknown) => {
   min-height: 0;
   display: flex;
   flex-direction: column;
+  padding: 0;
   overflow: hidden;
 }
 
 .report-sas-grid-shell {
   flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -438,6 +466,7 @@ const getPreview = (value: unknown) => {
 
 .report-sas-grid,
 .report-sas-grid.p-datatable {
+  flex: 1 1 auto;
   width: 100%;
   height: 100%;
   min-height: 0;
@@ -449,6 +478,7 @@ const getPreview = (value: unknown) => {
 .report-sas-grid :deep(.p-datatable-wrapper),
 .report-sas-grid :deep([data-pc-section="tablecontainer"]) {
   flex: 1 1 auto;
+  width: 100%;
   min-height: 0;
   overflow: auto;
   background: #fff;
@@ -463,6 +493,7 @@ const getPreview = (value: unknown) => {
 .report-sas-grid :deep(.p-datatable-paginator-bottom),
 .report-sas-grid :deep(> .p-paginator) {
   flex: 0 0 40px;
+  width: 100%;
   height: 40px;
   min-height: 40px;
   padding: 0;
@@ -516,29 +547,5 @@ const getPreview = (value: unknown) => {
   font-size: 11px;
   text-align: left;
   cursor: pointer;
-}
-
-.legajo-preview:hover,
-.legajo-preview.expanded {
-  border-color: #00a9bd;
-  background: #edfbfd;
-  color: #006f7d;
-}
-
-.legajo-preview span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.legajo-preview.expanded span {
-  white-space: normal;
-}
-
-@media (max-width: 700px) {
-  .report-sas-page {
-    height: calc(100dvh - 64px);
-    min-height: 420px;
-  }
 }
 </style>
