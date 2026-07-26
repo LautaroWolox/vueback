@@ -172,7 +172,7 @@
   min-height: 28px !important;
   height: 28px !important;
   justify-content: center !important;
-  gap: 6px !important;
+  gap: 7px !important;
   padding: 0 12px !important;
   border: 1px solid #00a9bd !important;
   border-radius: 6px !important;
@@ -185,10 +185,23 @@
 }
 
 #app .main-menu .logout-btn.p-button .p-button-icon {
-  font-size: 11px !important;
+  width: 14px !important;
+  min-width: 14px !important;
+  height: 14px !important;
+  flex: 0 0 14px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  color: currentColor !important;
+  font-size: 14px !important;
+  line-height: 14px !important;
+  transform: none !important;
 }
 
 #app .main-menu .logout-btn.p-button .p-button-label {
+  display: inline-flex !important;
+  align-items: center !important;
   font-size: 11px !important;
   line-height: 1 !important;
 }
