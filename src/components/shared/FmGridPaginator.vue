@@ -57,12 +57,12 @@
       <select
         v-if="showRowsSelect"
         class="fm-rows-select"
-        :value="rows"
+        :value="resolvedRows"
         :disabled="disabled"
         aria-label="Filas por página"
         @change="$emit('rows-change', Number($event.target.value))"
       >
-        <option v-for="option in rowsOptions" :key="option" :value="option">
+        <option v-for="option in normalizedRowsOptions" :key="option" :value="option">
           {{ option }}
         </option>
       </select>
@@ -75,21 +75,22 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 
 const props = defineProps({
   first: { type: Number, default: 0 },
   last: { type: Number, default: 0 },
   page: { type: Number, default: 0 },
   pageCount: { type: Number, default: 0 },
-  rows: { type: Number, default: 10 },
+  rows: { type: Number, default: 0 },
   totalRecords: { type: Number, default: 0 },
   rowsOptions: { type: Array, default: () => [10, 50, 100, 500] },
   disabled: { type: Boolean, default: false },
   showRowsSelect: { type: Boolean, default: true },
   showCounter: { type: Boolean, default: true },
   counterText: { type: String, default: '' },
-  pageLabel: { type: String, default: 'Página' }
+  pageLabel: { type: String, default: 'Página' },
+  autoMaxRows: { type: Boolean, default: true }
 })
 
 const emit = defineEmits([
@@ -101,10 +102,31 @@ const emit = defineEmits([
   'rows-change'
 ])
 
+const normalizedRowsOptions = computed(() => (
+  [...new Set(props.rowsOptions.map(Number).filter((value) => Number.isFinite(value) && value > 0))]
+))
+
+const maxRowsOption = computed(() => (
+  normalizedRowsOptions.value.length ? Math.max(...normalizedRowsOptions.value) : 0
+))
+
+const resolvedRows = computed(() => {
+  if (props.autoMaxRows && props.showRowsSelect && maxRowsOption.value) return maxRowsOption.value
+  if (props.rows > 0) return props.rows
+  return maxRowsOption.value
+})
+
 const resolvedCounterText = computed(() => {
   if (props.counterText) return props.counterText
-  return `Mostrando ${props.totalRecords ? props.first + 1 : 0} - ${props.last} de ${props.totalRecords}`
+  return `Mostrando ${props.last} de ${props.totalRecords}`
 })
+
+const applyMaximumRows = () => {
+  if (!props.autoMaxRows || !props.showRowsSelect || props.disabled) return
+  if (!maxRowsOption.value || props.rows === maxRowsOption.value) return
+
+  emit('rows-change', maxRowsOption.value)
+}
 
 const changePage = (event) => {
   if (!props.pageCount) return
@@ -116,6 +138,9 @@ const changePage = (event) => {
   event.target.value = String(normalizedPage)
   emit('page-change', normalizedPage - 1)
 }
+
+onMounted(applyMaximumRows)
+watch(() => props.rowsOptions, applyMaximumRows, { deep: true })
 </script>
 
 <style scoped>
