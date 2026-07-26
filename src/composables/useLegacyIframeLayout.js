@@ -1,4 +1,5 @@
 import { onBeforeUnmount } from 'vue'
+import { installAccordionSearchBehavior } from '@/utils/accordionSearchBehavior'
 
 const STYLE_ID = 'fm-legacy-layout-only'
 
@@ -179,6 +180,7 @@ export function useLegacyIframeLayout(iframeRef) {
   let clickHandler = null
   let resizeHandler = null
   let updateTimer = null
+  let removeSearchBehavior = null
 
   const cleanupDocument = () => {
     if (updateTimer) window.clearTimeout(updateTimer)
@@ -186,6 +188,9 @@ export function useLegacyIframeLayout(iframeRef) {
 
     observer?.disconnect()
     observer = null
+
+    removeSearchBehavior?.()
+    removeSearchBehavior = null
 
     if (currentDocument && clickHandler) {
       currentDocument.removeEventListener('click', clickHandler, true)
@@ -273,6 +278,7 @@ export function useLegacyIframeLayout(iframeRef) {
     doc.documentElement.classList.add('fm-legacy-layout-root')
     doc.body.classList.add('fm-legacy-layout')
 
+    removeSearchBehavior = installAccordionSearchBehavior(doc)
     clickHandler = scheduleLayout
     resizeHandler = scheduleLayout
 

@@ -16,9 +16,14 @@
 <script setup>
 import { nextTick, onBeforeUnmount, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useGlobalAccordionSearch } from '@/composables/useGlobalAccordionSearch'
+
 const router = useRouter()
 const isRouteLoading = ref(true)
 let navigationNumber = 0
+
+useGlobalAccordionSearch()
+
 /*
 * Se ejecuta antes de comenzar una navegación.
 * También cubre la descarga de componentes importados dinámicamente.

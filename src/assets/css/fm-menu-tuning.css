@@ -1,0 +1,253 @@
+/* Ajustes visuales específicos del menú principal.
+ * Se mantiene separado para no alterar los estilos generales de PrimeVue.
+ */
+#app .main-menu .fm-menu-link--submenu .fm-menu-label {
+  font-size: 12px !important;
+}
+
+/* Usuario superior: sin contenedor rectangular. */
+#app .main-menu .user-profile.p-button {
+  width: auto !important;
+  min-width: 0 !important;
+  min-height: 32px !important;
+  height: 32px !important;
+  gap: 8px !important;
+  padding: 0 4px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#app .main-menu .user-profile.p-button:hover,
+#app .main-menu .user-profile.p-button[aria-expanded='true'] {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#app .main-menu .user-profile-icon {
+  width: 24px !important;
+  height: 24px !important;
+  flex: 0 0 24px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, .18) !important;
+  color: #fff !important;
+  font-size: 15px !important;
+}
+
+#app .main-menu .username {
+  max-width: 220px !important;
+  color: #fff !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: .01em;
+}
+
+#app .main-menu .dropdown-icon {
+  margin-left: 2px;
+  color: #fff !important;
+  font-size: 9px !important;
+}
+
+/* Panel desplegado: legajo, nombre y apellido siempre visibles. */
+#app .main-menu .dropdown-content {
+  width: 238px !important;
+}
+
+#app .main-menu .user-info {
+  padding: 9px !important;
+}
+
+#app .main-menu .info-item {
+  min-height: 116px !important;
+  align-items: flex-start !important;
+  gap: 11px !important;
+  padding: 10px !important;
+  border-color: #dce8ec !important;
+  background: #fff !important;
+}
+
+#app .main-menu .info-icon {
+  width: 34px !important;
+  height: 34px !important;
+  flex: 0 0 34px !important;
+  margin-top: 1px;
+  border-radius: 6px !important;
+  background: #dff7fa !important;
+  color: #007f90 !important;
+}
+
+#app .main-menu .info-icon i {
+  font-size: 16px !important;
+}
+
+#app .main-menu .info-copy {
+  min-width: 0;
+  width: 100%;
+  max-width: 174px;
+}
+
+#app .main-menu .info-copy small {
+  color: #5f7d88 !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+}
+
+#app .main-menu .info-copy > span {
+  color: #203f4b !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+#app .main-menu .fm-user-extra-fields {
+  width: calc(100% + 45px);
+  display: grid;
+  gap: 8px;
+  margin-top: 9px;
+  margin-left: -45px;
+  padding-top: 9px;
+  border-top: 1px solid #e4ecef;
+}
+
+#app .main-menu .fm-user-profile-field {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 34px 55px minmax(0, 1fr);
+  align-items: center;
+  gap: 11px;
+}
+
+#app .main-menu .fm-user-profile-field__icon {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: center;
+  border-radius: 6px;
+  background: #dff7fa;
+  color: #007f90;
+}
+
+#app .main-menu .fm-user-profile-field__icon i {
+  font-size: 16px !important;
+}
+
+#app .main-menu .fm-user-profile-field small {
+  color: #5f7d88 !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+}
+
+#app .main-menu .fm-user-profile-field__value {
+  min-width: 0;
+  min-height: 18px;
+  overflow: hidden;
+  color: #203f4b !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#app .main-menu .fm-user-profile-field__value.is-empty {
+  border-bottom: 1px dashed #cbd9de;
+  color: transparent !important;
+}
+
+/* Botón de salida compacto y proporcionado. */
+#app .main-menu .logout-area {
+  display: flex !important;
+  justify-content: center !important;
+  padding: 2px 8px 9px !important;
+}
+
+#app .main-menu .logout-btn.p-button {
+  width: auto !important;
+  min-width: 132px !important;
+  min-height: 28px !important;
+  height: 28px !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  padding: 0 12px !important;
+  border: 1px solid #00a9bd !important;
+  border-radius: 6px !important;
+  background: #f7fdfe !important;
+  color: #007f90 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  box-shadow: 0 1px 2px rgba(0, 127, 144, .08) !important;
+}
+
+#app .main-menu .logout-btn.p-button .p-button-icon {
+  width: 14px !important;
+  min-width: 14px !important;
+  height: 14px !important;
+  flex: 0 0 14px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  color: currentColor !important;
+  font-size: 14px !important;
+  line-height: 14px !important;
+  transform: none !important;
+}
+
+#app .main-menu .logout-btn.p-button .p-button-label {
+  display: inline-flex !important;
+  align-items: center !important;
+  font-size: 11px !important;
+  line-height: 1 !important;
+}
+
+#app .main-menu .logout-btn.p-button:hover {
+  border-color: #008b9d !important;
+  background: #e8fafd !important;
+  color: #006f7d !important;
+  box-shadow: 0 2px 5px rgba(0, 127, 144, .12) !important;
+  transform: none !important;
+}
+
+/* Franja de color animada debajo del menú. No utiliza negro. */
+#app .menu-container .menu-accent {
+  height: 4px !important;
+  background: linear-gradient(
+    90deg,
+    #ff1744,
+    #ff7a00,
+    #ffd600,
+    #32d74b,
+    #00c7be,
+    #00a9bd,
+    #1689ff,
+    #5e5ce6,
+    #af52de,
+    #ff2d95,
+    #ff1744
+  ) !important;
+  background-size: 320% 100% !important;
+  animation: fm-menu-spectrum 7s linear infinite;
+}
+
+@keyframes fm-menu-spectrum {
+  from {
+    background-position: 0% 50%;
+  }
+
+  to {
+    background-position: 320% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #app .menu-container .menu-accent {
+    animation: none;
+    background-size: 100% 100% !important;
+  }
+}
