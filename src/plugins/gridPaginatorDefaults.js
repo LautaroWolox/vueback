@@ -12,6 +12,8 @@ const ROWS_SELECT_SELECTOR = [
 
 const RANGE_PATTERN = /Mostrando\s+[\d.,]+\s*(?:-|–|—|a|al)\s*([\d.,]+)\s+de\s+([\d.,]+)/i
 const INITIALIZED_ATTRIBUTE = 'data-fm-max-rows-initialized'
+const observedDocuments = new WeakSet()
+const registeredIframes = new WeakSet()
 
 const normalizeCounter = (element) => {
   const text = element.textContent?.trim() ?? ''
@@ -49,18 +51,44 @@ const applyMaximumRows = (select) => {
   select.dispatchEvent(new Event('change', { bubbles: true }))
 }
 
-const syncPaginators = () => {
-  document.querySelectorAll(COUNTER_SELECTOR).forEach(normalizeCounter)
-  document.querySelectorAll(ROWS_SELECT_SELECTOR).forEach(applyMaximumRows)
+const registerIframe = (iframe) => {
+  const connectIframeDocument = () => {
+    try {
+      const iframeDocument = iframe.contentDocument
+      if (iframeDocument?.body) observeDocument(iframeDocument)
+    } catch {
+      // Los iframes de otro dominio no permiten acceder al documento interno.
+    }
+  }
+
+  if (!registeredIframes.has(iframe)) {
+    registeredIframes.add(iframe)
+    iframe.addEventListener('load', connectIframeDocument)
+  }
+
+  connectIframeDocument()
 }
 
-export const installGridPaginatorDefaults = () => {
-  syncPaginators()
+const syncDocument = (rootDocument) => {
+  rootDocument.querySelectorAll(COUNTER_SELECTOR).forEach(normalizeCounter)
+  rootDocument.querySelectorAll(ROWS_SELECT_SELECTOR).forEach(applyMaximumRows)
+  rootDocument.querySelectorAll('iframe').forEach(registerIframe)
+}
 
-  const observer = new MutationObserver(syncPaginators)
-  observer.observe(document.body, {
+function observeDocument(rootDocument) {
+  if (observedDocuments.has(rootDocument) || !rootDocument.body) return
+
+  observedDocuments.add(rootDocument)
+  syncDocument(rootDocument)
+
+  const observer = new MutationObserver(() => syncDocument(rootDocument))
+  observer.observe(rootDocument.body, {
     childList: true,
     subtree: true,
     characterData: true
   })
+}
+
+export const installGridPaginatorDefaults = () => {
+  observeDocument(document)
 }
