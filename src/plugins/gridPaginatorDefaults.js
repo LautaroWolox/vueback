@@ -48,7 +48,9 @@ const applyMaximumRows = (select) => {
   if (Number(select.value) === maximumRows) return
 
   select.value = String(maximumRows)
-  select.dispatchEvent(new Event('change', { bubbles: true }))
+
+  const EventConstructor = select.ownerDocument.defaultView?.Event ?? Event
+  select.dispatchEvent(new EventConstructor('change', { bubbles: true }))
 }
 
 const registerIframe = (iframe) => {
@@ -81,7 +83,9 @@ function observeDocument(rootDocument) {
   observedDocuments.add(rootDocument)
   syncDocument(rootDocument)
 
-  const observer = new MutationObserver(() => syncDocument(rootDocument))
+  const ObserverConstructor = rootDocument.defaultView?.MutationObserver ?? MutationObserver
+  const observer = new ObserverConstructor(() => syncDocument(rootDocument))
+
   observer.observe(rootDocument.body, {
     childList: true,
     subtree: true,
