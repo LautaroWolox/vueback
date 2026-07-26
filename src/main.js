@@ -21,6 +21,7 @@ import Tooltip from 'primevue/tooltip'
 import App from './App.vue'
 import router from './router'
 import { strings } from './strings.js'
+import { useAuthStore } from './store/auth'
 import { fmPrimePassThrough } from './components/shared/primePassThrough.js'
 import { installResponsiveIframes } from './plugins/responsiveIframes.js'
 
@@ -71,6 +72,7 @@ const FieldManagerPreset = definePreset(Lara, {
 const app = createApp(App)
 
 app.use(pinia)
+useAuthStore().normalizeDisplayName()
 app.use(router)
 app.use(ToastService)
 app.use(ConfirmationService)
