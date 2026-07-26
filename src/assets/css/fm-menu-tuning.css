@@ -38,7 +38,7 @@
 }
 
 #app .main-menu .username {
-  max-width: 180px !important;
+  max-width: 220px !important;
   color: #fff !important;
   font-size: 13px !important;
   font-weight: 700 !important;
@@ -101,11 +101,15 @@
 
 #app .main-menu .logout-btn.p-button {
   width: auto !important;
-  min-width: 142px !important;
-  min-height: 30px !important;
-  height: 30px !important;
-  gap: 6px !important;
-  padding: 0 12px !important;
+  min-width: 122px !important;
+  min-height: 27px !important;
+  height: 27px !important;
+  gap: 5px !important;
+  padding: 0 9px !important;
   border-radius: 5px !important;
+  font-size: 10px !important;
+}
+
+#app .main-menu .logout-btn.p-button .p-button-icon {
   font-size: 11px !important;
 }
