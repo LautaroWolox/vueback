@@ -231,7 +231,7 @@ onUnmounted(() => {
 :deep(.p-menubar-submenu .p-menubar-item-content),
 :deep(.p-submenu-list .p-menubar-item-content),
 :deep(.p-submenu-list .p-menuitem-content) {
-  min-height: 34px !important;
+  min-height: 32px !important;
   height: auto !important;
   border-radius: 0 !important;
 }
@@ -254,9 +254,9 @@ onUnmounted(() => {
 
 .fm-menu-link--submenu {
   width: 100%;
-  min-height: 34px !important;
-  gap: 10px;
-  padding: 7px 13px !important;
+  min-height: 32px !important;
+  gap: 9px;
+  padding: 5px 12px !important;
   color: #334853 !important;
   background: transparent !important;
 }
