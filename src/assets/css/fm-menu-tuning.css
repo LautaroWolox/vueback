@@ -1,0 +1,111 @@
+/* Ajustes visuales específicos del menú principal.
+ * Se mantiene separado para no alterar los estilos generales de PrimeVue.
+ */
+#app .main-menu .fm-menu-link--submenu .fm-menu-label {
+  font-size: 12px !important;
+}
+
+/* Usuario superior: sin contenedor rectangular. */
+#app .main-menu .user-profile.p-button {
+  width: auto !important;
+  min-width: 0 !important;
+  min-height: 32px !important;
+  height: 32px !important;
+  gap: 8px !important;
+  padding: 0 4px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#app .main-menu .user-profile.p-button:hover,
+#app .main-menu .user-profile.p-button[aria-expanded='true'] {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#app .main-menu .user-profile-icon {
+  width: 24px !important;
+  height: 24px !important;
+  flex: 0 0 24px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, .18) !important;
+  color: #fff !important;
+  font-size: 15px !important;
+}
+
+#app .main-menu .username {
+  max-width: 180px !important;
+  color: #fff !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: .01em;
+}
+
+#app .main-menu .dropdown-icon {
+  margin-left: 2px;
+  color: #fff !important;
+  font-size: 9px !important;
+}
+
+/* Panel desplegado: legajo e identificación más legibles. */
+#app .main-menu .dropdown-content {
+  width: 218px !important;
+}
+
+#app .main-menu .user-info {
+  padding: 8px !important;
+}
+
+#app .main-menu .info-item {
+  min-height: 44px !important;
+  gap: 10px !important;
+  padding: 6px 8px !important;
+  border-color: #dce8ec !important;
+  background: #fff !important;
+}
+
+#app .main-menu .info-icon {
+  width: 30px !important;
+  height: 30px !important;
+  flex: 0 0 30px !important;
+  background: #dff7fa !important;
+  color: #007f90 !important;
+}
+
+#app .main-menu .info-icon i {
+  font-size: 15px !important;
+}
+
+#app .main-menu .info-copy small {
+  color: #5f7d88 !important;
+  font-size: 9px !important;
+  font-weight: 700 !important;
+}
+
+#app .main-menu .info-copy span {
+  color: #203f4b !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+
+/* Botón de salida más chico y centrado. */
+#app .main-menu .logout-area {
+  display: flex !important;
+  justify-content: center !important;
+  padding: 0 8px 8px !important;
+}
+
+#app .main-menu .logout-btn.p-button {
+  width: auto !important;
+  min-width: 142px !important;
+  min-height: 30px !important;
+  height: 30px !important;
+  gap: 6px !important;
+  padding: 0 12px !important;
+  border-radius: 5px !important;
+  font-size: 11px !important;
+}
