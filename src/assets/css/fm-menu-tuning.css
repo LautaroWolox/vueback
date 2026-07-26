@@ -51,7 +51,7 @@
   font-size: 9px !important;
 }
 
-/* Panel desplegado: legajo e identificación más legibles. */
+/* Panel desplegado: legajo, nombre e identificación legibles. */
 #app .main-menu .dropdown-content {
   width: 218px !important;
 }
@@ -61,7 +61,7 @@
 }
 
 #app .main-menu .info-item {
-  min-height: 44px !important;
+  min-height: 54px !important;
   gap: 10px !important;
   padding: 6px 8px !important;
   border-color: #dce8ec !important;
@@ -80,6 +80,11 @@
   font-size: 15px !important;
 }
 
+#app .main-menu .info-copy {
+  min-width: 0;
+  max-width: 154px;
+}
+
 #app .main-menu .info-copy small {
   color: #5f7d88 !important;
   font-size: 9px !important;
@@ -92,24 +97,37 @@
   font-weight: 700 !important;
 }
 
+#app .main-menu .info-copy .fm-user-full-name {
+  display: block;
+  max-width: 154px;
+  margin-top: 2px;
+  overflow: hidden;
+  color: #55717d !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* Botón de salida más chico y centrado. */
 #app .main-menu .logout-area {
   display: flex !important;
   justify-content: center !important;
-  padding: 0 8px 8px !important;
+  padding: 0 8px 7px !important;
 }
 
 #app .main-menu .logout-btn.p-button {
   width: auto !important;
-  min-width: 122px !important;
-  min-height: 27px !important;
-  height: 27px !important;
-  gap: 5px !important;
-  padding: 0 9px !important;
-  border-radius: 5px !important;
-  font-size: 10px !important;
+  min-width: 108px !important;
+  min-height: 24px !important;
+  height: 24px !important;
+  gap: 4px !important;
+  padding: 0 7px !important;
+  border-radius: 4px !important;
+  font-size: 9px !important;
 }
 
 #app .main-menu .logout-btn.p-button .p-button-icon {
-  font-size: 11px !important;
+  font-size: 10px !important;
 }
