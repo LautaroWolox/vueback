@@ -19,8 +19,9 @@ export const installUserMenuProfile = () => {
 
     document.querySelectorAll('.user-profile .username').forEach((element) => {
       const label = visibleName || legajo || 'Usuario'
-      element.textContent = label
-      element.setAttribute('title', label)
+
+      if (element.textContent !== label) element.textContent = label
+      if (element.getAttribute('title') !== label) element.setAttribute('title', label)
     })
 
     document.querySelectorAll('.dropdown-content .info-copy').forEach((copy) => {
@@ -37,8 +38,10 @@ export const installUserMenuProfile = () => {
         copy.append(nameElement)
       }
 
-      nameElement.textContent = visibleName
-      nameElement.setAttribute('title', visibleName)
+      if (nameElement.textContent !== visibleName) nameElement.textContent = visibleName
+      if (nameElement.getAttribute('title') !== visibleName) {
+        nameElement.setAttribute('title', visibleName)
+      }
     })
   }
 
