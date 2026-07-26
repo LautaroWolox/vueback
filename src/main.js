@@ -4,6 +4,7 @@ import './assets/css/fm-global.css'
 import './assets/css/fm-grid-resize.css'
 import './assets/css/fm-responsive.css'
 import './assets/css/fm-menu-responsive.css'
+import './assets/css/fm-menu-tuning.css'
 import './assets/css/fm-select.css'
 import './assets/css/jobtype-contrato.css'
 
