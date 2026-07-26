@@ -4,6 +4,7 @@ import { useFetch } from '@vueuse/core'
 
 interface Usuario {
     nombre: string
+    apellido: string
     legajo: string
     email: string
 }
@@ -12,6 +13,7 @@ interface PerfilState {
     autenticado: boolean
     rutas: string[]
     nombre: string
+    apellido: string
     legajo: string
     email: string
     usuario: Usuario | null
@@ -102,6 +104,17 @@ const resolveDisplayName = (perfil: SetPerfilParams) => {
     return nameFromEmail(email) || simpleName || legajo
 }
 
+const resolveSurname = (perfil: SetPerfilParams) => {
+    const nested = perfil.usuario && typeof perfil.usuario === 'object' ? perfil.usuario : {}
+
+    return firstText(
+        perfil.apellidos,
+        perfil.apellido,
+        nested.apellidos,
+        nested.apellido
+    )
+}
+
 const clave = import.meta.env.VITE_PARAMETER1;
 export const authStore = new EncryptStorageNoble('autorizacion', {
     stateManagementUse: true,
@@ -114,6 +127,7 @@ export const useAuthStore = defineStore('auth', {
         autenticado: false,
         rutas: [],
         nombre: "",
+        apellido: "",
         legajo: "",
         email: "",
         usuario: null
@@ -142,17 +156,20 @@ export const useAuthStore = defineStore('auth', {
             const legajo = firstText(perfil.legajo, nested.legajo)
             const email = firstText(perfil.email, nested.email)
             const nombre = resolveDisplayName(perfil)
+            const apellido = resolveSurname(perfil)
 
             this.autenticado = autenticado
             this.rutas = rutas
             this.nombre = nombre
+            this.apellido = apellido
             this.legajo = legajo
             this.email = email
-            this.usuario = { nombre, legajo, email }
+            this.usuario = { nombre, apellido, legajo, email }
         },
         normalizeDisplayName() {
             const nombre = resolveDisplayName({
                 nombre: this.nombre,
+                apellido: this.apellido,
                 legajo: this.legajo,
                 email: this.email,
                 usuario: this.usuario
@@ -163,6 +180,7 @@ export const useAuthStore = defineStore('auth', {
             this.nombre = nombre
             this.usuario = {
                 nombre,
+                apellido: this.usuario?.apellido || this.apellido,
                 legajo: this.usuario?.legajo || this.legajo,
                 email: this.usuario?.email || this.email
             }
@@ -171,6 +189,7 @@ export const useAuthStore = defineStore('auth', {
             this.autenticado=false,
               this.rutas=[],
               this.nombre="",
+              this.apellido="",
               this.legajo="",
               this.email="",
               this.usuario=null
