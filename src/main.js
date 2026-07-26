@@ -5,6 +5,7 @@ import './assets/css/fm-grid-resize.css'
 import './assets/css/fm-responsive.css'
 import './assets/css/fm-menu-responsive.css'
 import './assets/css/fm-menu-tuning.css'
+import './assets/css/fm-report-sas-fullscreen.css'
 import './assets/css/fm-select.css'
 import './assets/css/jobtype-contrato.css'
 
@@ -26,6 +27,7 @@ import { fmPrimePassThrough } from './components/shared/primePassThrough.js'
 import { installResponsiveIframes } from './plugins/responsiveIframes.js'
 import { installUserMenuProfile } from './plugins/userMenuProfile.js'
 import { installGridPaginatorDefaults } from './plugins/gridPaginatorDefaults.js'
+import { installReportSasFullscreen } from './plugins/reportSasFullscreen.js'
 
 import FmButton from './components/shared/FmButton.vue'
 import FmPanel from './components/shared/FmPanel.vue'
@@ -124,3 +126,4 @@ app.mount('#app')
 installResponsiveIframes()
 installUserMenuProfile()
 installGridPaginatorDefaults()
+installReportSasFullscreen()
