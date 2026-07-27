@@ -1,10 +1,11 @@
 <template>
-  <Dialog
+  <FmDialog
     :visible="visible"
     modal
     header="Detalle de Nota"
-    class="fm-dialog otf-note-dialog"
-    :style="{ width: '38rem' }"
+    base-class="fm-dialog"
+    dialog-class="otf-note-dialog"
+    :dialog-style="{ width: '38rem' }"
     @update:visible="$emit('update:visible', $event)"
   >
     <div class="fm-dialog-body otf-note-body">
@@ -19,10 +20,12 @@
         @click="$emit('update:visible', false)"
       />
     </template>
-  </Dialog>
+  </FmDialog>
 </template>
 
 <script setup>
+import FmDialog from '@/components/shared/FmDialog.vue'
+
 defineProps({
   visible: { type: Boolean, default: false },
   note: { type: String, default: '' }
