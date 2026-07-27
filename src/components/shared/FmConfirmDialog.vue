@@ -7,7 +7,6 @@
     :dialog-class="['fm-confirm-dialog', dialogClass]"
     :dialog-style="{ width }"
     @update:visible="updateVisible"
-    @hide="cancel"
   >
     <template #header>
       <div class="fm-confirm-dialog__header">
