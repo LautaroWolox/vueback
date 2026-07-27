@@ -3,22 +3,22 @@
     class="fm-grid-actions-final fm-responsive-grid-actions"
     :class="{ 'fm-grid-actions-final--large': size === 'large' }"
   >
-    <Button
+    <FmButton
       v-if="showExport"
-      icon="pi pi-download"
-      text
-      rounded
+      icon="pi-download"
+      icon-only
+      variant="ghost"
       class="fm-grid-action-final"
       :disabled="exportDisabled"
       :title="exportDisabled ? exportDisabledTitle : exportTitle"
       :aria-label="exportDisabled ? exportDisabledTitle : exportTitle"
       @click="$emit('export')"
     />
-    <Button
+    <FmButton
       v-if="showDelete"
-      icon="pi pi-trash"
-      text
-      rounded
+      icon="pi-trash"
+      icon-only
+      variant="ghost"
       class="fm-grid-action-final"
       :class="{ 'fm-grid-action-final--disabled': deleteDisabled }"
       :disabled="deleteDisabled"
@@ -26,11 +26,11 @@
       :aria-label="deleteDisabled ? deleteDisabledTitle : deleteTitle"
       @click="$emit('delete')"
     />
-    <Button
+    <FmButton
       v-if="showEdit"
-      icon="pi pi-pen-to-square"
-      text
-      rounded
+      icon="pi-pen-to-square"
+      icon-only
+      variant="ghost"
       class="fm-grid-action-final"
       :class="{ 'fm-grid-action-final--disabled': editDisabled }"
       :disabled="editDisabled"
@@ -38,22 +38,22 @@
       :aria-label="editDisabled ? editDisabledTitle : editTitle"
       @click="$emit('edit')"
     />
-    <Button
+    <FmButton
       v-if="showRefresh"
-      icon="pi pi-refresh"
-      text
-      rounded
+      icon="pi-refresh"
+      icon-only
+      variant="ghost"
       class="fm-grid-action-final"
       :disabled="refreshDisabled"
       :title="refreshDisabled ? refreshDisabledTitle : refreshTitle"
       :aria-label="refreshDisabled ? refreshDisabledTitle : refreshTitle"
       @click="$emit('refresh')"
     />
-    <Button
+    <FmButton
       v-if="showAdd"
-      icon="pi pi-plus"
-      text
-      rounded
+      icon="pi-plus"
+      icon-only
+      variant="ghost"
       class="fm-grid-action-final"
       :disabled="addDisabled"
       :title="addDisabled ? addDisabledTitle : addTitle"
@@ -64,7 +64,7 @@
 </template>
 
 <script setup>
-import Button from 'primevue/button'
+import FmButton from './FmButton.vue'
 
 defineProps({
   showExport: { type: Boolean, default: true },
