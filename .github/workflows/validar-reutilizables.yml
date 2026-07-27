@@ -1,0 +1,35 @@
+name: Validar reutilizables
+
+on:
+  push:
+    branches:
+      - CajonesDeFiltros
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validar-ui:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Auditar imágenes y reutilizables
+        run: npm run audit:ui
+
+      - name: Verificar tipos
+        run: npm run type-check
+
+      - name: Compilar aplicativo
+        run: npm run build
