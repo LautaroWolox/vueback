@@ -12,7 +12,7 @@
         aria-label="Primera página"
         :disabled="disabled || page === 0 || pageCount === 0"
         @click="$emit('first-page')"
-      >|&lt;</button>
+      >{{ firstLabel }}</button>
 
       <button
         type="button"
@@ -21,7 +21,7 @@
         aria-label="Página anterior"
         :disabled="disabled || page === 0 || pageCount === 0"
         @click="$emit('prev-page')"
-      >&lt;&lt;</button>
+      >{{ prevLabel }}</button>
 
       <span class="fm-page-label">{{ pageLabel }}</span>
       <input
@@ -29,7 +29,7 @@
         type="number"
         min="1"
         :max="Math.max(pageCount, 1)"
-        :value="pageCount ? page + 1 : 1"
+        :value="pageCount ? page + 1 : emptyPageValue"
         :disabled="disabled || pageCount === 0"
         aria-label="Número de página"
         @change="changePage"
@@ -43,7 +43,7 @@
         aria-label="Página siguiente"
         :disabled="disabled || pageCount === 0 || page >= pageCount - 1"
         @click="$emit('next-page')"
-      >&gt;&gt;</button>
+      >{{ nextLabel }}</button>
 
       <button
         type="button"
@@ -52,7 +52,7 @@
         aria-label="Última página"
         :disabled="disabled || pageCount === 0 || page >= pageCount - 1"
         @click="$emit('last-page')"
-      >&gt;|</button>
+      >{{ lastLabel }}</button>
 
       <select
         v-if="showRowsSelect"
@@ -90,6 +90,11 @@ const props = defineProps({
   showCounter: { type: Boolean, default: true },
   counterText: { type: String, default: '' },
   pageLabel: { type: String, default: 'Página' },
+  firstLabel: { type: String, default: '|<' },
+  prevLabel: { type: String, default: '<<' },
+  nextLabel: { type: String, default: '>>' },
+  lastLabel: { type: String, default: '>|' },
+  emptyPageValue: { type: Number, default: 1 },
   autoMaxRows: { type: Boolean, default: true }
 })
 
