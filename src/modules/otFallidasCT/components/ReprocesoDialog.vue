@@ -1,14 +1,15 @@
 <template>
-  <Dialog
+  <FmDialog
     v-if="!processing"
     :visible="visible"
     modal
     :header="dialogTitle"
     :closable="false"
-    :closeOnEscape="false"
-    :dismissableMask="false"
-    class="fm-dialog otf-reprocess-dialog"
-    :style="{ width: '38rem' }"
+    :close-on-escape="false"
+    :dismissable-mask="false"
+    base-class="fm-dialog"
+    dialog-class="otf-reprocess-dialog"
+    :dialog-style="{ width: '38rem' }"
   >
     <div class="fm-dialog-body otf-reprocess-body">
       <div
@@ -37,11 +38,12 @@
         @click="cerrar"
       />
     </template>
-  </Dialog>
+  </FmDialog>
 </template>
 
 <script setup>
 import { computed } from 'vue'
+import FmDialog from '@/components/shared/FmDialog.vue'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
