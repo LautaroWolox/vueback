@@ -15,7 +15,8 @@ reutilizables/
 ├── acordeones-y-paneles-reutilizables/
 ├── carga-y-feedback-reutilizables/
 ├── layout-reutilizable/
-└── configuracion-reutilizable/
+├── configuracion-reutilizable/
+└── estilos-reutilizables/
 ```
 
 ## Importación recomendada
@@ -48,14 +49,17 @@ import { FmDialog } from '@/reutilizables/popups-reutilizables'
 ## Regla de no duplicación
 
 - `FmButton` es el único botón estándar.
+- `FmActionButton` fue eliminado.
 - `FmGridActions` agrupa acciones de grilla, pero internamente utiliza `FmButton`.
 - `FmGridPaginator` es el único paginador de las grillas Vue.
 - `FmDialog` es el único contenedor base de ventanas flotantes.
-- Los botones nativos solo se conservan para controles especializados cuyo DOM forma parte del diseño aprobado: encabezados de acordeón, cierres personalizados y acciones específicas de celdas.
+- Los botones nativos o PrimeVue directos solo se conservan para controles especializados cuyo DOM forma parte del diseño aprobado: encabezados de acordeón, cierres personalizados, menú, login y acciones específicas de celdas.
 - No se debe crear otro componente general de botón, paginador o popup.
 
 ## Estado de transición
 
-`src/components/shared` se conserva como ubicación física temporal para evitar romper las pantallas existentes. El código nuevo debe importar exclusivamente desde `@/reutilizables`.
+`src/components/shared` se conserva como ubicación física temporal para evitar romper las pantallas existentes. No es otra biblioteca: contiene la única implementación que `src/reutilizables` reexporta.
 
-Después de validar localmente todas las pantallas y acordarlo con el equipo, se podrán mover físicamente las implementaciones y retirar la fachada anterior en una segunda etapa controlada.
+El código nuevo debe importar exclusivamente desde `@/reutilizables`.
+
+Después de validar localmente todas las pantallas y acordarlo con el equipo, se podrán mover físicamente las implementaciones y retirar la ubicación anterior en una segunda etapa controlada.
