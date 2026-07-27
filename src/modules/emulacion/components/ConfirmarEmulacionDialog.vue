@@ -1,13 +1,14 @@
 <template>
-  <Dialog
+  <FmDialog
     v-model:visible="showPopup"
-    appendTo="body"
+    append-to="body"
     modal
     :closable="false"
     :draggable="false"
     :resizable="false"
-    class="fm-dialog emulation-confirm-dialog"
-    :style="{ width: 'min(650px, calc(100vw - 32px))' }"
+    base-class="fm-dialog"
+    dialog-class="emulation-confirm-dialog"
+    :dialog-style="{ width: 'min(650px, calc(100vw - 32px))' }"
     @hide="cancelarConfirmacion"
   >
     <div class="emulation-confirm-body">
@@ -78,14 +79,14 @@
         />
       </div>
     </template>
-  </Dialog>
+  </FmDialog>
 </template>
 
 <script setup>
 import { computed, ref, watch } from 'vue'
-import Dialog from 'primevue/dialog'
 import { useToast } from 'primevue/usetoast'
 import router from '@/router'
+import FmDialog from '@/components/shared/FmDialog.vue'
 import emulacionStore from '../store/emulacionStore.js'
 
 const store = emulacionStore()
