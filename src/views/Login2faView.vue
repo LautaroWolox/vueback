@@ -11,14 +11,6 @@
     <span class="login-orbit login-orbit--inner" aria-hidden="true"></span>
 
     <main class="login-content" aria-label="Acceso Field Manager">
-      <div class="login-logo-frame">
-        <img
-          :src="fmLoginLogo"
-          class="login-logo-image"
-          alt="Field Manager"
-        />
-      </div>
-
       <h1 class="login-title">
         <span class="login-title__field">Field</span>
         <span class="login-title__manager">Manager</span>
@@ -53,7 +45,6 @@ import Button from 'primevue/button'
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
-import fmLoginLogo from '@/assets/images/FM_login.png'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -136,24 +127,6 @@ onMounted(async () => {
   align-items: center;
   text-align: center;
   transform: translateY(-5px);
-}
-
-.login-logo-frame {
-  width: 138px;
-  height: 110px;
-  display: grid;
-  place-items: center;
-  margin-bottom: 54px;
-  overflow: hidden;
-  background: #fff;
-  box-shadow: 0 12px 32px rgba(43, 84, 91, .05);
-}
-
-.login-logo-image {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: contain;
 }
 
 .login-title {
@@ -268,12 +241,6 @@ onMounted(async () => {
 
   .login-content {
     transform: none;
-  }
-
-  .login-logo-frame {
-    width: 118px;
-    height: 94px;
-    margin-bottom: 38px;
   }
 
   .login-title {
