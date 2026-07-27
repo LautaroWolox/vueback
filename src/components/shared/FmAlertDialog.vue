@@ -1,10 +1,11 @@
 <template>
-  <Dialog
+  <FmDialog
     :visible="visible"
     modal
     :closable="false"
-    :style="{ width }"
-    class="fm-alert-dialog fm-alert-dialog--refined fm-responsive-dialog"
+    base-class=""
+    dialog-class="fm-alert-dialog fm-alert-dialog--refined fm-responsive-dialog"
+    :dialog-style="{ width }"
     @update:visible="$emit('update:visible', $event)"
   >
     <template #header>
@@ -50,10 +51,12 @@
         {{ closeLabel }}
       </button>
     </template>
-  </Dialog>
+  </FmDialog>
 </template>
 
 <script setup>
+import FmDialog from './FmDialog.vue'
+
 defineProps({
   visible: { type: Boolean, default: false },
   title: { type: String, default: 'Alerta' },
