@@ -1,10 +1,11 @@
 <template>
-  <Dialog
+  <FmDialog
     :visible="visibleInc"
     modal
     header="Incluir Orden de Trabajo"
-    class="fm-dialog otf-action-dialog otf-include-dialog"
-    :style="{ width: '42rem' }"
+    base-class="fm-dialog"
+    dialog-class="otf-action-dialog otf-include-dialog"
+    :dialog-style="{ width: '42rem' }"
     @update:visible="$emit('update:visibleInc', $event)"
   >
     <div class="otf-include-form">
@@ -60,13 +61,14 @@
         @click="confirmar"
       />
     </template>
-  </Dialog>
+  </FmDialog>
 </template>
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import FmCompactSelect from '@/components/shared/FmCompactSelect.vue'
+import FmDialog from '@/components/shared/FmDialog.vue'
 import { useFallidasCtStore } from '../store/CtFallidaStore'
 import { useCommonCtStore } from '@/store/commonCt'
 
