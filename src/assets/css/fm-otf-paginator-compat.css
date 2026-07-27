@@ -1,0 +1,136 @@
+/* Compatibilidad visual del paginador de Registro OTs Fallidas.
+ * La pantalla ya usa FmGridPaginator, pero conserva exactamente las medidas aprobadas.
+ */
+#tabla .otf-custom-paginator {
+  width: 100% !important;
+  min-height: 38px !important;
+  display: grid !important;
+  grid-template-columns: minmax(110px, 1fr) auto minmax(160px, 1fr) !important;
+  align-items: center !important;
+  padding: 3px 8px !important;
+  color: #111 !important;
+  font-size: 12px !important;
+  box-sizing: border-box !important;
+}
+
+#tabla .otf-custom-paginator .fm-custom-paginator__actions,
+#tabla .otf-custom-paginator .otf-custom-paginator__actions {
+  justify-self: start !important;
+}
+
+#tabla .otf-custom-paginator .fm-custom-paginator__navigation {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  min-width: 0 !important;
+  color: #111 !important;
+  font-size: 12px !important;
+  white-space: nowrap !important;
+}
+
+#tabla .otf-custom-paginator .fm-page-button {
+  width: 22px !important;
+  min-width: 22px !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #111 !important;
+  font-family: Arial, sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+}
+
+#tabla .otf-custom-paginator .fm-page-button:hover:not(:disabled) {
+  color: #00a9bd !important;
+}
+
+#tabla .otf-custom-paginator .fm-page-button:disabled {
+  color: #b7c0c4 !important;
+  cursor: default !important;
+}
+
+#tabla .otf-custom-paginator .fm-page-label,
+#tabla .otf-custom-paginator .fm-page-total {
+  color: #111 !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+}
+
+#tabla .otf-custom-paginator .fm-page-input {
+  width: 46px !important;
+  min-width: 46px !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  padding: 2px 6px !important;
+  border: 1px solid #cbd4db !important;
+  border-radius: 4px !important;
+  background: #fff !important;
+  color: #111 !important;
+  font-size: 12px !important;
+  text-align: center !important;
+  box-shadow: none !important;
+}
+
+#tabla .otf-custom-paginator .fm-page-input:focus {
+  outline: none !important;
+  border-color: #00a9bd !important;
+  box-shadow: 0 0 0 2px rgba(0, 169, 189, .14) !important;
+}
+
+#tabla .otf-custom-paginator .fm-page-input:disabled {
+  background: #f1f3f4 !important;
+  color: #9aa5aa !important;
+}
+
+#tabla .otf-custom-paginator .fm-page-input::-webkit-inner-spin-button,
+#tabla .otf-custom-paginator .fm-page-input::-webkit-outer-spin-button {
+  margin: 0 !important;
+  appearance: none !important;
+}
+
+#tabla .otf-custom-paginator .fm-rows-select {
+  width: 58px !important;
+  min-width: 58px !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  margin-left: 2px !important;
+  padding: 0 6px !important;
+  border: 1px solid #cbd4db !important;
+  border-radius: 4px !important;
+  background: #fff !important;
+  color: #111 !important;
+  font-size: 12px !important;
+  box-shadow: none !important;
+}
+
+#tabla .otf-custom-paginator .fm-custom-paginator__counter {
+  justify-self: end !important;
+  color: #222 !important;
+  font-size: 12px !important;
+  white-space: nowrap !important;
+}
+
+@media (max-width: 900px) {
+  #tabla .otf-custom-paginator {
+    min-height: 86px !important;
+    grid-template-columns: 1fr !important;
+    gap: 4px !important;
+  }
+
+  #tabla .otf-custom-paginator .fm-custom-paginator__actions,
+  #tabla .otf-custom-paginator .fm-custom-paginator__navigation,
+  #tabla .otf-custom-paginator .fm-custom-paginator__counter,
+  #tabla .otf-custom-paginator .otf-custom-paginator__actions {
+    justify-self: center !important;
+  }
+}
