@@ -7,7 +7,7 @@
     :draggable="draggable"
     :resizable="resizable"
     :append-to="appendTo"
-    :class="['fm-dialog', dialogClass]"
+    :class="[baseClass, dialogClass]"
     :style="dialogStyle"
     @update:visible="$emit('update:visible', $event)"
     @show="$emit('show')"
@@ -37,6 +37,7 @@ defineProps({
   draggable: { type: Boolean, default: true },
   resizable: { type: Boolean, default: true },
   appendTo: { type: [String, Object], default: 'body' },
+  baseClass: { type: String, default: 'fm-dialog' },
   dialogClass: { type: [String, Array, Object], default: '' },
   dialogStyle: { type: [String, Array, Object], default: undefined }
 })
