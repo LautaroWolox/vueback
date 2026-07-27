@@ -92,7 +92,7 @@ onMounted(async () => {
   z-index: -2;
   inset: 0;
   background:
-    radial-gradient(circle at 50% 46%, rgba(19, 184, 190, .08), transparent 37%),
+    radial-gradient(circle at 50% 46%, rgba(19, 184, 190, .12), transparent 37%),
     linear-gradient(180deg, rgba(255, 255, 255, .48), rgba(237, 247, 248, .34));
 }
 
@@ -101,7 +101,7 @@ onMounted(async () => {
   z-index: -1;
   top: 50%;
   left: 50%;
-  border: 1px solid rgba(16, 185, 190, .16);
+  border: 1px solid rgba(16, 185, 190, .28);
   border-radius: 50%;
   transform: translate(-50%, -50%);
   pointer-events: none;
@@ -115,7 +115,7 @@ onMounted(async () => {
 .login-orbit--inner {
   width: min(54vw, 720px);
   aspect-ratio: 1;
-  border-color: rgba(16, 185, 190, .09);
+  border-color: rgba(16, 185, 190, .18);
 }
 
 .login-content {
