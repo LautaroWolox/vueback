@@ -2,6 +2,7 @@ import 'primeicons/primeicons.css'
 import 'primeflex/primeflex.css'
 import './assets/css/fm-global.css'
 import './assets/css/fm-grid-resize.css'
+import './assets/css/fm-otf-paginator-compat.css'
 import './assets/css/fm-responsive.css'
 import './assets/css/fm-menu-responsive.css'
 import './assets/css/fm-menu-tuning.css'
@@ -32,7 +33,10 @@ import { installReportSasAutoHeight } from './plugins/reportSasAutoHeight.js'
 import FmButton from './components/shared/FmButton.vue'
 import FmPanel from './components/shared/FmPanel.vue'
 import FmGridShell from './components/shared/FmGridShell.vue'
+import FmDialog from './components/shared/FmDialog.vue'
 import FmAlertDialog from './components/shared/FmAlertDialog.vue'
+import FmConfirmDialog from './components/shared/FmConfirmDialog.vue'
+import FmGridDialog from './components/shared/FmGridDialog.vue'
 import FmActionButton from './components/shared/FmActionButton.vue'
 import FmGridActions from './components/shared/FmGridActions.vue'
 import FmGridPaginator from './components/shared/FmGridPaginator.vue'
@@ -114,7 +118,10 @@ app.component('Select', Select)
 app.component('FmButton', FmButton)
 app.component('FmPanel', FmPanel)
 app.component('FmGridShell', FmGridShell)
+app.component('FmDialog', FmDialog)
 app.component('FmAlertDialog', FmAlertDialog)
+app.component('FmConfirmDialog', FmConfirmDialog)
+app.component('FmGridDialog', FmGridDialog)
 app.component('FmActionButton', FmActionButton)
 app.component('FmGridActions', FmGridActions)
 app.component('FmGridPaginator', FmGridPaginator)
