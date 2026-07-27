@@ -1,1 +1,1 @@
-export { default as FmCompactSelect } from '@/components/shared/FmCompactSelect.vue'
+export { default as FmCompactSelect } from '../../components/shared/FmCompactSelect.vue'
