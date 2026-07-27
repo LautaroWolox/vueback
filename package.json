@@ -21,7 +21,10 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
     "format": "prettier --write src/",
     "audit:images": "node scripts/auditar-imagenes.mjs",
-    "audit:images:strict": "node scripts/auditar-imagenes.mjs --fail-on-unused"
+    "audit:images:strict": "node scripts/auditar-imagenes.mjs --fail-on-unused",
+    "audit:reusables": "node scripts/auditar-reutilizables.mjs",
+    "audit:reusables:strict": "node scripts/auditar-reutilizables.mjs --strict",
+    "audit:ui": "npm run audit:images && npm run audit:reusables"
   },
   "dependencies": {
     "@primeuix/themes": "^1.2.2",
