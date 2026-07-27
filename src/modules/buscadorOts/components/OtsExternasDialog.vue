@@ -1,10 +1,11 @@
 <template>
-  <Dialog
+  <FmDialog
     :visible="visible"
     modal
     header="Órdenes de Trabajo Externas"
     append-to="body"
-    class="fm-dialog busqueda-ots-external-dialog"
+    base-class="fm-dialog"
+    dialog-class="busqueda-ots-external-dialog"
     :draggable="false"
     :resizable="false"
     @update:visible="emit('update:visible', $event)"
@@ -103,15 +104,15 @@
         @click="emit('update:visible', false)"
       />
     </template>
-  </Dialog>
+  </FmDialog>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import Dialog from 'primevue/dialog'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import FmButton from '@/components/shared/FmButton.vue'
+import FmDialog from '@/components/shared/FmDialog.vue'
 import FmGridPaginator from '@/components/shared/FmGridPaginator.vue'
 
 const props = defineProps({
