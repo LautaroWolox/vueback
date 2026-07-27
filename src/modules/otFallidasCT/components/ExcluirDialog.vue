@@ -1,10 +1,11 @@
 <template>
-  <Dialog
+  <FmDialog
     :visible="visibleExc"
     modal
     :closable="false"
-    class="fm-dialog otf-action-dialog otf-exclude-dialog"
-    :style="{ '--fm-dialog-width': dialogWidth }"
+    base-class="fm-dialog"
+    dialog-class="otf-action-dialog otf-exclude-dialog"
+    :dialog-style="{ '--fm-dialog-width': dialogWidth }"
     @update:visible="$emit('update:visibleExc', $event)"
   >
     <template #header>
@@ -74,13 +75,14 @@
         @click="confirmar"
       />
     </template>
-  </Dialog>
+  </FmDialog>
 </template>
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import FmCompactSelect from '@/components/shared/FmCompactSelect.vue'
+import FmDialog from '@/components/shared/FmDialog.vue'
 import { useFallidasCtStore } from '../store/CtFallidaStore'
 import { useCommonCtStore } from '@/store/commonCt'
 
