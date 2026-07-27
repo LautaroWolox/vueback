@@ -24,24 +24,24 @@ import App from './App.vue'
 import router from './router'
 import { strings } from './strings.js'
 import { useAuthStore } from './store/auth'
-import { fmPrimePassThrough } from './components/shared/primePassThrough.js'
+import {
+  FmButton,
+  FmPanel,
+  FmGridShell,
+  FmDialog,
+  FmAlertDialog,
+  FmConfirmDialog,
+  FmGridDialog,
+  FmGridActions,
+  FmGridPaginator,
+  FmTypingLoader,
+  FmResponsivePage,
+  fmPrimePassThrough
+} from './reutilizables/index.js'
 import { installResponsiveIframes } from './plugins/responsiveIframes.js'
 import { installUserMenuProfile } from './plugins/userMenuProfile.js'
 import { installGridPaginatorDefaults } from './plugins/gridPaginatorDefaults.js'
 import { installReportSasAutoHeight } from './plugins/reportSasAutoHeight.js'
-
-import FmButton from './components/shared/FmButton.vue'
-import FmPanel from './components/shared/FmPanel.vue'
-import FmGridShell from './components/shared/FmGridShell.vue'
-import FmDialog from './components/shared/FmDialog.vue'
-import FmAlertDialog from './components/shared/FmAlertDialog.vue'
-import FmConfirmDialog from './components/shared/FmConfirmDialog.vue'
-import FmGridDialog from './components/shared/FmGridDialog.vue'
-import FmActionButton from './components/shared/FmActionButton.vue'
-import FmGridActions from './components/shared/FmGridActions.vue'
-import FmGridPaginator from './components/shared/FmGridPaginator.vue'
-import FmTypingLoader from './components/shared/FmTypingLoader.vue'
-import FmResponsivePage from './components/shared/FmResponsivePage.vue'
 
 import Accordion from 'primevue/accordion'
 import AccordionPanel from 'primevue/accordionpanel'
@@ -122,7 +122,6 @@ app.component('FmDialog', FmDialog)
 app.component('FmAlertDialog', FmAlertDialog)
 app.component('FmConfirmDialog', FmConfirmDialog)
 app.component('FmGridDialog', FmGridDialog)
-app.component('FmActionButton', FmActionButton)
 app.component('FmGridActions', FmGridActions)
 app.component('FmGridPaginator', FmGridPaginator)
 app.component('FmTypingLoader', FmTypingLoader)
