@@ -54,7 +54,8 @@ const props = defineProps({
   iconOnly: { type: Boolean, default: false },
   rounded: { type: Boolean, default: false },
   title: { type: String, default: '' },
-  ariaLabel: { type: String, default: '' }
+  ariaLabel: { type: String, default: '' },
+  labelPreset: { type: Boolean, default: true }
 })
 
 const slots = useSlots()
@@ -68,13 +69,15 @@ const defaultIcons = {
 }
 
 const usesGlobalCleanIcon = computed(() => (
+  props.labelPreset &&
   normalizedLabel.value === 'LIMPIAR' &&
   !props.icon &&
   !slots.icon
 ))
 
 const primeIcon = computed(() => {
-  const requestedIcon = props.icon || defaultIcons[normalizedLabel.value]
+  const presetIcon = props.labelPreset ? defaultIcons[normalizedLabel.value] : undefined
+  const requestedIcon = props.icon || presetIcon
   if (!requestedIcon) return undefined
   return requestedIcon.startsWith('pi ') ? requestedIcon : `pi ${requestedIcon}`
 })
@@ -91,7 +94,7 @@ const variantClass = computed(() => ({
   'fm-action-button--primary fm-ui-button--primary': props.variant === 'primary',
   'fm-action-button--outline fm-ui-button--outline': props.variant === 'outline',
   'fm-action-button--ghost fm-ui-button--ghost': props.variant === 'ghost',
-  'fm-action-button--clean fm-ui-button--clean': normalizedLabel.value === 'LIMPIAR',
+  'fm-action-button--clean fm-ui-button--clean': props.labelPreset && normalizedLabel.value === 'LIMPIAR',
   'fm-action-button--icon-only': props.iconOnly,
   [`fm-action-button--${props.size}`]: true
 }))
