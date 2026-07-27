@@ -1,1 +1,1 @@
-export { default as FmButton } from '@/components/shared/FmButton.vue'
+export { default as FmButton } from '../../components/shared/FmButton.vue'
