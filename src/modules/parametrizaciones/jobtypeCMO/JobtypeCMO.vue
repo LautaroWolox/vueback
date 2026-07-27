@@ -6,15 +6,16 @@
   >
     <JobtypeRelacion relation="cmo" />
 
-    <Dialog
+    <FmDialog
       v-model:visible="showDeleteConfirm"
-      appendTo="body"
+      append-to="body"
       modal
       :closable="false"
       :draggable="true"
       :resizable="false"
-      class="cmo-delete-confirm-dialog"
-      :style="deleteConfirmDialogStyle"
+      base-class=""
+      dialog-class="cmo-delete-confirm-dialog"
+      :dialog-style="deleteConfirmDialogStyle"
       @hide="cancelDelete"
     >
       <template #header>
@@ -60,13 +61,13 @@
           </button>
         </div>
       </template>
-    </Dialog>
+    </FmDialog>
   </div>
 </template>
 
 <script setup>
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
-import Dialog from 'primevue/dialog'
+import FmDialog from '@/components/shared/FmDialog.vue'
 import JobtypeRelacion from '../jobtypeRelacion/JobtypeRelacion.vue'
 
 const screenRoot = ref(null)
