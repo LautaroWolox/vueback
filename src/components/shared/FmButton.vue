@@ -3,9 +3,13 @@
     :type="type"
     :disabled="disabled || loading"
     :loading="loading"
-    :label="loading ? loadingLabel : label"
-    :icon="usesGlobalCleanIcon ? undefined : primeIcon"
+    :label="buttonLabel"
+    :icon="usesGlobalCleanIcon || $slots.icon ? undefined : primeIcon"
     :outlined="variant === 'outline'"
+    :text="variant === 'ghost'"
+    :rounded="rounded || iconOnly"
+    :title="title || undefined"
+    :aria-label="resolvedAriaLabel || undefined"
     class="fm-action-button fm-ui-button fm-responsive-button"
     :class="variantClass"
     @click="$emit('click', $event)"
@@ -37,11 +41,20 @@ const props = defineProps({
   variant: {
     type: String,
     default: 'primary',
-    validator: (value) => ['primary', 'outline'].includes(value)
+    validator: (value) => ['primary', 'outline', 'ghost'].includes(value)
+  },
+  size: {
+    type: String,
+    default: 'normal',
+    validator: (value) => ['small', 'normal', 'large'].includes(value)
   },
   type: { type: String, default: 'button' },
   disabled: { type: Boolean, default: false },
-  loading: { type: Boolean, default: false }
+  loading: { type: Boolean, default: false },
+  iconOnly: { type: Boolean, default: false },
+  rounded: { type: Boolean, default: false },
+  title: { type: String, default: '' },
+  ariaLabel: { type: String, default: '' }
 })
 
 const slots = useSlots()
@@ -66,10 +79,21 @@ const primeIcon = computed(() => {
   return requestedIcon.startsWith('pi ') ? requestedIcon : `pi ${requestedIcon}`
 })
 
+const buttonLabel = computed(() => (
+  props.iconOnly ? undefined : (props.loading ? props.loadingLabel : props.label)
+))
+
+const resolvedAriaLabel = computed(() => (
+  props.ariaLabel || props.title || props.label
+))
+
 const variantClass = computed(() => ({
   'fm-action-button--primary fm-ui-button--primary': props.variant === 'primary',
   'fm-action-button--outline fm-ui-button--outline': props.variant === 'outline',
-  'fm-action-button--clean fm-ui-button--clean': normalizedLabel.value === 'LIMPIAR'
+  'fm-action-button--ghost fm-ui-button--ghost': props.variant === 'ghost',
+  'fm-action-button--clean fm-ui-button--clean': normalizedLabel.value === 'LIMPIAR',
+  'fm-action-button--icon-only': props.iconOnly,
+  [`fm-action-button--${props.size}`]: true
 }))
 </script>
 
@@ -179,11 +203,63 @@ const variantClass = computed(() => ({
   color: #008fa1 !important;
 }
 
+.fm-action-button--ghost,
+.fm-ui-button--ghost {
+  min-width: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #111 !important;
+  box-shadow: none !important;
+}
+
+.fm-action-button--ghost:hover:not(:disabled),
+.fm-ui-button--ghost:hover:not(:disabled) {
+  border: 0 !important;
+  background: transparent !important;
+  color: #00a9bd !important;
+  box-shadow: none !important;
+}
+
+.fm-action-button--icon-only {
+  width: 28px !important;
+  min-width: 28px !important;
+  max-width: 28px !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  max-height: 28px !important;
+  padding: 2px !important;
+  gap: 0 !important;
+}
+
+.fm-action-button--small:not(.fm-action-button--icon-only) {
+  min-width: 110px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 14px !important;
+  border-radius: 6px !important;
+  font-size: 12px !important;
+}
+
+.fm-action-button--large:not(.fm-action-button--icon-only) {
+  min-width: 132px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  padding: 0 20px !important;
+}
+
 .fm-action-button:disabled,
 .fm-ui-button:disabled {
   border-color: #c9d2d7 !important;
   background: #dbe1e4 !important;
   color: #7c8a92 !important;
   box-shadow: none !important;
+}
+
+.fm-action-button--ghost:disabled,
+.fm-ui-button--ghost:disabled,
+.fm-action-button--icon-only:disabled {
+  border-color: transparent !important;
+  background: transparent !important;
+  color: #aeb7bd !important;
 }
 </style>
