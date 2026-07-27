@@ -4,6 +4,7 @@
     :variant="variant"
     :type="type"
     :disabled="disabled"
+    :label-preset="false"
     class="fm-action-button-compat"
     @click="$emit('click', $event)"
   >
