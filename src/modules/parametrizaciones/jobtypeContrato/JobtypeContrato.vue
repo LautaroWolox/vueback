@@ -29,6 +29,7 @@
 
       <div v-show="resultsExpanded" class="jobtype-results-body">
         <ParametrizacionGrid
+          ref="gridRef"
           table-id="tabla-jobtype-contrato"
           grid-class="jobtype-main-grid"
           :columns="columns"
@@ -37,12 +38,12 @@
           :rows-per-page-options="[100, 250, 500]"
           :initial-rows="100"
           empty-text="No hay resultados"
-          export-title="Descargar"
-          delete-title="Desactivar"
+          export-title="Descargar Excel"
+          delete-title="Eliminar"
           edit-title="Editar"
           add-title="Nueva relación"
           @update:selected="selectedRow = $event"
-          @export="exportCsv"
+          @export="exportExcel"
           @delete="requestDelete"
           @edit="openEdit"
           @add="showAlta = true"
@@ -82,7 +83,7 @@ import ParametrizacionGrid from '../shared/ParametrizacionGrid.vue'
 import ConfirmarAccionDialog from '../shared/ConfirmarAccionDialog.vue'
 import AltaJobtypeContratoDialog from './AltaJobtypeContratoDialog.vue'
 import EditarJobtypeContratoDialog from './EditarJobtypeContratoDialog.vue'
-import { exportRowsToCsv } from '../shared/exportRowsToCsv'
+import { exportRowsToExcel } from '../shared/exportRowsToExcel'
 
 const columns = [
   { field: 'codigoTarea', header: 'CODIGO_TAREA', width: '12.5%' },
@@ -99,6 +100,7 @@ const auth = useAuthStore()
 const store = useJobtypeContratoStore()
 const { rows } = storeToRefs(store)
 
+const gridRef = ref(null)
 const filtersExpanded = ref(true)
 const resultsExpanded = ref(true)
 const showAlta = ref(false)
@@ -119,6 +121,7 @@ const currentUser = () => auth.nombre || auth.legajo || 'usuario'
 const search = () => {
   selectedRow.value = null
   resultsExpanded.value = true
+  gridRef.value?.resetPage()
 }
 
 const createRelations = (newRows) => {
@@ -161,12 +164,14 @@ const requestDelete = (row = selectedRow.value) => {
 
 const confirmDelete = () => {
   if (!selectedRow.value) return
-  selectedRow.value = store.deactivateById(selectedRow.value.id, currentUser())
+  store.removeById(selectedRow.value.id)
+  selectedRow.value = null
 }
 
-const exportCsv = () => {
-  exportRowsToCsv({
-    filename: 'jobtype-contrato.csv',
+const exportExcel = async () => {
+  await exportRowsToExcel({
+    filename: 'jobtype-contrato.xlsx',
+    sheetName: 'Jobtype Contrato',
     columns,
     rows: rows.value
   })
