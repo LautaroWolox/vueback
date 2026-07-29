@@ -36,7 +36,7 @@
           v-model:rows="mainPageRows"
           class="jobtype-main-grid"
           :value="mainRows"
-          dataKey="id"
+          dataKey="tareaContratoId"
           tableStyle="table-layout: fixed; width: 100%; min-width: 100%"
           scrollable
           scrollHeight="flex"
@@ -395,6 +395,7 @@ import Select from 'primevue/select'
 import { FilterMatchMode } from '@primevue/core/api'
 import EditarCmoActividadDialog from '../cmoActividad/EditarCmoActividadDialog.vue'
 import EditarJobtypeContratoDialog from '../jobtypeContrato/EditarJobtypeContratoDialog.vue'
+import { useFetch } from '@vueuse/core'
 
 const props = defineProps({
   relation: {
@@ -450,11 +451,14 @@ const compactSelectPt = {
 }
 
 const mainColumns = computed(() => [
-  { field: 'codigoTarea', header: 'CODIGO_TAREA', width: '12.5%' },
-  { field: 'tarea', header: 'TAREA', width: '12.5%' },
+  { field: 'tareaContratoId', header: 'id1', hidden: true},
+  { field: 'tareaId',  header: 'id2', hidden: true},
+  { field: 'contratoTipoId',  header: 'id3', hidden: true},
+  { field: 'tareaCodigo', header: 'CODIGO_TAREA', width: '12.5%' },
+  { field: 'tareaNombre', header: 'TAREA', width: '12.5%' },
   { field: 'origen', header: 'ORIGEN', width: '12.5%' },
-  { field: 'relacion', header: relationColumnHeader.value, width: '12.5%' },
-  { field: 'usuarioModificacion', header: 'USUARIO_MODIFICACION', width: '12.5%' },
+  { field: 'contratoNombre', header: relationColumnHeader.value, width: '12.5%' },
+  { field: 'legajoModificacion', header: 'USUARIO_MODIFICACION', width: '12.5%' },
   { field: 'fechaModificacion', header: 'FECHA_MODIFICACION', width: '12.5%' },
   { field: 'activo', header: 'ACTIVO', width: '12.5%' },
   { field: 'pais', header: 'PAIS', width: '12.5%' }
@@ -537,9 +541,18 @@ const canAgregar = computed(() => {
   )
 })
 
-const buscar = () => {
+const buscar = async () => {
   resultsExpanded.value = true
   mainFirst.value = 0
+  let {data, error} = await useFetch('/pc/jobtypeContrato/getJobTypes.html').get()
+  if(error){
+    console.log(error.value)
+  }
+  if(data) {
+    console.log(JSON.parse(data.value))
+    mainRows.value = JSON.parse(data.value)
+  }
+
 }
 
 const abrirAlta = () => {

@@ -120,12 +120,14 @@ const customizeContratoDialog = () => {
     setImportantStyle(form, 'align-items', 'end')
 
     form.querySelectorAll('.jobtype-alta-field').forEach((field) => {
+      console.log("jobtype-alta-field")
       setImportantStyle(field, 'width', '100%')
       setImportantStyle(field, 'min-width', '0')
       setImportantStyle(field, 'max-width', 'none')
     })
 
     form.querySelectorAll('.jobtype-alta-control').forEach((control) => {
+      console.log("jobtype-alta-control")
       const label = control.closest('.jobtype-alta-field')?.querySelector('label')?.textContent?.trim()
       if (label === 'Jobtype' || label === 'Contrato') {
         setImportantStyle(control, 'width', '100%')
@@ -136,6 +138,7 @@ const customizeContratoDialog = () => {
   }
 
   dialog.querySelectorAll('.jobtype-add-button, .jobtype-relate-button').forEach((button) => {
+    console.log("jobtype-add-relate")
     setImportantStyle(button, 'width', '120px')
     setImportantStyle(button, 'min-width', '120px')
     setImportantStyle(button, 'max-width', '120px')
