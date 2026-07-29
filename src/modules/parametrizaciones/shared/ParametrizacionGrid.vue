@@ -218,6 +218,12 @@ const clearFilter = (filterModel, filterCallback) => {
   filterModel.value = null
   filterCallback()
 }
+
+const resetPage = () => {
+  first.value = 0
+}
+
+defineExpose({ resetPage })
 </script>
 
 <style scoped>
