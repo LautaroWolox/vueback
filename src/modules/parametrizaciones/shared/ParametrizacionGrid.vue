@@ -63,7 +63,7 @@
           @rows-change="rowChangeCallback"
         >
           <template #actions>
-            <FmGridActions
+            <ParametrizacionGridActions
               :size="actionsSize"
               :show-export="showExport"
               :show-delete="showDelete"
@@ -137,6 +137,7 @@
 import { computed, ref, watch } from 'vue'
 import InputText from 'primevue/inputtext'
 import { FilterMatchMode } from '@primevue/core/api'
+import ParametrizacionGridActions from './ParametrizacionGridActions.vue'
 
 const props = defineProps({
   tableId: { type: String, required: true },
