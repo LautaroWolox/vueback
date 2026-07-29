@@ -12,7 +12,7 @@
       </button>
 
       <div v-show="filtersExpanded" class="jobtype-search-body">
-        <FmButton label="BUSCAR" class="jobtype-search-button" @click="search" />
+        <ParametrizacionButton label="BUSCAR" size="search" @click="search" />
       </div>
     </section>
 
@@ -76,8 +76,9 @@
 import { reactive, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/store/auth'
-import { useCmoActividadStore } from '@/store/cmoActividad'
+import { useCmoActividadStore } from '../cmoActividad/cmoActividad.store'
 import ParametrizacionGrid from '../shared/ParametrizacionGrid.vue'
+import ParametrizacionButton from '../shared/ParametrizacionButton.vue'
 import ConfirmarAccionDialog from '../shared/ConfirmarAccionDialog.vue'
 import AltaCmoActividadDialog from '../cmoActividad/AltaCmoActividadDialog.vue'
 import EditarCmoActividadDialog from '../cmoActividad/EditarCmoActividadDialog.vue'
