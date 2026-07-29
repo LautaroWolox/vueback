@@ -18,7 +18,7 @@ Cada pantalla define explícitamente:
 
 - `shared/ParametrizacionGrid.vue`: DataTable reutilizable con filtros, selección, paginador y `FmGridActions`.
 - `shared/ConfirmarAccionDialog.vue`: confirmación reutilizable basada en `FmButton`.
-- `shared/exportRowsToCsv.js`: exportación CSV común.
+- `shared/exportRowsToExcel.js`: exportación Excel `.xlsx` común mediante ExcelJS.
 
 Estos componentes no conocen Jobtype, Contrato, CMO ni Actividad. Reciben datos y emiten eventos.
 
@@ -47,3 +47,4 @@ Los formularios temporales permanecen dentro de los modales. Al confirmar, el mo
 3. No agregar condiciones de CMO dentro de componentes de Contrato, ni al revés.
 4. Reutilizar `ParametrizacionGrid`, `FmGridActions`, `FmGridPaginator` y `FmButton`.
 5. Las diferencias de negocio deben quedar visibles en los archivos de cada módulo.
+6. Las exportaciones de estas parametrizaciones deben generarse en formato Excel `.xlsx`.
