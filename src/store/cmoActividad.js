@@ -45,8 +45,10 @@ export const useCmoActividadStore = defineStore('cmoActividad', {
       return updatedRow
     },
 
-    deactivateById(id, usuario = 'usuario') {
-      return this.updateById(id, { activo: 'N' }, usuario)
+    removeById(id) {
+      const removedRow = this.rows.find((row) => row.id === id) || null
+      this.rows = this.rows.filter((row) => row.id !== id)
+      return removedRow
     }
   }
 })
