@@ -12,7 +12,7 @@
       </button>
 
       <div v-show="filtersExpanded" class="jobtype-search-body">
-        <FmButton label="BUSCAR" class="jobtype-search-button" @click="search" />
+        <ParametrizacionButton label="BUSCAR" size="search" @click="search" />
       </div>
     </section>
 
@@ -78,8 +78,9 @@
 import { reactive, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/store/auth'
-import { useJobtypeContratoStore } from '@/store/jobtypeContrato'
+import { useJobtypeContratoStore } from './jobtypeContrato.store'
 import ParametrizacionGrid from '../shared/ParametrizacionGrid.vue'
+import ParametrizacionButton from '../shared/ParametrizacionButton.vue'
 import ConfirmarAccionDialog from '../shared/ConfirmarAccionDialog.vue'
 import AltaJobtypeContratoDialog from './AltaJobtypeContratoDialog.vue'
 import EditarJobtypeContratoDialog from './EditarJobtypeContratoDialog.vue'
