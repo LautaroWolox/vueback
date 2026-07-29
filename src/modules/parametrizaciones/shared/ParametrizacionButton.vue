@@ -22,7 +22,7 @@
 <script setup>
 import FmButton from '@/components/shared/FmButton.vue'
 
-const props = defineProps({
+defineProps({
   label: { type: String, default: '' },
   loadingLabel: { type: String, default: 'PROCESANDO...' },
   icon: { type: String, default: '' },
