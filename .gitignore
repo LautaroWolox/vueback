@@ -30,3 +30,5 @@ coverage
 *.tsbuildinfo
 
 .vscode
+.kiro
+package-lock.json

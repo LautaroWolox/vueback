@@ -234,6 +234,12 @@ const routes = [
         component: () => import('../modules/parametrizaciones/jobtypeCMO/JobtypeCMO.vue')
       },
       {
+        path: 'configuraCmoActividad.html',
+        name: 'CMOA',
+        beforeEnter: allowed,
+        component: () => import('../modules/parametrizaciones/configuraCmoActividad/ConfiguraCmoActividad.vue')
+      },
+      {
         path: 'consultarActas.html',
         name: 'COAC',
         beforeEnter: allowed,
