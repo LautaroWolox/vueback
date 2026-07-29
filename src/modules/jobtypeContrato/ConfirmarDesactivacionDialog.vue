@@ -60,6 +60,8 @@ defineProps({
 
 const emit = defineEmits(['update:visible', 'confirmar'])
 
+const dialogStyle = 'width: min(900px, calc(100vw - 32px)); max-width: 900px;'
+
 const cancelar = () => {
   emit('update:visible', false)
 }
