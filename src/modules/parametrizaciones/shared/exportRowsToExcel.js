@@ -1,4 +1,4 @@
-import ExcelJS from 'exceljs/dist/exceljs.min.js'
+import ExcelJS from 'exceljs'
 
 const XLSX_MIME_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 
