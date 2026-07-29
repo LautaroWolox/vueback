@@ -12,11 +12,10 @@ parametrizaciones/
 │   ├── EditarJobtypeContratoDialog.vue
 │   └── jobtypeContrato.store.js
 ├── jobtypeCMO/
-│   └── JobtypeCMO.vue
-├── cmoActividad/
+│   ├── JobtypeCMO.vue
 │   ├── AltaCmoActividadDialog.vue
 │   ├── EditarCmoActividadDialog.vue
-│   └── cmoActividad.store.js
+│   └── jobtypeCMO.store.js
 └── shared/
     ├── ParametrizacionGrid.vue
     ├── ParametrizacionGridActions.vue
@@ -51,21 +50,21 @@ Los componentes compartidos no conocen Jobtype, Contrato, CMO ni Actividad. Reci
 
 ## Estado Pinia
 
-Cada store vive dentro del módulo dueño de los datos:
+Cada store vive dentro del módulo dueño de la pantalla y de sus datos:
 
 - `jobtypeContrato/jobtypeContrato.store.js`: registros y acciones de Jobtype-Contrato.
-- `cmoActividad/cmoActividad.store.js`: registros y acciones de CMO-Actividad.
+- `jobtypeCMO/jobtypeCMO.store.js`: registros y acciones de CMO-Actividad.
 
 No se deben combinar ambos modelos en un único store ni colocar estos stores dentro de `src/store`.
 
 ## Modales
 
-Cada parametrización conserva sus propios modales de alta y edición:
+Cada parametrización conserva sus propios modales de alta y edición dentro de su carpeta:
 
-- `AltaJobtypeContratoDialog.vue`
-- `EditarJobtypeContratoDialog.vue`
-- `AltaCmoActividadDialog.vue`
-- `EditarCmoActividadDialog.vue`
+- `jobtypeContrato/AltaJobtypeContratoDialog.vue`
+- `jobtypeContrato/EditarJobtypeContratoDialog.vue`
+- `jobtypeCMO/AltaCmoActividadDialog.vue`
+- `jobtypeCMO/EditarCmoActividadDialog.vue`
 
 Los formularios temporales permanecen dentro de los modales. Al confirmar, el modal emite un payload y la pantalla llama al store correspondiente.
 
