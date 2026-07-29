@@ -76,12 +76,12 @@
 import { reactive, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/store/auth'
-import { useCmoActividadStore } from '../cmoActividad/cmoActividad.store'
+import { useJobtypeCmoStore } from './jobtypeCMO.store'
 import ParametrizacionGrid from '../shared/ParametrizacionGrid.vue'
 import ParametrizacionButton from '../shared/ParametrizacionButton.vue'
 import ConfirmarAccionDialog from '../shared/ConfirmarAccionDialog.vue'
-import AltaCmoActividadDialog from '../cmoActividad/AltaCmoActividadDialog.vue'
-import EditarCmoActividadDialog from '../cmoActividad/EditarCmoActividadDialog.vue'
+import AltaCmoActividadDialog from './AltaCmoActividadDialog.vue'
+import EditarCmoActividadDialog from './EditarCmoActividadDialog.vue'
 import { exportRowsToExcel } from '../shared/exportRowsToExcel'
 
 const columns = [
@@ -95,7 +95,7 @@ const columns = [
 ]
 
 const auth = useAuthStore()
-const store = useCmoActividadStore()
+const store = useJobtypeCmoStore()
 const { rows } = storeToRefs(store)
 
 const gridRef = ref(null)
