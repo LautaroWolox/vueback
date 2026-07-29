@@ -14,7 +14,7 @@
     <template #header>
       <div class="alta-header">
         <h2>Alta CMO - Actividad</h2>
-        <button type="button" class="alta-close" title="Cerrar" aria-label="Cerrar" @click="close">×</button>
+        <ParametrizacionCloseButton @click="close" />
       </div>
     </template>
 
@@ -40,7 +40,11 @@
           />
         </div>
 
-        <FmButton label="AGREGAR" class="alta-add-button" @click="addPreview" />
+        <ParametrizacionButton
+          label="AGREGAR"
+          class="alta-add-button"
+          @click="addPreview"
+        />
       </div>
 
       <div class="alta-grid">
@@ -69,9 +73,8 @@
     </div>
 
     <template #footer>
-      <FmButton
+      <ParametrizacionButton
         label="RELACIONAR"
-        class="alta-submit-button"
         :disabled="previewRows.length === 0"
         @click="submit"
       />
@@ -83,6 +86,8 @@
 import { reactive, ref, watch } from 'vue'
 import InputText from 'primevue/inputtext'
 import ParametrizacionGrid from '../shared/ParametrizacionGrid.vue'
+import ParametrizacionButton from '../shared/ParametrizacionButton.vue'
+import ParametrizacionCloseButton from '../shared/ParametrizacionCloseButton.vue'
 
 const props = defineProps({
   visible: { type: Boolean, default: false }
@@ -186,24 +191,6 @@ const submit = () => {
   font-weight: 500;
 }
 
-.alta-close {
-  width: 28px;
-  height: 28px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: #a5afb4;
-  font-size: 22px;
-  cursor: pointer;
-}
-
-.alta-close:hover {
-  color: #00a9bd;
-}
-
 .alta-content {
   height: 100%;
   min-height: 0;
@@ -240,13 +227,6 @@ const submit = () => {
   height: 34px;
 }
 
-.alta-add-button,
-.alta-submit-button {
-  width: 120px !important;
-  min-width: 120px !important;
-  max-width: 120px !important;
-}
-
 .alta-grid {
   min-height: 0;
   overflow: hidden;
@@ -275,7 +255,12 @@ const submit = () => {
   }
 
   .alta-add-button {
+    width: 100%;
+  }
+
+  .alta-add-button :deep(.p-button) {
     width: 100% !important;
+    min-width: 0 !important;
     max-width: none !important;
   }
 }
