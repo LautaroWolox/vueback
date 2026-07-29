@@ -20,13 +20,7 @@
           <span class="parametrizacion-confirm__title">{{ title }}</span>
         </div>
 
-        <button
-          type="button"
-          class="parametrizacion-confirm__close"
-          title="Cerrar"
-          aria-label="Cerrar"
-          @click="cancel"
-        >×</button>
+        <ParametrizacionCloseButton @click="cancel" />
       </div>
     </template>
 
@@ -36,15 +30,15 @@
 
     <template #footer>
       <div class="parametrizacion-confirm__actions">
-        <FmButton
+        <ParametrizacionButton
           :label="cancelLabel"
           variant="outline"
-          class="parametrizacion-confirm__button"
+          size="confirm"
           @click="cancel"
         />
-        <FmButton
+        <ParametrizacionButton
           :label="acceptLabel"
-          class="parametrizacion-confirm__button"
+          size="confirm"
           @click="accept"
         />
       </div>
@@ -53,6 +47,9 @@
 </template>
 
 <script setup>
+import ParametrizacionButton from './ParametrizacionButton.vue'
+import ParametrizacionCloseButton from './ParametrizacionCloseButton.vue'
+
 const props = defineProps({
   visible: { type: Boolean, default: false },
   title: { type: String, default: 'Confirmar acción' },
@@ -121,26 +118,6 @@ const onVisibleChange = (visible) => {
   line-height: 1.2;
 }
 
-.parametrizacion-confirm__close {
-  width: 28px;
-  height: 28px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: #c7c7c7;
-  font-size: 21px;
-  font-weight: 700;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.parametrizacion-confirm__close:hover {
-  color: #00a9bd;
-}
-
 .parametrizacion-confirm__content {
   min-height: 72px;
   display: flex;
@@ -160,16 +137,6 @@ const onVisibleChange = (visible) => {
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
-}
-
-.parametrizacion-confirm__button {
-  width: 110px !important;
-  min-width: 110px !important;
-  max-width: 110px !important;
-  height: 34px !important;
-  min-height: 34px !important;
-  max-height: 34px !important;
-  border-radius: 7px !important;
 }
 
 :global(.p-dialog.parametrizacion-confirm-dialog) {
@@ -205,9 +172,8 @@ const onVisibleChange = (visible) => {
     flex-direction: column-reverse;
   }
 
-  .parametrizacion-confirm__button {
-    width: 100% !important;
-    max-width: none !important;
+  .parametrizacion-confirm__actions > * {
+    width: 100%;
   }
 }
 </style>
