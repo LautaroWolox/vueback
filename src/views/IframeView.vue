@@ -1,5 +1,5 @@
 <template>
-  <BuscadorOts v-if="isBuscadorOts" />
+  <component v-if="nativeScreen" :is="nativeScreen" />
 
   <iframe
     v-else
@@ -18,6 +18,7 @@
 import { computed, onUnmounted, ref, watchEffect } from 'vue'
 import router from '@/router'
 import BuscadorOts from '@/modules/buscadorOts/BuscadorOts.vue'
+import JobtypeContrato from '@/modules/parametrizaciones/jobtypeContrato/JobtypeContrato.vue'
 import { useLegacyIframeLayout } from '@/composables/useLegacyIframeLayout'
 import { useLegacyIframeViewport } from '@/composables/useLegacyIframeViewport'
 
@@ -26,15 +27,22 @@ const props = defineProps({
   titleParam: { type: String, required: true }
 })
 
+const nativeScreens = {
+  '/busquedaOtsGcc.html': BuscadorOts,
+  '/jobtypeContrato.html': JobtypeContrato
+}
+
+const nativeScreen = computed(() => nativeScreens[props.urlParam] || null)
 const iframeRef = ref(null)
 const { onIframeLoad: applyLegacyLayout } = useLegacyIframeLayout(iframeRef)
 const { onIframeLoad: applyLegacyViewport } = useLegacyIframeViewport(iframeRef)
+
 const onIframeLoad = () => {
   applyLegacyLayout()
   applyLegacyViewport()
 }
+
 const titulo = computed(() => props.titleParam || sessionStorage.getItem('titleParam') || '')
-const isBuscadorOts = computed(() => props.urlParam === '/busquedaOtsGcc.html')
 
 watchEffect(() => {
   sessionStorage.setItem('urlParam', props.urlParam)
