@@ -14,7 +14,7 @@
     <template #header>
       <div class="edit-header">
         <h2>Edición CMO-Actividad</h2>
-        <button type="button" class="edit-close" title="Cerrar" aria-label="Cerrar" @click="requestClose">×</button>
+        <ParametrizacionCloseButton @click="requestClose" />
       </div>
     </template>
 
@@ -41,7 +41,12 @@
     </div>
 
     <template #footer>
-      <FmButton label="ACTUALIZAR" class="edit-update" :disabled="!canUpdate" @click="update" />
+      <ParametrizacionButton
+        label="ACTUALIZAR"
+        size="wide"
+        :disabled="!canUpdate"
+        @click="update"
+      />
     </template>
   </Dialog>
 
@@ -56,6 +61,8 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import InputText from 'primevue/inputtext'
+import ParametrizacionButton from '../shared/ParametrizacionButton.vue'
+import ParametrizacionCloseButton from '../shared/ParametrizacionCloseButton.vue'
 import ConfirmarAccionDialog from '../shared/ConfirmarAccionDialog.vue'
 
 const props = defineProps({
@@ -125,24 +132,6 @@ const update = () => {
   font-weight: 500;
 }
 
-.edit-close {
-  width: 28px;
-  height: 28px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: #a5afb4;
-  font-size: 22px;
-  cursor: pointer;
-}
-
-.edit-close:hover {
-  color: #00a9bd;
-}
-
 .edit-content {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -178,12 +167,6 @@ const update = () => {
   background: #eeeeee;
   color: #444;
   opacity: 1;
-}
-
-.edit-update {
-  width: 140px !important;
-  min-width: 140px !important;
-  max-width: 140px !important;
 }
 
 :global(.p-dialog.cmo-edit-dialog) {
