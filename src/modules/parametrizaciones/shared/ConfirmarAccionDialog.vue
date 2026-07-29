@@ -38,7 +38,7 @@
       <div class="parametrizacion-confirm__actions">
         <FmButton
           :label="cancelLabel"
-          variant="outlined"
+          variant="outline"
           class="parametrizacion-confirm__button"
           @click="cancel"
         />
