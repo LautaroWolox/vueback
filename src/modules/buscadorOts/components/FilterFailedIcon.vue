@@ -1,6 +1,6 @@
 <template>
   <i
-    class="pi pi-times-circle failed-ots-icon"
+    class="pi pi-times failed-ots-icon"
     aria-hidden="true"
   ></i>
 </template>
