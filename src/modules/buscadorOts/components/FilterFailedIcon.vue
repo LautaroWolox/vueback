@@ -1,62 +1,51 @@
 <template>
   <svg
-    class="filter-failed-icon"
+    class="failed-ots-icon"
     viewBox="0 0 24 24"
     fill="none"
     aria-hidden="true"
   >
     <path
-      class="filter-failed-icon__funnel"
-      d="M3 4H21L14 12V17L10 20V12L3 4Z"
-    />
-
-    <circle
-      class="filter-failed-icon__badge"
-      cx="18"
-      cy="18"
-      r="5"
+      class="failed-ots-icon__triangle"
+      d="M12 3.2L22 20.5H2L12 3.2Z"
     />
     <path
-      class="filter-failed-icon__alert-line"
-      d="M18 15.2V18.2"
+      class="failed-ots-icon__line"
+      d="M12 9V14.2"
     />
     <circle
-      class="filter-failed-icon__alert-dot"
-      cx="18"
-      cy="20.2"
-      r="0.7"
+      class="failed-ots-icon__dot"
+      cx="12"
+      cy="17.3"
+      r="1"
     />
   </svg>
 </template>
 
 <style scoped>
-.filter-failed-icon {
+.failed-ots-icon {
   width: 18px;
   height: 18px;
   display: block;
   overflow: visible;
 }
 
-.filter-failed-icon__funnel {
+.failed-ots-icon__triangle {
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.8;
+  stroke-width: 1.9;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-.filter-failed-icon__badge {
-  fill: currentColor;
-}
-
-.filter-failed-icon__alert-line {
+.failed-ots-icon__line {
   fill: none;
-  stroke: #ffffff;
-  stroke-width: 1.7;
+  stroke: currentColor;
+  stroke-width: 2;
   stroke-linecap: round;
 }
 
-.filter-failed-icon__alert-dot {
-  fill: #ffffff;
+.failed-ots-icon__dot {
+  fill: currentColor;
 }
 </style>
