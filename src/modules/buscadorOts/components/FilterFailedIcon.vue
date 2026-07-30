@@ -8,7 +8,7 @@
 <style scoped>
 .failed-ots-icon {
   display: block;
-  font-size: 18px;
+  font-size: 13px;
   line-height: 1;
   color: currentColor;
 }
