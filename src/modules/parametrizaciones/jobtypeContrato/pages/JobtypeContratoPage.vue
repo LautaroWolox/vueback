@@ -7,7 +7,6 @@
       message="Consultando Jobtype-Contrato"
     />
 
-    <!-- ── Panel: Filtros ── -->
     <section class="jobtype-panel jobtype-panel--filters">
       <button
         type="button"
@@ -29,7 +28,6 @@
       </div>
     </section>
 
-    <!-- ── Panel: Resultados ── -->
     <section
       class="jobtype-panel jobtype-panel--results"
       :class="{ 'is-expanded': resultsExpanded }"
@@ -162,7 +160,6 @@
       </div>
     </section>
 
-    <!-- ── Dialogs ── -->
     <AltaJobtypeContratoDialog
       v-model:visible="showAlta"
       @relacionado="onRelacionado"
@@ -171,9 +168,11 @@
     <EditarJobtypeContratoDialog
       v-model:visible="showEditar"
       :tarea-contrato-id="editForm.tareaContratoId"
+      :contrato-tipo-id="editForm.contratoTipoId"
       :jobtype="editForm.jobtype"
       :contrato-actual="editForm.contratoActual"
       :pais="editForm.pais"
+      :origen-actual="editForm.origenActual"
       @actualizado="onActualizado"
     />
 
@@ -191,45 +190,36 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 import { FilterMatchMode } from '@primevue/core/api'
-import AltaJobtypeContratoDialog    from '../dialogs/AltaJobtypeContratoDialog.vue'
-import EditarJobtypeContratoDialog  from '../dialogs/EditarJobtypeContratoDialog.vue'
+import AltaJobtypeContratoDialog from '../dialogs/AltaJobtypeContratoDialog.vue'
+import EditarJobtypeContratoDialog from '../dialogs/EditarJobtypeContratoDialog.vue'
 import ConfirmarDesactivacionDialog from '../dialogs/ConfirmarDesactivacionDialog.vue'
-import { useJobtypeContratoStore }  from '../store/jobtypeContratoStore'
+import { JOBTYPE_CONTRATO_COLUMNS } from '../config/columns'
+import { useJobtypeContratoStore } from '../store/jobtypeContratoStore'
 
 const store = useJobtypeContratoStore()
 
 const filtersExpanded = ref(true)
 const resultsExpanded = ref(false)
-const selectedRow     = ref(null)
-const mainFirst       = ref(0)
-const mainPageRows    = ref(100)
-const showAlta        = ref(false)
-const showEditar      = ref(false)
-const showDesactivar  = ref(false)
-const showError       = ref(false)
+const selectedRow = ref(null)
+const mainFirst = ref(0)
+const mainPageRows = ref(100)
+const showAlta = ref(false)
+const showEditar = ref(false)
+const showDesactivar = ref(false)
+const showError = ref(false)
 
 const editForm = ref({
   tareaContratoId: 0,
-  jobtype:         '',
-  contratoActual:  '',
-  pais:            ''
+  contratoTipoId: 0,
+  jobtype: '',
+  contratoActual: '',
+  pais: '',
+  origenActual: ''
 })
 
-const columns = [
-  { field: 'tareaContratoId',    header: '',                        width: '0',      hidden: true,  exportable: false, filter: false, sort: false },
-  { field: 'tareaId',            header: '',                        width: '0',      hidden: true,  exportable: false, filter: false, sort: false },
-  { field: 'contratoTipoId',     header: '',                        width: '0',      hidden: true,  exportable: false, filter: false, sort: false },
-  { field: 'tareaCodigo',        header: 'CODIGO_TAREA',            width: '14.28%', exportable: true, filter: true, sort: true },
-  { field: 'tareaNombre',        header: 'TAREA',                   width: '14.28%', exportable: true, filter: true, sort: true },
-  { field: 'contratoNombre',     header: 'NOMBRE_CONTRATO',         width: '14.28%', exportable: true, filter: true, sort: true },
-  { field: 'legajoModificacion', header: 'USUARIO_MODIFICACION',    width: '14.28%', exportable: true, filter: true, sort: true },
-  { field: 'fechaModificacion',  header: 'FECHA_MODIFICACION',      width: '14.28%', exportable: true, filter: true, sort: true },
-  { field: 'activo',             header: 'ACTIVO',                  width: '14.28%', exportable: true, filter: true, sort: true },
-  { field: 'pais',               header: 'PAIS',                    width: '14.28%', exportable: true, filter: true, sort: true }
-]
-
+const columns = JOBTYPE_CONTRATO_COLUMNS
 const visibleColumns = computed(() => columns.filter((col) => !col.hidden))
 
 const mainFilters = ref(
@@ -242,8 +232,9 @@ const mainFilters = ref(
 
 const buscar = async () => {
   resultsExpanded.value = true
-  mainFirst.value       = 0
-  selectedRow.value     = null
+  mainFirst.value = 0
+  selectedRow.value = null
+
   try {
     await store.fetchRelaciones()
   } catch {
@@ -262,17 +253,21 @@ const clearFilter = (filterModel, filterCallback) => {
 
 const editarSeleccionado = () => {
   if (!selectedRow.value) return
+
   editForm.value = {
     tareaContratoId: selectedRow.value.tareaContratoId,
-    jobtype:         selectedRow.value.tareaNombre,
-    contratoActual:  selectedRow.value.contratoNombre,
-    pais:            selectedRow.value.pais
+    contratoTipoId: selectedRow.value.contratoTipoId,
+    jobtype: selectedRow.value.tareaNombre,
+    contratoActual: selectedRow.value.contratoNombre,
+    pais: selectedRow.value.pais,
+    origenActual: selectedRow.value.origen ?? ''
   }
   showEditar.value = true
 }
 
 const onDesactivacionConfirmada = async () => {
   if (!selectedRow.value) return
+
   try {
     await store.desactivarRelacion(selectedRow.value.tareaContratoId)
     selectedRow.value = null
@@ -284,34 +279,43 @@ const onDesactivacionConfirmada = async () => {
 
 const onRelacionado = async () => {
   selectedRow.value = null
-  await store.fetchRelaciones()
+  try {
+    await store.fetchRelaciones()
+  } catch {
+    showError.value = true
+  }
 }
 
 const onActualizado = async () => {
   selectedRow.value = null
-  await store.fetchRelaciones()
+  try {
+    await store.fetchRelaciones()
+  } catch {
+    showError.value = true
+  }
 }
 
 const exportarExcel = () => {
   if (!store.relaciones.length) return
-  const exportCols = columns.filter((c) => c.exportable)
-  const headers    = exportCols.map((c) => c.header)
-  const lines      = store.relaciones.map((row) =>
-    exportCols.map((c) => JSON.stringify(row[c.field] ?? '')).join(',')
+
+  const exportCols = columns.filter((column) => column.exportable)
+  const headers = exportCols.map((column) => column.header)
+  const lines = store.relaciones.map((row) =>
+    exportCols.map((column) => JSON.stringify(row[column.field] ?? '')).join(',')
   )
-  const csv  = [headers.join(','), ...lines].join('\n')
+  const csv = [headers.join(','), ...lines].join('\n')
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-  const url  = URL.createObjectURL(blob)
-  const a    = document.createElement('a')
-  a.href     = url
-  a.download = 'Jobtype_Contrato.csv'
-  a.click()
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement('a')
+
+  anchor.href = url
+  anchor.download = 'Jobtype_Contrato.csv'
+  anchor.click()
   URL.revokeObjectURL(url)
 }
 </script>
 
 <style scoped>
-/* Fila seleccionada — scoped para no contaminar otras grillas */
 .jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-tbody > tr.p-datatable-row-selected > td),
 .jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-tbody > tr.p-datatable-row-selected:hover > td),
 .jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-tbody > tr[data-p-selected='true'] > td),
@@ -328,7 +332,6 @@ const exportarExcel = () => {
   color: #111 !important;
 }
 
-/* Estado vacío */
 .jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-emptymessage > td),
 .jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-empty-message > td) {
   position: relative !important;
