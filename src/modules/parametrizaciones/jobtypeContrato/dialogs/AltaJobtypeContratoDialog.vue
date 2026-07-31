@@ -90,7 +90,6 @@
           <FmButton
             label="AGREGAR"
             class="joco-alta-add-button"
-            :disabled="!canAgregar"
             @click="agregar"
           />
         </div>
@@ -227,13 +226,7 @@ const emit = defineEmits(['update:visible', 'relacionado'])
 const store = useJobtypeContratoStore()
 
 const paisOptions = PAIS_OPTIONS
-const form = reactive({
-  pais: '',
-  jobtype: '',
-  contrato: '',
-  origen: ''
-})
-
+const form = reactive({ pais: '', jobtype: '', contrato: '', origen: '' })
 const jobtypeSuggestions = ref([])
 const contratoSuggestions = ref([])
 const jobtypeSelected = ref(null)
@@ -246,7 +239,6 @@ const showConfirmCierre = ref(false)
 
 const origenOptions = computed(() => {
   if (form.pais === '2') return [{ label: 'FAN', value: 'FAN' }]
-
   return [
     { label: '', value: '' },
     { label: 'FAN', value: 'FAN' },
@@ -255,20 +247,12 @@ const origenOptions = computed(() => {
 })
 
 const canAgregar = computed(() => Boolean(
-  form.pais &&
-  form.origen &&
-  jobtypeSelected.value &&
-  contratoSelected.value
+  form.pais && form.origen && jobtypeSelected.value && contratoSelected.value
 ))
 
 const hayDatos = computed(() => Boolean(
-  form.pais ||
-  form.jobtype ||
-  form.contrato ||
-  form.origen ||
-  jobtypeSelected.value ||
-  contratoSelected.value ||
-  altaRows.value.length
+  form.pais || form.jobtype || form.contrato || form.origen ||
+  jobtypeSelected.value || contratoSelected.value || altaRows.value.length
 ))
 
 watch(() => form.pais, (pais) => {
@@ -304,17 +288,9 @@ const buscarContratos = async (event) => {
   contratoSuggestions.value = await store.buscarContratos(event.query)
 }
 
-const onJobtypeSelect = (event) => {
-  jobtypeSelected.value = event.value
-}
-
-const onContratoSelect = (event) => {
-  contratoSelected.value = event.value
-}
-
-const onRowClick = ({ data }) => {
-  altaSelectedRow.value = data
-}
+const onJobtypeSelect = (event) => { jobtypeSelected.value = event.value }
+const onContratoSelect = (event) => { contratoSelected.value = event.value }
+const onRowClick = ({ data }) => { altaSelectedRow.value = data }
 
 const agregar = () => {
   if (!canAgregar.value) return
@@ -323,7 +299,6 @@ const agregar = () => {
   if (altaRows.value.some((row) => row.relCodigoTarea === codigo)) return
 
   const paisLabel = paisOptions.find((option) => option.value === form.pais)?.label ?? ''
-
   const nuevaFila = {
     id: `${Date.now()}-${codigo}`,
     relCodigoTarea: codigo,
@@ -346,7 +321,6 @@ const agregar = () => {
 
 const eliminarPreview = () => {
   if (!altaSelectedRow.value) return
-
   altaRows.value = altaRows.value.filter((row) => row.id !== altaSelectedRow.value.id)
   altaSelectedRow.value = null
 }
@@ -432,44 +406,41 @@ const cerrar = () => {
   width: 100% !important;
 }
 
-.joco-alta-dialog .joco-alta-control.p-select {
+.joco-alta-dialog .joco-alta-control.p-select,
+.joco-alta-dialog .joco-alta-input {
   height: 42px !important;
   min-height: 42px !important;
+  font-size: 13px !important;
+  box-sizing: border-box !important;
 }
 
 .joco-alta-dialog .joco-alta-control.p-select .p-select-label {
   display: flex !important;
   align-items: center !important;
   padding: 0 12px !important;
-  font-size: 13px !important;
 }
 
 .joco-alta-dialog .joco-alta-input {
   width: 100% !important;
+  padding: 0 12px !important;
+}
+
+.joco-alta-dialog .joco-alta-add-button.p-button,
+.joco-alta-dialog .joco-alta-relate-button.p-button {
   height: 42px !important;
   min-height: 42px !important;
-  padding: 0 12px !important;
+  border-radius: 7px !important;
   font-size: 13px !important;
-  box-sizing: border-box !important;
+  font-weight: 700 !important;
 }
 
 .joco-alta-dialog .joco-alta-add-button.p-button {
   width: 100% !important;
   min-width: 138px !important;
-  height: 42px !important;
-  min-height: 42px !important;
-  border-radius: 7px !important;
-  font-size: 13px !important;
-  font-weight: 700 !important;
 }
 
 .joco-alta-dialog .joco-alta-relate-button.p-button {
   min-width: 150px !important;
-  height: 42px !important;
-  min-height: 42px !important;
-  border-radius: 7px !important;
-  font-size: 13px !important;
-  font-weight: 700 !important;
 }
 
 .joco-alta-dialog .joco-alta-grid.p-datatable {
@@ -509,9 +480,7 @@ const cerrar = () => {
   font-size: 12px !important;
 }
 
-.joco-alta-select-overlay {
-  min-width: 140px !important;
-}
+.joco-alta-select-overlay { min-width: 140px !important; }
 </style>
 
 <style scoped>
@@ -530,7 +499,6 @@ const cerrar = () => {
   color: #263746;
   font-size: 24px;
   font-weight: 400;
-  line-height: 1.2;
 }
 
 .joco-alta-header__close {
@@ -545,13 +513,10 @@ const cerrar = () => {
   color: #111;
   font-size: 25px;
   font-weight: 700;
-  line-height: 1;
   cursor: pointer;
 }
 
-.joco-alta-header__close:hover {
-  color: #00a9bd;
-}
+.joco-alta-header__close:hover { color: #00a9bd; }
 
 .joco-alta-body {
   height: 100%;
@@ -585,9 +550,7 @@ const cerrar = () => {
   white-space: nowrap;
 }
 
-.joco-alta-field--button {
-  justify-content: flex-end;
-}
+.joco-alta-field--button { justify-content: flex-end; }
 
 .joco-alta-grid-wrap {
   flex: 1 1 auto;
@@ -629,46 +592,18 @@ const cerrar = () => {
 }
 
 @media (max-width: 1050px) {
-  .joco-alta-form {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .joco-alta-field--button {
-    grid-column: 2;
-  }
-
-  .joco-alta-body {
-    overflow-y: auto;
-  }
-
-  .joco-alta-grid-wrap {
-    flex: 0 0 330px;
-  }
+  .joco-alta-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .joco-alta-field--button { grid-column: 2; }
+  .joco-alta-body { overflow-y: auto; }
+  .joco-alta-grid-wrap { flex: 0 0 330px; }
 }
 
 @media (max-width: 680px) {
-  .joco-alta-header {
-    padding: 0 16px 0 20px;
-  }
-
-  .joco-alta-header__title {
-    font-size: 20px;
-  }
-
-  .joco-alta-body {
-    padding: 22px 18px 26px;
-  }
-
-  .joco-alta-form {
-    grid-template-columns: 1fr;
-  }
-
-  .joco-alta-field--button {
-    grid-column: 1;
-  }
-
-  .joco-alta-footer {
-    padding: 0 18px;
-  }
+  .joco-alta-header { padding: 0 16px 0 20px; }
+  .joco-alta-header__title { font-size: 20px; }
+  .joco-alta-body { padding: 22px 18px 26px; }
+  .joco-alta-form { grid-template-columns: 1fr; }
+  .joco-alta-field--button { grid-column: 1; }
+  .joco-alta-footer { padding: 0 18px; }
 }
 </style>
