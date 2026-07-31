@@ -18,12 +18,12 @@ import type {
 
 export const useJobtypeContratoStore = defineStore('jobtypeContrato', () => {
   const relaciones = ref<JobTypeContratoRow[]>([])
-  const loading    = ref(false)
-  const error      = ref<string | null>(null)
+  const loading = ref(false)
+  const error = ref<string | null>(null)
 
   async function withLoading<T>(fn: () => Promise<T>): Promise<T> {
     loading.value = true
-    error.value   = null
+    error.value = null
     try {
       return await fn()
     } catch (e: unknown) {
@@ -44,9 +44,10 @@ export const useJobtypeContratoStore = defineStore('jobtypeContrato', () => {
 
   const actualizarRelacion = (
     tareaContratoId: number,
-    tipoContratoId: number
+    tipoContratoId: number,
+    origen?: string
   ): Promise<JobTypeContratoRow> =>
-    withLoading(() => apiActualizarRelacion(tareaContratoId, tipoContratoId))
+    withLoading(() => apiActualizarRelacion(tareaContratoId, tipoContratoId, origen))
 
   const desactivarRelacion = (idRelacion: number): Promise<JobTypeContratoRow> =>
     withLoading(() => apiDesactivarRelacion(idRelacion))
