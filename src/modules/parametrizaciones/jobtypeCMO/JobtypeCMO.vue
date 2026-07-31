@@ -67,7 +67,7 @@
 <script setup>
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import Dialog from 'primevue/dialog'
-import JobtypeRelacion from '../jobtypeRelacion/JobtypeRelacion.vue'
+import JobtypeRelacion from './components/CmoActividadGrid.vue'
 
 const screenRoot = ref(null)
 const showDeleteConfirm = ref(false)

@@ -221,7 +221,7 @@ const routes = [
         path: 'jobtypeContrato.html',
         name: 'JOCO',
         beforeEnter: allowed,
-        component: () => import('../modules/jobtypeContrato/pages/JobtypeContratoPage.vue')
+        component: () => import('../modules/parametrizaciones/jobtypeContrato/pages/JobtypeContratoPage.vue')
       },
       {
         path: 'jobtypeCMO.html',

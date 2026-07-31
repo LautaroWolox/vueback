@@ -16,7 +16,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import CustomMenu from '@/components/CustomMenu.vue'
-import JobtypeContrato from '@/modules/parametrizaciones/jobtypeContrato/JobtypeContrato.vue'
+import JobtypeContrato from '@/modules/parametrizaciones/jobtypeContrato/pages/JobtypeContratoPage.vue'
 
 const route = useRoute()
 const showLogo = computed(() => route.name === 'main')
