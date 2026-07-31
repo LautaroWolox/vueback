@@ -24,10 +24,9 @@
     </template>
 
     <div class="joco-alta-body">
-      <!-- ── Formulario: País | Jobtype | Contrato | AGREGAR ── -->
       <div class="joco-alta-form">
         <div class="joco-alta-field">
-          <label for="joco-alta-pais">Pais</label>
+          <label for="joco-alta-pais">País</label>
           <Select
             id="joco-alta-pais"
             v-model="form.pais"
@@ -73,18 +72,30 @@
           />
         </div>
 
-        <!-- El botón AGREGAR está en el flujo del grid, alineado al final -->
-        <div class="joco-alta-field joco-alta-field--btn">
+        <div class="joco-alta-field">
+          <label for="joco-alta-origen">Origen</label>
+          <Select
+            id="joco-alta-origen"
+            v-model="form.origen"
+            :options="origenOptions"
+            optionLabel="label"
+            optionValue="value"
+            :disabled="!form.pais"
+            overlayClass="joco-alta-select-overlay"
+            class="joco-alta-control"
+          />
+        </div>
+
+        <div class="joco-alta-field joco-alta-field--button">
           <FmButton
             label="AGREGAR"
-            class="joco-alta-add-btn"
+            class="joco-alta-add-button"
             :disabled="!canAgregar"
             @click="agregar"
           />
         </div>
       </div>
 
-      <!-- ── Grid de preview ── -->
       <div class="joco-alta-grid-wrap">
         <DataTable
           v-model:selection="altaSelectedRow"
@@ -95,12 +106,12 @@
           dataKey="id"
           tableStyle="table-layout: fixed; width: 100%; min-width: 100%"
           scrollable
-          scroll-height="flex"
+          scrollHeight="flex"
           selectionMode="single"
           paginator
           :rowsPerPageOptions="[10]"
           showGridlines
-          @row-click="({ data }) => altaSelectedRow = data"
+          @row-click="onRowClick"
         >
           <template #empty>
             <div class="joco-alta-empty">No hay relaciones agregadas</div>
@@ -108,20 +119,37 @@
 
           <template
             #paginatorcontainer="{
-              first, last, page, pageCount, rows, totalRecords,
-              firstPageCallback, lastPageCallback, prevPageCallback,
-              nextPageCallback, rowChangeCallback, changePageCallback
+              first,
+              last,
+              page,
+              pageCount,
+              rows,
+              totalRecords,
+              firstPageCallback,
+              lastPageCallback,
+              prevPageCallback,
+              nextPageCallback,
+              rowChangeCallback,
+              changePageCallback
             }"
           >
             <FmGridPaginator
-              :first="first" :last="last" :page="page"
-              :page-count="pageCount" :rows="rows"
-              :total-records="totalRecords" :rows-options="[10]"
-              :show-rows-select="false" :show-counter="false"
+              :first="first"
+              :last="last"
+              :page="page"
+              :page-count="pageCount"
+              :rows="rows"
+              :total-records="totalRecords"
+              :rows-options="[10]"
+              :show-rows-select="false"
+              :show-counter="false"
               page-label="Página"
-              @first-page="firstPageCallback" @prev-page="prevPageCallback"
-              @next-page="nextPageCallback"   @last-page="lastPageCallback"
-              @page-change="changePageCallback" @rows-change="rowChangeCallback"
+              @first-page="firstPageCallback"
+              @prev-page="prevPageCallback"
+              @next-page="nextPageCallback"
+              @last-page="lastPageCallback"
+              @page-change="changePageCallback"
+              @rows-change="rowChangeCallback"
             >
               <template #actions>
                 <FmGridActions
@@ -142,17 +170,22 @@
               <span class="joco-cell-text" :title="data.relCodigoTarea">{{ data.relCodigoTarea }}</span>
             </template>
           </Column>
-          <Column field="relTarea" header="TAREA" style="width: 25%">
+          <Column field="relTarea" header="TAREA" style="width: 20%">
             <template #body="{ data }">
               <span class="joco-cell-text" :title="data.relTarea">{{ data.relTarea }}</span>
             </template>
           </Column>
-          <Column field="relContrato" header="NOMBRE_CONTRATO" style="width: 30%">
+          <Column field="origen" header="ORIGEN" style="width: 20%">
+            <template #body="{ data }">
+              <span class="joco-cell-text" :title="data.origen">{{ data.origen }}</span>
+            </template>
+          </Column>
+          <Column field="relContrato" header="NOMBRE_CONTRATO" style="width: 20%">
             <template #body="{ data }">
               <span class="joco-cell-text" :title="data.relContrato">{{ data.relContrato }}</span>
             </template>
           </Column>
-          <Column field="paisLabel" header="PAIS" style="width: 25%">
+          <Column field="paisLabel" header="PAIS" style="width: 20%">
             <template #body="{ data }">
               <span class="joco-cell-text" :title="data.paisLabel">{{ data.paisLabel }}</span>
             </template>
@@ -165,7 +198,7 @@
       <div class="joco-alta-footer">
         <FmButton
           label="RELACIONAR"
-          class="joco-alta-relate-btn"
+          class="joco-alta-relate-button"
           :disabled="altaRows.length === 0"
           @click="relacionar"
         />
@@ -183,59 +216,83 @@
 
 <script setup>
 import { computed, reactive, ref, watch } from 'vue'
+import { PAIS_OPTIONS } from '../config/columns'
 import { useJobtypeContratoStore } from '../store/jobtypeContratoStore'
-
-const paisOptions = [
-  { label: '',       value: '' },
-  { label: 'ARG/UY', value: '1' },
-  { label: 'PY',     value: '2' }
-]
 
 const props = defineProps({
   visible: { type: Boolean, default: false }
 })
 
 const emit = defineEmits(['update:visible', 'relacionado'])
-
 const store = useJobtypeContratoStore()
 
-const form = reactive({ pais: '', jobtype: '', contrato: '' })
-const jobtypeSuggestions  = ref([])
-const contratoSuggestions = ref([])
-const jobtypeSelected     = ref(null)
-const contratoSelected    = ref(null)
-const altaRows            = ref([])
-const altaSelectedRow     = ref(null)
-const altaFirst           = ref(0)
-const altaPageRows        = ref(10)
-const showConfirmCierre   = ref(false)
-
-const canAgregar = computed(() => Boolean(jobtypeSelected.value && contratoSelected.value))
-
-const hayDatos = computed(() =>
-  Boolean(form.jobtype || form.contrato || jobtypeSelected.value || contratoSelected.value || altaRows.value.length)
-)
-
-watch(() => form.pais, () => {
-  form.jobtype           = ''
-  form.contrato          = ''
-  jobtypeSelected.value  = null
-  contratoSelected.value = null
+const paisOptions = PAIS_OPTIONS
+const form = reactive({
+  pais: '',
+  jobtype: '',
+  contrato: '',
+  origen: ''
 })
 
-watch(() => props.visible, (val) => {
-  if (val) resetForm()
+const jobtypeSuggestions = ref([])
+const contratoSuggestions = ref([])
+const jobtypeSelected = ref(null)
+const contratoSelected = ref(null)
+const altaRows = ref([])
+const altaSelectedRow = ref(null)
+const altaFirst = ref(0)
+const altaPageRows = ref(10)
+const showConfirmCierre = ref(false)
+
+const origenOptions = computed(() => {
+  if (form.pais === '2') return [{ label: 'FAN', value: 'FAN' }]
+
+  return [
+    { label: '', value: '' },
+    { label: 'FAN', value: 'FAN' },
+    { label: 'MXM', value: 'MXM' }
+  ]
+})
+
+const canAgregar = computed(() => Boolean(
+  form.pais &&
+  form.origen &&
+  jobtypeSelected.value &&
+  contratoSelected.value
+))
+
+const hayDatos = computed(() => Boolean(
+  form.pais ||
+  form.jobtype ||
+  form.contrato ||
+  form.origen ||
+  jobtypeSelected.value ||
+  contratoSelected.value ||
+  altaRows.value.length
+))
+
+watch(() => form.pais, (pais) => {
+  form.jobtype = ''
+  form.contrato = ''
+  jobtypeSelected.value = null
+  contratoSelected.value = null
+  form.origen = pais === '2' ? 'FAN' : ''
+})
+
+watch(() => props.visible, (visible) => {
+  if (visible) resetForm()
 })
 
 const resetForm = () => {
-  form.pais              = ''
-  form.jobtype           = ''
-  form.contrato          = ''
-  jobtypeSelected.value  = null
+  form.pais = ''
+  form.jobtype = ''
+  form.contrato = ''
+  form.origen = ''
+  jobtypeSelected.value = null
   contratoSelected.value = null
-  altaRows.value         = []
-  altaSelectedRow.value  = null
-  altaFirst.value        = 0
+  altaRows.value = []
+  altaSelectedRow.value = null
+  altaFirst.value = 0
   showConfirmCierre.value = false
 }
 
@@ -247,57 +304,85 @@ const buscarContratos = async (event) => {
   contratoSuggestions.value = await store.buscarContratos(event.query)
 }
 
-const onJobtypeSelect  = (e) => { jobtypeSelected.value  = e.value }
-const onContratoSelect = (e) => { contratoSelected.value = e.value }
+const onJobtypeSelect = (event) => {
+  jobtypeSelected.value = event.value
+}
+
+const onContratoSelect = (event) => {
+  contratoSelected.value = event.value
+}
+
+const onRowClick = ({ data }) => {
+  altaSelectedRow.value = data
+}
 
 const agregar = () => {
-  if (!jobtypeSelected.value || !contratoSelected.value) return
+  if (!canAgregar.value) return
+
   const codigo = jobtypeSelected.value.codigo
-  if (altaRows.value.some((r) => r.relCodigoTarea === codigo)) return
+  if (altaRows.value.some((row) => row.relCodigoTarea === codigo)) return
 
-  const paisLabel = paisOptions.find((o) => o.value === form.pais)?.label ?? ''
+  const paisLabel = paisOptions.find((option) => option.value === form.pais)?.label ?? ''
 
-  altaRows.value = [...altaRows.value, {
-    id:             `${Date.now()}-${codigo}`,
+  const nuevaFila = {
+    id: `${Date.now()}-${codigo}`,
     relCodigoTarea: codigo,
-    relTarea:       jobtypeSelected.value.nombre,
-    relContratoId:  contratoSelected.value.contratoId,
-    relContrato:    contratoSelected.value.nombre,
-    pais:           paisLabel,
+    relTarea: jobtypeSelected.value.nombre,
+    relContratoId: contratoSelected.value.contratoId,
+    relContrato: contratoSelected.value.nombre,
+    origen: form.origen,
+    pais: paisLabel,
     paisLabel
-  }]
+  }
 
-  form.jobtype           = ''
-  form.contrato          = ''
-  jobtypeSelected.value  = null
+  altaRows.value = [...altaRows.value, nuevaFila]
+  altaSelectedRow.value = nuevaFila
+  form.jobtype = ''
+  form.contrato = ''
+  jobtypeSelected.value = null
   contratoSelected.value = null
+  form.origen = form.pais === '2' ? 'FAN' : ''
 }
 
 const eliminarPreview = () => {
   if (!altaSelectedRow.value) return
-  altaRows.value = altaRows.value.filter((r) => r.id !== altaSelectedRow.value.id)
+
+  altaRows.value = altaRows.value.filter((row) => row.id !== altaSelectedRow.value.id)
   altaSelectedRow.value = null
 }
 
 const relacionar = async () => {
   if (!altaRows.value.length) return
+
   try {
     await store.crearRelaciones(
-      altaRows.value.map(({ relCodigoTarea, relTarea, relContratoId, relContrato, pais }) => ({
-        relCodigoTarea, relTarea, relContratoId, relContrato, pais
+      altaRows.value.map(({ relCodigoTarea, relTarea, relContratoId, relContrato, origen, pais }) => ({
+        relCodigoTarea,
+        relTarea,
+        relContratoId,
+        relContrato,
+        origen,
+        pais
       }))
     )
     cerrar()
     emit('relacionado')
-  } catch { /* error en store.error */ }
+  } catch {
+    // El mensaje queda disponible en store.error.
+  }
 }
 
 const solicitarCierre = () => {
-  if (hayDatos.value) { showConfirmCierre.value = true; return }
+  if (hayDatos.value) {
+    showConfirmCierre.value = true
+    return
+  }
   cerrar()
 }
 
-const onVisibleChange = (val) => { if (!val) solicitarCierre() }
+const onVisibleChange = (visible) => {
+  if (!visible) solicitarCierre()
+}
 
 const cerrar = () => {
   resetForm()
@@ -305,26 +390,25 @@ const cerrar = () => {
 }
 </script>
 
-<!-- ─── Estilos del Dialog que se teletransporta a body ─── -->
 <style>
-/* Contenedor del diálogo */
 .p-dialog.joco-alta-dialog {
-  width: min(980px, calc(100dvw - 32px)) !important;
-  max-width: calc(100dvw - 32px) !important;
-  max-height: calc(100dvh - 32px) !important;
-  /* No fijamos height: el diálogo crece con su contenido hasta el max */
+  width: calc(100dvw - 48px) !important;
+  max-width: 1440px !important;
+  height: min(760px, calc(100dvh - 48px)) !important;
+  max-height: calc(100dvh - 48px) !important;
+  display: flex !important;
+  flex-direction: column !important;
   overflow: hidden;
-  border: 1px solid #d4dde2;
+  border: 1px solid #cdd8de;
   border-radius: 8px;
   background: #fff;
-  box-shadow: 0 20px 55px rgba(20, 48, 59, .24);
-  box-sizing: border-box;
+  box-shadow: 0 22px 58px rgba(18, 43, 53, .28);
 }
 
 .joco-alta-dialog .p-dialog-header {
-  flex: 0 0 auto;
+  flex: 0 0 80px;
   padding: 0 !important;
-  border-bottom: 1px solid #d4dde2;
+  border-bottom: 1px solid #d5dfe4;
   background: #fff;
 }
 
@@ -337,81 +421,63 @@ const cerrar = () => {
 }
 
 .joco-alta-dialog .p-dialog-footer {
-  flex: 0 0 auto;
+  flex: 0 0 80px;
   padding: 0 !important;
-  border-top: 1px solid #d4dde2;
+  border-top: 1px solid #d5dfe4;
   background: #fff;
 }
 
-/* Botón RELACIONAR en footer */
-.joco-alta-dialog .joco-alta-relate-btn.p-button {
-  width: 120px !important;
-  min-width: 120px !important;
-  height: 30px !important;
-  min-height: 30px !important;
-  padding: 0 13px !important;
-  border-radius: 2px !important;
-  font-size: 12px !important;
-}
-
-/* Botón AGREGAR */
-.joco-alta-dialog .joco-alta-add-btn.p-button {
+.joco-alta-dialog .joco-alta-control.p-select,
+.joco-alta-dialog .joco-alta-autocomplete.p-autocomplete {
   width: 100% !important;
-  height: 30px !important;
-  min-height: 30px !important;
-  padding: 0 10px !important;
-  border-radius: 2px !important;
-  font-size: 12px !important;
 }
 
-/* Controles del formulario */
 .joco-alta-dialog .joco-alta-control.p-select {
-  width: 100% !important;
-  height: 30px !important;
-  min-height: 30px !important;
+  height: 42px !important;
+  min-height: 42px !important;
 }
 
 .joco-alta-dialog .joco-alta-control.p-select .p-select-label {
   display: flex !important;
   align-items: center !important;
-  padding: 0 8px !important;
-  font-size: 12px !important;
-  line-height: 1.2 !important;
-}
-
-.joco-alta-dialog .joco-alta-autocomplete.p-autocomplete {
-  width: 100% !important;
+  padding: 0 12px !important;
+  font-size: 13px !important;
 }
 
 .joco-alta-dialog .joco-alta-input {
   width: 100% !important;
-  height: 30px !important;
-  min-height: 30px !important;
-  font-size: 12px !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  padding: 0 12px !important;
+  font-size: 13px !important;
   box-sizing: border-box !important;
 }
 
-/* Overlay del select */
-.joco-alta-select-overlay {
-  min-width: 140px !important;
-  max-width: 200px !important;
+.joco-alta-dialog .joco-alta-add-button.p-button {
+  width: 100% !important;
+  min-width: 138px !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  border-radius: 7px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
 }
 
-.joco-alta-select-overlay .p-select-list { padding: 2px 0 !important; }
-.joco-alta-select-overlay .p-select-option {
-  min-height: 30px !important;
-  padding: 5px 10px !important;
-  font-size: 12px !important;
+.joco-alta-dialog .joco-alta-relate-button.p-button {
+  min-width: 150px !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  border-radius: 7px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
 }
 
-/* Grilla de preview */
 .joco-alta-dialog .joco-alta-grid.p-datatable {
   width: 100% !important;
   height: 100% !important;
-  border: 0 !important;
-  background: #fff !important;
   display: flex !important;
   flex-direction: column !important;
+  border: 0 !important;
 }
 
 .joco-alta-dialog .joco-alta-grid .p-datatable-table-container,
@@ -424,147 +490,126 @@ const cerrar = () => {
 
 .joco-alta-dialog .joco-alta-grid .p-datatable-paginator-bottom,
 .joco-alta-dialog .joco-alta-grid > .p-paginator {
-  flex: 0 0 42px !important;
-  height: 42px !important;
-  min-height: 42px !important;
-  border-top: 1px solid #d4dde2 !important;
-}
-
-.joco-alta-dialog .joco-alta-grid .fm-custom-paginator {
-  min-height: 42px !important;
-  height: 42px !important;
-  padding: 2px 10px !important;
-}
-
-.joco-alta-dialog .joco-alta-grid .p-datatable-tbody > tr > td {
-  font-size: 11px !important;
-  height: 30px !important;
-  padding: 0 7px !important;
+  flex: 0 0 58px !important;
+  min-height: 58px !important;
+  border-top: 1px solid #d5dfe4 !important;
 }
 
 .joco-alta-dialog .joco-alta-grid .p-datatable-thead > tr > th {
-  font-size: 10px !important;
-  height: 30px !important;
-  padding: 0 7px !important;
-  background: #f1f1f1 !important;
+  height: 48px !important;
+  padding: 0 12px !important;
+  background: #f2f6f8 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+
+.joco-alta-dialog .joco-alta-grid .p-datatable-tbody > tr > td {
+  height: 34px !important;
+  padding: 0 12px !important;
+  font-size: 12px !important;
+}
+
+.joco-alta-select-overlay {
+  min-width: 140px !important;
 }
 </style>
 
-<!-- ─── Estilos scoped para el layout interno ─── -->
 <style scoped>
-/* ── Header ── */
 .joco-alta-header {
   width: 100%;
-  height: 52px;
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 12px 0 20px;
+  padding: 0 42px 0 50px;
   box-sizing: border-box;
 }
 
 .joco-alta-header__title {
   margin: 0;
   color: #263746;
-  font-size: 18px;
+  font-size: 24px;
   font-weight: 400;
   line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .joco-alta-header__close {
-  flex: 0 0 auto;
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  border: 1px solid transparent;
-  border-radius: 6px;
+  border: 0;
   background: transparent;
-  color: #9aa4aa;
-  font-size: 22px;
+  color: #111;
+  font-size: 25px;
   font-weight: 700;
   line-height: 1;
   cursor: pointer;
-  transition: border-color .14s ease, color .14s ease;
 }
 
 .joco-alta-header__close:hover {
-  border-color: #00a9bd;
   color: #00a9bd;
 }
 
-/* ── Body ── */
 .joco-alta-body {
+  height: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 12px 16px 10px;
-  /* El body no tiene altura fija — se ajusta al contenido */
+  gap: 20px;
+  padding: 32px 48px 36px;
+  box-sizing: border-box;
 }
 
-/* ── Formulario: 4 columnas en escritorio ── */
 .joco-alta-form {
+  flex: 0 0 auto;
   display: grid;
-  grid-template-columns:
-    minmax(150px, 180px)
-    minmax(220px, 1fr)
-    minmax(220px, 1fr)
-    120px;
+  grid-template-columns: 140px minmax(180px, 1fr) minmax(180px, 1fr) 140px 160px;
   align-items: end;
-  gap: 10px;
-  box-sizing: border-box;
+  gap: 16px;
 }
 
 .joco-alta-field {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 8px;
 }
 
 .joco-alta-field > label {
-  color: #202020;
-  font-size: 11px;
+  color: #171717;
+  font-size: 13px;
   font-weight: 700;
   white-space: nowrap;
 }
 
-/* El campo del botón no necesita label pero debe alinearse al final */
-.joco-alta-field--btn {
+.joco-alta-field--button {
   justify-content: flex-end;
 }
 
-/* ── Grid wrap con altura acotada ── */
 .joco-alta-grid-wrap {
-  width: 100%;
-  height: clamp(260px, 40dvh, 380px);
-  min-height: 260px;
+  flex: 1 1 auto;
+  min-height: 300px;
   display: flex;
   flex-direction: column;
-  border: 1px solid #d4dde2;
-  border-left: 3px solid #00a9bd;
   overflow: hidden;
+  border: 1px solid #cfdbe1;
+  border-left: 4px solid #00a9bd;
   background: #fff;
-  box-sizing: border-box;
 }
 
-/* Estado vacío */
 .joco-alta-empty {
+  min-height: 108px;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 60px;
-  color: #075f6d;
-  font-size: 12px;
-  background: #eafcff;
+  color: #2f6475;
+  font-size: 14px;
+  background: #e8f9fc;
 }
 
-/* Celda de texto */
 .joco-cell-text {
   display: block;
   width: 100%;
@@ -573,41 +618,57 @@ const cerrar = () => {
   white-space: nowrap;
 }
 
-/* ── Footer ── */
 .joco-alta-footer {
+  width: 100%;
+  min-height: 80px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding: 10px 16px;
-  min-height: 52px;
+  padding: 0 48px;
   box-sizing: border-box;
 }
 
-/* ────────────────────────────
-   Responsive
-   ──────────────────────────── */
-
-/* 700–1100 px: 2 columnas */
-@media (max-width: 1100px) {
+@media (max-width: 1050px) {
   .joco-alta-form {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-rows: auto auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  /* Botón en celda 2×1 al final de la segunda fila */
-  .joco-alta-field--btn {
-    grid-column: 2 / 3;
+  .joco-alta-field--button {
+    grid-column: 2;
+  }
+
+  .joco-alta-body {
+    overflow-y: auto;
+  }
+
+  .joco-alta-grid-wrap {
+    flex: 0 0 330px;
   }
 }
 
-/* < 700 px: 1 columna */
-@media (max-width: 700px) {
+@media (max-width: 680px) {
+  .joco-alta-header {
+    padding: 0 16px 0 20px;
+  }
+
+  .joco-alta-header__title {
+    font-size: 20px;
+  }
+
+  .joco-alta-body {
+    padding: 22px 18px 26px;
+  }
+
   .joco-alta-form {
     grid-template-columns: 1fr;
   }
 
-  .joco-alta-field--btn {
+  .joco-alta-field--button {
     grid-column: 1;
+  }
+
+  .joco-alta-footer {
+    padding: 0 18px;
   }
 }
 </style>
