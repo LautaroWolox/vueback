@@ -10,6 +10,7 @@ import './assets/css/fm-menu-tuning.css'
 import './assets/css/fm-report-sas-auto-height.css'
 import './assets/css/fm-select.css'
 import './modules/parametrizaciones/jobtypeContrato/styles/jobtype-contrato.css'
+import './modules/parametrizaciones/jobtypeContrato/styles/jobtypeContratoSingleRow.css'
 
 import Lara from '@primeuix/themes/lara'
 import { definePreset } from '@primeuix/themes'
