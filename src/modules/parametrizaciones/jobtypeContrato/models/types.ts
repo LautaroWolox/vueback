@@ -3,6 +3,7 @@ export interface JobTypeContratoRow {
   tareaCodigo: string
   tareaNombre: string
   contratoNombre: string
+  origen?: string
   legajoModificacion: string
   fechaModificacion: string
   activo: string
@@ -21,6 +22,7 @@ export interface NuevaRelacion {
   relTarea: string
   relContratoId: number
   relContrato: string
+  origen: string
   pais: string
 }
 
