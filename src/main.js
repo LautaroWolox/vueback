@@ -9,8 +9,7 @@ import './assets/css/fm-menu-responsive.css'
 import './assets/css/fm-menu-tuning.css'
 import './assets/css/fm-report-sas-auto-height.css'
 import './assets/css/fm-select.css'
-/* NOTA: jobtype-contrato.css fue eliminado de aquí.
-   Se importa únicamente dentro de pages/JobtypeContratoPage.vue */
+import './modules/jobtypeContrato/styles/jobtype-contrato.css'
 
 import Lara from '@primeuix/themes/lara'
 import { definePreset } from '@primeuix/themes'

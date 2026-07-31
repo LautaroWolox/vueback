@@ -1,22 +1,21 @@
 <template>
-  <!-- Dialog principal de alta -->
   <Dialog
     :visible="visible"
-    append-to="body"
+    appendTo="body"
     modal
     :closable="false"
     :close-on-escape="false"
     :draggable="false"
     :resizable="false"
-    class="jc-alta-dialog"
+    class="jobtype-alta-dialog"
     @update:visible="onVisibleChange"
   >
     <template #header>
-      <div class="jc-alta-header">
-        <h2 class="jc-alta-header__title">Alta Jobtype - Contrato</h2>
+      <div class="jobtype-alta-header">
+        <h2 class="jobtype-alta-header__title">Alta Jobtype - Contrato</h2>
         <button
           type="button"
-          class="jc-alta-header__close"
+          class="jobtype-alta-header__close"
           title="Cerrar"
           aria-label="Cerrar"
           @click="solicitarCierre"
@@ -24,50 +23,50 @@
       </div>
     </template>
 
-    <div class="jc-alta-content">
+    <div class="jobtype-alta-content">
       <!-- Formulario de carga -->
-      <div class="jc-alta-form">
-        <div class="jc-alta-field fm-field">
-          <label for="jc-alta-pais">Pais</label>
+      <div class="jobtype-alta-form">
+        <div class="jobtype-alta-field fm-field">
+          <label for="alta-pais">Pais</label>
           <Select
-            id="jc-alta-pais"
+            id="alta-pais"
             v-model="form.pais"
-            :options="PAIS_OPTIONS"
-            option-label="label"
-            option-value="value"
-            overlay-class="jc-alta-select-overlay"
-            class="jc-alta-control"
+            :options="paisOptions"
+            optionLabel="label"
+            optionValue="value"
+            overlayClass="jobtype-alta-select-overlay"
+            class="jobtype-alta-control"
           />
         </div>
 
-        <div class="jc-alta-field fm-field">
-          <label for="jc-alta-jobtype">Jobtype</label>
+        <div class="jobtype-alta-field fm-field">
+          <label for="alta-jobtype">Jobtype</label>
           <AutoComplete
-            id="jc-alta-jobtype"
+            id="alta-jobtype"
             v-model="form.jobtype"
             :suggestions="jobtypeSuggestions"
-            option-label="valor"
-            :min-length="4"
+            optionLabel="valor"
+            :minLength="4"
             :disabled="!form.pais"
-            class="jc-alta-control"
-            input-class="jc-alta-control"
+            class="jobtype-alta-control"
+            inputClass="jobtype-alta-control"
             @complete="buscarJobtypes"
             @item-select="onJobtypeSelect"
             @clear="jobtypeSelected = null"
           />
         </div>
 
-        <div class="jc-alta-field fm-field">
-          <label for="jc-alta-contrato">Contrato</label>
+        <div class="jobtype-alta-field fm-field">
+          <label for="alta-contrato">Contrato</label>
           <AutoComplete
-            id="jc-alta-contrato"
+            id="alta-contrato"
             v-model="form.contrato"
             :suggestions="contratoSuggestions"
-            option-label="valor"
-            :min-length="4"
+            optionLabel="valor"
+            :minLength="4"
             :disabled="!form.pais"
-            class="jc-alta-control"
-            input-class="jc-alta-control"
+            class="jobtype-alta-control"
+            inputClass="jobtype-alta-control"
             @complete="buscarContratos"
             @item-select="onContratoSelect"
             @clear="contratoSelected = null"
@@ -76,32 +75,32 @@
 
         <FmButton
           label="AGREGAR"
-          class="jc-add-btn"
+          class="jobtype-add-button"
           :disabled="!canAgregar"
           @click="agregar"
         />
       </div>
 
       <!-- Grid de preview -->
-      <div class="jc-alta-grid-wrap">
+      <div class="jobtype-alta-grid-wrap">
         <DataTable
           v-model:selection="altaSelectedRow"
           v-model:first="altaFirst"
           v-model:rows="altaPageRows"
-          class="jc-alta-grid fm-pass-grid"
+          class="jobtype-alta-grid fm-pass-grid"
           :value="altaRows"
-          data-key="id"
-          table-style="table-layout: fixed; width: 100%; min-width: 100%"
+          dataKey="id"
+          tableStyle="table-layout: fixed; width: 100%; min-width: 100%"
           scrollable
-          scroll-height="flex"
-          selection-mode="single"
+          scrollHeight="flex"
+          selectionMode="single"
           paginator
-          :rows-per-page-options="[10]"
-          show-gridlines
+          :rowsPerPageOptions="[10]"
+          showGridlines
           @row-click="({ data }) => altaSelectedRow = data"
         >
           <template #empty>
-            <FmEmptyState text="No hay relaciones agregadas" size="sm" />
+            <div class="fm-grid-empty jobtype-alta-empty">No hay relaciones agregadas</div>
           </template>
 
           <template
@@ -135,17 +134,24 @@
             </FmGridPaginator>
           </template>
 
-          <Column
-            v-for="col in ALTA_PREVIEW_COLUMNS"
-            :key="col.field"
-            :field="col.field"
-            :header="col.header"
-            :style="{ width: col.width }"
-          >
+          <Column field="relCodigoTarea" header="CODIGO_TAREA" style="width: 20%">
             <template #body="{ data }">
-              <span class="fm-cell-text" :title="String(data[col.field] ?? '')">
-                {{ data[col.field] ?? '' }}
-              </span>
+              <span class="jobtype-cell-text" :title="data.relCodigoTarea">{{ data.relCodigoTarea }}</span>
+            </template>
+          </Column>
+          <Column field="relTarea" header="TAREA" style="width: 25%">
+            <template #body="{ data }">
+              <span class="jobtype-cell-text" :title="data.relTarea">{{ data.relTarea }}</span>
+            </template>
+          </Column>
+          <Column field="relContrato" header="NOMBRE_CONTRATO" style="width: 30%">
+            <template #body="{ data }">
+              <span class="jobtype-cell-text" :title="data.relContrato">{{ data.relContrato }}</span>
+            </template>
+          </Column>
+          <Column field="paisLabel" header="PAIS" style="width: 25%">
+            <template #body="{ data }">
+              <span class="jobtype-cell-text" :title="data.paisLabel">{{ data.paisLabel }}</span>
             </template>
           </Column>
         </DataTable>
@@ -155,7 +161,7 @@
     <template #footer>
       <FmButton
         label="RELACIONAR"
-        class="jc-relate-btn"
+        class="jobtype-relate-button"
         :disabled="altaRows.length === 0"
         @click="relacionar"
       />
@@ -174,9 +180,14 @@
 <script setup>
 import { computed, reactive, ref, watch } from 'vue'
 import { useJobtypeContratoStore } from '../store/jobtypeContratoStore'
-import { ALTA_PREVIEW_COLUMNS, PAIS_OPTIONS } from '../config/columns'
 
-defineProps({
+const paisOptions = [
+  { label: '',       value: '' },
+  { label: 'ARG/UY', value: '1' },
+  { label: 'PY',     value: '2' }
+]
+
+const props = defineProps({
   visible: { type: Boolean, default: false }
 })
 
@@ -202,16 +213,20 @@ const hayDatos = computed(() =>
 )
 
 watch(() => form.pais, () => {
-  form.jobtype   = ''
-  form.contrato  = ''
+  form.jobtype           = ''
+  form.contrato          = ''
   jobtypeSelected.value  = null
   contratoSelected.value = null
 })
 
+watch(() => props.visible, (val) => {
+  if (val) resetForm()
+})
+
 const resetForm = () => {
-  form.pais     = ''
-  form.jobtype  = ''
-  form.contrato = ''
+  form.pais              = ''
+  form.jobtype           = ''
+  form.contrato          = ''
   jobtypeSelected.value  = null
   contratoSelected.value = null
   altaRows.value         = []
@@ -236,10 +251,10 @@ const agregar = () => {
   const codigo = jobtypeSelected.value.codigo
   if (altaRows.value.some((r) => r.relCodigoTarea === codigo)) return
 
-  const paisLabel = PAIS_OPTIONS.find((o) => o.value === form.pais)?.label ?? ''
+  const paisLabel = paisOptions.find((o) => o.value === form.pais)?.label ?? ''
 
   altaRows.value = [...altaRows.value, {
-    id:           `${Date.now()}-${codigo}`,
+    id:             `${Date.now()}-${codigo}`,
     relCodigoTarea: codigo,
     relTarea:       jobtypeSelected.value.nombre,
     relContratoId:  contratoSelected.value.contratoId,
@@ -248,8 +263,8 @@ const agregar = () => {
     paisLabel
   }]
 
-  form.jobtype  = ''
-  form.contrato = ''
+  form.jobtype           = ''
+  form.contrato          = ''
   jobtypeSelected.value  = null
   contratoSelected.value = null
 }
@@ -285,126 +300,3 @@ const cerrar = () => {
   emit('update:visible', false)
 }
 </script>
-
-<style scoped>
-/* ── Header del dialog de alta ── */
-.jc-alta-header {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 8px 0 20px;
-  box-sizing: border-box;
-}
-
-.jc-alta-header__title {
-  margin: 0;
-  color: var(--fm-text);
-  font-size: 20px;
-  font-weight: 400;
-  line-height: 1;
-}
-
-.jc-alta-header__close {
-  width: 44px;
-  height: 40px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 1px solid transparent;
-  border-radius: var(--fm-radius-sm);
-  background: transparent;
-  color: #111;
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 1;
-  cursor: pointer;
-  transition: border-color var(--fm-transition-fast), color var(--fm-transition-fast);
-}
-
-.jc-alta-header__close:hover {
-  border-color: var(--fm-cyan);
-  color: var(--fm-cyan);
-}
-
-/* ── Contenido ── */
-.jc-alta-content {
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  gap: 14px;
-  padding: 8px 16px 10px;
-  overflow: hidden;
-  box-sizing: border-box;
-}
-
-.jc-alta-form {
-  display: grid;
-  grid-template-columns: 120px minmax(0, 1fr) minmax(0, 1fr) 140px;
-  align-items: end;
-  gap: 14px;
-  box-sizing: border-box;
-}
-
-.jc-alta-field { min-width: 0; }
-
-/* fuerza el alto de controles dentro del formulario de alta */
-.jc-alta-control,
-.jc-alta-control.p-inputtext,
-.jc-alta-control.p-select,
-.jc-alta-control.p-autocomplete-input {
-  width: 100% !important;
-  min-width: 0 !important;
-  height: 30px !important;
-  min-height: 30px !important;
-  box-sizing: border-box !important;
-}
-
-/* ── Grid de preview ── */
-.jc-alta-grid-wrap {
-  width: 100%;
-  min-height: 0;
-  display: flex;
-  border: 1px solid var(--fm-border);
-  border-left: 3px solid var(--fm-cyan);
-  overflow: hidden;
-  background: var(--fm-white);
-  box-sizing: border-box;
-}
-
-.jc-alta-grid.p-datatable {
-  width: 100% !important;
-  min-width: 0 !important;
-  height: 100% !important;
-  min-height: 0 !important;
-  flex: 1 1 auto !important;
-  display: flex !important;
-  flex-direction: column !important;
-  overflow: hidden !important;
-}
-
-.jc-alta-grid .p-datatable-table-container,
-.jc-alta-grid .p-datatable-wrapper,
-.jc-alta-grid [data-pc-section="tablecontainer"] {
-  flex: 1 1 auto !important;
-  overflow: auto !important;
-}
-
-/* Responsive: formulario de 1 columna en pantallas pequeñas */
-@media (max-width: 860px) {
-  .jc-alta-form {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-rows: auto auto;
-  }
-}
-
-@media (max-width: 560px) {
-  .jc-alta-form {
-    grid-template-columns: 1fr;
-  }
-}
-</style>
