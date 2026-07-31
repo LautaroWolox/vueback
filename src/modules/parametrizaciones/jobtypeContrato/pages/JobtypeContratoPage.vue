@@ -197,6 +197,7 @@ import EditarJobtypeContratoDialog from '../dialogs/EditarJobtypeContratoDialog.
 import ConfirmarDesactivacionDialog from '../dialogs/ConfirmarDesactivacionDialog.vue'
 import { JOBTYPE_CONTRATO_COLUMNS } from '../config/columns'
 import { useJobtypeContratoStore } from '../store/jobtypeContratoStore'
+import '../styles/jobtypeContratoDialogs.css'
 
 const store = useJobtypeContratoStore()
 
