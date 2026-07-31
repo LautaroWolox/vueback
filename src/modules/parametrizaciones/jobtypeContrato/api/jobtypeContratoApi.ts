@@ -31,12 +31,16 @@ export async function apiCrearRelaciones(
 
 export async function apiActualizarRelacion(
   tareaContratoId: number,
-  tipoContratoId: number
+  tipoContratoId: number,
+  origen?: string
 ): Promise<JobTypeContratoRow> {
   const params = new URLSearchParams({
     tareaContratoId: String(tareaContratoId),
-    tipoContratoId:  String(tipoContratoId)
+    tipoContratoId: String(tipoContratoId)
   })
+
+  if (origen) params.set('origen', origen)
+
   const response = await fetch(`${BASE}/actualizarJobtype.html?${params}`)
   return handleResponse<JobTypeContratoRow>(response)
 }
