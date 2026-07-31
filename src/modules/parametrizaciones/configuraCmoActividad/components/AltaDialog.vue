@@ -29,8 +29,7 @@
 
     <div class="jobtype-alta-content">
       <div
-        class="jobtype-alta-form"
-        style="grid-template-columns: minmax(280px, 1fr) minmax(280px, 1fr) 120px !important; max-width: 860px !important; align-items: end !important;"
+        class="jobtype-alta-form cmo-alta-form"
       >
         <div
           class="jobtype-alta-field fm-field"
@@ -406,6 +405,19 @@ const onHide = () => {
 </script>
 
 <style scoped>
+.cmo-alta-form {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 120px !important;
+  max-width: 860px !important;
+  align-items: end !important;
+}
+
+@media (max-width: 768px) {
+  .cmo-alta-form {
+    grid-template-columns: 1fr !important;
+    max-width: none !important;
+  }
+}
+
 .cmo-alta-errors {
   padding: 4px 16px;
   margin: 0;
