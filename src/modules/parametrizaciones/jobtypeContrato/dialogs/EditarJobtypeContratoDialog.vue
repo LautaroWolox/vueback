@@ -7,16 +7,15 @@
     :close-on-escape="false"
     :draggable="true"
     :resizable="false"
-    class="jobtype-contrato-edit-dialog"
-    :style="dialogStyle"
+    class="joco-edit-dialog"
     @update:visible="onVisibleChange"
   >
     <template #header>
-      <div class="jobtype-contrato-edit-header">
-        <h2>Edición Jobtype-Contrato</h2>
+      <div class="joco-edit-header">
+        <h2 class="joco-edit-header__title">Edición Jobtype-Contrato</h2>
         <button
           type="button"
-          class="jobtype-contrato-edit-close"
+          class="joco-edit-header__close"
           title="Cerrar"
           aria-label="Cerrar"
           @click="solicitarCierre"
@@ -24,65 +23,72 @@
       </div>
     </template>
 
-    <div class="jobtype-contrato-edit-content">
-      <div class="jobtype-contrato-edit-field jobtype-contrato-edit-field--jobtype">
-        <label for="jc-edit-jobtype">JobType</label>
-        <InputText
-          id="jc-edit-jobtype"
-          :model-value="jobtype"
-          disabled
-          class="jobtype-contrato-edit-control jobtype-contrato-edit-control--readonly"
-        />
-      </div>
+    <!--
+      Layout de escritorio (>1100 px): 4 columnas en una fila
+        Jobtype | Contrato actual | País | Nuevo Contrato
+    -->
+    <div class="joco-edit-body">
+      <div class="joco-edit-form">
+        <div class="joco-edit-field">
+          <label for="joco-edit-jobtype">JobType</label>
+          <InputText
+            id="joco-edit-jobtype"
+            :model-value="jobtype"
+            disabled
+            class="joco-edit-control joco-edit-control--readonly"
+          />
+        </div>
 
-      <div class="jobtype-contrato-edit-field jobtype-contrato-edit-field--contrato">
-        <label for="jc-edit-contrato-actual">Contrato</label>
-        <InputText
-          id="jc-edit-contrato-actual"
-          :model-value="contratoActual"
-          disabled
-          class="jobtype-contrato-edit-control jobtype-contrato-edit-control--readonly"
-        />
-      </div>
+        <div class="joco-edit-field">
+          <label for="joco-edit-contrato-actual">Contrato</label>
+          <InputText
+            id="joco-edit-contrato-actual"
+            :model-value="contratoActual"
+            disabled
+            class="joco-edit-control joco-edit-control--readonly"
+          />
+        </div>
 
-      <div class="jobtype-contrato-edit-field jobtype-contrato-edit-field--pais">
-        <label for="jc-edit-pais">País</label>
-        <InputText
-          id="jc-edit-pais"
-          :model-value="pais"
-          disabled
-          class="jobtype-contrato-edit-control jobtype-contrato-edit-control--readonly"
-        />
-      </div>
+        <div class="joco-edit-field">
+          <label for="joco-edit-pais">País</label>
+          <InputText
+            id="joco-edit-pais"
+            :model-value="pais"
+            disabled
+            class="joco-edit-control joco-edit-control--readonly"
+          />
+        </div>
 
-      <div class="jobtype-contrato-edit-field jobtype-contrato-edit-field--nuevo">
-        <label for="jc-edit-nuevo-contrato">Nuevo Contrato</label>
-        <AutoComplete
-          id="jc-edit-nuevo-contrato"
-          v-model="nuevoContrato"
-          :suggestions="contratoSuggestions"
-          optionLabel="valor"
-          :minLength="4"
-          class="jobtype-contrato-edit-control"
-          inputClass="jobtype-contrato-edit-control"
-          @complete="buscarContratos"
-          @item-select="onContratoSelect"
-          @clear="contratoSelectedItem = null"
-        />
+        <div class="joco-edit-field">
+          <label for="joco-edit-nuevo-contrato">Nuevo Contrato</label>
+          <AutoComplete
+            id="joco-edit-nuevo-contrato"
+            v-model="nuevoContrato"
+            :suggestions="contratoSuggestions"
+            optionLabel="valor"
+            :minLength="4"
+            class="joco-edit-autocomplete"
+            inputClass="joco-edit-input"
+            @complete="buscarContratos"
+            @item-select="onContratoSelect"
+            @clear="contratoSelectedItem = null"
+          />
+        </div>
       </div>
     </div>
 
     <template #footer>
-      <FmButton
-        label="ACTUALIZAR"
-        class="jobtype-contrato-edit-update"
-        :disabled="!puedeActualizar"
-        @click="actualizar"
-      />
+      <div class="joco-edit-footer">
+        <FmButton
+          label="ACTUALIZAR"
+          class="joco-edit-update-btn"
+          :disabled="!puedeActualizar"
+          @click="actualizar"
+        />
+      </div>
     </template>
   </Dialog>
 
-  <!-- Guard: cambios sin guardar -->
   <FmConfirmDialog
     v-model:visible="showConfirmCierre"
     title="Confirmar acción"
@@ -108,11 +114,10 @@ const emit = defineEmits(['update:visible', 'actualizado'])
 
 const store = useJobtypeContratoStore()
 
-const dialogStyle         = 'width: min(900px, calc(100vw - 32px)); max-width: 900px;'
-const nuevoContrato       = ref('')
-const contratoSuggestions = ref([])
+const nuevoContrato        = ref('')
+const contratoSuggestions  = ref([])
 const contratoSelectedItem = ref(null)
-const showConfirmCierre   = ref(false)
+const showConfirmCierre    = ref(false)
 
 const hayCambios      = computed(() => Boolean(contratoSelectedItem.value))
 const puedeActualizar = computed(() => hayCambios.value)
@@ -158,23 +163,85 @@ const cerrar = () => {
 }
 </script>
 
+<!-- ─── Estilos del Dialog que se teletransporta a body ─── -->
+<style>
+.p-dialog.joco-edit-dialog {
+  width: min(860px, calc(100dvw - 32px)) !important;
+  max-width: calc(100dvw - 32px) !important;
+  /* Sin altura fija — el diálogo se ajusta al contenido sin espacio vacío */
+  overflow: hidden;
+  border: 1px solid #bdbdbd;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .28);
+  box-sizing: border-box;
+}
+
+.joco-edit-dialog .p-dialog-header {
+  padding: 0 !important;
+  border-bottom: 1px solid #dedede;
+  background: #fff;
+}
+
+.joco-edit-dialog .p-dialog-content {
+  padding: 0 !important;
+  background: #fff;
+  overflow: visible !important;
+}
+
+.joco-edit-dialog .p-dialog-footer {
+  padding: 0 !important;
+  border-top: 1px solid #dedede;
+  background: #fff;
+}
+
+/* Botón ACTUALIZAR compacto */
+.joco-edit-dialog .joco-edit-update-btn.p-button {
+  width: 110px !important;
+  min-width: 110px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  border-radius: 16px !important;
+  font-size: 12px !important;
+}
+
+/* AutoComplete dentro del diálogo de edición */
+.joco-edit-dialog .joco-edit-autocomplete.p-autocomplete {
+  width: 100% !important;
+}
+
+.joco-edit-dialog .joco-edit-input {
+  width: 100% !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  font-size: 13px !important;
+  box-sizing: border-box !important;
+}
+</style>
+
+<!-- ─── Estilos scoped para el layout interno ─── -->
 <style scoped>
-.jobtype-contrato-edit-header {
+/* ── Header ── */
+.joco-edit-header {
   width: 100%;
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  padding: 0 12px 0 16px;
+  box-sizing: border-box;
 }
 
-.jobtype-contrato-edit-header h2 {
+.joco-edit-header__title {
   margin: 0;
   color: #263746;
   font-size: 18px;
   font-weight: 400;
+  line-height: 1.2;
 }
 
-.jobtype-contrato-edit-close {
+.joco-edit-header__close {
+  flex: 0 0 auto;
   width: 28px;
   height: 28px;
   display: inline-flex;
@@ -188,108 +255,85 @@ const cerrar = () => {
   font-weight: 700;
   line-height: 1;
   cursor: pointer;
+  transition: color .14s ease;
 }
 
-.jobtype-contrato-edit-close:hover {
-  color: #00a9bd;
+.joco-edit-header__close:hover { color: #00a9bd; }
+
+/* ── Body ── */
+.joco-edit-body {
+  padding: 20px 16px 24px;
+  box-sizing: border-box;
 }
 
-.jobtype-contrato-edit-content {
-  min-height: 170px;
+/* ── Formulario: 4 columnas en escritorio (>1100 px) ── */
+.joco-edit-form {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
-  grid-template-areas:
-    'jobtype contrato pais'
-    '. nuevo .';
-  align-items: start;
-  column-gap: 20px;
-  row-gap: 14px;
-  padding: 16px 0 28px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  align-items: end;
+  box-sizing: border-box;
 }
 
-.jobtype-contrato-edit-field--jobtype  { grid-area: jobtype; }
-.jobtype-contrato-edit-field--contrato { grid-area: contrato; }
-.jobtype-contrato-edit-field--pais     { grid-area: pais; }
-.jobtype-contrato-edit-field--nuevo    { grid-area: nuevo; }
-
-.jobtype-contrato-edit-field {
+.joco-edit-field {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 6px;
 }
 
-.jobtype-contrato-edit-field > label {
+.joco-edit-field > label {
   color: #202020;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
-.jobtype-contrato-edit-control {
+/* Controles de solo lectura */
+.joco-edit-control {
   width: 100%;
   height: 32px;
   min-height: 32px;
   box-sizing: border-box;
 }
 
-.jobtype-contrato-edit-control--readonly:disabled {
+.joco-edit-control--readonly:disabled {
   border-color: #d1d1d1;
   background: #eeeeee;
   color: #444;
   opacity: 1;
 }
 
-@media (max-width: 760px) {
-  .jobtype-contrato-edit-content {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      'jobtype'
-      'contrato'
-      'pais'
-      'nuevo';
-    row-gap: 14px;
-    padding: 16px 0 22px;
-  }
-}
-</style>
-
-<style>
-/* Dialog styles — no-scoped porque el Dialog se teletransporta a body */
-.jobtype-contrato-edit-dialog.p-dialog {
-  overflow: hidden;
-  border: 1px solid #bdbdbd;
-  border-radius: 0;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, .28);
-}
-
-.jobtype-contrato-edit-dialog .p-dialog-header {
-  min-height: 56px;
-  padding: 12px 16px;
-  border-bottom: 1px solid #dedede;
-  background: #fff;
-}
-
-.jobtype-contrato-edit-dialog .p-dialog-content {
-  padding: 0 16px;
-  background: #fff;
-}
-
-.jobtype-contrato-edit-dialog .p-dialog-footer {
-  min-height: 62px;
+/* ── Footer ── */
+.joco-edit-footer {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   padding: 10px 16px;
-  border-top: 1px solid #dedede;
-  background: #fff;
+  min-height: 52px;
+  box-sizing: border-box;
 }
 
-.jobtype-contrato-edit-dialog .jobtype-contrato-edit-update {
-  width: 108px !important;
-  min-width: 108px !important;
-  height: 32px !important;
-  min-height: 32px !important;
-  border-radius: 16px !important;
-  font-size: 12px !important;
+/* ────────────────────────────
+   Responsive
+   ──────────────────────────── */
+
+/* 700–1100 px: 2 columnas */
+@media (max-width: 1100px) {
+  .joco-edit-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* < 700 px: 1 columna */
+@media (max-width: 700px) {
+  .joco-edit-form {
+    grid-template-columns: 1fr;
+  }
+
+  .joco-edit-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 </style>
