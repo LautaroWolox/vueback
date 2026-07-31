@@ -23,43 +23,42 @@
       </div>
     </template>
 
-    <!--
-      Layout de escritorio (>1100 px): 4 columnas en una fila
-        Jobtype | Contrato actual | País | Nuevo Contrato
-    -->
     <div class="joco-edit-body">
       <div class="joco-edit-form">
-        <div class="joco-edit-field">
-          <label for="joco-edit-jobtype">JobType</label>
+        <div class="joco-edit-field joco-edit-field--jobtype">
+          <label for="joco-edit-jobtype">Jobtype</label>
           <InputText
             id="joco-edit-jobtype"
             :model-value="jobtype"
+            :title="jobtype"
             disabled
             class="joco-edit-control joco-edit-control--readonly"
           />
         </div>
 
-        <div class="joco-edit-field">
+        <div class="joco-edit-field joco-edit-field--contrato">
           <label for="joco-edit-contrato-actual">Contrato</label>
           <InputText
             id="joco-edit-contrato-actual"
             :model-value="contratoActual"
+            :title="contratoActual"
             disabled
             class="joco-edit-control joco-edit-control--readonly"
           />
         </div>
 
-        <div class="joco-edit-field">
+        <div class="joco-edit-field joco-edit-field--pais">
           <label for="joco-edit-pais">País</label>
           <InputText
             id="joco-edit-pais"
             :model-value="pais"
+            :title="pais"
             disabled
             class="joco-edit-control joco-edit-control--readonly"
           />
         </div>
 
-        <div class="joco-edit-field">
+        <div class="joco-edit-field joco-edit-field--nuevo">
           <label for="joco-edit-nuevo-contrato">Nuevo Contrato</label>
           <AutoComplete
             id="joco-edit-nuevo-contrato"
@@ -71,7 +70,20 @@
             inputClass="joco-edit-input"
             @complete="buscarContratos"
             @item-select="onContratoSelect"
-            @clear="contratoSelectedItem = null"
+            @clear="limpiarContratoSeleccionado"
+          />
+        </div>
+
+        <div class="joco-edit-field joco-edit-field--origen">
+          <label for="joco-edit-origen">Origen</label>
+          <Select
+            id="joco-edit-origen"
+            v-model="origenSeleccionado"
+            :options="origenOptions"
+            optionLabel="label"
+            optionValue="value"
+            overlayClass="joco-edit-select-overlay"
+            class="joco-edit-select"
           />
         </div>
       </div>
@@ -81,7 +93,7 @@
       <div class="joco-edit-footer">
         <FmButton
           label="ACTUALIZAR"
-          class="joco-edit-update-btn"
+          class="joco-edit-update-button"
           :disabled="!puedeActualizar"
           @click="actualizar"
         />
@@ -103,32 +115,68 @@ import { computed, ref, watch } from 'vue'
 import { useJobtypeContratoStore } from '../store/jobtypeContratoStore'
 
 const props = defineProps({
-  visible:         { type: Boolean, default: false },
-  tareaContratoId: { type: Number,  default: 0 },
-  jobtype:         { type: String,  default: '' },
-  contratoActual:  { type: String,  default: '' },
-  pais:            { type: String,  default: '' }
+  visible: { type: Boolean, default: false },
+  tareaContratoId: { type: Number, default: 0 },
+  contratoTipoId: { type: Number, default: 0 },
+  jobtype: { type: String, default: '' },
+  contratoActual: { type: String, default: '' },
+  pais: { type: String, default: '' },
+  origenActual: { type: String, default: '' }
 })
 
 const emit = defineEmits(['update:visible', 'actualizado'])
-
 const store = useJobtypeContratoStore()
 
-const nuevoContrato        = ref('')
-const contratoSuggestions  = ref([])
+const nuevoContrato = ref('')
+const contratoSuggestions = ref([])
 const contratoSelectedItem = ref(null)
-const showConfirmCierre    = ref(false)
+const origenSeleccionado = ref('')
+const showConfirmCierre = ref(false)
 
-const hayCambios      = computed(() => Boolean(contratoSelectedItem.value))
-const puedeActualizar = computed(() => hayCambios.value)
-
-watch(() => props.visible, (val) => {
-  if (val) {
-    nuevoContrato.value        = ''
-    contratoSelectedItem.value = null
-    showConfirmCierre.value    = false
-  }
+const esParaguay = computed(() => {
+  const paisNormalizado = props.pais.trim().toUpperCase()
+  return paisNormalizado === 'PY' || paisNormalizado === '2'
 })
+
+const origenInicial = computed(() => {
+  const actual = props.origenActual.trim()
+  if (actual) return actual
+  return esParaguay.value ? 'FAN' : ''
+})
+
+const origenOptions = computed(() => {
+  const values = esParaguay.value ? ['FAN'] : ['', 'FAN', 'MXM']
+  const actual = props.origenActual.trim()
+
+  if (actual && !values.includes(actual)) values.push(actual)
+
+  return values.map((value) => ({ label: value, value }))
+})
+
+const contratoFinalId = computed(() =>
+  Number(contratoSelectedItem.value?.contratoId ?? props.contratoTipoId ?? 0)
+)
+
+const cambioContrato = computed(() => Boolean(contratoSelectedItem.value))
+const cambioOrigen = computed(() => origenSeleccionado.value !== origenInicial.value)
+const hayCambios = computed(() => cambioContrato.value || cambioOrigen.value)
+const puedeActualizar = computed(() => Boolean(
+  hayCambios.value &&
+  contratoFinalId.value > 0 &&
+  origenSeleccionado.value
+))
+
+watch(() => props.visible, (visible) => {
+  if (visible) resetForm()
+  else showConfirmCierre.value = false
+})
+
+const resetForm = () => {
+  nuevoContrato.value = ''
+  contratoSelectedItem.value = null
+  origenSeleccionado.value = origenInicial.value
+  showConfirmCierre.value = false
+}
 
 const buscarContratos = async (event) => {
   contratoSuggestions.value = await store.buscarContratos(event.query)
@@ -138,202 +186,241 @@ const onContratoSelect = (event) => {
   contratoSelectedItem.value = event.value
 }
 
+const limpiarContratoSeleccionado = () => {
+  contratoSelectedItem.value = null
+}
+
 const actualizar = async () => {
   if (!puedeActualizar.value) return
+
   try {
-    await store.actualizarRelacion(props.tareaContratoId, contratoSelectedItem.value.contratoId)
+    await store.actualizarRelacion(
+      props.tareaContratoId,
+      contratoFinalId.value,
+      origenSeleccionado.value
+    )
     cerrar()
     emit('actualizado')
-  } catch { /* error en store.error */ }
+  } catch {
+    // El mensaje queda disponible en store.error.
+  }
 }
 
 const solicitarCierre = () => {
-  if (hayCambios.value) { showConfirmCierre.value = true; return }
+  if (hayCambios.value) {
+    showConfirmCierre.value = true
+    return
+  }
   cerrar()
 }
 
-const onVisibleChange = (val) => { if (!val) solicitarCierre() }
-const cancelarCierre  = () => { showConfirmCierre.value = false }
-const confirmarCierre = () => { showConfirmCierre.value = false; cerrar() }
+const onVisibleChange = (visible) => {
+  if (!visible) solicitarCierre()
+}
+
+const cancelarCierre = () => {
+  showConfirmCierre.value = false
+}
+
+const confirmarCierre = () => {
+  showConfirmCierre.value = false
+  cerrar()
+}
 
 const cerrar = () => {
-  nuevoContrato.value        = ''
-  contratoSelectedItem.value = null
+  resetForm()
   emit('update:visible', false)
 }
 </script>
 
-<!-- ─── Estilos del Dialog que se teletransporta a body ─── -->
 <style>
 .p-dialog.joco-edit-dialog {
-  width: min(860px, calc(100dvw - 32px)) !important;
-  max-width: calc(100dvw - 32px) !important;
-  /* Sin altura fija — el diálogo se ajusta al contenido sin espacio vacío */
+  width: min(1220px, calc(100dvw - 48px)) !important;
+  max-width: calc(100dvw - 48px) !important;
   overflow: hidden;
-  border: 1px solid #bdbdbd;
-  border-radius: 6px;
+  border: 1px solid #cdd8de;
+  border-radius: 8px;
   background: #fff;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, .28);
-  box-sizing: border-box;
+  box-shadow: 0 18px 48px rgba(18, 43, 53, .26);
 }
 
 .joco-edit-dialog .p-dialog-header {
   padding: 0 !important;
-  border-bottom: 1px solid #dedede;
+  border-bottom: 1px solid #d5dfe4;
   background: #fff;
 }
 
 .joco-edit-dialog .p-dialog-content {
   padding: 0 !important;
-  background: #fff;
   overflow: visible !important;
+  background: #fff;
 }
 
 .joco-edit-dialog .p-dialog-footer {
   padding: 0 !important;
-  border-top: 1px solid #dedede;
+  border-top: 1px solid #d5dfe4;
   background: #fff;
 }
 
-/* Botón ACTUALIZAR compacto */
-.joco-edit-dialog .joco-edit-update-btn.p-button {
-  width: 110px !important;
-  min-width: 110px !important;
-  height: 32px !important;
-  min-height: 32px !important;
-  border-radius: 16px !important;
-  font-size: 12px !important;
+.joco-edit-dialog .joco-edit-autocomplete.p-autocomplete,
+.joco-edit-dialog .joco-edit-select.p-select {
+  width: 100% !important;
 }
 
-/* AutoComplete dentro del diálogo de edición */
-.joco-edit-dialog .joco-edit-autocomplete.p-autocomplete {
-  width: 100% !important;
+.joco-edit-dialog .joco-edit-input,
+.joco-edit-dialog .joco-edit-select.p-select {
+  height: 42px !important;
+  min-height: 42px !important;
+  font-size: 13px !important;
+  box-sizing: border-box !important;
 }
 
 .joco-edit-dialog .joco-edit-input {
   width: 100% !important;
-  height: 32px !important;
-  min-height: 32px !important;
+  padding: 0 12px !important;
+}
+
+.joco-edit-dialog .joco-edit-select.p-select .p-select-label {
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 12px !important;
   font-size: 13px !important;
-  box-sizing: border-box !important;
+}
+
+.joco-edit-dialog .joco-edit-update-button.p-button {
+  min-width: 150px !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  border-radius: 7px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+
+.joco-edit-select-overlay {
+  min-width: 140px !important;
 }
 </style>
 
-<!-- ─── Estilos scoped para el layout interno ─── -->
 <style scoped>
-/* ── Header ── */
 .joco-edit-header {
   width: 100%;
-  height: 52px;
+  height: 74px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 12px 0 16px;
+  padding: 0 36px 0 42px;
   box-sizing: border-box;
 }
 
 .joco-edit-header__title {
   margin: 0;
   color: #263746;
-  font-size: 18px;
+  font-size: 24px;
   font-weight: 400;
   line-height: 1.2;
 }
 
 .joco-edit-header__close {
-  flex: 0 0 auto;
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   border: 0;
   background: transparent;
-  color: #c7c7c7;
-  font-size: 22px;
+  color: #111;
+  font-size: 25px;
   font-weight: 700;
   line-height: 1;
   cursor: pointer;
-  transition: color .14s ease;
 }
 
-.joco-edit-header__close:hover { color: #00a9bd; }
+.joco-edit-header__close:hover {
+  color: #00a9bd;
+}
 
-/* ── Body ── */
 .joco-edit-body {
-  padding: 20px 16px 24px;
+  padding: 34px 42px 38px;
   box-sizing: border-box;
 }
 
-/* ── Formulario: 4 columnas en escritorio (>1100 px) ── */
 .joco-edit-form {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
+  grid-template-columns: minmax(220px, 1.45fr) minmax(170px, 1fr) minmax(110px, .7fr) minmax(210px, 1.25fr) minmax(120px, .75fr);
+  gap: 18px;
   align-items: end;
-  box-sizing: border-box;
 }
 
 .joco-edit-field {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .joco-edit-field > label {
-  color: #202020;
-  font-size: 12px;
-  font-weight: 600;
+  color: #171717;
+  font-size: 13px;
+  font-weight: 700;
   white-space: nowrap;
 }
 
-/* Controles de solo lectura */
 .joco-edit-control {
   width: 100%;
-  height: 32px;
-  min-height: 32px;
+  height: 42px;
+  min-height: 42px;
+  padding: 0 12px;
   box-sizing: border-box;
+  text-overflow: ellipsis;
 }
 
 .joco-edit-control--readonly:disabled {
-  border-color: #d1d1d1;
-  background: #eeeeee;
-  color: #444;
+  border-color: #cbd6dc;
+  background: #eef2f4;
+  color: #768a96;
   opacity: 1;
 }
 
-/* ── Footer ── */
 .joco-edit-footer {
+  width: 100%;
+  min-height: 78px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding: 10px 16px;
-  min-height: 52px;
+  padding: 0 42px;
   box-sizing: border-box;
 }
 
-/* ────────────────────────────
-   Responsive
-   ──────────────────────────── */
-
-/* 700–1100 px: 2 columnas */
-@media (max-width: 1100px) {
+@media (max-width: 900px) {
   .joco-edit-form {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .joco-edit-body {
+    padding: 28px 30px 32px;
+  }
 }
 
-/* < 700 px: 1 columna */
-@media (max-width: 700px) {
+@media (max-width: 620px) {
+  .joco-edit-header {
+    padding: 0 16px 0 20px;
+  }
+
+  .joco-edit-header__title {
+    font-size: 20px;
+  }
+
   .joco-edit-form {
     grid-template-columns: 1fr;
   }
 
+  .joco-edit-body {
+    padding: 24px 18px 28px;
+  }
+
   .joco-edit-footer {
-    flex-direction: column;
-    align-items: stretch;
+    padding: 0 18px;
   }
 }
 </style>
