@@ -1,353 +1,609 @@
 /*
- * Ajustes visuales y responsivos para los dialogs de Jobtype-Contrato.
- * Se importa desde JobtypeContratoPage.vue para que también alcance a los
- * Dialog de PrimeVue teletransportados a document.body.
+ * Layout único de los dialogs Jobtype-Contrato.
+ *
+ * Los Dialog de PrimeVue se teletransportan a <body>. Por eso estos estilos
+ * son globales y usan selectores con mayor especificidad que los estilos
+ * históricos incluidos dentro de los SFC.
  */
 
-/* --------------------------------------------------------------------------
- * Alta Jobtype-Contrato
- * -------------------------------------------------------------------------- */
-
-.p-dialog.joco-alta-dialog {
-  width: min(1080px, calc(100vw - 32px)) !important;
-  max-width: calc(100vw - 32px) !important;
-  height: auto !important;
-  max-height: calc(100vh - 32px) !important;
+body .p-dialog.joco-alta-dialog,
+body .p-dialog.joco-edit-dialog {
+  box-sizing: border-box !important;
   display: flex !important;
   flex-direction: column !important;
+  max-width: calc(100dvw - 48px) !important;
+  max-height: calc(100dvh - 48px) !important;
+  margin: 0 !important;
   overflow: hidden !important;
-  box-sizing: border-box !important;
-  border: 1px solid #cdd8de !important;
+  border: 1px solid #cbd7dd !important;
   border-radius: 10px !important;
-  background: #fff !important;
+  background: #ffffff !important;
   box-shadow: 0 20px 52px rgba(18, 43, 53, 0.28) !important;
 }
 
-.joco-alta-dialog .p-dialog-header {
-  flex: 0 0 72px !important;
-  min-height: 72px !important;
-  padding: 0 !important;
-  border-bottom: 1px solid #d5dfe4 !important;
-  background: #fff !important;
+body .p-dialog.joco-alta-dialog *,
+body .p-dialog.joco-alta-dialog *::before,
+body .p-dialog.joco-alta-dialog *::after,
+body .p-dialog.joco-edit-dialog *,
+body .p-dialog.joco-edit-dialog *::before,
+body .p-dialog.joco-edit-dialog *::after {
+  box-sizing: border-box;
 }
 
-.joco-alta-dialog .p-dialog-content {
+/* ==========================================================================
+   Alta Jobtype-Contrato
+   ========================================================================== */
+
+body .p-dialog.joco-alta-dialog {
+  width: min(1180px, calc(100dvw - 48px)) !important;
+  height: min(720px, calc(100dvh - 48px)) !important;
+}
+
+body .p-dialog.joco-alta-dialog > .p-dialog-header,
+body .p-dialog.joco-alta-dialog [data-pc-section='header'] {
+  flex: 0 0 74px !important;
+  min-height: 74px !important;
+  padding: 0 !important;
+  border-bottom: 1px solid #d5dfe4 !important;
+  background: #ffffff !important;
+}
+
+body .p-dialog.joco-alta-dialog > .p-dialog-content,
+body .p-dialog.joco-alta-dialog [data-pc-section='content'] {
   flex: 1 1 auto !important;
   min-width: 0 !important;
   min-height: 0 !important;
   padding: 0 !important;
-  overflow: auto !important;
-  background: #fff !important;
+  overflow: hidden !important;
+  background: #ffffff !important;
 }
 
-.joco-alta-dialog .p-dialog-footer {
-  flex: 0 0 72px !important;
-  min-height: 72px !important;
+body .p-dialog.joco-alta-dialog > .p-dialog-footer,
+body .p-dialog.joco-alta-dialog [data-pc-section='footer'] {
+  flex: 0 0 74px !important;
+  min-height: 74px !important;
   padding: 0 !important;
   border-top: 1px solid #d5dfe4 !important;
-  background: #fff !important;
+  background: #ffffff !important;
 }
 
-.joco-alta-header {
+body .p-dialog.joco-alta-dialog .joco-alta-header {
   width: 100% !important;
-  height: 72px !important;
-  padding: 0 32px 0 36px !important;
-  box-sizing: border-box !important;
+  height: 74px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0 30px 0 34px !important;
 }
 
-.joco-alta-header__title {
-  font-size: clamp(21px, 2vw, 26px) !important;
+body .p-dialog.joco-alta-dialog .joco-alta-header__title {
+  margin: 0 !important;
+  color: #263746 !important;
+  font-size: 25px !important;
+  font-weight: 400 !important;
   line-height: 1.2 !important;
 }
 
-.joco-alta-header__close {
-  flex: 0 0 36px !important;
+body .p-dialog.joco-alta-dialog .joco-alta-header__close {
+  width: 38px !important;
+  height: 38px !important;
+  flex: 0 0 38px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #111111 !important;
+  font-size: 26px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
 }
 
-.joco-alta-body {
+body .p-dialog.joco-alta-dialog .joco-alta-header__close:hover {
+  color: #00a9bd !important;
+}
+
+body .p-dialog.joco-alta-dialog .joco-alta-body {
   width: 100% !important;
-  height: auto !important;
+  height: 100% !important;
   min-width: 0 !important;
   min-height: 0 !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 20px !important;
-  padding: 24px 32px 28px !important;
-  overflow-x: hidden !important;
-  box-sizing: border-box !important;
+  padding: 24px 30px 28px !important;
+  overflow: hidden !important;
 }
 
-.joco-alta-form {
+body .p-dialog.joco-alta-dialog .joco-alta-form {
   width: 100% !important;
   min-width: 0 !important;
+  flex: 0 0 auto !important;
   display: grid !important;
   grid-template-columns:
-    minmax(110px, 0.8fr)
-    minmax(160px, 1.45fr)
-    minmax(160px, 1.45fr)
-    minmax(110px, 0.8fr)
-    132px !important;
+    140px
+    minmax(0, 1fr)
+    minmax(0, 1fr)
+    140px
+    150px !important;
   align-items: end !important;
-  gap: 12px !important;
-  box-sizing: border-box !important;
+  gap: 14px !important;
 }
 
-.joco-alta-field,
-.joco-alta-field--button {
+body .p-dialog.joco-alta-dialog .joco-alta-field {
   min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 7px !important;
 }
 
-.joco-alta-dialog .joco-alta-control.p-select,
-.joco-alta-dialog .joco-alta-autocomplete.p-autocomplete,
-.joco-alta-dialog .joco-alta-input {
+body .p-dialog.joco-alta-dialog .joco-alta-field > label {
+  margin: 0 !important;
+  color: #171717 !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+}
+
+body .p-dialog.joco-alta-dialog .joco-alta-field--button {
+  min-width: 0 !important;
+  justify-content: flex-end !important;
+}
+
+body .p-dialog.joco-alta-dialog .joco-alta-control.p-select,
+body .p-dialog.joco-alta-dialog .joco-alta-autocomplete.p-autocomplete,
+body .p-dialog.joco-alta-dialog .joco-alta-input,
+body .p-dialog.joco-alta-dialog .p-autocomplete-input {
   width: 100% !important;
   max-width: 100% !important;
-  box-sizing: border-box !important;
-}
-
-.joco-alta-dialog .joco-alta-control.p-select,
-.joco-alta-dialog .joco-alta-input,
-.joco-alta-dialog .joco-alta-add-button.p-button,
-.joco-alta-dialog .joco-alta-relate-button.p-button {
-  height: 40px !important;
-  min-height: 40px !important;
-}
-
-.joco-alta-dialog .joco-alta-add-button.p-button {
-  width: 100% !important;
   min-width: 0 !important;
 }
 
-.joco-alta-grid-wrap {
-  width: 100% !important;
-  height: clamp(280px, 42vh, 380px) !important;
+body .p-dialog.joco-alta-dialog .joco-alta-autocomplete.p-autocomplete {
+  display: flex !important;
+}
+
+body .p-dialog.joco-alta-dialog .joco-alta-control.p-select,
+body .p-dialog.joco-alta-dialog .joco-alta-input,
+body .p-dialog.joco-alta-dialog .p-autocomplete-input,
+body .p-dialog.joco-alta-dialog .joco-alta-add-button.p-button,
+body .p-dialog.joco-alta-dialog .joco-alta-relate-button.p-button {
+  height: 42px !important;
+  min-height: 42px !important;
+}
+
+body .p-dialog.joco-alta-dialog .joco-alta-control.p-select,
+body .p-dialog.joco-alta-dialog .joco-alta-input,
+body .p-dialog.joco-alta-dialog .p-autocomplete-input {
+  font-size: 13px !important;
+}
+
+body .p-dialog.joco-alta-dialog .joco-alta-control.p-select .p-select-label {
   min-width: 0 !important;
-  min-height: 280px !important;
-  flex: 0 0 auto !important;
-  overflow: hidden !important;
-  box-sizing: border-box !important;
-}
-
-.joco-alta-dialog .joco-alta-grid.p-datatable {
-  width: 100% !important;
-  min-width: 0 !important;
-  height: 100% !important;
-}
-
-.joco-alta-dialog .joco-alta-grid .p-datatable-table-container,
-.joco-alta-dialog .joco-alta-grid .p-datatable-wrapper,
-.joco-alta-dialog .joco-alta-grid [data-pc-section='tablecontainer'] {
-  min-width: 0 !important;
-  overflow: auto !important;
-}
-
-.joco-alta-dialog .joco-alta-grid .p-datatable-table {
-  width: 100% !important;
-  min-width: 720px !important;
-}
-
-.joco-alta-empty {
-  min-height: 150px !important;
-  height: 100% !important;
-}
-
-.joco-alta-footer {
-  min-height: 72px !important;
-  padding: 0 32px !important;
-}
-
-/* --------------------------------------------------------------------------
- * Edición Jobtype-Contrato
- * -------------------------------------------------------------------------- */
-
-.p-dialog.joco-edit-dialog {
-  width: min(920px, calc(100vw - 32px)) !important;
-  max-width: calc(100vw - 32px) !important;
-  max-height: calc(100vh - 32px) !important;
-  overflow: hidden !important;
-  box-sizing: border-box !important;
-  border: 1px solid #cdd8de !important;
-  border-radius: 10px !important;
-  background: #fff !important;
-  box-shadow: 0 18px 46px rgba(18, 43, 53, 0.26) !important;
-}
-
-.joco-edit-dialog .p-dialog-header {
-  min-height: 72px !important;
-  padding: 0 !important;
-}
-
-.joco-edit-dialog .p-dialog-content {
-  min-width: 0 !important;
-  padding: 0 !important;
-  overflow: auto !important;
-}
-
-.joco-edit-dialog .p-dialog-footer {
-  min-height: 72px !important;
-  padding: 0 !important;
-}
-
-.joco-edit-header {
-  height: 72px !important;
-  padding: 0 32px 0 36px !important;
-}
-
-.joco-edit-header__title {
-  font-size: clamp(21px, 2vw, 26px) !important;
-}
-
-.joco-edit-body {
-  width: 100% !important;
-  min-width: 0 !important;
-  padding: 28px 36px 32px !important;
-  overflow-x: hidden !important;
-  box-sizing: border-box !important;
-}
-
-.joco-edit-form {
-  width: 100% !important;
-  min-width: 0 !important;
-  display: grid !important;
-  grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
-  gap: 18px 20px !important;
-  align-items: end !important;
-  box-sizing: border-box !important;
-}
-
-.joco-edit-field {
-  min-width: 0 !important;
-}
-
-.joco-edit-field--jobtype {
-  grid-column: span 5 !important;
-}
-
-.joco-edit-field--contrato {
-  grid-column: span 4 !important;
-}
-
-.joco-edit-field--pais {
-  grid-column: span 3 !important;
-}
-
-.joco-edit-field--nuevo {
-  grid-column: span 8 !important;
-}
-
-.joco-edit-field--origen {
-  grid-column: span 4 !important;
-}
-
-.joco-edit-control,
-.joco-edit-dialog .joco-edit-autocomplete.p-autocomplete,
-.joco-edit-dialog .joco-edit-select.p-select,
-.joco-edit-dialog .joco-edit-input {
-  width: 100% !important;
-  max-width: 100% !important;
-  box-sizing: border-box !important;
-}
-
-.joco-edit-control {
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 12px !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
 }
 
-.joco-edit-dialog .joco-edit-input,
-.joco-edit-dialog .joco-edit-select.p-select,
-.joco-edit-control {
-  height: 40px !important;
-  min-height: 40px !important;
+body .p-dialog.joco-alta-dialog .joco-alta-input,
+body .p-dialog.joco-alta-dialog .p-autocomplete-input {
+  flex: 1 1 auto !important;
+  padding: 0 12px !important;
 }
 
-.joco-edit-footer {
-  min-height: 72px !important;
-  padding: 0 36px !important;
+body .p-dialog.joco-alta-dialog .joco-alta-add-button.p-button {
+  width: 100% !important;
+  min-width: 0 !important;
 }
 
-.joco-edit-dialog .joco-edit-update-button.p-button {
-  min-width: 150px !important;
-  height: 40px !important;
-  min-height: 40px !important;
+body .p-dialog.joco-alta-dialog .joco-alta-add-button.p-button,
+body .p-dialog.joco-alta-dialog .joco-alta-relate-button.p-button {
+  border-radius: 7px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
 }
 
-/* --------------------------------------------------------------------------
- * Responsive
- * -------------------------------------------------------------------------- */
+body .p-dialog.joco-alta-dialog .joco-alta-grid-wrap {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  border: 1px solid #cfdbe1 !important;
+  border-left: 4px solid #00a9bd !important;
+  background: #ffffff !important;
+}
 
-@media (max-width: 1020px) {
-  .p-dialog.joco-alta-dialog {
-    width: min(820px, calc(100vw - 24px)) !important;
-    max-width: calc(100vw - 24px) !important;
+body .p-dialog.joco-alta-dialog .joco-alta-grid.p-datatable {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  border: 0 !important;
+}
+
+body .p-dialog.joco-alta-dialog .joco-alta-grid .p-datatable-table-container,
+body .p-dialog.joco-alta-dialog .joco-alta-grid .p-datatable-wrapper,
+body .p-dialog.joco-alta-dialog .joco-alta-grid [data-pc-section='tablecontainer'] {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  overflow: auto !important;
+}
+
+body .p-dialog.joco-alta-dialog .joco-alta-grid .p-datatable-table {
+  width: 100% !important;
+  min-width: 760px !important;
+  table-layout: fixed !important;
+}
+
+body .p-dialog.joco-alta-dialog .joco-alta-grid .p-datatable-thead > tr > th {
+  height: 46px !important;
+  padding: 0 10px !important;
+  background: #f2f6f8 !important;
+  color: #183246 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+}
+
+body .p-dialog.joco-alta-dialog .joco-alta-grid .p-datatable-tbody > tr > td {
+  height: 34px !important;
+  padding: 0 10px !important;
+  font-size: 12px !important;
+}
+
+body .p-dialog.joco-alta-dialog .joco-alta-empty {
+  width: 100% !important;
+  min-height: 150px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #2f6475 !important;
+  font-size: 15px !important;
+  background: #e8f9fc !important;
+}
+
+body .p-dialog.joco-alta-dialog .joco-alta-grid .p-datatable-paginator-bottom,
+body .p-dialog.joco-alta-dialog .joco-alta-grid > .p-paginator {
+  flex: 0 0 58px !important;
+  min-height: 58px !important;
+  border-top: 1px solid #d5dfe4 !important;
+}
+
+body .p-dialog.joco-alta-dialog .joco-alta-footer {
+  width: 100% !important;
+  min-height: 74px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  padding: 0 30px !important;
+}
+
+body .p-dialog.joco-alta-dialog .joco-alta-relate-button.p-button {
+  min-width: 160px !important;
+}
+
+/* ==========================================================================
+   Edición Jobtype-Contrato
+   ========================================================================== */
+
+body .p-dialog.joco-edit-dialog {
+  width: min(960px, calc(100dvw - 48px)) !important;
+  height: auto !important;
+}
+
+body .p-dialog.joco-edit-dialog > .p-dialog-header,
+body .p-dialog.joco-edit-dialog [data-pc-section='header'] {
+  flex: 0 0 74px !important;
+  min-height: 74px !important;
+  padding: 0 !important;
+  border-bottom: 1px solid #d5dfe4 !important;
+  background: #ffffff !important;
+}
+
+body .p-dialog.joco-edit-dialog > .p-dialog-content,
+body .p-dialog.joco-edit-dialog [data-pc-section='content'] {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: #ffffff !important;
+}
+
+body .p-dialog.joco-edit-dialog > .p-dialog-footer,
+body .p-dialog.joco-edit-dialog [data-pc-section='footer'] {
+  flex: 0 0 74px !important;
+  min-height: 74px !important;
+  padding: 0 !important;
+  border-top: 1px solid #d5dfe4 !important;
+  background: #ffffff !important;
+}
+
+body .p-dialog.joco-edit-dialog .joco-edit-header {
+  width: 100% !important;
+  height: 74px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0 30px 0 34px !important;
+}
+
+body .p-dialog.joco-edit-dialog .joco-edit-header__title {
+  margin: 0 !important;
+  color: #263746 !important;
+  font-size: 25px !important;
+  font-weight: 400 !important;
+  line-height: 1.2 !important;
+}
+
+body .p-dialog.joco-edit-dialog .joco-edit-header__close {
+  width: 38px !important;
+  height: 38px !important;
+  flex: 0 0 38px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #111111 !important;
+  font-size: 26px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+}
+
+body .p-dialog.joco-edit-dialog .joco-edit-header__close:hover {
+  color: #00a9bd !important;
+}
+
+body .p-dialog.joco-edit-dialog .joco-edit-body {
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: 28px 34px 32px !important;
+  overflow: hidden !important;
+}
+
+body .p-dialog.joco-edit-dialog .joco-edit-form {
+  width: 100% !important;
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+  gap: 20px 18px !important;
+  align-items: end !important;
+}
+
+body .p-dialog.joco-edit-dialog .joco-edit-field {
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 7px !important;
+}
+
+body .p-dialog.joco-edit-dialog .joco-edit-field--jobtype {
+  grid-column: span 5 !important;
+}
+
+body .p-dialog.joco-edit-dialog .joco-edit-field--contrato {
+  grid-column: span 4 !important;
+}
+
+body .p-dialog.joco-edit-dialog .joco-edit-field--pais {
+  grid-column: span 3 !important;
+}
+
+body .p-dialog.joco-edit-dialog .joco-edit-field--nuevo {
+  grid-column: span 8 !important;
+}
+
+body .p-dialog.joco-edit-dialog .joco-edit-field--origen {
+  grid-column: span 4 !important;
+}
+
+body .p-dialog.joco-edit-dialog .joco-edit-field > label {
+  margin: 0 !important;
+  color: #171717 !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+}
+
+body .p-dialog.joco-edit-dialog .joco-edit-control,
+body .p-dialog.joco-edit-dialog .joco-edit-autocomplete.p-autocomplete,
+body .p-dialog.joco-edit-dialog .joco-edit-select.p-select,
+body .p-dialog.joco-edit-dialog .joco-edit-input,
+body .p-dialog.joco-edit-dialog .p-autocomplete-input {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+body .p-dialog.joco-edit-dialog .joco-edit-autocomplete.p-autocomplete {
+  display: flex !important;
+}
+
+body .p-dialog.joco-edit-dialog .joco-edit-control,
+body .p-dialog.joco-edit-dialog .joco-edit-input,
+body .p-dialog.joco-edit-dialog .p-autocomplete-input,
+body .p-dialog.joco-edit-dialog .joco-edit-select.p-select,
+body .p-dialog.joco-edit-dialog .joco-edit-update-button.p-button {
+  height: 42px !important;
+  min-height: 42px !important;
+}
+
+body .p-dialog.joco-edit-dialog .joco-edit-control,
+body .p-dialog.joco-edit-dialog .joco-edit-input,
+body .p-dialog.joco-edit-dialog .p-autocomplete-input,
+body .p-dialog.joco-edit-dialog .joco-edit-select.p-select {
+  font-size: 13px !important;
+}
+
+body .p-dialog.joco-edit-dialog .joco-edit-input,
+body .p-dialog.joco-edit-dialog .p-autocomplete-input {
+  flex: 1 1 auto !important;
+  padding: 0 12px !important;
+}
+
+body .p-dialog.joco-edit-dialog .joco-edit-select.p-select .p-select-label {
+  min-width: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 12px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+body .p-dialog.joco-edit-dialog .joco-edit-control {
+  padding: 0 12px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+body .p-dialog.joco-edit-dialog .joco-edit-control--readonly:disabled {
+  border-color: #cbd6dc !important;
+  background: #eef2f4 !important;
+  color: #768a96 !important;
+  opacity: 1 !important;
+}
+
+body .p-dialog.joco-edit-dialog .joco-edit-footer {
+  width: 100% !important;
+  min-height: 74px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  padding: 0 34px !important;
+}
+
+body .p-dialog.joco-edit-dialog .joco-edit-update-button.p-button {
+  min-width: 160px !important;
+  border-radius: 7px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 1180px) {
+  body .p-dialog.joco-alta-dialog {
+    width: min(860px, calc(100dvw - 32px)) !important;
+    max-width: calc(100dvw - 32px) !important;
+    height: min(780px, calc(100dvh - 32px)) !important;
+    max-height: calc(100dvh - 32px) !important;
   }
 
-  .joco-alta-form {
+  body .p-dialog.joco-alta-dialog .joco-alta-body {
+    padding: 22px 26px 26px !important;
+    overflow-y: auto !important;
+  }
+
+  body .p-dialog.joco-alta-dialog .joco-alta-form {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 16px !important;
+    gap: 16px 18px !important;
   }
 
-  .joco-alta-field--button {
+  body .p-dialog.joco-alta-dialog .joco-alta-field--button {
     grid-column: 2 !important;
   }
 
-  .p-dialog.joco-edit-dialog {
-    width: min(760px, calc(100vw - 24px)) !important;
-    max-width: calc(100vw - 24px) !important;
+  body .p-dialog.joco-alta-dialog .joco-alta-grid-wrap {
+    min-height: 280px !important;
+    flex: 1 0 280px !important;
+  }
+}
+
+@media (max-width: 900px) {
+  body .p-dialog.joco-edit-dialog {
+    width: min(760px, calc(100dvw - 32px)) !important;
+    max-width: calc(100dvw - 32px) !important;
   }
 
-  .joco-edit-form {
+  body .p-dialog.joco-edit-dialog .joco-edit-form {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 
-  .joco-edit-field--jobtype,
-  .joco-edit-field--contrato,
-  .joco-edit-field--pais,
-  .joco-edit-field--nuevo,
-  .joco-edit-field--origen {
+  body .p-dialog.joco-edit-dialog .joco-edit-field--jobtype,
+  body .p-dialog.joco-edit-dialog .joco-edit-field--contrato,
+  body .p-dialog.joco-edit-dialog .joco-edit-field--pais,
+  body .p-dialog.joco-edit-dialog .joco-edit-field--nuevo,
+  body .p-dialog.joco-edit-dialog .joco-edit-field--origen {
     grid-column: auto !important;
   }
 }
 
 @media (max-width: 640px) {
-  .p-dialog.joco-alta-dialog,
-  .p-dialog.joco-edit-dialog {
-    width: calc(100vw - 16px) !important;
-    max-width: calc(100vw - 16px) !important;
-    max-height: calc(100vh - 16px) !important;
+  body .p-dialog.joco-alta-dialog,
+  body .p-dialog.joco-edit-dialog {
+    width: calc(100dvw - 16px) !important;
+    max-width: calc(100dvw - 16px) !important;
+    max-height: calc(100dvh - 16px) !important;
+    border-radius: 8px !important;
   }
 
-  .joco-alta-header,
-  .joco-edit-header {
-    padding: 0 16px 0 20px !important;
+  body .p-dialog.joco-alta-dialog .joco-alta-header,
+  body .p-dialog.joco-edit-dialog .joco-edit-header {
+    padding: 0 14px 0 18px !important;
   }
 
-  .joco-alta-body,
-  .joco-edit-body {
-    padding: 22px 18px 26px !important;
+  body .p-dialog.joco-alta-dialog .joco-alta-header__title,
+  body .p-dialog.joco-edit-dialog .joco-edit-header__title {
+    font-size: 20px !important;
   }
 
-  .joco-alta-form,
-  .joco-edit-form {
+  body .p-dialog.joco-alta-dialog .joco-alta-body,
+  body .p-dialog.joco-edit-dialog .joco-edit-body {
+    padding: 20px 16px 24px !important;
+  }
+
+  body .p-dialog.joco-alta-dialog .joco-alta-form,
+  body .p-dialog.joco-edit-dialog .joco-edit-form {
     grid-template-columns: 1fr !important;
   }
 
-  .joco-alta-field--button {
+  body .p-dialog.joco-alta-dialog .joco-alta-field--button,
+  body .p-dialog.joco-edit-dialog .joco-edit-field--jobtype,
+  body .p-dialog.joco-edit-dialog .joco-edit-field--contrato,
+  body .p-dialog.joco-edit-dialog .joco-edit-field--pais,
+  body .p-dialog.joco-edit-dialog .joco-edit-field--nuevo,
+  body .p-dialog.joco-edit-dialog .joco-edit-field--origen {
     grid-column: 1 !important;
   }
 
-  .joco-alta-grid-wrap {
-    height: 300px !important;
+  body .p-dialog.joco-alta-dialog .joco-alta-grid-wrap {
     min-height: 300px !important;
+    flex-basis: 300px !important;
   }
 
-  .joco-alta-footer,
-  .joco-edit-footer {
-    padding: 0 18px !important;
+  body .p-dialog.joco-alta-dialog .joco-alta-footer,
+  body .p-dialog.joco-edit-dialog .joco-edit-footer {
+    padding: 0 16px !important;
   }
 
-  .joco-alta-dialog .joco-alta-relate-button.p-button,
-  .joco-edit-dialog .joco-edit-update-button.p-button {
+  body .p-dialog.joco-alta-dialog .joco-alta-relate-button.p-button,
+  body .p-dialog.joco-edit-dialog .joco-edit-update-button.p-button {
     width: 100% !important;
   }
+}
+
+.joco-alta-select-overlay,
+.joco-edit-select-overlay {
+  min-width: 140px !important;
 }
