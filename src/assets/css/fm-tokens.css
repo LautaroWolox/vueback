@@ -1,0 +1,127 @@
+/**
+ * fm-tokens.css
+ * Design tokens globales de FieldManager.
+ * Este archivo es la única fuente de verdad para colores, tipografía,
+ * espaciados, sombras y radios. No agregar reglas de layout aquí.
+ *
+ * Importado ANTES de fm-global.css en main.js.
+ */
+@layer fieldmanager {
+  :root {
+    /* ── Paleta de marca ── */
+    --fm-cyan-50:       #e0fafa;
+    --fm-cyan-100:      #b3f1f1;
+    --fm-cyan-200:      #80e7e8;
+    --fm-cyan-300:      #4ddddd;
+    --fm-cyan-400:      #26d4d4;
+    --fm-cyan-500:      #00b4b5;
+    --fm-cyan:          #00a9bd;   /* primario principal */
+    --fm-cyan-strong:   #008fa1;
+    --fm-cyan-dark:     #006f7d;
+    --fm-cyan-soft:     #e4f9fc;
+    --fm-cyan-900:      #006364;
+    --fm-cyan-950:      #004445;
+
+    /* ── Semánticos de UI ── */
+    --fm-bg:            #f4f7f8;
+    --fm-white:         #ffffff;
+    --fm-text:          #263746;
+    --fm-text-muted:    #607887;
+    --fm-text-strong:   #111111;
+    --fm-border:        #d4dde2;
+    --fm-border-strong: #c5d1d8;
+    --fm-header-bg:     #f3f7f9;
+    --fm-grid-empty:    #eafcff;
+    --fm-selected-row:  #9debf3;
+    --fm-selected-text: #112f39;
+    --fm-hover-row:     #f1fbfc;
+    --fm-disabled-bg:   #edf1f3;
+    --fm-disabled-text: #84939c;
+    --fm-disabled-row:  #eef1f3;
+    --fm-disabled-row-text: #7b8991;
+
+    /* ── Estados ── */
+    --fm-danger:        #d9363e;
+    --fm-danger-soft:   #fdecea;
+    --fm-warning:       #f59e0b;
+    --fm-warning-soft:  #fef3c7;
+    --fm-success:       #16a34a;
+    --fm-success-soft:  #dcfce7;
+    --fm-info:          #0284c7;
+    --fm-info-soft:     #e0f2fe;
+
+    /* ── Tipografía ── */
+    --fm-font:          "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --fm-font-size-xs:  10px;
+    --fm-font-size-sm:  11px;
+    --fm-font-size-md:  12px;
+    --fm-font-size-base: 13px;
+    --fm-font-size-lg:  14px;
+    --fm-font-size-xl:  16px;
+    --fm-font-size-2xl: 18px;
+    --fm-font-size-3xl: 20px;
+
+    /* ── Radios ── */
+    --fm-radius-xs:     3px;
+    --fm-radius-sm:     5px;
+    --fm-radius-md:     8px;
+    --fm-radius-lg:     14px;
+    --fm-radius-full:   9999px;
+
+    /* ── Sombras ── */
+    --fm-shadow-button: 0 5px 14px rgba(0, 73, 84, .14);
+    --fm-shadow-card:   0 2px 8px rgba(23, 49, 62, .10);
+    --fm-shadow-popup:  0 20px 55px rgba(20, 48, 59, .24);
+    --fm-shadow-dialog: 0 4px 14px rgba(0, 0, 0, .28);
+
+    /* ── Controles ── */
+    --fm-control-height:     30px;
+    --fm-control-height-lg:  36px;
+    --fm-control-height-xl:  40px;
+    --fm-control-padding-x:  8px;
+    --fm-control-padding-y:  5px;
+
+    /* ── Grilla ── */
+    --fm-row-height:         35px;
+    --fm-filter-row-height:  34px;
+    --fm-header-row-height:  35px;
+    --fm-paginator-height:   36px;
+
+    /* ── Dialog ── */
+    --fm-dialog-header-height: 56px;
+    --fm-dialog-footer-height: 60px;
+    --fm-dialog-gutter:        16px;
+
+    /* ── Espaciado ── */
+    --fm-space-1:  4px;
+    --fm-space-2:  8px;
+    --fm-space-3:  12px;
+    --fm-space-4:  16px;
+    --fm-space-5:  20px;
+    --fm-space-6:  24px;
+    --fm-space-8:  32px;
+    --fm-space-10: 40px;
+
+    /* ── Transiciones ── */
+    --fm-transition-fast:   .12s ease;
+    --fm-transition-base:   .16s ease;
+    --fm-transition-slow:   .24s ease;
+
+    /* ── Z-index ── */
+    --fm-z-dropdown:  1000;
+    --fm-z-sticky:    1020;
+    --fm-z-modal:     1050;
+    --fm-z-popover:   1070;
+    --fm-z-toast:     1090;
+    --fm-z-tooltip:   1100;
+
+    /* ── Responsive (override en media queries de fm-responsive.css) ── */
+    --fm-page-padding:    clamp(4px, .55vw, 12px);
+    --fm-section-gap:     clamp(6px, .6vw, 12px);
+    --fm-grid-min-width:  760px;
+    --fm-touch-target:    40px;
+    --fm-safe-bottom:     env(safe-area-inset-bottom, 0px);
+    --fm-safe-left:       env(safe-area-inset-left, 0px);
+    --fm-safe-right:      env(safe-area-inset-right, 0px);
+  }
+}
