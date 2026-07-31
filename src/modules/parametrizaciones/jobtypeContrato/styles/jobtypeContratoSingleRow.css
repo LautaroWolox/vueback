@@ -3,19 +3,20 @@
  * Mantiene los cinco elementos del formulario en una única fila:
  * País | Jobtype | Contrato | Origen | Agregar.
  *
- * Se importa después de los estilos históricos para evitar que reglas previas
- * vuelvan a repartir el formulario en dos filas.
+ * Los selectores duplican la clase del dialog intencionalmente: así tienen
+ * mayor especificidad que los estilos históricos aunque un SFC se cargue
+ * después de esta hoja global.
  */
 
-body .p-dialog.joco-alta-dialog {
+body .p-dialog.joco-alta-dialog.joco-alta-dialog {
   width: min(1180px, calc(100dvw - 32px)) !important;
 }
 
-body .p-dialog.joco-alta-dialog .joco-alta-body {
+body .p-dialog.joco-alta-dialog.joco-alta-dialog .joco-alta-body {
   padding-inline: 28px !important;
 }
 
-body .p-dialog.joco-alta-dialog .joco-alta-form {
+body .p-dialog.joco-alta-dialog.joco-alta-dialog .joco-alta-form {
   width: 100% !important;
   min-width: 0 !important;
   display: grid !important;
@@ -31,8 +32,8 @@ body .p-dialog.joco-alta-dialog .joco-alta-form {
   align-items: end !important;
 }
 
-body .p-dialog.joco-alta-dialog .joco-alta-form > .joco-alta-field,
-body .p-dialog.joco-alta-dialog .joco-alta-form > .joco-alta-field--button {
+body .p-dialog.joco-alta-dialog.joco-alta-dialog .joco-alta-form > .joco-alta-field,
+body .p-dialog.joco-alta-dialog.joco-alta-dialog .joco-alta-form > .joco-alta-field--button {
   grid-column: auto !important;
   grid-row: 1 !important;
   width: 100% !important;
@@ -41,30 +42,30 @@ body .p-dialog.joco-alta-dialog .joco-alta-form > .joco-alta-field--button {
   margin: 0 !important;
 }
 
-body .p-dialog.joco-alta-dialog .joco-alta-form > .joco-alta-field--button {
+body .p-dialog.joco-alta-dialog.joco-alta-dialog .joco-alta-form > .joco-alta-field--button {
   align-items: stretch !important;
   justify-content: flex-end !important;
 }
 
-body .p-dialog.joco-alta-dialog .joco-alta-field > label {
+body .p-dialog.joco-alta-dialog.joco-alta-dialog .joco-alta-field > label {
   overflow: visible !important;
   text-overflow: clip !important;
 }
 
-body .p-dialog.joco-alta-dialog .joco-alta-field > *,
-body .p-dialog.joco-alta-dialog .joco-alta-control,
-body .p-dialog.joco-alta-dialog .joco-alta-autocomplete,
-body .p-dialog.joco-alta-dialog .joco-alta-input,
-body .p-dialog.joco-alta-dialog .p-select,
-body .p-dialog.joco-alta-dialog .p-autocomplete,
-body .p-dialog.joco-alta-dialog .p-autocomplete-input,
-body .p-dialog.joco-alta-dialog .p-inputtext {
+body .p-dialog.joco-alta-dialog.joco-alta-dialog .joco-alta-field > *,
+body .p-dialog.joco-alta-dialog.joco-alta-dialog .joco-alta-control,
+body .p-dialog.joco-alta-dialog.joco-alta-dialog .joco-alta-autocomplete,
+body .p-dialog.joco-alta-dialog.joco-alta-dialog .joco-alta-input,
+body .p-dialog.joco-alta-dialog.joco-alta-dialog .p-select,
+body .p-dialog.joco-alta-dialog.joco-alta-dialog .p-autocomplete,
+body .p-dialog.joco-alta-dialog.joco-alta-dialog .p-autocomplete-input,
+body .p-dialog.joco-alta-dialog.joco-alta-dialog .p-inputtext {
   width: 100% !important;
   min-width: 0 !important;
   max-width: 100% !important;
 }
 
-body .p-dialog.joco-alta-dialog .joco-alta-add-button.p-button {
+body .p-dialog.joco-alta-dialog.joco-alta-dialog .joco-alta-add-button.p-button {
   width: 140px !important;
   min-width: 140px !important;
   max-width: 140px !important;
@@ -72,11 +73,11 @@ body .p-dialog.joco-alta-dialog .joco-alta-add-button.p-button {
 }
 
 /* La variante histórica usa nombres de clase sin prefijo joco. */
-body .p-dialog.jobtype-alta-dialog {
+body .p-dialog.jobtype-alta-dialog.jobtype-alta-dialog {
   width: min(1180px, calc(100dvw - 32px)) !important;
 }
 
-body .p-dialog.jobtype-alta-dialog .jobtype-alta-form {
+body .p-dialog.jobtype-alta-dialog.jobtype-alta-dialog .jobtype-alta-form {
   width: 100% !important;
   min-width: 0 !important;
   display: grid !important;
@@ -92,8 +93,8 @@ body .p-dialog.jobtype-alta-dialog .jobtype-alta-form {
   align-items: end !important;
 }
 
-body .p-dialog.jobtype-alta-dialog .jobtype-alta-form > .jobtype-alta-field,
-body .p-dialog.jobtype-alta-dialog .jobtype-alta-form > .jobtype-alta-field--button {
+body .p-dialog.jobtype-alta-dialog.jobtype-alta-dialog .jobtype-alta-form > .jobtype-alta-field,
+body .p-dialog.jobtype-alta-dialog.jobtype-alta-dialog .jobtype-alta-form > .jobtype-alta-field--button {
   grid-column: auto !important;
   grid-row: 1 !important;
   width: 100% !important;
@@ -102,17 +103,17 @@ body .p-dialog.jobtype-alta-dialog .jobtype-alta-form > .jobtype-alta-field--but
   margin: 0 !important;
 }
 
-body .p-dialog.jobtype-alta-dialog .jobtype-alta-control,
-body .p-dialog.jobtype-alta-dialog .p-select,
-body .p-dialog.jobtype-alta-dialog .p-autocomplete,
-body .p-dialog.jobtype-alta-dialog .p-autocomplete-input,
-body .p-dialog.jobtype-alta-dialog .p-inputtext {
+body .p-dialog.jobtype-alta-dialog.jobtype-alta-dialog .jobtype-alta-control,
+body .p-dialog.jobtype-alta-dialog.jobtype-alta-dialog .p-select,
+body .p-dialog.jobtype-alta-dialog.jobtype-alta-dialog .p-autocomplete,
+body .p-dialog.jobtype-alta-dialog.jobtype-alta-dialog .p-autocomplete-input,
+body .p-dialog.jobtype-alta-dialog.jobtype-alta-dialog .p-inputtext {
   width: 100% !important;
   min-width: 0 !important;
   max-width: 100% !important;
 }
 
-body .p-dialog.jobtype-alta-dialog .jobtype-add-button.p-button {
+body .p-dialog.jobtype-alta-dialog.jobtype-alta-dialog .jobtype-add-button.p-button {
   width: 140px !important;
   min-width: 140px !important;
   max-width: 140px !important;
@@ -121,21 +122,21 @@ body .p-dialog.jobtype-alta-dialog .jobtype-add-button.p-button {
 
 /* En pantallas realmente angostas se permite apilar para evitar overflow. */
 @media (max-width: 760px) {
-  body .p-dialog.joco-alta-dialog .joco-alta-form,
-  body .p-dialog.jobtype-alta-dialog .jobtype-alta-form {
+  body .p-dialog.joco-alta-dialog.joco-alta-dialog .joco-alta-form,
+  body .p-dialog.jobtype-alta-dialog.jobtype-alta-dialog .jobtype-alta-form {
     grid-template-columns: 1fr !important;
     row-gap: 14px !important;
   }
 
-  body .p-dialog.joco-alta-dialog .joco-alta-form > .joco-alta-field,
-  body .p-dialog.joco-alta-dialog .joco-alta-form > .joco-alta-field--button,
-  body .p-dialog.jobtype-alta-dialog .jobtype-alta-form > .jobtype-alta-field,
-  body .p-dialog.jobtype-alta-dialog .jobtype-alta-form > .jobtype-alta-field--button {
+  body .p-dialog.joco-alta-dialog.joco-alta-dialog .joco-alta-form > .joco-alta-field,
+  body .p-dialog.joco-alta-dialog.joco-alta-dialog .joco-alta-form > .joco-alta-field--button,
+  body .p-dialog.jobtype-alta-dialog.jobtype-alta-dialog .jobtype-alta-form > .jobtype-alta-field,
+  body .p-dialog.jobtype-alta-dialog.jobtype-alta-dialog .jobtype-alta-form > .jobtype-alta-field--button {
     grid-row: auto !important;
   }
 
-  body .p-dialog.joco-alta-dialog .joco-alta-add-button.p-button,
-  body .p-dialog.jobtype-alta-dialog .jobtype-add-button.p-button {
+  body .p-dialog.joco-alta-dialog.joco-alta-dialog .joco-alta-add-button.p-button,
+  body .p-dialog.jobtype-alta-dialog.jobtype-alta-dialog .jobtype-add-button.p-button {
     width: 100% !important;
     min-width: 0 !important;
     max-width: 100% !important;
