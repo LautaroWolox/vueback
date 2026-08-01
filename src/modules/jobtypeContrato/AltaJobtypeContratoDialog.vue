@@ -47,7 +47,7 @@
             optionLabel="valor"
             :minLength="4"
             :disabled="!form.pais"
-            class="jobtype-alta-control"
+            class="jobtype-alta-autocomplete"
             inputClass="jobtype-alta-control"
             @complete="buscarJobtypes"
             @item-select="onJobtypeSelect"
@@ -64,11 +64,24 @@
             optionLabel="valor"
             :minLength="4"
             :disabled="!form.pais"
-            class="jobtype-alta-control"
+            class="jobtype-alta-autocomplete"
             inputClass="jobtype-alta-control"
             @complete="buscarContratos"
             @item-select="onContratoSelect"
             @clear="contratoSelected = null"
+          />
+        </div>
+
+        <div class="jobtype-alta-field">
+          <label for="alta-origen">Origen</label>
+          <Select
+            id="alta-origen"
+            v-model="form.origen"
+            :options="origenOptions"
+            optionLabel="label"
+            optionValue="value"
+            overlayClass="jobtype-alta-select-overlay"
+            class="jobtype-alta-control"
           />
         </div>
 
@@ -80,12 +93,12 @@
         />
       </div>
 
-      <div class="jobtype-alta-grid-wrap">
+      <div class="jobtype-alta-grid-wrap fm-grid-shell">
         <DataTable
           v-model:selection="altaSelectedRow"
           v-model:first="altaFirst"
           v-model:rows="altaPageRows"
-          class="jobtype-alta-grid"
+          class="jobtype-alta-grid fm-pass-grid"
           :value="altaRows"
           dataKey="id"
           tableStyle="table-layout: fixed; width: 100%; min-width: 100%"
@@ -98,7 +111,7 @@
           @row-click="onAltaRowClick"
         >
           <template #empty>
-            <div class="jobtype-alta-empty">No hay relaciones agregadas</div>
+            <div class="fm-grid-empty jobtype-alta-empty">No hay relaciones agregadas</div>
           </template>
 
           <template
@@ -154,17 +167,22 @@
               <span class="jobtype-cell-text" :title="data.relCodigoTarea">{{ data.relCodigoTarea }}</span>
             </template>
           </Column>
-          <Column field="relTarea" header="TAREA" :style="{ width: '25%' }">
+          <Column field="relTarea" header="TAREA" :style="{ width: '20%' }">
             <template #body="{ data }">
               <span class="jobtype-cell-text" :title="data.relTarea">{{ data.relTarea }}</span>
             </template>
           </Column>
-          <Column field="relContrato" header="NOMBRE_CONTRATO" :style="{ width: '30%' }">
+          <Column field="relContrato" header="NOMBRE_CONTRATO" :style="{ width: '20%' }">
             <template #body="{ data }">
               <span class="jobtype-cell-text" :title="data.relContrato">{{ data.relContrato }}</span>
             </template>
           </Column>
-          <Column field="paisLabel" header="PAIS" :style="{ width: '25%' }">
+          <Column field="origen" header="ORIGEN" :style="{ width: '20%' }">
+            <template #body="{ data }">
+              <span class="jobtype-cell-text" :title="data.origen">{{ data.origen }}</span>
+            </template>
+          </Column>
+          <Column field="paisLabel" header="PAIS" :style="{ width: '20%' }">
             <template #body="{ data }">
               <span class="jobtype-cell-text" :title="data.paisLabel">{{ data.paisLabel }}</span>
             </template>
@@ -266,7 +284,18 @@ const paisOptions = [
 const form = reactive({
   pais: '',
   jobtype: '',
-  contrato: ''
+  contrato: '',
+  origen: ''
+})
+
+const origenOptions = computed(() => {
+  if (form.pais === '2') return [{ label: 'FAN', value: 'FAN' }]
+
+  return [
+    { label: '', value: '' },
+    { label: 'FAN', value: 'FAN' },
+    { label: 'MXM', value: 'MXM' }
+  ]
 })
 
 const jobtypeSuggestions = ref([])
@@ -279,21 +308,25 @@ const altaFirst = ref(0)
 const altaPageRows = ref(10)
 const showConfirmCierre = ref(false)
 
-const canAgregar = computed(() => Boolean(jobtypeSelected.value && contratoSelected.value))
+const canAgregar = computed(() => Boolean(
+  form.pais && jobtypeSelected.value && contratoSelected.value && form.origen
+))
 
 const hayDatosCargados = computed(() => {
   return Boolean(
     form.jobtype ||
     form.contrato ||
+    form.origen ||
     jobtypeSelected.value ||
     contratoSelected.value ||
     altaRows.value.length
   )
 })
 
-watch(() => form.pais, () => {
+watch(() => form.pais, (pais) => {
   form.jobtype = ''
   form.contrato = ''
+  form.origen = pais === '2' ? 'FAN' : ''
   jobtypeSelected.value = null
   contratoSelected.value = null
 })
@@ -306,6 +339,7 @@ const resetForm = () => {
   form.pais = ''
   form.jobtype = ''
   form.contrato = ''
+  form.origen = ''
   jobtypeSelected.value = null
   contratoSelected.value = null
   altaRows.value = []
@@ -344,12 +378,14 @@ const agregar = () => {
     relTarea: jobtypeSelected.value.nombre,
     relContratoId: contratoSelected.value.contratoId,
     relContrato: contratoSelected.value.nombre,
+    origen: form.origen,
     pais: paisLabel,
     paisLabel
   }]
 
   form.jobtype = ''
   form.contrato = ''
+  form.origen = form.pais === '2' ? 'FAN' : ''
   jobtypeSelected.value = null
   contratoSelected.value = null
 }
@@ -382,12 +418,10 @@ const relacionar = async () => {
       emit('update:visible', false)
       emit('relacionado')
     } else if (errores.length === 1) {
-      // Single error message — could show in an alert
       console.warn(errores[0].mensaje)
       emit('update:visible', false)
       emit('relacionado')
     } else {
-      // Multiple errors
       const msgs = errores.map((e) => e.tareaCodigo).join(', ')
       console.warn('Ya existe relación para los jobtypes:', msgs)
       emit('update:visible', false)
