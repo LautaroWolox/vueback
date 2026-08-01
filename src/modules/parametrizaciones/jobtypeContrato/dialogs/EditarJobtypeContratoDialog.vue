@@ -235,13 +235,14 @@ const cerrar = () => {
 
 <style>
 .p-dialog.joco-edit-dialog {
-  width: min(1220px, calc(100dvw - 48px)) !important;
+  width: min(900px, calc(100dvw - 48px)) !important;
   max-width: calc(100dvw - 48px) !important;
   overflow: hidden;
   border: 1px solid #cdd8de;
   border-radius: 8px;
   background: #fff;
   box-shadow: 0 18px 48px rgba(18, 43, 53, .26);
+  box-sizing: border-box;
 }
 
 .joco-edit-dialog .p-dialog-header {
@@ -262,6 +263,7 @@ const cerrar = () => {
   background: #fff;
 }
 
+/* Controles */
 .joco-edit-dialog .joco-edit-autocomplete.p-autocomplete,
 .joco-edit-dialog .joco-edit-select.p-select {
   width: 100% !important;
@@ -269,86 +271,103 @@ const cerrar = () => {
 
 .joco-edit-dialog .joco-edit-input,
 .joco-edit-dialog .joco-edit-select.p-select {
-  height: 42px !important;
-  min-height: 42px !important;
-  font-size: 13px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  font-size: 12px !important;
   box-sizing: border-box !important;
 }
 
 .joco-edit-dialog .joco-edit-input {
   width: 100% !important;
-  padding: 0 12px !important;
+  padding: 0 8px !important;
 }
 
 .joco-edit-dialog .joco-edit-select.p-select .p-select-label {
   display: flex !important;
   align-items: center !important;
-  padding: 0 12px !important;
-  font-size: 13px !important;
+  padding: 0 8px !important;
+  font-size: 12px !important;
+  line-height: 1.2 !important;
 }
 
 .joco-edit-dialog .joco-edit-update-button.p-button {
-  min-width: 150px !important;
-  height: 42px !important;
-  min-height: 42px !important;
-  border-radius: 7px !important;
-  font-size: 13px !important;
-  font-weight: 700 !important;
+  width: 110px !important;
+  min-width: 110px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 13px !important;
+  border-radius: 15px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
 }
 
-.joco-edit-select-overlay {
-  min-width: 140px !important;
+.joco-edit-select-overlay { min-width: 120px !important; max-width: 180px !important; }
+.joco-edit-select-overlay .p-select-list { padding: 2px 0 !important; }
+.joco-edit-select-overlay .p-select-option {
+  min-height: 28px !important;
+  padding: 4px 10px !important;
+  font-size: 12px !important;
 }
 </style>
 
 <style scoped>
 .joco-edit-header {
   width: 100%;
-  height: 74px;
+  height: 58px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 36px 0 42px;
+  padding: 0 8px 0 20px;
   box-sizing: border-box;
 }
 
 .joco-edit-header__title {
   margin: 0;
   color: #263746;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 400;
   line-height: 1.2;
 }
 
 .joco-edit-header__close {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 40px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  border: 0;
-  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: #fff;
   color: #111;
-  font-size: 25px;
+  font-size: 24px;
   font-weight: 700;
   line-height: 1;
   cursor: pointer;
+  transition: border-color .15s ease, color .15s ease;
 }
 
 .joco-edit-header__close:hover {
+  border-color: #00a9bd;
   color: #00a9bd;
 }
 
+/* ── Body ── */
 .joco-edit-body {
-  padding: 34px 42px 38px;
+  padding: 22px 20px 28px;
   box-sizing: border-box;
 }
 
+/* 5 columnas en 1 fila — escritorio */
 .joco-edit-form {
   display: grid;
-  grid-template-columns: minmax(220px, 1.45fr) minmax(170px, 1fr) minmax(110px, .7fr) minmax(210px, 1.25fr) minmax(120px, .75fr);
-  gap: 18px;
+  grid-template-columns:
+    minmax(160px, 1.5fr)
+    minmax(130px, 1fr)
+    minmax(80px, .6fr)
+    minmax(160px, 1.4fr)
+    minmax(100px, .7fr);
+  gap: 14px;
   align-items: end;
 }
 
@@ -356,71 +375,60 @@ const cerrar = () => {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 5px;
 }
 
 .joco-edit-field > label {
   color: #171717;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 700;
   white-space: nowrap;
 }
 
 .joco-edit-control {
   width: 100%;
-  height: 42px;
-  min-height: 42px;
-  padding: 0 12px;
+  height: 30px;
+  min-height: 30px;
+  padding: 0 8px;
+  font-size: 12px;
   box-sizing: border-box;
   text-overflow: ellipsis;
 }
 
 .joco-edit-control--readonly:disabled {
-  border-color: #cbd6dc;
-  background: #eef2f4;
-  color: #768a96;
+  border-color: #d1d1d1;
+  background: #eeeeee;
+  color: #444;
   opacity: 1;
 }
 
+/* ── Footer ── */
 .joco-edit-footer {
   width: 100%;
-  min-height: 78px;
+  min-height: 58px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding: 0 42px;
+  padding: 0 20px;
   box-sizing: border-box;
 }
 
-@media (max-width: 900px) {
+/* ── Responsive ── */
+@media (max-width: 700px) {
   .joco-edit-form {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
   }
 
-  .joco-edit-body {
-    padding: 28px 30px 32px;
-  }
+  .joco-edit-body { padding: 18px 16px 22px; }
+  .joco-edit-footer { padding: 0 16px; }
 }
 
-@media (max-width: 620px) {
-  .joco-edit-header {
-    padding: 0 16px 0 20px;
-  }
-
-  .joco-edit-header__title {
-    font-size: 20px;
-  }
-
-  .joco-edit-form {
-    grid-template-columns: 1fr;
-  }
-
-  .joco-edit-body {
-    padding: 24px 18px 28px;
-  }
-
-  .joco-edit-footer {
-    padding: 0 18px;
-  }
+@media (max-width: 520px) {
+  .joco-edit-header { padding: 0 8px 0 16px; }
+  .joco-edit-header__title { font-size: 17px; }
+  .joco-edit-form { grid-template-columns: 1fr; }
+  .joco-edit-body { padding: 14px 14px 18px; }
+  .joco-edit-footer { padding: 0 14px; }
 }
 </style>

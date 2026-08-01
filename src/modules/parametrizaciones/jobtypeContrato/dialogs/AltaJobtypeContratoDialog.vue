@@ -368,39 +368,40 @@ const cerrar = () => {
 .p-dialog.joco-alta-dialog {
   width: calc(100dvw - 48px) !important;
   max-width: 1440px !important;
-  height: min(760px, calc(100dvh - 48px)) !important;
+  height: min(680px, calc(100dvh - 48px)) !important;
   max-height: calc(100dvh - 48px) !important;
-  display: flex !important;
-  flex-direction: column !important;
-  overflow: hidden;
-  border: 1px solid #cdd8de;
+  display: grid !important;
+  grid-template-rows: 58px minmax(0, 1fr) 58px !important;
+  overflow: hidden !important;
+  border: 1px solid #d4dde2;
   border-radius: 8px;
   background: #fff;
-  box-shadow: 0 22px 58px rgba(18, 43, 53, .28);
+  box-shadow: 0 20px 55px rgba(20, 48, 59, .24);
+  box-sizing: border-box;
 }
 
 .joco-alta-dialog .p-dialog-header {
-  flex: 0 0 80px;
   padding: 0 !important;
-  border-bottom: 1px solid #d5dfe4;
+  border-bottom: 1px solid #d4dde2;
   background: #fff;
+  overflow: hidden;
 }
 
 .joco-alta-dialog .p-dialog-content {
-  flex: 1 1 auto;
-  min-height: 0;
+  min-height: 0 !important;
   padding: 0 !important;
   overflow: hidden !important;
   background: #fff;
 }
 
 .joco-alta-dialog .p-dialog-footer {
-  flex: 0 0 80px;
   padding: 0 !important;
-  border-top: 1px solid #d5dfe4;
+  border-top: 1px solid #d4dde2;
   background: #fff;
+  overflow: hidden;
 }
 
+/* Controles del formulario */
 .joco-alta-dialog .joco-alta-control.p-select,
 .joco-alta-dialog .joco-alta-autocomplete.p-autocomplete {
   width: 100% !important;
@@ -408,47 +409,54 @@ const cerrar = () => {
 
 .joco-alta-dialog .joco-alta-control.p-select,
 .joco-alta-dialog .joco-alta-input {
-  height: 42px !important;
-  min-height: 42px !important;
-  font-size: 13px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  font-size: 12px !important;
   box-sizing: border-box !important;
 }
 
 .joco-alta-dialog .joco-alta-control.p-select .p-select-label {
   display: flex !important;
   align-items: center !important;
-  padding: 0 12px !important;
+  padding: 0 8px !important;
+  font-size: 12px !important;
+  line-height: 1.2 !important;
 }
 
 .joco-alta-dialog .joco-alta-input {
   width: 100% !important;
-  padding: 0 12px !important;
-}
-
-.joco-alta-dialog .joco-alta-add-button.p-button,
-.joco-alta-dialog .joco-alta-relate-button.p-button {
-  height: 42px !important;
-  min-height: 42px !important;
-  border-radius: 7px !important;
-  font-size: 13px !important;
-  font-weight: 700 !important;
+  padding: 0 8px !important;
 }
 
 .joco-alta-dialog .joco-alta-add-button.p-button {
   width: 100% !important;
-  min-width: 138px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 10px !important;
+  border-radius: 2px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
 }
 
 .joco-alta-dialog .joco-alta-relate-button.p-button {
-  min-width: 150px !important;
+  width: 120px !important;
+  min-width: 120px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 13px !important;
+  border-radius: 2px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
 }
 
+/* Grilla de preview */
 .joco-alta-dialog .joco-alta-grid.p-datatable {
   width: 100% !important;
   height: 100% !important;
   display: flex !important;
   flex-direction: column !important;
   border: 0 !important;
+  background: #fff !important;
 }
 
 .joco-alta-dialog .joco-alta-grid .p-datatable-table-container,
@@ -461,115 +469,148 @@ const cerrar = () => {
 
 .joco-alta-dialog .joco-alta-grid .p-datatable-paginator-bottom,
 .joco-alta-dialog .joco-alta-grid > .p-paginator {
-  flex: 0 0 58px !important;
-  min-height: 58px !important;
-  border-top: 1px solid #d5dfe4 !important;
+  flex: 0 0 42px !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  border-top: 1px solid #d4dde2 !important;
+  background: #fff !important;
+  overflow: hidden !important;
+}
+
+.joco-alta-dialog .joco-alta-grid .fm-custom-paginator {
+  min-height: 42px !important;
+  height: 42px !important;
+  padding: 2px 10px !important;
 }
 
 .joco-alta-dialog .joco-alta-grid .p-datatable-thead > tr > th {
-  height: 48px !important;
-  padding: 0 12px !important;
-  background: #f2f6f8 !important;
-  font-size: 12px !important;
+  height: 30px !important;
+  padding: 0 7px !important;
+  background: #f1f1f1 !important;
+  font-size: 10px !important;
   font-weight: 700 !important;
 }
 
 .joco-alta-dialog .joco-alta-grid .p-datatable-tbody > tr > td {
-  height: 34px !important;
-  padding: 0 12px !important;
-  font-size: 12px !important;
+  height: 30px !important;
+  padding: 0 7px !important;
+  font-size: 11px !important;
 }
 
-.joco-alta-select-overlay { min-width: 140px !important; }
+.joco-alta-select-overlay { min-width: 140px !important; max-width: 200px !important; }
+.joco-alta-select-overlay .p-select-list { padding: 2px 0 !important; }
+.joco-alta-select-overlay .p-select-option {
+  min-height: 28px !important;
+  padding: 4px 10px !important;
+  font-size: 12px !important;
+}
 </style>
 
 <style scoped>
 .joco-alta-header {
   width: 100%;
-  height: 80px;
+  height: 58px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 42px 0 50px;
+  padding: 0 8px 0 20px;
   box-sizing: border-box;
 }
 
 .joco-alta-header__title {
   margin: 0;
   color: #263746;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 400;
 }
 
 .joco-alta-header__close {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 40px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  border: 0;
-  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: #fff;
   color: #111;
-  font-size: 25px;
+  font-size: 24px;
   font-weight: 700;
+  line-height: 1;
   cursor: pointer;
+  transition: border-color .15s ease, color .15s ease;
 }
 
-.joco-alta-header__close:hover { color: #00a9bd; }
+.joco-alta-header__close:hover {
+  border-color: #00a9bd;
+  color: #00a9bd;
+}
 
+/* ── Body: display:grid igual que el dialog-content interno ── */
 .joco-alta-body {
+  width: 100%;
   height: 100%;
   min-height: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 32px 48px 36px;
+  display: grid;
+  grid-template-rows: 58px minmax(0, 1fr);
+  gap: 14px;
+  padding: 8px 16px 10px;
+  overflow: hidden;
   box-sizing: border-box;
 }
 
+/* ── Formulario ── */
 .joco-alta-form {
-  flex: 0 0 auto;
+  width: 100%;
+  min-width: 0;
   display: grid;
-  grid-template-columns: 140px minmax(180px, 1fr) minmax(180px, 1fr) 140px 160px;
+  grid-template-columns: 120px minmax(200px, 1fr) minmax(200px, 1fr) 120px 140px;
   align-items: end;
-  gap: 16px;
+  gap: 14px;
+  box-sizing: border-box;
 }
 
 .joco-alta-field {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 5px;
 }
 
 .joco-alta-field > label {
   color: #171717;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 700;
   white-space: nowrap;
 }
 
-.joco-alta-field--button { justify-content: flex-end; }
+.joco-alta-field--button {
+  justify-content: flex-end;
+}
 
+/* ── Grid wrap ── */
 .joco-alta-grid-wrap {
-  flex: 1 1 auto;
-  min-height: 300px;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
+  border: 1px solid #d4dde2;
+  border-left: 3px solid #00a9bd;
   overflow: hidden;
-  border: 1px solid #cfdbe1;
-  border-left: 4px solid #00a9bd;
   background: #fff;
+  box-sizing: border-box;
 }
 
 .joco-alta-empty {
-  min-height: 108px;
+  min-height: 76px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #2f6475;
-  font-size: 14px;
+  font-size: 12px;
   background: #e8f9fc;
 }
 
@@ -581,29 +622,43 @@ const cerrar = () => {
   white-space: nowrap;
 }
 
+/* ── Footer ── */
 .joco-alta-footer {
   width: 100%;
-  min-height: 80px;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding: 0 48px;
+  padding: 0 16px;
   box-sizing: border-box;
 }
 
+/* Responsive 900–1440: form cabe en menos espacio */
 @media (max-width: 1050px) {
-  .joco-alta-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .joco-alta-field--button { grid-column: 2; }
-  .joco-alta-body { overflow-y: auto; }
-  .joco-alta-grid-wrap { flex: 0 0 330px; }
+  .joco-alta-form {
+    grid-template-columns: 110px minmax(0, 1fr) minmax(0, 1fr) 110px 130px;
+    gap: 10px;
+  }
 }
 
-@media (max-width: 680px) {
-  .joco-alta-header { padding: 0 16px 0 20px; }
-  .joco-alta-header__title { font-size: 20px; }
-  .joco-alta-body { padding: 22px 18px 26px; }
-  .joco-alta-form { grid-template-columns: 1fr; }
-  .joco-alta-field--button { grid-column: 1; }
-  .joco-alta-footer { padding: 0 18px; }
+@media (max-width: 760px) {
+  .joco-alta-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .joco-alta-field--button {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 520px) {
+  .joco-alta-form {
+    grid-template-columns: 1fr;
+  }
+
+  .joco-alta-field--button {
+    grid-column: 1;
+  }
 }
 </style>
