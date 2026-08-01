@@ -7,36 +7,44 @@
   />
 
   <div v-else class="login-page">
-    <span class="login-orbit login-orbit--outer" aria-hidden="true"></span>
-    <span class="login-orbit login-orbit--inner" aria-hidden="true"></span>
+    <main class="login-main">
+      <section class="login-shell" aria-label="Acceso Field Manager">
+        <div class="login-brand-panel">
+          <div class="login-logo" aria-hidden="true">
+            <span>FM</span>
+          </div>
 
-    <main class="login-content" aria-label="Acceso Field Manager">
-      <h1 class="login-title">
-        <span class="login-title__field">Field</span>
-        <span class="login-title__manager">Manager</span>
-      </h1>
+          <h1>Field Manager</h1>
+          <span class="login-eyebrow">Personal Argentina</span>
+        </div>
 
-      <div class="login-secure-label">
-        <span class="login-secure-label__line" aria-hidden="true"></span>
-        <span>ACCESO SEGURO</span>
-        <span class="login-secure-label__line" aria-hidden="true"></span>
-      </div>
+        <div class="login-card">
+          <span class="login-chip">
+            <i class="pi pi-shield"></i>
+            Acceso seguro
+          </span>
 
-      <p class="login-description">
-        Conectate con tu usuario corporativo<br />
-        para ingresar al sistema.
-      </p>
+          <div class="login-card-title">
+            <h2>Bienvenido</h2>
+            <p>Conectate con tu usuario corporativo para ingresar al sistema.</p>
+          </div>
 
-      <Button
-        icon="pi pi-sign-in"
-        label="CONECTAR"
-        class="login-submit-button"
-        type="button"
-        @click="ingresar"
-      />
-
-      <p class="login-copyright">PERSONAL ARGENTINA © 2025</p>
+          <Button
+            icon="pi pi-sign-in"
+            label="CONECTAR"
+            class="login-submit-button"
+            type="button"
+            @click="ingresar"
+          />
+        </div>
+      </section>
     </main>
+
+    <footer class="footer-fm">
+      <div class="footer-copyright">
+        © Copyright | <a href="#" class="footer-link">Personal Argentina | v. 1.0.0</a>
+      </div>
+    </footer>
   </div>
 </template>
 
@@ -76,215 +84,240 @@ onMounted(async () => {
   position: relative;
   width: 100%;
   min-height: 100vh;
-  display: grid;
-  place-items: center;
   overflow: hidden;
-  padding: 28px;
   background:
-    radial-gradient(circle at center, rgba(217, 244, 246, .58) 0, rgba(239, 248, 249, .74) 34%, rgba(246, 249, 250, .96) 67%, #f5f8f9 100%);
-  color: #111d22;
-  isolation: isolate;
+    radial-gradient(circle at 18% 18%, rgba(0, 180, 181, .16), transparent 28%),
+    radial-gradient(circle at 82% 24%, rgba(2, 77, 161, .10), transparent 30%),
+    linear-gradient(135deg, #f5f8fa 0%, #eef3f6 100%);
+  color: #1d3444;
 }
 
 .login-page::before {
   content: '';
   position: absolute;
-  z-index: -2;
-  inset: 0;
-  background:
-    radial-gradient(circle at 50% 46%, rgba(19, 184, 190, .18), transparent 38%),
-    linear-gradient(180deg, rgba(255, 255, 255, .42), rgba(237, 247, 248, .30));
-}
-
-.login-orbit {
-  position: absolute;
-  z-index: -1;
-  top: 50%;
-  left: 50%;
-  border: 1px solid rgba(16, 185, 190, .42);
+  right: -12%;
+  bottom: -34%;
+  width: 560px;
+  height: 560px;
   border-radius: 50%;
-  box-shadow: 0 0 0 1px rgba(16, 185, 190, .05);
-  transform: translate(-50%, -50%);
-  pointer-events: none;
+  background: rgba(0, 169, 189, .10);
 }
 
-.login-orbit--outer {
-  width: min(82vw, 1110px);
-  aspect-ratio: 1;
-}
-
-.login-orbit--inner {
-  width: min(54vw, 720px);
-  aspect-ratio: 1;
-  border-color: rgba(16, 185, 190, .28);
-}
-
-.login-content {
-  position: relative;
-  z-index: 1;
-  width: min(430px, 100%);
+.login-main {
+  min-height: calc(100vh - 42px);
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  transform: translateY(-5px);
-}
-
-.login-title {
-  margin: 0;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: clamp(46px, 4.2vw, 58px);
-  line-height: .98;
-  font-weight: 700;
-  letter-spacing: -.055em;
-}
-
-.login-title__field,
-.login-title__manager {
-  display: block;
-}
-
-.login-title__field {
-  color: #101d22;
-}
-
-.login-title__manager {
-  color: #08b5ba;
-}
-
-.login-secure-label {
-  width: 100%;
-  display: grid;
-  grid-template-columns: minmax(48px, 82px) auto minmax(48px, 82px);
   align-items: center;
   justify-content: center;
-  gap: 15px;
-  margin-top: 30px;
-  color: #9aa5a9;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: .34em;
-  white-space: nowrap;
+  padding: 44px 22px 58px;
 }
 
-.login-secure-label__line {
-  width: 100%;
-  height: 1px;
-  background: rgba(10, 181, 186, .58);
+.login-shell {
+  position: relative;
+  z-index: 1;
+  width: min(920px, 100%);
+  min-height: 430px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(320px, .95fr);
+  overflow: hidden;
+  border: 1px solid rgba(224, 234, 239, .92);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, .86);
+  box-shadow: 0 24px 70px rgba(26, 48, 66, .16);
+  backdrop-filter: blur(10px);
 }
 
-.login-description {
-  margin: 30px 0 36px;
-  color: #7a8589;
-  font-size: 17px;
+.login-brand-panel {
+  position: relative;
+  min-height: 430px;
+  overflow: hidden;
+  padding: 34px;
+  background: linear-gradient(135deg, rgba(0, 169, 189, .96), rgba(0, 139, 140, .94));
+}
+
+.login-brand-panel::before {
+  content: '';
+  position: absolute;
+  top: -84px;
+  left: -30px;
+  width: 430px;
+  height: 430px;
+  background: url('@/assets/images/FM_login.png') center / contain no-repeat;
+  opacity: .20;
+  filter: brightness(0) invert(1);
+}
+
+.login-brand-panel::after {
+  content: '';
+  position: absolute;
+  right: -90px;
+  bottom: -110px;
+  width: 280px;
+  height: 280px;
+  border: 42px solid rgba(255, 255, 255, .13);
+  border-radius: 50%;
+}
+
+.login-logo {
+  position: absolute;
+  z-index: 2;
+  top: 14px;
+  left: 20px;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 5px solid rgba(255, 255, 255, .92);
+  border-radius: 50%;
+  color: #1d3444;
+  font-size: 18px;
+  font-weight: 900;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, .13);
+}
+
+.login-brand-panel h1 {
+  position: absolute;
+  z-index: 2;
+  top: 202px;
+  right: 24px;
+  left: 24px;
+  margin: 0;
+  color: #fff;
+  font-size: clamp(31px, 4vw, 44px);
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  text-align: center;
+}
+
+.login-eyebrow {
+  position: absolute;
+  z-index: 2;
+  right: 10px;
+  bottom: 7px;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .17);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.login-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 46px 42px;
+  background: rgba(255, 255, 255, .95);
+}
+
+.login-chip {
+  align-self: flex-start;
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 11px;
+  border: 1px solid rgba(0, 169, 189, .16);
+  border-radius: 999px;
+  background: #e9fbfd;
+  color: #008fa1;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.login-card-title {
+  margin: 28px 0;
+}
+
+.login-card-title h2 {
+  margin: 0 0 8px;
+  color: #1d3444;
+  font-size: 30px;
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -.03em;
+}
+
+.login-card-title p {
+  margin: 0;
+  color: #61727f;
+  font-size: 14px;
   line-height: 1.55;
-  font-weight: 400;
 }
 
 .login-submit-button,
 :deep(.login-submit-button.p-button) {
-  width: 236px !important;
-  height: 60px !important;
-  min-height: 60px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 12px !important;
-  padding: 0 24px !important;
+  width: 100% !important;
+  height: 42px !important;
+  min-height: 42px !important;
   border: 0 !important;
-  border-radius: 18px !important;
-  background: #08b5ba !important;
+  border-radius: 8px !important;
+  background: linear-gradient(135deg, #00a9bd, #008fa1) !important;
   color: #fff !important;
-  box-shadow: 0 14px 28px rgba(8, 181, 186, .18) !important;
-  font-size: 16px !important;
+  box-shadow: 0 10px 24px rgba(0, 169, 189, .26) !important;
+  font-size: 13px !important;
   font-weight: 800 !important;
-  letter-spacing: .09em !important;
-  transition: transform .16s ease, background-color .16s ease, box-shadow .16s ease !important;
 }
 
 .login-submit-button:hover,
 :deep(.login-submit-button.p-button:hover) {
-  background: #079fa5 !important;
-  box-shadow: 0 18px 34px rgba(8, 181, 186, .25) !important;
+  background: linear-gradient(135deg, #00b7ca, #008c9d) !important;
   transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(0, 169, 189, .30) !important;
 }
 
-.login-submit-button:focus-visible,
-:deep(.login-submit-button.p-button:focus-visible) {
-  outline: 3px solid rgba(8, 181, 186, .22) !important;
-  outline-offset: 4px !important;
+.footer-fm {
+  position: fixed;
+  z-index: 2;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 0 18px 12px;
+  color: #5f727e;
+  font-size: 11px;
+  text-align: right;
 }
 
-:deep(.login-submit-button .p-button-icon) {
-  font-size: 15px !important;
-}
-
-.login-copyright {
-  margin: 37px 0 0;
-  color: #c0c6c8;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: .2em;
+.footer-link {
+  color: #008fa1;
+  text-decoration: none;
 }
 
 @media (max-width: 760px) {
-  .login-page {
-    padding: 24px 18px;
+  .login-main {
+    padding: 18px 14px 52px;
   }
 
-  .login-orbit--outer {
-    width: 150vw;
+  .login-shell {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    border-radius: 20px;
   }
 
-  .login-orbit--inner {
-    width: 102vw;
+  .login-brand-panel {
+    min-height: 210px;
   }
 
-  .login-content {
-    transform: none;
+  .login-brand-panel h1 {
+    top: 112px;
+    font-size: 34px;
   }
 
-  .login-title {
-    font-size: 45px;
+  .login-brand-panel::before {
+    width: 280px;
+    height: 280px;
   }
 
-  .login-secure-label {
-    grid-template-columns: minmax(30px, 56px) auto minmax(30px, 56px);
-    gap: 10px;
-    margin-top: 24px;
-    font-size: 10px;
-    letter-spacing: .24em;
-  }
-
-  .login-description {
-    margin: 26px 0 30px;
-    font-size: 15px;
-  }
-
-  .login-submit-button,
-  :deep(.login-submit-button.p-button) {
-    width: min(236px, 82vw) !important;
-    height: 56px !important;
-    min-height: 56px !important;
-  }
-
-  .login-copyright {
-    margin-top: 32px;
-    font-size: 10px;
-    letter-spacing: .16em;
-  }
-}
-
-@media (max-height: 700px) and (min-width: 761px) {
-  .login-content {
-    transform: scale(.88);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .login-submit-button,
-  :deep(.login-submit-button.p-button) {
-    transition: none !important;
+  .login-card {
+    padding: 32px 24px 36px;
   }
 }
 </style>
