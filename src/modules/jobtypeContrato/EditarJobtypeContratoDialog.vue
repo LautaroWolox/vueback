@@ -63,11 +63,24 @@
           :suggestions="contratoSuggestions"
           optionLabel="valor"
           :minLength="4"
-          class="jobtype-contrato-edit-control"
+          class="jobtype-contrato-edit-autocomplete"
           inputClass="jobtype-contrato-edit-control"
           @complete="buscarContratos"
           @item-select="onContratoSelect"
           @clear="contratoSelectedItem = null"
+        />
+      </div>
+
+      <div class="jobtype-contrato-edit-field jobtype-contrato-edit-field--origen">
+        <label for="edit-origen">Origen</label>
+        <Select
+          id="edit-origen"
+          v-model="origenSeleccionado"
+          :options="origenOptions"
+          optionLabel="label"
+          optionValue="value"
+          overlayClass="jobtype-contrato-edit-select-overlay"
+          class="jobtype-contrato-edit-control jobtype-contrato-edit-control--select"
         />
       </div>
     </div>
@@ -139,6 +152,7 @@ import { ref, computed, watch } from 'vue'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import AutoComplete from 'primevue/autocomplete'
+import Select from 'primevue/select'
 import FmButton from '@/components/shared/FmButton.vue'
 import { useJobtypeContratoStore } from './jobtypeContratoStore'
 
@@ -160,15 +174,30 @@ const confirmDialogStyle = 'width: min(540px, calc(100vw - 32px)); max-width: 54
 const nuevoContrato = ref('')
 const contratoSuggestions = ref([])
 const contratoSelectedItem = ref(null)
+const origenSeleccionado = ref('')
 const showConfirmCierre = ref(false)
 
-const hayCambios = computed(() => Boolean(contratoSelectedItem.value))
+const origenOptions = computed(() => {
+  if (props.pais === 'PY') return [{ label: 'FAN', value: 'FAN' }]
+
+  return [
+    { label: '', value: '' },
+    { label: 'FAN', value: 'FAN' },
+    { label: 'MXM', value: 'MXM' }
+  ]
+})
+
+const origenInicial = computed(() => props.pais === 'PY' ? 'FAN' : '')
+const hayCambios = computed(() => Boolean(
+  contratoSelectedItem.value || origenSeleccionado.value !== origenInicial.value
+))
 const puedeActualizar = computed(() => Boolean(contratoSelectedItem.value))
 
 watch(() => props.visible, (val) => {
   if (val) {
     nuevoContrato.value = ''
     contratoSelectedItem.value = null
+    origenSeleccionado.value = origenInicial.value
     showConfirmCierre.value = false
   }
 })
@@ -188,6 +217,7 @@ const actualizar = async () => {
     await store.actualizarRelacion(props.tareaContratoId, contratoSelectedItem.value.contratoId)
     nuevoContrato.value = ''
     contratoSelectedItem.value = null
+    origenSeleccionado.value = origenInicial.value
     emit('update:visible', false)
     emit('actualizado')
   } catch {
@@ -219,6 +249,7 @@ const confirmarCierre = () => {
 const cerrar = () => {
   nuevoContrato.value = ''
   contratoSelectedItem.value = null
+  origenSeleccionado.value = origenInicial.value
   emit('update:visible', false)
 }
 </script>
@@ -267,7 +298,7 @@ const cerrar = () => {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
   grid-template-areas:
     'jobtype contrato pais'
-    '. nuevo .';
+    '. nuevo origen';
   align-items: start;
   column-gap: 20px;
   row-gap: 14px;
@@ -278,6 +309,7 @@ const cerrar = () => {
 .jobtype-contrato-edit-field--contrato { grid-area: contrato; }
 .jobtype-contrato-edit-field--pais { grid-area: pais; }
 .jobtype-contrato-edit-field--nuevo { grid-area: nuevo; }
+.jobtype-contrato-edit-field--origen { grid-area: origen; }
 
 .jobtype-contrato-edit-field {
   min-width: 0;
@@ -297,6 +329,30 @@ const cerrar = () => {
   height: 32px;
   min-height: 32px;
   box-sizing: border-box;
+}
+
+:global(.jobtype-contrato-edit-autocomplete) {
+  width: 100% !important;
+  min-width: 0 !important;
+  display: flex !important;
+}
+
+:global(.jobtype-contrato-edit-autocomplete .p-autocomplete-input) {
+  width: 100% !important;
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+}
+
+:global(.jobtype-contrato-edit-control--select.p-select) {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+:global(.jobtype-contrato-edit-control--select .p-select-label) {
+  display: flex;
+  align-items: center;
+  padding: 0 9px;
+  font-size: 13px;
 }
 
 .jobtype-contrato-edit-control--readonly:disabled {
@@ -471,7 +527,8 @@ const cerrar = () => {
       'jobtype'
       'contrato'
       'pais'
-      'nuevo';
+      'nuevo'
+      'origen';
     row-gap: 14px;
     padding: 16px 0 22px;
   }
