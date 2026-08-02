@@ -10,6 +10,7 @@ import './assets/css/fm-select.css'
 import './assets/css/jobtype-contrato.css'
 import './assets/css/jobtype-required-validation.css'
 import './assets/css/parametrizaciones-grid-selection.css'
+import './assets/css/fm-grid-empty-state.css'
 
 import Lara from '@primeuix/themes/lara'
 import { definePreset } from '@primeuix/themes'
