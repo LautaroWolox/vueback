@@ -6,7 +6,7 @@
     :closable="false"
     :draggable="true"
     :resizable="false"
-    class="jobtype-contrato-delete-confirm-dialog"
+    class="jobtype-contrato-delete-confirm-dialog fm-confirm-dialog"
     :style="dialogStyle"
     @update:visible="(val) => emit('update:visible', val)"
   >
@@ -16,7 +16,7 @@
           <span class="jobtype-contrato-delete-confirm__icon-circle">
             <i class="pi pi-bell jobtype-contrato-delete-confirm__header-icon" aria-hidden="true" />
           </span>
-          <span class="jobtype-contrato-delete-confirm__title">Confirmar Accion</span>
+          <span class="jobtype-contrato-delete-confirm__title">Confirmar Acción</span>
         </div>
         <button
           type="button"
@@ -35,24 +35,19 @@
     </div>
 
     <template #footer>
-      <div class="jobtype-contrato-delete-confirm__actions">
-        <button
-          type="button"
-          class="jobtype-contrato-delete-confirm__button jobtype-contrato-delete-confirm__button--cancel"
-          @click="cancelar"
-        >CANCELAR</button>
-        <button
-          type="button"
-          class="jobtype-contrato-delete-confirm__button jobtype-contrato-delete-confirm__button--accept"
-          @click="confirmar"
-        >ACEPTAR</button>
-      </div>
+      <FmDialogActions
+        secondary-label="CANCELAR"
+        primary-label="ACEPTAR"
+        @secondary="cancelar"
+        @primary="confirmar"
+      />
     </template>
   </Dialog>
 </template>
 
 <script setup>
 import Dialog from 'primevue/dialog'
+import FmDialogActions from '@/components/shared/FmDialogActions.vue'
 
 defineProps({
   visible: { type: Boolean, default: false }
@@ -142,45 +137,6 @@ const confirmar = () => {
   color: #4b5563;
   font-size: 15px;
   line-height: 1.35;
-}
-
-.jobtype-contrato-delete-confirm__actions {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-.jobtype-contrato-delete-confirm__button {
-  appearance: none;
-  width: 100px;
-  min-width: 100px;
-  height: 30px;
-  min-height: 30px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 12px;
-  border: 1px solid #00acc1;
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1;
-  box-shadow: none;
-  outline: none;
-  cursor: pointer;
-}
-
-.jobtype-contrato-delete-confirm__button--cancel {
-  background: #fff;
-  color: #0097a7;
-}
-
-.jobtype-contrato-delete-confirm__button--accept {
-  background: #00acc1;
-  color: #fff;
 }
 
 :global(.p-dialog.jobtype-contrato-delete-confirm-dialog) {
