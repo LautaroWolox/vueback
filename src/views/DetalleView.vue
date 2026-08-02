@@ -34,10 +34,13 @@ const titulo = `Detalle Acta - ${sessionStorage.getItem('nroActa') || ''}`
 <style scoped>
 .legacy-iframe {
   width: 100%;
-  height: calc(100vh - 64px);
-  min-height: 520px;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
   display: block;
-  margin: -4px 0 0;
+  margin: 0;
   border: 0;
+  background: #fff;
 }
 </style>
