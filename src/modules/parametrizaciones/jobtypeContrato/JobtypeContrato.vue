@@ -35,126 +35,27 @@
       </button>
 
       <div v-show="resultsExpanded" class="jobtype-results-body">
-        <DataTable
-          id="tabla-jobtype-contrato"
+        <Tabla
           v-model:filters="mainFilters"
-          v-model:selection="selectedRow"
+          v-model:selected-row="selectedRow"
           v-model:first="mainFirst"
           v-model:rows="mainPageRows"
-          class="jobtype-main-grid jobtype-contrato-main-grid"
-          :value="store.relaciones"
-          dataKey="tareaContratoId"
-          tableStyle="table-layout: fixed; width: 100%; min-width: 100%"
-          scrollable
-          scrollHeight="flex"
-          removableSort
-          sortMode="multiple"
-          filterDisplay="row"
-          selectionMode="single"
-          paginator
-          :rowsPerPageOptions="[100, 250, 500]"
-          :resizableColumns="true"
-          columnResizeMode="fit"
-          showGridlines
-          @row-click="onRowClick"
-        >
-          <template
-            #paginatorcontainer="{
-              first,
-              last,
-              page,
-              pageCount,
-              rows,
-              totalRecords,
-              firstPageCallback,
-              lastPageCallback,
-              prevPageCallback,
-              nextPageCallback,
-              rowChangeCallback,
-              changePageCallback
-            }"
-          >
-            <FmGridPaginator
-              :first="first"
-              :last="last"
-              :page="page"
-              :page-count="pageCount"
-              :rows="rows"
-              :total-records="totalRecords"
-              :rows-options="[100, 250, 500]"
-              :show-rows-select="true"
-              :show-counter="true"
-              :counter-text="totalRecords === 0 ? 'No hay resultados' : ''"
-              @first-page="firstPageCallback"
-              @prev-page="prevPageCallback"
-              @next-page="nextPageCallback"
-              @last-page="lastPageCallback"
-              @page-change="changePageCallback"
-              @rows-change="rowChangeCallback"
-            >
-              <template #actions>
-                <FmGridActions
-                  :show-refresh="false"
-                  :show-edit="true"
-                  :show-add="true"
-                  :delete-disabled="!selectedRow"
-                  :edit-disabled="!selectedRow"
-                  export-title="Descargar"
-                  delete-title="Desactivar"
-                  edit-title="Editar"
-                  add-title="Nueva relación"
-                  @export="exportarExcel"
-                  @delete="solicitarDesactivacion"
-                  @edit="editarSeleccionado"
-                  @add="showAlta = true"
-                />
-              </template>
-            </FmGridPaginator>
-          </template>
-
-          <Column
-            v-for="col in visibleColumns"
-            :key="col.field"
-            :field="col.field"
-            :sortField="col.field"
-            :filterField="col.field"
-            :header="col.header"
-            :sortable="col.sort"
-            :filter="col.filter"
-            :showFilterMenu="false"
-            :style="{ width: col.width }"
-            :headerStyle="{ width: col.width }"
-            :bodyStyle="{ width: col.width }"
-          >
-            <template #filter="{ filterModel, filterCallback }">
-              <div class="jobtype-filter-cell">
-                <span class="jobtype-filter-symbol">~</span>
-                <InputText
-                  v-model="filterModel.value"
-                  class="jobtype-filter-input"
-                  type="text"
-                  @input="filterCallback()"
-                />
-                <span class="jobtype-filter-clear" @click="clearFilter(filterModel, filterCallback)">x</span>
-              </div>
-            </template>
-
-            <template #body="{ data }">
-              <span class="jobtype-cell-text" :title="String(data[col.field] ?? '')">
-                {{ data[col.field] ?? '' }}
-              </span>
-            </template>
-          </Column>
-        </DataTable>
+          :relaciones="store.relaciones"
+          :columns="visibleColumns"
+          @export="exportarExcel"
+          @delete="solicitarDesactivacion"
+          @edit="editarSeleccionado"
+          @add="showAlta = true"
+        />
       </div>
     </section>
 
-    <AltaJobtypeContratoDialog
+    <AltaDialog
       v-model:visible="showAlta"
       @relacionado="onRelacionado"
     />
 
-    <EditarJobtypeContratoDialog
+    <EditarDialog
       v-model:visible="showEditar"
       :tarea-contrato-id="editForm.tareaContratoId"
       :jobtype="editForm.jobtype"
@@ -172,18 +73,14 @@
 
 <script setup>
 import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import InputText from 'primevue/inputtext'
 import { FilterMatchMode } from '@primevue/core/api'
 import FmButton from '@/components/shared/FmButton.vue'
-import FmGridPaginator from '@/components/shared/FmGridPaginator.vue'
-import FmGridActions from '@/components/shared/FmGridActions.vue'
 import LoadingOverlay from '@/modules/shared/components/LoadingOverlay.vue'
-import AltaJobtypeContratoDialog from './AltaJobtypeContratoDialog.vue'
-import EditarJobtypeContratoDialog from './EditarJobtypeContratoDialog.vue'
-import ConfirmarDesactivacionDialog from './ConfirmarDesactivacionDialog.vue'
-import { useJobtypeContratoStore } from './jobtypeContratoStore'
+import Tabla from './components/Tabla.vue'
+import AltaDialog from './components/AltaDialog.vue'
+import EditarDialog from './components/EditarDialog.vue'
+import ConfirmarDesactivacionDialog from './components/ConfirmarDesactivacionDialog.vue'
+import { useJobtypeContratoStore } from './store/jobtypeContratoStore'
 
 const store = useJobtypeContratoStore()
 
@@ -293,15 +190,6 @@ const buscar = async () => {
   } catch {
     // error already in store.error
   }
-}
-
-const onRowClick = ({ data }) => {
-  selectedRow.value = data
-}
-
-const clearFilter = (filterModel, filterCallback) => {
-  filterModel.value = null
-  filterCallback()
 }
 
 const editarSeleccionado = () => {
@@ -435,46 +323,6 @@ onBeforeUnmount(() => {
   max-height: none !important;
   flex: 1 1 auto !important;
   overflow: auto !important;
-}
-
-.jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-tbody > tr.p-datatable-row-selected > td),
-.jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-tbody > tr.p-datatable-row-selected:hover > td),
-.jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-tbody > tr[data-p-selected='true'] > td),
-.jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-tbody > tr[data-p-selected='true']:hover > td),
-.jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-tbody > tr[aria-selected='true'] > td),
-.jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-tbody > tr[aria-selected='true']:hover > td) {
-  background: #9ee7ee !important;
-  color: #111 !important;
-}
-
-.jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-tbody > tr.p-datatable-row-selected > td *),
-.jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-tbody > tr[data-p-selected='true'] > td *),
-.jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-tbody > tr[aria-selected='true'] > td *) {
-  color: #111 !important;
-}
-
-.jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-emptymessage > td),
-.jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-empty-message > td) {
-  position: relative !important;
-  height: 120px !important;
-  padding: 0 !important;
-  text-align: center !important;
-  vertical-align: middle !important;
-  background: #e8f9fc !important;
-  color: transparent !important;
-}
-
-.jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-emptymessage > td)::after,
-.jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-empty-message > td)::after {
-  content: 'No hay resultados';
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #075f6d;
-  font-size: 12px;
-  font-weight: 400;
 }
 
 :global(body [data-jobtype-popup-button='true']),
