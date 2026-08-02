@@ -1,5 +1,5 @@
 <template>
-  <div class="fm-custom-paginator fm-responsive-paginator">
+  <div class="fm-custom-paginator">
     <div class="fm-custom-paginator__actions">
       <slot name="actions" />
     </div>
@@ -155,18 +155,32 @@ watch(() => props.rowsOptions, scheduleMaximumRows, { deep: true })
 .fm-custom-paginator {
   width: 100%;
   min-height: 36px;
-  display: grid;
-  grid-template-columns: minmax(130px, 1fr) auto minmax(170px, 1fr);
+  display: grid !important;
+  grid-template-columns: minmax(100px, 1fr) auto minmax(100px, 1fr);
   align-items: center;
-  padding: 2px 9px;
+  padding: 2px 4px;
   color: #111;
   font-size: 11px;
   box-sizing: border-box;
 }
 
 .fm-custom-paginator__actions {
-  justify-self: start;
-  min-width: 0;
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  justify-self: start !important;
+  overflow: visible !important;
+}
+
+.fm-custom-paginator__actions :deep(.fm-grid-actions-final) {
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  flex: 0 0 auto !important;
+  justify-content: flex-start !important;
 }
 
 .fm-custom-paginator__navigation {
@@ -248,7 +262,10 @@ watch(() => props.rowsOptions, scheduleMaximumRows, { deep: true })
     gap: 4px;
   }
 
-  .fm-custom-paginator__actions,
+  .fm-custom-paginator__actions {
+    justify-self: start !important;
+  }
+
   .fm-custom-paginator__navigation,
   .fm-custom-paginator__counter {
     justify-self: center;
