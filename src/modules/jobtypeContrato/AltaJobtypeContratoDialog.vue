@@ -314,13 +314,14 @@ const altaSelectedRow = ref(null)
 const altaFirst = ref(0)
 const altaPageRows = ref(10)
 const showConfirmCierre = ref(false)
+const validationRequested = ref(false)
 
 const canAgregar = computed(() => Boolean(
   form.pais && jobtypeSelected.value && contratoSelected.value && form.origen
 ))
 
-const jobtypeInvalid = computed(() => !jobtypeSelected.value)
-const contratoInvalid = computed(() => !contratoSelected.value)
+const jobtypeInvalid = computed(() => validationRequested.value && !jobtypeSelected.value)
+const contratoInvalid = computed(() => validationRequested.value && !contratoSelected.value)
 
 const hayDatosCargados = computed(() => {
   return Boolean(
@@ -363,6 +364,7 @@ const resetForm = () => {
   altaSelectedRow.value = null
   altaFirst.value = 0
   showConfirmCierre.value = false
+  validationRequested.value = false
 }
 
 const buscarJobtypes = async (event) => {
@@ -382,6 +384,8 @@ const onContratoSelect = (event) => {
 }
 
 const agregar = () => {
+  validationRequested.value = true
+
   if (!canAgregar.value) return
 
   const codigo = jobtypeSelected.value.codigo
@@ -405,6 +409,7 @@ const agregar = () => {
   form.origen = form.pais ? 'FAN' : ''
   jobtypeSelected.value = null
   contratoSelected.value = null
+  validationRequested.value = false
 }
 
 const eliminarPreview = () => {
@@ -615,5 +620,14 @@ const cerrar = () => {
   padding: 10px 18px;
   border-top: 1px solid #dedede;
   background: #fff;
+}
+
+:global(.p-dialog.jobtype-alta-dialog .jobtype-alta-autocomplete--invalid .p-autocomplete-input),
+:global(.p-dialog.jobtype-alta-dialog .jobtype-alta-autocomplete--invalid input),
+:global(.p-dialog.jobtype-alta-dialog .jobtype-alta-autocomplete--invalid .p-autocomplete-input:focus),
+:global(.p-dialog.jobtype-alta-dialog .jobtype-alta-autocomplete--invalid input:focus) {
+  border-color: #e57373 !important;
+  background: #fffafa !important;
+  box-shadow: 0 0 0 1px rgba(229, 115, 115, .22) inset !important;
 }
 </style>
