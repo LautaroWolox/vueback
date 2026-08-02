@@ -1,0 +1,52 @@
+/*
+ * Selección compartida para las grillas de Parametrizaciones.
+ * Referencia visual: turquesa claro con texto negro.
+ */
+
+#tabla-jobtype-contrato,
+#tabla-cmo-actividad {
+  --p-datatable-row-selected-background: #d9f8fa;
+  --p-datatable-row-selected-color: #111;
+}
+
+#tabla-jobtype-contrato .p-datatable-tbody > tr.p-datatable-row-selected,
+#tabla-jobtype-contrato .p-datatable-tbody > tr.p-highlight,
+#tabla-jobtype-contrato .p-datatable-tbody > tr[data-p-selected='true'],
+#tabla-jobtype-contrato .p-datatable-tbody > tr[aria-selected='true'],
+#tabla-cmo-actividad .p-datatable-tbody > tr.p-datatable-row-selected,
+#tabla-cmo-actividad .p-datatable-tbody > tr.p-highlight,
+#tabla-cmo-actividad .p-datatable-tbody > tr[data-p-selected='true'],
+#tabla-cmo-actividad .p-datatable-tbody > tr[aria-selected='true'] {
+  opacity: 1 !important;
+}
+
+#tabla-jobtype-contrato .p-datatable-tbody > tr.p-datatable-row-selected > td,
+#tabla-jobtype-contrato .p-datatable-tbody > tr.p-datatable-row-selected:hover > td,
+#tabla-jobtype-contrato .p-datatable-tbody > tr.p-highlight > td,
+#tabla-jobtype-contrato .p-datatable-tbody > tr.p-highlight:hover > td,
+#tabla-jobtype-contrato .p-datatable-tbody > tr[data-p-selected='true'] > td,
+#tabla-jobtype-contrato .p-datatable-tbody > tr[data-p-selected='true']:hover > td,
+#tabla-jobtype-contrato .p-datatable-tbody > tr[aria-selected='true'] > td,
+#tabla-jobtype-contrato .p-datatable-tbody > tr[aria-selected='true']:hover > td,
+#tabla-cmo-actividad .p-datatable-tbody > tr.p-datatable-row-selected > td,
+#tabla-cmo-actividad .p-datatable-tbody > tr.p-datatable-row-selected:hover > td,
+#tabla-cmo-actividad .p-datatable-tbody > tr.p-highlight > td,
+#tabla-cmo-actividad .p-datatable-tbody > tr.p-highlight:hover > td,
+#tabla-cmo-actividad .p-datatable-tbody > tr[data-p-selected='true'] > td,
+#tabla-cmo-actividad .p-datatable-tbody > tr[data-p-selected='true']:hover > td,
+#tabla-cmo-actividad .p-datatable-tbody > tr[aria-selected='true'] > td,
+#tabla-cmo-actividad .p-datatable-tbody > tr[aria-selected='true']:hover > td {
+  background: #d9f8fa !important;
+  color: #111 !important;
+}
+
+#tabla-jobtype-contrato .p-datatable-tbody > tr.p-datatable-row-selected > td *,
+#tabla-jobtype-contrato .p-datatable-tbody > tr.p-highlight > td *,
+#tabla-jobtype-contrato .p-datatable-tbody > tr[data-p-selected='true'] > td *,
+#tabla-jobtype-contrato .p-datatable-tbody > tr[aria-selected='true'] > td *,
+#tabla-cmo-actividad .p-datatable-tbody > tr.p-datatable-row-selected > td *,
+#tabla-cmo-actividad .p-datatable-tbody > tr.p-highlight > td *,
+#tabla-cmo-actividad .p-datatable-tbody > tr[data-p-selected='true'] > td *,
+#tabla-cmo-actividad .p-datatable-tbody > tr[aria-selected='true'] > td * {
+  color: #111 !important;
+}
