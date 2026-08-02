@@ -5,7 +5,7 @@
     v-model:selection="selectionModel"
     v-model:first="firstModel"
     v-model:rows="rowsModel"
-    class="jobtype-main-grid jobtype-contrato-main-grid"
+    class="jobtype-main-grid jobtype-contrato-main-grid fm-pass-grid"
     :value="relaciones"
     dataKey="tareaContratoId"
     tableStyle="table-layout: fixed; width: 100%; min-width: 100%"
@@ -91,20 +91,26 @@
       :bodyStyle="{ width: col.width }"
     >
       <template #filter="{ filterModel, filterCallback }">
-        <div class="jobtype-filter-cell">
-          <span class="jobtype-filter-symbol">~</span>
+        <div class="jobtype-filter-cell fm-filter-cell">
+          <span class="jobtype-filter-symbol fm-filter-prefix">~</span>
           <InputText
             v-model="filterModel.value"
-            class="jobtype-filter-input"
+            class="jobtype-filter-input fm-column-filter"
             type="text"
             @input="filterCallback()"
           />
-          <span class="jobtype-filter-clear" @click="clearFilter(filterModel, filterCallback)">x</span>
+          <button
+            type="button"
+            class="jobtype-filter-clear fm-filter-clear"
+            title="Limpiar filtro"
+            aria-label="Limpiar filtro"
+            @click="clearFilter(filterModel, filterCallback)"
+          >×</button>
         </div>
       </template>
 
       <template #body="{ data }">
-        <span class="jobtype-cell-text" :title="String(data[col.field] ?? '')">
+        <span class="jobtype-cell-text fm-cell-text" :title="String(data[col.field] ?? '')">
           {{ data[col.field] ?? '' }}
         </span>
       </template>
