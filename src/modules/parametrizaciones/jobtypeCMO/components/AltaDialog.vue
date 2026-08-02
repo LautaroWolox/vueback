@@ -20,20 +20,21 @@ const emit = defineEmits<{
   saved: []
 }>()
 
+// Mismas dimensiones que el Alta Jobtype-Contrato.
 const dialogStyle =
-  'width:calc(100vw - 22px) !important;' +
-  'height:calc(100dvh - 12px) !important;' +
-  'max-width:none !important;' +
-  'max-height:none !important;' +
+  'width:min(1440px, calc(100vw - 24px)) !important;' +
+  'height:min(680px, 56vw, calc(100dvh - 24px)) !important;' +
+  'max-width:calc(100vw - 24px) !important;' +
+  'max-height:calc(100dvh - 24px) !important;' +
   'margin:0 !important;'
 </script>
 
 <style>
 body .p-dialog.jobtype-alta-dialog.cmo-alta-dialog {
-  width: calc(100vw - 22px) !important;
-  height: calc(100dvh - 12px) !important;
-  max-width: none !important;
-  max-height: none !important;
+  width: min(1440px, calc(100vw - 24px)) !important;
+  height: min(680px, 56vw, calc(100dvh - 24px)) !important;
+  max-width: calc(100vw - 24px) !important;
+  max-height: calc(100dvh - 24px) !important;
   margin: 0 !important;
 }
 
@@ -55,11 +56,6 @@ body .p-dialog.cmo-alta-dialog input::placeholder {
 }
 
 @media (max-width: 768px) {
-  body .p-dialog.jobtype-alta-dialog.cmo-alta-dialog {
-    width: calc(100vw - 12px) !important;
-    height: calc(100dvh - 12px) !important;
-  }
-
   body .p-dialog.cmo-alta-dialog .cmo-alta-form {
     grid-template-columns: 1fr !important;
     width: 100% !important;
