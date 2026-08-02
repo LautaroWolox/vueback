@@ -63,20 +63,12 @@
     </div>
 
     <template #footer>
-      <div class="emulation-confirm-actions">
-        <FmButton
-          label="CANCELAR"
-          variant="outline"
-          class="emulation-confirm-button"
-          @click="cancelarConfirmacion"
-        />
-        <FmButton
-          label="ACEPTAR"
-          icon="pi-check"
-          class="emulation-confirm-button"
-          @click="emular"
-        />
-      </div>
+      <FmDialogActions
+        secondary-label="CANCELAR"
+        primary-label="ACEPTAR"
+        @secondary="cancelarConfirmacion"
+        @primary="emular"
+      />
     </template>
   </Dialog>
 </template>
@@ -85,6 +77,7 @@
 import { computed, ref, watch } from 'vue'
 import Dialog from 'primevue/dialog'
 import { useToast } from 'primevue/usetoast'
+import FmDialogActions from '@/components/shared/FmDialogActions.vue'
 import router from '@/router'
 import emulacionStore from '../store/emulacionStore.js'
 
@@ -169,7 +162,6 @@ watch(() => store.confirmationVersion, () => {
 
 <style scoped>
 :global(.emulation-confirm-dialog) {
-  border-radius: 7px !important;
   overflow: hidden !important;
 }
 
@@ -184,12 +176,7 @@ watch(() => store.confirmationVersion, () => {
 
 :global(.emulation-confirm-dialog .p-dialog-footer) {
   padding: 12px 22px 18px !important;
-  border-top: 1px solid #d8e3e7 !important;
   background: #fff !important;
-}
-
-.emulation-confirm-body {
-  padding-top: 0;
 }
 
 .emulation-confirm-message {
@@ -295,21 +282,6 @@ watch(() => store.confirmationVersion, () => {
   color: #718894;
   font-size: 11px;
   font-style: italic;
-}
-
-.emulation-confirm-actions {
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-.emulation-confirm-button,
-.emulation-confirm-button :deep(.p-button) {
-  min-width: 110px;
-  height: 32px;
-  min-height: 32px;
-  border-radius: 3px;
 }
 
 @media (max-width: 700px) {
