@@ -103,7 +103,7 @@
     :close-on-escape="false"
     :draggable="true"
     :resizable="false"
-    class="jobtype-contrato-unsaved-dialog"
+    class="jobtype-contrato-unsaved-dialog fm-confirm-dialog"
     :style="confirmDialogStyle"
   >
     <template #header>
@@ -112,7 +112,7 @@
           <span class="jobtype-contrato-unsaved__icon-circle">
             <i class="pi pi-bell jobtype-contrato-unsaved__header-icon" aria-hidden="true" />
           </span>
-          <span class="jobtype-contrato-unsaved__title">Confirmar Accion</span>
+          <span class="jobtype-contrato-unsaved__title">Confirmar Acción</span>
         </div>
         <button
           type="button"
@@ -131,18 +131,12 @@
     </div>
 
     <template #footer>
-      <div class="jobtype-contrato-unsaved__actions">
-        <button
-          type="button"
-          class="jobtype-contrato-unsaved__button jobtype-contrato-unsaved__button--cancel"
-          @click="cancelarCierre"
-        >CANCELAR</button>
-        <button
-          type="button"
-          class="jobtype-contrato-unsaved__button jobtype-contrato-unsaved__button--accept"
-          @click="confirmarCierre"
-        >ACEPTAR</button>
-      </div>
+      <FmDialogActions
+        secondary-label="CANCELAR"
+        primary-label="ACEPTAR"
+        @secondary="cancelarCierre"
+        @primary="confirmarCierre"
+      />
     </template>
   </Dialog>
 </template>
@@ -154,6 +148,7 @@ import InputText from 'primevue/inputtext'
 import AutoComplete from 'primevue/autocomplete'
 import Select from 'primevue/select'
 import FmButton from '@/components/shared/FmButton.vue'
+import FmDialogActions from '@/components/shared/FmDialogActions.vue'
 import { useJobtypeContratoStore } from '../store/jobtypeContratoStore'
 
 const props = defineProps({
@@ -270,28 +265,6 @@ const cerrar = () => {
   font-weight: 400;
 }
 
-.jobtype-contrato-edit-close,
-.jobtype-contrato-unsaved__close {
-  width: 28px;
-  height: 28px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: #c7c7c7;
-  font-size: 22px;
-  font-weight: 700;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.jobtype-contrato-edit-close:hover,
-.jobtype-contrato-unsaved__close:hover {
-  color: #00a9bd;
-}
-
 .jobtype-contrato-edit-content {
   min-height: 170px;
   display: grid;
@@ -362,18 +335,9 @@ const cerrar = () => {
   opacity: 1;
 }
 
-:global(.p-dialog.jobtype-contrato-edit-dialog) {
-  overflow: hidden;
-  border: 1px solid #bdbdbd;
-  border-radius: 0;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, .28);
-}
-
 :global(.jobtype-contrato-edit-dialog .p-dialog-header) {
   min-height: 56px;
   padding: 12px 16px;
-  border-bottom: 1px solid #dedede;
-  background: #fff;
 }
 
 :global(.jobtype-contrato-edit-dialog .p-dialog-content) {
@@ -387,19 +351,6 @@ const cerrar = () => {
   align-items: center;
   justify-content: flex-end;
   padding: 10px 16px;
-  border-top: 1px solid #dedede;
-  background: #fff;
-}
-
-:global(.jobtype-contrato-edit-dialog .jobtype-contrato-edit-update) {
-  width: 108px !important;
-  min-width: 108px !important;
-  max-width: 108px !important;
-  height: 32px !important;
-  min-height: 32px !important;
-  max-height: 32px !important;
-  border-radius: 16px !important;
-  font-size: 12px !important;
 }
 
 .jobtype-contrato-unsaved__header {
@@ -453,57 +404,9 @@ const cerrar = () => {
   line-height: 1.35;
 }
 
-.jobtype-contrato-unsaved__actions {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-.jobtype-contrato-unsaved__button {
-  appearance: none;
-  width: 100px;
-  min-width: 100px;
-  height: 30px;
-  min-height: 30px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 12px;
-  border: 1px solid #00acc1;
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1;
-  box-shadow: none;
-  outline: none;
-  cursor: pointer;
-}
-
-.jobtype-contrato-unsaved__button--cancel {
-  background: #fff;
-  color: #0097a7;
-}
-
-.jobtype-contrato-unsaved__button--accept {
-  background: #00acc1;
-  color: #fff;
-}
-
-:global(.p-dialog.jobtype-contrato-unsaved-dialog) {
-  overflow: hidden;
-  border: 1px solid #bdbdbd;
-  border-radius: 0;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, .28);
-}
-
 :global(.jobtype-contrato-unsaved-dialog .p-dialog-header) {
   min-height: 68px;
   padding: 12px 18px;
-  border-bottom: 1px solid #dedede;
-  background: #fff;
 }
 
 :global(.jobtype-contrato-unsaved-dialog .p-dialog-content) {
@@ -516,8 +419,6 @@ const cerrar = () => {
   display: flex;
   align-items: center;
   padding: 10px 18px;
-  border-top: 1px solid #dedede;
-  background: #fff;
 }
 
 @media (max-width: 760px) {
