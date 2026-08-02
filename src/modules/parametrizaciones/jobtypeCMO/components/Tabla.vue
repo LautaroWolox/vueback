@@ -111,7 +111,13 @@
               type="text"
               @input="filterCallback()"
             />
-            <span class="fm-filter-more">...</span>
+            <button
+              type="button"
+              class="fm-filter-clear"
+              title="Limpiar filtro"
+              aria-label="Limpiar filtro"
+              @click="clearFilter(filterModel, filterCallback)"
+            >×</button>
           </div>
         </template>
         <template #body="{ data }">
@@ -182,6 +188,15 @@ const onRowClick = ({ data }: { data: RelCmoActividad }) => {
   store.setSelectedRow(data)
 }
 
+const clearFilter = (
+  filterModel: { value: string | null },
+  filterCallback: () => void
+) => {
+  filterModel.value = null
+  filterCallback()
+  mainFirst.value = 0
+}
+
 const onAdd = () => {
   showAltaDialog.value = true
 }
@@ -195,7 +210,7 @@ const onDelete = () => {
   if (!store.selectedRow) return
 
   confirm.require({
-    message: 'Confirma que desea desactivar la relación seleccionada?',
+    message: '¿Confirma que desea desactivar la relación seleccionada?',
     header: 'Confirmar desactivación',
     icon: 'pi pi-exclamation-triangle',
     acceptLabel: 'Aceptar',
@@ -285,53 +300,5 @@ const exportarExcel = () => {
   width: 100% !important;
   min-width: 100% !important;
   table-layout: fixed !important;
-}
-
-:global(#tabla-cmo-actividad .p-sortable-column-badge),
-:global(#tabla-cmo-actividad .p-datatable-sort-badge),
-:global(#tabla-cmo-actividad [data-pc-section="sortbadge"]) {
-  display: none !important;
-}
-
-:global(#tabla-cmo-actividad .p-datatable-thead > tr > th) {
-  font-size: 12px !important;
-}
-
-:global(#tabla-cmo-actividad .p-datatable-tbody > tr > td) {
-  font-size: 13px !important;
-}
-
-:global(#tabla-cmo-actividad .p-datatable-emptymessage > td),
-:global(#tabla-cmo-actividad .p-datatable-empty-message > td) {
-  height: 48px !important;
-  min-height: 48px !important;
-  padding: 0 !important;
-  vertical-align: middle !important;
-  background: #eafcff !important;
-}
-
-:global(#tabla-cmo-actividad .p-datatable-emptymessage .fm-grid-empty),
-:global(#tabla-cmo-actividad .p-datatable-empty-message .fm-grid-empty) {
-  width: 100% !important;
-  height: 48px !important;
-  min-height: 48px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 0 !important;
-  background: #eafcff !important;
-  box-sizing: border-box !important;
-}
-
-:global(#tabla-cmo-actividad .fm-filter-cell),
-:global(#tabla-cmo-actividad .fm-column-filter),
-:global(#tabla-cmo-actividad .fm-filter-prefix),
-:global(#tabla-cmo-actividad .fm-filter-more) {
-  font-size: 12px !important;
-}
-
-:global(#tabla-cmo-actividad .fm-grid-paginator),
-:global(#tabla-cmo-actividad .fm-grid-paginator *) {
-  font-size: 13px !important;
 }
 </style>
