@@ -42,18 +42,17 @@
     </div>
 
     <template #footer>
-      <button
-        type="button"
-        class="fm-alert-close-action"
-        @click="$emit('update:visible', false)"
-      >
-        {{ closeLabel }}
-      </button>
+      <FmDialogActions
+        :secondary-label="closeLabel"
+        @secondary="$emit('update:visible', false)"
+      />
     </template>
   </Dialog>
 </template>
 
 <script setup>
+import FmDialogActions from './FmDialogActions.vue'
+
 defineProps({
   visible: { type: Boolean, default: false },
   title: { type: String, default: 'Alerta' },
@@ -176,31 +175,6 @@ defineEmits(['update:visible'])
   padding: 14px 22px !important;
   border-top: 1px solid #dce4e8 !important;
   background: #fff !important;
-}
-
-.fm-alert-close-action {
-  width: 128px;
-  min-width: 128px;
-  height: 42px;
-  min-height: 42px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 18px;
-  border: 1px solid #00a9bd;
-  border-radius: 22px;
-  background: #fff;
-  color: #0093a6;
-  font-size: 17px;
-  font-weight: 500;
-  cursor: pointer;
-  box-shadow: none;
-}
-
-.fm-alert-close-action:hover {
-  background: #ebfbfd;
-  border-color: #008fa1;
-  color: #007f90;
 }
 
 @media (max-width: 620px) {
