@@ -1,0 +1,52 @@
+/*
+ * Estado vacío compartido para todas las grillas del aplicativo.
+ * Referencia visual: franja celeste fina de 35 px con texto centrado.
+ */
+
+:root {
+  --fm-grid-empty-row-height: 35px;
+  --fm-grid-empty-row-background: #eafcff;
+  --fm-grid-empty-row-color: #075f6d;
+}
+
+html body #app .p-datatable.p-component .p-datatable-tbody > tr.p-datatable-emptymessage,
+html body #app .p-datatable.p-component .p-datatable-tbody > tr.p-datatable-empty-message {
+  height: var(--fm-grid-empty-row-height) !important;
+  min-height: var(--fm-grid-empty-row-height) !important;
+  max-height: var(--fm-grid-empty-row-height) !important;
+}
+
+html body #app .p-datatable.p-component .p-datatable-tbody > tr.p-datatable-emptymessage > td,
+html body #app .p-datatable.p-component .p-datatable-tbody > tr.p-datatable-empty-message > td {
+  height: var(--fm-grid-empty-row-height) !important;
+  min-height: var(--fm-grid-empty-row-height) !important;
+  max-height: var(--fm-grid-empty-row-height) !important;
+  padding: 0 !important;
+  vertical-align: middle !important;
+  text-align: center !important;
+  background: var(--fm-grid-empty-row-background) !important;
+  color: var(--fm-grid-empty-row-color) !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: var(--fm-grid-empty-row-height) !important;
+}
+
+html body #app .p-datatable.p-component .p-datatable-tbody > tr.p-datatable-emptymessage > td > *,
+html body #app .p-datatable.p-component .p-datatable-tbody > tr.p-datatable-empty-message > td > *,
+html body #app .p-datatable.p-component .fm-grid-empty {
+  width: 100% !important;
+  height: var(--fm-grid-empty-row-height) !important;
+  min-height: var(--fm-grid-empty-row-height) !important;
+  max-height: var(--fm-grid-empty-row-height) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: var(--fm-grid-empty-row-background) !important;
+  color: var(--fm-grid-empty-row-color) !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+  box-sizing: border-box !important;
+}
