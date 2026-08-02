@@ -27,7 +27,7 @@
     <div class="jobtype-alta-content">
       <div class="jobtype-alta-form">
         <div class="jobtype-alta-field">
-          <label for="alta-pais">Pais</label>
+          <label for="alta-pais">País</label>
           <Select
             id="alta-pais"
             v-model="form.pais"
@@ -36,7 +36,6 @@
             optionValue="value"
             overlayClass="jobtype-alta-select-overlay"
             class="jobtype-alta-control"
-            style="width: 120px !important; min-width: 120px !important; max-width: 120px !important"
           />
         </div>
 
@@ -86,14 +85,12 @@
             optionValue="value"
             overlayClass="jobtype-alta-select-overlay"
             class="jobtype-alta-control"
-            style="width: 120px !important; min-width: 120px !important; max-width: 120px !important"
           />
         </div>
 
         <FmButton
           label="AGREGAR"
           class="jobtype-add-button"
-          style="width: 120px !important; min-width: 120px !important; max-width: 120px !important; border-radius: 0 !important"
           @click="agregar"
         />
       </div>
@@ -169,27 +166,27 @@
 
           <Column field="relCodigoTarea" header="CODIGO_TAREA" :style="{ width: '20%' }">
             <template #body="{ data }">
-              <span class="jobtype-cell-text" :title="data.relCodigoTarea">{{ data.relCodigoTarea }}</span>
+              <span class="jobtype-cell-text fm-cell-text" :title="data.relCodigoTarea">{{ data.relCodigoTarea }}</span>
             </template>
           </Column>
           <Column field="relTarea" header="TAREA" :style="{ width: '20%' }">
             <template #body="{ data }">
-              <span class="jobtype-cell-text" :title="data.relTarea">{{ data.relTarea }}</span>
+              <span class="jobtype-cell-text fm-cell-text" :title="data.relTarea">{{ data.relTarea }}</span>
             </template>
           </Column>
           <Column field="origen" header="ORIGEN" :style="{ width: '20%' }">
             <template #body="{ data }">
-              <span class="jobtype-cell-text" :title="data.origen">{{ data.origen }}</span>
+              <span class="jobtype-cell-text fm-cell-text" :title="data.origen">{{ data.origen }}</span>
             </template>
           </Column>
           <Column field="relContrato" header="NOMBRE_CONTRATO" :style="{ width: '20%' }">
             <template #body="{ data }">
-              <span class="jobtype-cell-text" :title="data.relContrato">{{ data.relContrato }}</span>
+              <span class="jobtype-cell-text fm-cell-text" :title="data.relContrato">{{ data.relContrato }}</span>
             </template>
           </Column>
           <Column field="paisLabel" header="PAIS" :style="{ width: '20%' }">
             <template #body="{ data }">
-              <span class="jobtype-cell-text" :title="data.paisLabel">{{ data.paisLabel }}</span>
+              <span class="jobtype-cell-text fm-cell-text" :title="data.paisLabel">{{ data.paisLabel }}</span>
             </template>
           </Column>
         </DataTable>
@@ -200,7 +197,6 @@
       <FmButton
         label="RELACIONAR"
         class="jobtype-relate-button"
-        style="width: 120px !important; min-width: 120px !important; max-width: 120px !important; border-radius: 0 !important"
         :disabled="altaRows.length === 0"
         @click="relacionar"
       />
@@ -215,7 +211,7 @@
     :close-on-escape="false"
     :draggable="true"
     :resizable="false"
-    class="jobtype-alta-unsaved-dialog"
+    class="jobtype-alta-unsaved-dialog fm-confirm-dialog"
     :style="confirmDialogStyle"
   >
     <template #header>
@@ -224,7 +220,7 @@
           <span class="jobtype-alta-unsaved__icon-circle">
             <i class="pi pi-bell jobtype-alta-unsaved__header-icon" aria-hidden="true" />
           </span>
-          <span class="jobtype-alta-unsaved__title">Confirmar Accion</span>
+          <span class="jobtype-alta-unsaved__title">Confirmar Acción</span>
         </div>
         <button
           type="button"
@@ -238,23 +234,17 @@
 
     <div class="jobtype-alta-unsaved__content">
       <span class="jobtype-alta-unsaved__message">
-        Hay datos ingresados, confirma que desea cancelar?
+        Hay datos ingresados. ¿Confirma que desea cancelar?
       </span>
     </div>
 
     <template #footer>
-      <div class="jobtype-alta-unsaved__actions">
-        <button
-          type="button"
-          class="jobtype-alta-unsaved__button jobtype-alta-unsaved__button--cancel"
-          @click="cancelarCierre"
-        >CANCELAR</button>
-        <button
-          type="button"
-          class="jobtype-alta-unsaved__button jobtype-alta-unsaved__button--accept"
-          @click="confirmarCierre"
-        >ACEPTAR</button>
-      </div>
+      <FmDialogActions
+        secondary-label="CANCELAR"
+        primary-label="ACEPTAR"
+        @secondary="cancelarCierre"
+        @primary="confirmarCierre"
+      />
     </template>
   </Dialog>
 </template>
@@ -267,6 +257,7 @@ import AutoComplete from 'primevue/autocomplete'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import FmButton from '@/components/shared/FmButton.vue'
+import FmDialogActions from '@/components/shared/FmDialogActions.vue'
 import FmGridPaginator from '@/components/shared/FmGridPaginator.vue'
 import FmGridActions from '@/components/shared/FmGridActions.vue'
 import { useJobtypeContratoStore } from '../store/jobtypeContratoStore'
@@ -333,15 +324,13 @@ const contratoInputClass = computed(() => [
   { 'jobtype-alta-control--invalid': contratoInvalid.value }
 ])
 
-const hayDatosCargados = computed(() => {
-  return Boolean(
-    form.jobtype ||
-    form.contrato ||
-    jobtypeSelected.value ||
-    contratoSelected.value ||
-    altaRows.value.length
-  )
-})
+const hayDatosCargados = computed(() => Boolean(
+  form.jobtype ||
+  form.contrato ||
+  jobtypeSelected.value ||
+  contratoSelected.value ||
+  altaRows.value.length
+))
 
 watch(() => form.pais, (pais) => {
   form.jobtype = ''
@@ -530,26 +519,6 @@ const cerrar = () => {
   line-height: 1.2;
 }
 
-.jobtype-alta-unsaved__close {
-  width: 28px;
-  height: 28px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: #c7c7c7;
-  font-size: 22px;
-  font-weight: 700;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.jobtype-alta-unsaved__close:hover {
-  color: #00a9bd;
-}
-
 .jobtype-alta-unsaved__content {
   min-height: 72px;
   display: flex;
@@ -563,57 +532,13 @@ const cerrar = () => {
   line-height: 1.35;
 }
 
-.jobtype-alta-unsaved__actions {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-.jobtype-alta-unsaved__button {
-  appearance: none;
-  width: 100px;
-  min-width: 100px;
-  height: 30px;
-  min-height: 30px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 12px;
-  border: 1px solid #00acc1;
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1;
-  box-shadow: none;
-  outline: none;
-  cursor: pointer;
-}
-
-.jobtype-alta-unsaved__button--cancel {
-  background: #fff;
-  color: #0097a7;
-}
-
-.jobtype-alta-unsaved__button--accept {
-  background: #00acc1;
-  color: #fff;
-}
-
 :global(.p-dialog.jobtype-alta-unsaved-dialog) {
   overflow: hidden;
-  border: 1px solid #bdbdbd;
-  border-radius: 0;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, .28);
 }
 
 :global(.jobtype-alta-unsaved-dialog .p-dialog-header) {
   min-height: 68px;
   padding: 12px 18px;
-  border-bottom: 1px solid #dedede;
-  background: #fff;
 }
 
 :global(.jobtype-alta-unsaved-dialog .p-dialog-content) {
@@ -626,8 +551,6 @@ const cerrar = () => {
   display: flex;
   align-items: center;
   padding: 10px 18px;
-  border-top: 1px solid #dedede;
-  background: #fff;
 }
 
 :global(.p-dialog.jobtype-alta-dialog input.jobtype-alta-control--invalid),
