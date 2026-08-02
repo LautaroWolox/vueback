@@ -1,5 +1,10 @@
 <template>
-  <div class="jobtype-screen">
+  <div
+    class="jobtype-screen jobtype-contrato-screen"
+    :class="{
+      'jobtype-contrato-screen--grid-expanded': !filtersExpanded && resultsExpanded
+    }"
+  >
     <LoadingOverlay :loading="store.loading" />
 
     <section class="jobtype-panel jobtype-panel--filters">
@@ -36,7 +41,7 @@
           v-model:selection="selectedRow"
           v-model:first="mainFirst"
           v-model:rows="mainPageRows"
-          class="jobtype-main-grid"
+          class="jobtype-main-grid jobtype-contrato-main-grid"
           :value="store.relaciones"
           dataKey="tareaContratoId"
           tableStyle="table-layout: fixed; width: 100%; min-width: 100%"
@@ -382,6 +387,56 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+.jobtype-contrato-screen--grid-expanded {
+  height: calc(100vh - 64px) !important;
+  min-height: 0 !important;
+  padding-bottom: 4px !important;
+  overflow: hidden !important;
+}
+
+.jobtype-contrato-screen--grid-expanded .jobtype-panel--filters {
+  flex: 0 0 auto !important;
+}
+
+.jobtype-contrato-screen--grid-expanded .jobtype-panel--results {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.jobtype-contrato-screen--grid-expanded .jobtype-results-body {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  overflow: hidden !important;
+}
+
+.jobtype-contrato-screen--grid-expanded :deep(.jobtype-contrato-main-grid),
+.jobtype-contrato-screen--grid-expanded :deep(.jobtype-contrato-main-grid.p-datatable) {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.jobtype-contrato-screen--grid-expanded :deep(.jobtype-contrato-main-grid .p-datatable-table-container),
+.jobtype-contrato-screen--grid-expanded :deep(.jobtype-contrato-main-grid .p-datatable-wrapper),
+.jobtype-contrato-screen--grid-expanded :deep(.jobtype-contrato-main-grid [data-pc-section='tablecontainer']) {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 1 1 auto !important;
+  overflow: auto !important;
+}
+
 .jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-tbody > tr.p-datatable-row-selected > td),
 .jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-tbody > tr.p-datatable-row-selected:hover > td),
 .jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-tbody > tr[data-p-selected='true'] > td),
