@@ -13,16 +13,17 @@
     </div>
 
     <template #footer>
-      <FmButton
-        label="CERRAR"
-        variant="outline"
-        @click="$emit('update:visible', false)"
+      <FmDialogActions
+        secondary-label="CERRAR"
+        @secondary="$emit('update:visible', false)"
       />
     </template>
   </Dialog>
 </template>
 
 <script setup>
+import FmDialogActions from '@/components/shared/FmDialogActions.vue'
+
 defineProps({
   visible: { type: Boolean, default: false },
   note: { type: String, default: '' }
@@ -49,10 +50,5 @@ defineEmits(['update:visible'])
   color: #314957;
   line-height: 1.55;
   white-space: pre-wrap;
-}
-
-:global(.otf-exclude-confirmation),
-:global(.otf-include-confirmation) {
-  display: none !important;
 }
 </style>
