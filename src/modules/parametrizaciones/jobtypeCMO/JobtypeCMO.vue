@@ -75,18 +75,18 @@ const applyStandardButtonDesign = () => {
     button.dataset.cmoPopupButtonVariant = isOutline ? 'outline' : 'primary'
 
     setImportantStyle(button, 'width', 'auto')
-    setImportantStyle(button, 'min-width', '120px')
+    setImportantStyle(button, 'min-width', '110px')
     setImportantStyle(button, 'max-width', 'none')
-    setImportantStyle(button, 'height', '36px')
-    setImportantStyle(button, 'min-height', '36px')
-    setImportantStyle(button, 'max-height', '36px')
-    setImportantStyle(button, 'padding', '0 18px')
+    setImportantStyle(button, 'height', '34px')
+    setImportantStyle(button, 'min-height', '34px')
+    setImportantStyle(button, 'max-height', '34px')
+    setImportantStyle(button, 'padding', '0 16px')
     setImportantStyle(button, 'border-radius', '8px')
-    setImportantStyle(button, 'gap', '8px')
-    setImportantStyle(button, 'font-size', '13px')
+    setImportantStyle(button, 'gap', '7px')
+    setImportantStyle(button, 'font-size', '12px')
     setImportantStyle(button, 'font-weight', '600')
     setImportantStyle(button, 'line-height', '1')
-    setImportantStyle(button, 'box-shadow', '0 5px 14px rgba(0, 73, 84, 0.14)')
+    setImportantStyle(button, 'box-shadow', '0 4px 12px rgba(0, 73, 84, 0.13)')
     setImportantStyle(button, 'transform', 'none')
   })
 }
@@ -135,7 +135,7 @@ onBeforeUnmount(() => {
 <style>
 body [data-cmo-popup-button='true'],
 body [data-cmo-popup-button='true'] .p-button-label {
-  font-size: 13px !important;
+  font-size: 12px !important;
   font-weight: 600 !important;
   line-height: 1 !important;
 }
