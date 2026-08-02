@@ -13,6 +13,7 @@ import './assets/css/parametrizaciones-grid-selection.css'
 import './assets/css/fm-grid-empty-state.css'
 import './assets/css/fm-desktop-notebook-responsive.css'
 import './assets/css/fm-desktop-notebook-modules.css'
+import './assets/css/fm-component-unification.css'
 
 import Lara from '@primeuix/themes/lara'
 import { definePreset } from '@primeuix/themes'
