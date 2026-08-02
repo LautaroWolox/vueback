@@ -1,486 +1,56 @@
 <template>
-  <div
-    ref="screenRoot"
-    class="cmo-actividad-screen"
-    @click.capture="interceptDeleteClick"
-  >
-    <JobtypeRelacion relation="cmo" />
+  <div class="jobtype-screen">
+    <section class="jobtype-panel jobtype-panel--filters">
+      <button
+        type="button"
+        class="jobtype-panel__header"
+        :aria-expanded="filtersExpanded"
+        @click="filtersExpanded = !filtersExpanded"
+      >
+        <span>FILTROS DE BÚSQUEDA</span>
+        <span class="jobtype-panel__toggle">{{ filtersExpanded ? '−' : '+' }}</span>
+      </button>
 
-    <Dialog
-      v-model:visible="showDeleteConfirm"
-      appendTo="body"
-      modal
-      :closable="false"
-      :draggable="true"
-      :resizable="false"
-      class="cmo-delete-confirm-dialog"
-      :style="deleteConfirmDialogStyle"
-      @hide="cancelDelete"
-    >
-      <template #header>
-        <div class="cmo-delete-confirm__header">
-          <div class="cmo-delete-confirm__header-main">
-            <span class="cmo-delete-confirm__icon-circle cmo-delete-confirm__icon-circle--header">
-              <i class="pi pi-bell cmo-delete-confirm__header-icon" aria-hidden="true" />
-            </span>
-            <span class="cmo-delete-confirm__title">Confirmar Acción</span>
-          </div>
-
-          <button
-            type="button"
-            class="cmo-delete-confirm__close"
-            title="Cerrar"
-            aria-label="Cerrar"
-            @click="cancelDelete"
-          >×</button>
-        </div>
-      </template>
-
-      <div class="cmo-delete-confirm__content">
-        <span class="cmo-delete-confirm__message">
-          ¿Confirma que desea desactivar la relación seleccionada?
-        </span>
+      <div v-show="filtersExpanded" class="jobtype-panel__body jobtype-search-body">
+        <FmButton label="BUSCAR" class="jobtype-search-button" :loading="store.loading" @click="buscar" />
       </div>
+    </section>
 
-      <template #footer>
-        <div class="cmo-delete-confirm__actions">
-          <button
-            type="button"
-            class="cmo-delete-confirm__button cmo-delete-confirm__button--cancel"
-            @click="cancelDelete"
-          >
-            CANCELAR
-          </button>
-          <button
-            type="button"
-            class="cmo-delete-confirm__button cmo-delete-confirm__button--accept"
-            @click="acceptDelete"
-          >
-            ACEPTAR
-          </button>
-        </div>
-      </template>
-    </Dialog>
+    <section class="jobtype-panel jobtype-panel--results" :class="{ 'is-expanded': resultsExpanded }">
+      <button
+        type="button"
+        class="jobtype-panel__header"
+        :aria-expanded="resultsExpanded"
+        @click="resultsExpanded = !resultsExpanded"
+      >
+        <span>RELACIONES CMO-ACTIVIDAD</span>
+        <span class="jobtype-panel__toggle">{{ resultsExpanded ? '−' : '+' }}</span>
+      </button>
+
+      <div v-show="resultsExpanded" class="jobtype-results-body">
+        <Tabla />
+      </div>
+    </section>
   </div>
 </template>
 
 <script setup>
-import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
-import Dialog from 'primevue/dialog'
-import JobtypeRelacion from '../jobtypeRelacion/JobtypeRelacion.vue'
+import { onUnmounted, ref } from 'vue'
+import { useCmoActividadStore } from './store/cmoActividadStore'
+import Tabla from './components/Tabla.vue'
 
-const screenRoot = ref(null)
-const showDeleteConfirm = ref(false)
-const deleteConfirmDialogStyle = 'width: min(540px, calc(100vw - 32px)); max-width: 540px;'
+const store = useCmoActividadStore()
 
-let dialogObserver = null
-let dialogRefreshFrame = null
-let pendingDeleteButton = null
-let allowDeleteOnce = false
+const filtersExpanded = ref(true)
+const resultsExpanded = ref(false)
 
-const openResultsAccordion = async () => {
-  await nextTick()
-
-  const resultsHeader = screenRoot.value?.querySelector(
-    '.jobtype-panel--results .jobtype-panel__header'
-  )
-
-  if (resultsHeader?.getAttribute('aria-expanded') !== 'true') {
-    resultsHeader?.click()
-  }
+const buscar = async () => {
+  resultsExpanded.value = true
+  await store.fetchData()
 }
 
-const setImportantStyle = (element, property, value) => {
-  if (
-    element.style.getPropertyValue(property) === value &&
-    element.style.getPropertyPriority(property) === 'important'
-  ) {
-    return
-  }
-
-  element.style.setProperty(property, value, 'important')
-}
-
-const customizeActivityDialog = () => {
-  const dialog = document.querySelector('.p-dialog.jobtype-alta-dialog')
-  if (!dialog) return
-
-  setImportantStyle(dialog, 'width', 'min(980px, calc(100vw - 48px))')
-  setImportantStyle(dialog, 'max-width', '980px')
-  setImportantStyle(dialog, 'height', 'min(560px, calc(100dvh - 48px))')
-  setImportantStyle(dialog, 'max-height', 'calc(100dvh - 48px)')
-
-  dialog.querySelectorAll('.jobtype-add-button, .jobtype-relate-button').forEach((button) => {
-    setImportantStyle(button, 'width', '120px')
-    setImportantStyle(button, 'min-width', '120px')
-    setImportantStyle(button, 'max-width', '120px')
-    setImportantStyle(button, 'height', '36px')
-    setImportantStyle(button, 'min-height', '36px')
-    setImportantStyle(button, 'max-height', '36px')
-    setImportantStyle(button, 'padding', '0 13px')
-    setImportantStyle(button, 'border-radius', '6px')
-    setImportantStyle(button, 'font-size', '12px')
-    setImportantStyle(button, 'font-weight', '600')
-    setImportantStyle(button, 'box-shadow', '0 2px 6px rgba(0, 91, 104, .14)')
-    setImportantStyle(button, 'transform', 'none')
-  })
-}
-
-const scheduleDialogCustomization = () => {
-  if (dialogRefreshFrame !== null) return
-
-  dialogRefreshFrame = requestAnimationFrame(() => {
-    dialogRefreshFrame = null
-    customizeActivityDialog()
-  })
-}
-
-const interceptDeleteClick = (event) => {
-  const target = event.target instanceof Element ? event.target : null
-  const button = target?.closest('button')
-
-  if (!button || button.disabled || !button.querySelector('.pi-trash')) return
-  if (button.closest('.jobtype-alta-dialog')) return
-
-  if (allowDeleteOnce) {
-    allowDeleteOnce = false
-    return
-  }
-
-  event.preventDefault()
-  event.stopPropagation()
-  event.stopImmediatePropagation()
-
-  pendingDeleteButton = button
-  showDeleteConfirm.value = true
-}
-
-const cancelDelete = () => {
-  showDeleteConfirm.value = false
-  pendingDeleteButton = null
-  allowDeleteOnce = false
-}
-
-const acceptDelete = () => {
-  const button = pendingDeleteButton
-
-  showDeleteConfirm.value = false
-  pendingDeleteButton = null
-
-  if (!button?.isConnected) {
-    allowDeleteOnce = false
-    return
-  }
-
-  allowDeleteOnce = true
-  button.click()
-}
-
-onMounted(async () => {
-  await openResultsAccordion()
-  scheduleDialogCustomization()
-
-  dialogObserver = new MutationObserver((mutations) => {
-    const dialogChanged = mutations.some((mutation) => {
-      if (mutation.type === 'childList') return true
-
-      const target = mutation.target
-      return target instanceof Element && Boolean(
-        target.matches('.p-dialog.jobtype-alta-dialog, .jobtype-add-button, .jobtype-relate-button') ||
-        target.closest('.p-dialog.jobtype-alta-dialog')
-      )
-    })
-
-    if (dialogChanged) scheduleDialogCustomization()
-  })
-
-  dialogObserver.observe(document.body, {
-    childList: true,
-    subtree: true,
-    attributes: true,
-    attributeFilter: ['style']
-  })
-})
-
-onBeforeUnmount(() => {
-  dialogObserver?.disconnect()
-  pendingDeleteButton = null
-
-  if (dialogRefreshFrame !== null) {
-    cancelAnimationFrame(dialogRefreshFrame)
-    dialogRefreshFrame = null
-  }
+// Liberar memoria (~9000+ registros) al salir de la pantalla
+onUnmounted(() => {
+  store.clearStore()
 })
 </script>
-
-<style scoped>
-/*
- * CMO-Actividad reutiliza el popup y la grilla común aprobados.
- * Esta capa adapta únicamente el título, las columnas visibles y el estado
- * inicial del segundo acordeón, sin afectar Jobtype-Contrato.
- */
-.cmo-actividad-screen :deep(.jobtype-panel--results .jobtype-panel__header > span:first-child) {
-  font-size: 0;
-}
-
-.cmo-actividad-screen :deep(.jobtype-panel--results .jobtype-panel__header > span:first-child)::after {
-  content: 'RELACIONES CMO-ACTIVIDAD';
-  font-size: 12px;
-}
-
-/* CMO-Actividad no muestra la columna PAIS heredada de la grilla común. */
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo col:nth-child(8)),
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr > th:nth-child(8)),
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-tbody > tr > td:nth-child(8)) {
-  display: none !important;
-}
-
-/* Las siete columnas visibles ocupan todo el ancho de la grilla. */
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo col:nth-child(-n + 7)),
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr > th:nth-child(-n + 7)),
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-tbody > tr > td:nth-child(-n + 7)) {
-  width: 14.2857% !important;
-  min-width: 0 !important;
-  max-width: 14.2857% !important;
-}
-
-/* Estado vacío de la grilla principal. */
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-emptymessage > td),
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-empty-message > td) {
-  position: relative !important;
-  height: 120px !important;
-  padding: 0 !important;
-  text-align: center !important;
-  vertical-align: middle !important;
-  background: #e8f9fc !important;
-  color: transparent !important;
-}
-
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-emptymessage > td)::after,
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-empty-message > td)::after {
-  content: 'No hay resultados';
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #075f6d;
-  font-size: 12px;
-  font-weight: 400;
-}
-
-/* Fila seleccionada: fondo turquesa y texto negro. */
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-tbody > tr.p-datatable-row-selected > td),
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-tbody > tr.p-datatable-row-selected:hover > td),
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-tbody > tr[data-p-selected='true'] > td),
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-tbody > tr[data-p-selected='true']:hover > td),
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-tbody > tr[aria-selected='true'] > td),
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-tbody > tr[aria-selected='true']:hover > td) {
-  background: #9ee7ee !important;
-  color: #111 !important;
-}
-
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-tbody > tr.p-datatable-row-selected > td *),
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-tbody > tr[data-p-selected='true'] > td *),
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-tbody > tr[aria-selected='true'] > td *) {
-  color: #111 !important;
-}
-
-/*
- * PrimeVue 4 usa .p-datatable-column-title. Se conserva también
- * .p-column-title por compatibilidad con cualquier tema anterior.
- */
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(-n + 7) .p-datatable-column-title),
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(-n + 7) .p-column-title) {
-  font-size: 0 !important;
-}
-
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(1) .p-datatable-column-title)::after,
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(1) .p-column-title)::after {
-  content: 'CODIGO_ACTIVIDAD';
-  font-size: 11px;
-}
-
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(2) .p-datatable-column-title)::after,
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(2) .p-column-title)::after {
-  content: 'DESC_ACTIVIDAD';
-  font-size: 11px;
-}
-
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(3) .p-datatable-column-title)::after,
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(3) .p-column-title)::after {
-  content: 'CODIGO_S4';
-  font-size: 11px;
-}
-
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(4) .p-datatable-column-title)::after,
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(4) .p-column-title)::after {
-  content: 'CMO';
-  font-size: 11px;
-}
-
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(5) .p-datatable-column-title)::after,
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(5) .p-column-title)::after {
-  content: 'USUARIO_MODIFICACION';
-  font-size: 11px;
-}
-
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(6) .p-datatable-column-title)::after,
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(6) .p-column-title)::after {
-  content: 'FECHA_MODIFICACION';
-  font-size: 11px;
-}
-
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(7) .p-datatable-column-title)::after,
-.cmo-actividad-screen :deep(#tabla-jobtype-cmo .p-datatable-thead > tr:first-child > th:nth-child(7) .p-column-title)::after {
-  content: 'ACTIVO';
-  font-size: 11px;
-}
-
-.cmo-delete-confirm__header {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.cmo-delete-confirm__header-main {
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.cmo-delete-confirm__title {
-  color: #252b33;
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.cmo-delete-confirm__icon-circle {
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: #e9f8fa;
-}
-
-.cmo-delete-confirm__icon-circle--header {
-  width: 48px;
-  height: 48px;
-}
-
-.cmo-delete-confirm__header-icon {
-  color: #11aabd;
-  font-size: 23px;
-}
-
-.cmo-delete-confirm__close {
-  width: 28px;
-  height: 28px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: #c7c7c7;
-  font-size: 21px;
-  font-weight: 700;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.cmo-delete-confirm__close:hover {
-  color: #00a9bd;
-}
-
-.cmo-delete-confirm__content {
-  min-height: 72px;
-  display: flex;
-  align-items: center;
-  padding: 18px 4px;
-}
-
-.cmo-delete-confirm__message {
-  color: #4b5563;
-  font-size: 15px;
-  line-height: 1.35;
-}
-
-.cmo-delete-confirm__actions {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-:global(.p-dialog.cmo-delete-confirm-dialog) {
-  overflow: hidden;
-  border: 1px solid #bdbdbd;
-  border-radius: 0;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, .28);
-}
-
-:global(.cmo-delete-confirm-dialog .p-dialog-header) {
-  min-height: 68px;
-  padding: 12px 18px;
-  border-bottom: 1px solid #dedede;
-  background: #fff;
-}
-
-:global(.cmo-delete-confirm-dialog .p-dialog-content) {
-  padding: 0 18px;
-  background: #fff;
-}
-
-:global(.cmo-delete-confirm-dialog .p-dialog-footer) {
-  min-height: 60px;
-  display: flex;
-  align-items: center;
-  padding: 10px 18px;
-  border-top: 1px solid #dedede;
-  background: #fff;
-}
-
-.cmo-delete-confirm__button {
-  appearance: none;
-  width: 100px;
-  min-width: 100px;
-  height: 30px;
-  min-height: 30px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 12px;
-  border: 1px solid #00acc1;
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1;
-  box-shadow: none;
-  outline: none;
-  cursor: pointer;
-}
-
-.cmo-delete-confirm__button--cancel,
-.cmo-delete-confirm__button--cancel:hover,
-.cmo-delete-confirm__button--cancel:focus,
-.cmo-delete-confirm__button--cancel:active {
-  background: #fff;
-  color: #0097a7;
-}
-
-.cmo-delete-confirm__button--accept,
-.cmo-delete-confirm__button--accept:hover,
-.cmo-delete-confirm__button--accept:focus,
-.cmo-delete-confirm__button--accept:active {
-  background: #00acc1;
-  color: #fff;
-}
-</style>
