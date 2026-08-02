@@ -1,0 +1,329 @@
+@layer fieldmanager {
+  /*
+   * Primera etapa responsive del aplicativo.
+   * Alcance: monitores y notebooks desde 1024 px de ancho.
+   * El menú de escritorio ocupa 82 px: 42 px + 3 px + 37 px.
+   */
+  @media (min-width: 961px) {
+    :root {
+      --fm-desktop-header-height: 82px;
+      --fm-desktop-content-height: calc(100dvh - var(--fm-desktop-header-height));
+    }
+
+    html,
+    body,
+    #app {
+      width: 100%;
+      height: 100%;
+      min-height: 100%;
+    }
+
+    body {
+      min-width: 1024px;
+    }
+
+    .main-layout {
+      width: 100%;
+      height: 100dvh;
+      min-height: 0 !important;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .main-layout > .menu-container {
+      width: 100%;
+      min-height: var(--fm-desktop-header-height);
+      flex: 0 0 var(--fm-desktop-header-height);
+    }
+
+    .main-layout > :not(.menu-container):not(.main-home) {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      min-height: 0;
+      flex: 1 1 auto;
+    }
+
+    .main-layout > .fm-screen,
+    .main-layout > .fm-module-page,
+    .main-layout > .fm-responsive-page,
+    .main-layout > .jobtype-screen,
+    .main-layout > .cmo-actividad-screen,
+    .main-layout > .buscador-ots-screen,
+    .main-layout > .otf-page,
+    .main-layout > .report-sas-page {
+      height: var(--fm-desktop-content-height) !important;
+      min-height: 0 !important;
+      max-height: var(--fm-desktop-content-height) !important;
+      overflow: hidden;
+    }
+
+    .fm-screen,
+    .fm-module-page,
+    .fm-responsive-page,
+    .jobtype-screen,
+    .cmo-actividad-screen,
+    .buscador-ots-screen,
+    .otf-page,
+    .report-sas-page {
+      min-width: 0 !important;
+      min-height: 0 !important;
+    }
+
+    .fm-accordion,
+    .p-accordion,
+    .p-accordionpanel,
+    .p-accordioncontent,
+    .p-accordioncontent-content,
+    .fm-panel,
+    .fm-grid-shell,
+    .fm-responsive-grid-shell,
+    .jobtype-results-body {
+      min-width: 0;
+      min-height: 0;
+    }
+
+    .fm-pass-grid,
+    .fm-pass-grid.p-datatable,
+    .jobtype-main-grid,
+    .jobtype-main-grid.p-datatable {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      min-height: 0 !important;
+      flex: 1 1 auto !important;
+      overflow: hidden !important;
+    }
+
+    .fm-pass-grid .p-datatable-table-container,
+    .fm-pass-grid .p-datatable-wrapper,
+    .fm-pass-grid [data-pc-section='tablecontainer'],
+    .jobtype-main-grid .p-datatable-table-container,
+    .jobtype-main-grid .p-datatable-wrapper,
+    .jobtype-main-grid [data-pc-section='tablecontainer'] {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      min-height: 0 !important;
+      flex: 1 1 auto !important;
+      overflow: auto !important;
+      overscroll-behavior: contain;
+    }
+
+    .fm-pass-grid > .p-paginator,
+    .fm-pass-grid .p-datatable-paginator-bottom,
+    .jobtype-main-grid > .p-paginator,
+    .jobtype-main-grid .p-datatable-paginator-bottom {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      flex: 0 0 auto !important;
+    }
+
+    .legacy-iframe,
+    .detail-frame,
+    .fm-legacy-frame {
+      width: 100% !important;
+      height: var(--fm-desktop-content-height) !important;
+      min-height: 0 !important;
+      max-height: var(--fm-desktop-content-height) !important;
+      flex: 1 1 auto;
+      display: block;
+      border: 0;
+    }
+
+    body .p-dialog,
+    body .fm-dialog,
+    body .fm-responsive-dialog,
+    body .fm-alert-dialog {
+      max-width: calc(100dvw - 24px) !important;
+      max-height: calc(100dvh - 24px) !important;
+    }
+
+    body .p-dialog .p-dialog-content {
+      min-width: 0;
+      min-height: 0;
+    }
+  }
+
+  /* Notebook estándar: 1366 × 768 y resoluciones cercanas. */
+  @media (min-width: 961px) and (max-width: 1366px) {
+    :root {
+      --fm-page-padding: 5px;
+      --fm-section-gap: 7px;
+    }
+
+    .fm-screen--pad,
+    .fm-module-page,
+    .fm-responsive-page {
+      padding: 5px !important;
+    }
+
+    .fm-accordion,
+    .fm-pt-accordion {
+      gap: 6px !important;
+    }
+
+    .fm-accordion .p-accordionheader,
+    .fm-pt-accordion-header,
+    .fm-card__header,
+    .fm-panel-header,
+    .fm-ui-section-header {
+      min-height: 29px !important;
+      padding-top: 4px !important;
+      padding-bottom: 4px !important;
+    }
+
+    .fm-filters {
+      padding: 9px 12px 10px !important;
+    }
+
+    .fm-filter-grid {
+      gap: 8px 11px !important;
+    }
+
+    .fm-pass-grid .p-datatable-thead > tr > th {
+      height: 31px !important;
+      min-height: 31px !important;
+    }
+
+    .fm-pass-grid .p-datatable-tbody > tr > td {
+      height: 31px !important;
+      min-height: 31px !important;
+    }
+  }
+
+  /* 1280 × 720 y notebooks de poca altura. */
+  @media (min-width: 961px) and (max-width: 1280px),
+         (min-width: 961px) and (max-height: 760px) {
+    .fm-screen--pad,
+    .fm-module-page,
+    .fm-responsive-page {
+      padding: 4px !important;
+    }
+
+    .fm-card,
+    .fm-panel,
+    .fm-ui-section {
+      margin-bottom: 5px !important;
+    }
+
+    .fm-filters {
+      padding-top: 7px !important;
+      padding-bottom: 8px !important;
+    }
+
+    .fm-actions,
+    .fm-filter-actions {
+      margin-top: 8px !important;
+    }
+
+    .fm-action-button,
+    .fm-ui-button,
+    .fm-btn {
+      height: 34px !important;
+      min-height: 34px !important;
+    }
+
+    .fm-pass-grid .p-datatable-table-container,
+    .fm-pass-grid .p-datatable-wrapper,
+    .fm-pt-datatable-wrapper {
+      max-height: none !important;
+    }
+
+    body .p-dialog .p-dialog-header {
+      min-height: 48px;
+    }
+
+    body .p-dialog .p-dialog-content {
+      max-height: calc(100dvh - 126px) !important;
+      overflow: auto;
+    }
+
+    body .p-dialog .p-dialog-footer {
+      min-height: 48px;
+    }
+
+    body .p-dialog.jobtype-alta-dialog {
+      height: calc(100dvh - 20px) !important;
+      max-height: calc(100dvh - 20px) !important;
+    }
+
+    body .jobtype-alta-dialog .p-dialog-header,
+    body .jobtype-alta-dialog .p-dialog-footer {
+      height: 50px !important;
+      min-height: 50px !important;
+    }
+
+    body .jobtype-alta-dialog .jobtype-alta-content {
+      grid-template-rows: auto minmax(0, 1fr) !important;
+      gap: 9px !important;
+      padding-top: 6px !important;
+      padding-bottom: 7px !important;
+    }
+
+    body .jobtype-alta-dialog .jobtype-alta-grid-wrap {
+      min-height: 0 !important;
+      height: auto !important;
+      flex: 1 1 auto !important;
+    }
+  }
+
+  /* 1024 × 768: conserva escritorio, pero reacomoda formularios anchos. */
+  @media (min-width: 961px) and (max-width: 1100px) {
+    :root {
+      --fm-grid-min-width: 700px;
+    }
+
+    .fm-screen--pad,
+    .fm-module-page,
+    .fm-responsive-page {
+      padding: 4px !important;
+    }
+
+    .fm-filter-grid {
+      gap: 8px 9px !important;
+    }
+
+    .fm-custom-paginator,
+    .otf-custom-paginator {
+      width: 100% !important;
+      max-width: 100% !important;
+      grid-template-columns: minmax(76px, 1fr) auto minmax(115px, 1fr) !important;
+      padding-right: 6px !important;
+      padding-left: 6px !important;
+    }
+
+    body .p-dialog.jobtype-alta-dialog {
+      width: calc(100dvw - 20px) !important;
+      max-width: calc(100dvw - 20px) !important;
+    }
+
+    body .jobtype-alta-dialog .jobtype-alta-form {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      grid-auto-rows: auto !important;
+      gap: 9px 12px !important;
+    }
+
+    body .jobtype-alta-dialog .jobtype-alta-form > .jobtype-alta-field,
+    body .jobtype-alta-dialog .jobtype-alta-form > .jobtype-alta-field--button {
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+      grid-column: auto !important;
+      grid-row: auto !important;
+    }
+
+    body .jobtype-alta-dialog .jobtype-add-button,
+    body .jobtype-alta-dialog .jobtype-add-button.p-button {
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+    }
+
+    body .jobtype-alta-dialog .jobtype-alta-form > .jobtype-alta-field--button {
+      grid-column: 2 !important;
+    }
+  }
+}
