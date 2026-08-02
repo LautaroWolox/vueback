@@ -11,15 +11,12 @@
     @hide="onHide"
   >
     <template #header>
-      <div class="jobtype-alta-header" style="grid-template-columns: minmax(0, 1fr) 52px">
-        <h2 class="jobtype-alta-header__title" style="margin-left: 20px">
-          Alta CMO - Actividad
-        </h2>
+      <div class="jobtype-alta-header cmo-alta-header">
+        <h2 class="jobtype-alta-header__title">Alta CMO - Actividad</h2>
 
         <button
           type="button"
           class="jobtype-alta-header__close"
-          style="justify-self: center; margin-left: 0"
           title="Cerrar"
           aria-label="Cerrar"
           @click="cerrar"
@@ -28,13 +25,8 @@
     </template>
 
     <div class="jobtype-alta-content">
-      <div
-        class="jobtype-alta-form cmo-alta-form"
-      >
-        <div
-          class="jobtype-alta-field fm-field"
-          style="width: 100% !important; min-width: 0 !important; max-width: none !important"
-        >
+      <div class="jobtype-alta-form cmo-alta-form">
+        <div class="jobtype-alta-field fm-field">
           <label for="alta-actividad">Actividad</label>
           <AutoComplete
             id="alta-actividad"
@@ -51,10 +43,7 @@
           />
         </div>
 
-        <div
-          class="jobtype-alta-field fm-field"
-          style="width: 100% !important; min-width: 0 !important; max-width: none !important"
-        >
+        <div class="jobtype-alta-field fm-field">
           <label for="alta-cmo">CMO</label>
           <AutoComplete
             id="alta-cmo"
@@ -74,13 +63,11 @@
         <FmButton
           label="AGREGAR"
           class="jobtype-add-button"
-          style="width: 120px !important; min-width: 120px !important; max-width: 120px !important; border-radius: 0 !important"
           :disabled="!canAgregar"
           @click="agregar"
         />
       </div>
 
-      <!-- Errores de backend -->
       <div v-if="errorMessages.length" class="cmo-alta-errors">
         <p v-for="(msg, idx) in errorMessages" :key="idx" class="cmo-alta-errors__item">
           {{ msg }}
@@ -179,7 +166,6 @@
       <FmButton
         label="RELACIONAR"
         class="jobtype-relate-button"
-        style="width: 120px !important; min-width: 120px !important; max-width: 120px !important; border-radius: 0 !important"
         :disabled="previewRows.length === 0 || saving"
         @click="relacionar"
       />
@@ -198,8 +184,6 @@ import { useCmoActividadStore } from '../store/cmoActividadStore'
 import { altaPreviewColumns } from './columns'
 import type { ActividadAutocomplete, CmoAutocomplete, NuevaRelacion } from '../store/types'
 
-// ─── Props & Emits ────────────────────────────────────────────────
-
 defineProps<{
   visible: boolean
 }>()
@@ -209,13 +193,9 @@ const emit = defineEmits<{
   saved: []
 }>()
 
-// ─── Servicios ────────────────────────────────────────────────
-
 const store = useCmoActividadStore()
 const confirm = useConfirm()
 const toast = useToast()
-
-// ─── Estado local ────────────────────────────────────────────────
 
 const actividadSelected = ref<ActividadAutocomplete | string | null>(null)
 const cmoSelected = ref<CmoAutocomplete | string | null>(null)
@@ -232,11 +212,8 @@ const previewPageRows = ref(10)
 const saving = ref(false)
 const errorMessages = ref<string[]>([])
 
-// Debounce timers
 let actividadTimer: ReturnType<typeof setTimeout> | null = null
 let cmoTimer: ReturnType<typeof setTimeout> | null = null
-
-// ─── Computed ─────────────────────────────────────────────────────
 
 const canAgregar = computed(() => {
   return (
@@ -246,8 +223,6 @@ const canAgregar = computed(() => {
     typeof cmoSelected.value === 'object'
   )
 })
-
-// ─── Autocomplete handlers (debounce 300ms) ───────────────────────
 
 const onSearchActividad = (event: { query: string }) => {
   if (actividadTimer) clearTimeout(actividadTimer)
@@ -279,15 +254,12 @@ const onSearchCmo = (event: { query: string }) => {
   }, 300)
 }
 
-// ─── Agregar a preview ────────────────────────────────────────────
-
 const agregar = () => {
   if (!canAgregar.value) return
 
   const actividad = actividadSelected.value as ActividadAutocomplete
   const cmo = cmoSelected.value as CmoAutocomplete
 
-  // Validar duplicado por idActividad en preview
   if (previewRows.value.some((row) => row.idActividad === actividad.id && row.idCmo === cmo.id)) {
     return
   }
@@ -305,13 +277,9 @@ const agregar = () => {
   previewRows.value = [...previewRows.value, row]
   selectedPreviewRow.value = row
   errorMessages.value = []
-
-  // Limpiar campos
   actividadSelected.value = null
   cmoSelected.value = null
 }
-
-// ─── Eliminar de preview ──────────────────────────────────────────
 
 const eliminarPreview = () => {
   if (!selectedPreviewRow.value) return
@@ -323,8 +291,6 @@ const onPreviewRowClick = ({ data }: { data: NuevaRelacion & { id: string } }) =
   selectedPreviewRow.value = data
 }
 
-// ─── Enviar relaciones al backend ─────────────────────────────────
-
 const relacionar = async () => {
   if (previewRows.value.length === 0 || saving.value) return
 
@@ -332,12 +298,10 @@ const relacionar = async () => {
   errorMessages.value = []
 
   try {
-    // Preparar payload sin el campo 'id' local
     const payload: NuevaRelacion[] = previewRows.value.map(({ id, ...rest }) => rest)
     const responses = await store.crearRelaciones(payload)
 
     if (responses.length === 0) {
-      // Éxito total
       toast.add({
         severity: 'success',
         summary: 'Relaciones creadas',
@@ -347,7 +311,6 @@ const relacionar = async () => {
       resetAndClose()
       emit('saved')
     } else {
-      // Errores de negocio — mostrar inline
       errorMessages.value = responses.map((r) => r.mensaje)
     }
   } catch {
@@ -362,19 +325,15 @@ const relacionar = async () => {
   }
 }
 
-// ─── Cerrar dialog ────────────────────────────────────────────────
-
 const cerrar = () => {
   if (previewRows.value.length > 0) {
     confirm.require({
-      message: 'Hay datos ingresados, confirma que desea cancelar?',
+      message: 'Hay datos ingresados. ¿Confirma que desea cancelar?',
       header: 'Confirmar cierre',
       icon: 'pi pi-exclamation-triangle',
       acceptLabel: 'Aceptar',
       rejectLabel: 'Cancelar',
-      accept: () => {
-        resetAndClose()
-      },
+      accept: resetAndClose,
     })
   } else {
     resetAndClose()
@@ -395,7 +354,6 @@ const resetAndClose = () => {
 }
 
 const onHide = () => {
-  // Cleanup al cerrar
   actividadSelected.value = null
   cmoSelected.value = null
   previewRows.value = []
@@ -405,10 +363,20 @@ const onHide = () => {
 </script>
 
 <style scoped>
+.cmo-alta-header {
+  grid-template-columns: minmax(0, 1fr) 52px;
+}
+
 .cmo-alta-form {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 120px !important;
   max-width: 860px !important;
   align-items: end !important;
+}
+
+.cmo-alta-form .jobtype-alta-field {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
 }
 
 @media (max-width: 768px) {
