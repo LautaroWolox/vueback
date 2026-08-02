@@ -1,0 +1,34 @@
+/*
+ * Validación visible de los campos obligatorios de Alta Jobtype-Contrato.
+ * Se carga después de jobtype-contrato.css para prevalecer sobre PrimeVue.
+ */
+
+html body .p-dialog.jobtype-alta-dialog
+.jobtype-alta-autocomplete.jobtype-alta-autocomplete--invalid {
+  border-radius: 3px !important;
+  background: #fffafa !important;
+  outline: 2px solid #e7a1a1 !important;
+  outline-offset: -1px !important;
+  box-shadow: 0 0 0 2px rgba(231, 161, 161, 0.16) !important;
+}
+
+html body .p-dialog.jobtype-alta-dialog
+.jobtype-alta-autocomplete.jobtype-alta-autocomplete--invalid
+.p-autocomplete-input,
+html body .p-dialog.jobtype-alta-dialog
+.jobtype-alta-autocomplete.jobtype-alta-autocomplete--invalid
+input,
+html body .p-dialog.jobtype-alta-dialog
+#alta-jobtype[aria-invalid='true'] input,
+html body .p-dialog.jobtype-alta-dialog
+#alta-contrato[aria-invalid='true'] input {
+  border-color: #e7a1a1 !important;
+  background: #fffafa !important;
+  box-shadow: none !important;
+}
+
+html body .p-dialog.jobtype-alta-dialog
+.jobtype-alta-autocomplete.jobtype-alta-autocomplete--invalid:focus-within {
+  outline-color: #df8d8d !important;
+  box-shadow: 0 0 0 3px rgba(223, 141, 141, 0.18) !important;
+}
