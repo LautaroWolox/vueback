@@ -95,11 +95,16 @@ defineEmits(['export', 'delete', 'edit', 'refresh', 'add'])
 
 <style scoped>
 .fm-grid-actions-final {
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
   min-height: 26px;
-  display: inline-flex;
+  flex: 0 0 auto !important;
+  display: inline-flex !important;
   align-items: center;
-  gap: 9px;
-  padding: 1px 3px;
+  justify-content: flex-start !important;
+  gap: 6px !important;
+  padding: 1px 0 !important;
   overflow: visible !important;
 }
 
