@@ -8,6 +8,7 @@
     :draggable="false"
     :resizable="false"
     class="jobtype-alta-dialog"
+    :style="altaDialogStyle"
     @update:visible="onVisibleChange"
   >
     <template #header>
@@ -35,6 +36,7 @@
             optionValue="value"
             overlayClass="jobtype-alta-select-overlay"
             class="jobtype-alta-control"
+            style="width: 120px !important; min-width: 120px !important; max-width: 120px !important"
           />
         </div>
 
@@ -84,13 +86,14 @@
             optionValue="value"
             overlayClass="jobtype-alta-select-overlay"
             class="jobtype-alta-control"
+            style="width: 120px !important; min-width: 120px !important; max-width: 120px !important"
           />
         </div>
 
         <FmButton
           label="AGREGAR"
           class="jobtype-add-button"
-          :disabled="!canAgregar"
+          style="width: 120px !important; min-width: 120px !important; max-width: 120px !important; border-radius: 0 !important"
           @click="agregar"
         />
       </div>
@@ -197,6 +200,7 @@
       <FmButton
         label="RELACIONAR"
         class="jobtype-relate-button"
+        style="width: 120px !important; min-width: 120px !important; max-width: 120px !important; border-radius: 0 !important"
         :disabled="altaRows.length === 0"
         @click="relacionar"
       />
@@ -266,7 +270,6 @@ import FmButton from '@/components/shared/FmButton.vue'
 import FmGridPaginator from '@/components/shared/FmGridPaginator.vue'
 import FmGridActions from '@/components/shared/FmGridActions.vue'
 import { useJobtypeContratoStore } from './jobtypeContratoStore'
-import '@/assets/css/jobtype-alta-visual-fix.css'
 
 const props = defineProps({
   visible: { type: Boolean, default: false }
@@ -276,6 +279,7 @@ const emit = defineEmits(['update:visible', 'relacionado'])
 
 const store = useJobtypeContratoStore()
 
+const altaDialogStyle = 'width: calc(100vw - 48px) !important; max-width: 1440px !important; height: min(680px, calc(100dvh - 48px)) !important; max-height: calc(100dvh - 48px) !important; margin: 0 !important;'
 const confirmDialogStyle = 'width: min(540px, calc(100vw - 32px)); max-width: 540px;'
 
 const paisOptions = [
@@ -283,6 +287,13 @@ const paisOptions = [
   { label: 'ARG/UY', value: '1' },
   { label: 'PY', value: '2' }
 ]
+
+const form = reactive({
+  pais: '1',
+  jobtype: '',
+  contrato: '',
+  origen: 'FAN'
+})
 
 const origenOptions = computed(() => {
   if (form.pais === '2') return [{ label: 'FAN', value: 'FAN' }]
@@ -292,13 +303,6 @@ const origenOptions = computed(() => {
     { label: 'FAN', value: 'FAN' },
     { label: 'MXM', value: 'MXM' }
   ]
-})
-
-const form = reactive({
-  pais: '',
-  jobtype: '',
-  contrato: '',
-  origen: ''
 })
 
 const jobtypeSuggestions = ref([])
@@ -315,14 +319,13 @@ const canAgregar = computed(() => Boolean(
   form.pais && jobtypeSelected.value && contratoSelected.value && form.origen
 ))
 
-const jobtypeInvalid = computed(() => Boolean(form.pais && !jobtypeSelected.value))
-const contratoInvalid = computed(() => Boolean(form.pais && !contratoSelected.value))
+const jobtypeInvalid = computed(() => !jobtypeSelected.value)
+const contratoInvalid = computed(() => !contratoSelected.value)
 
 const hayDatosCargados = computed(() => {
   return Boolean(
     form.jobtype ||
     form.contrato ||
-    form.origen ||
     jobtypeSelected.value ||
     contratoSelected.value ||
     altaRows.value.length
@@ -332,17 +335,17 @@ const hayDatosCargados = computed(() => {
 watch(() => form.pais, (pais) => {
   form.jobtype = ''
   form.contrato = ''
-  form.origen = pais === '2' ? 'FAN' : ''
+  form.origen = pais ? 'FAN' : ''
   jobtypeSelected.value = null
   contratoSelected.value = null
 })
 
 watch(() => form.jobtype, (value) => {
-  if (value !== jobtypeSelected.value) jobtypeSelected.value = null
+  if (jobtypeSelected.value && value !== jobtypeSelected.value) jobtypeSelected.value = null
 })
 
 watch(() => form.contrato, (value) => {
-  if (value !== contratoSelected.value) contratoSelected.value = null
+  if (contratoSelected.value && value !== contratoSelected.value) contratoSelected.value = null
 })
 
 watch(() => props.visible, (val) => {
@@ -350,10 +353,10 @@ watch(() => props.visible, (val) => {
 })
 
 const resetForm = () => {
-  form.pais = ''
+  form.pais = '1'
   form.jobtype = ''
   form.contrato = ''
-  form.origen = ''
+  form.origen = 'FAN'
   jobtypeSelected.value = null
   contratoSelected.value = null
   altaRows.value = []
@@ -363,11 +366,6 @@ const resetForm = () => {
 }
 
 const buscarJobtypes = async (event) => {
-  if (!form.pais) {
-    jobtypeSuggestions.value = []
-    return
-  }
-
   jobtypeSuggestions.value = await store.buscarJobtypes(event.query, form.pais)
 }
 
@@ -384,7 +382,7 @@ const onContratoSelect = (event) => {
 }
 
 const agregar = () => {
-  if (!jobtypeSelected.value || !contratoSelected.value) return
+  if (!canAgregar.value) return
 
   const codigo = jobtypeSelected.value.codigo
   if (altaRows.value.some((row) => row.relCodigoTarea === codigo)) return
@@ -404,7 +402,7 @@ const agregar = () => {
 
   form.jobtype = ''
   form.contrato = ''
-  form.origen = form.pais === '2' ? 'FAN' : ''
+  form.origen = form.pais ? 'FAN' : ''
   jobtypeSelected.value = null
   contratoSelected.value = null
 }
@@ -437,10 +435,12 @@ const relacionar = async () => {
       emit('update:visible', false)
       emit('relacionado')
     } else if (errores.length === 1) {
+      // Single error message — could show in an alert
       console.warn(errores[0].mensaje)
       emit('update:visible', false)
       emit('relacionado')
     } else {
+      // Multiple errors
       const msgs = errores.map((e) => e.tareaCodigo).join(', ')
       console.warn('Ya existe relación para los jobtypes:', msgs)
       emit('update:visible', false)

@@ -335,13 +335,13 @@ body .jobtype-alta-dialog .p-dialog-content {
   min-width: 0;
   display: grid;
   grid-template-columns:
-    110px
-    minmax(0, 1.35fr)
-    minmax(0, 1.15fr)
-    100px
-    120px;
+    120px
+    minmax(260px, 1fr)
+    minmax(260px, 1fr)
+    120px
+    140px;
   align-items: end;
-  gap: 12px;
+  gap: 14px;
   box-sizing: border-box;
 }
 
@@ -351,26 +351,9 @@ body .jobtype-alta-dialog .p-dialog-content {
 
 .jobtype-alta-form > .jobtype-alta-field:nth-child(1),
 .jobtype-alta-form > .jobtype-alta-field:nth-child(4) {
-  width: 100% !important;
-  min-width: 0 !important;
-  max-width: 100% !important;
-}
-
-.jobtype-alta-field .jobtype-alta-autocomplete,
-.jobtype-alta-field .p-autocomplete {
-  width: 100% !important;
-  min-width: 0 !important;
-  max-width: 100% !important;
-  display: flex !important;
-}
-
-.jobtype-alta-field .jobtype-alta-autocomplete .p-autocomplete-input,
-.jobtype-alta-field .p-autocomplete .p-autocomplete-input {
-  width: 100% !important;
-  min-width: 0 !important;
-  max-width: 100% !important;
-  flex: 1 1 auto !important;
-  box-sizing: border-box !important;
+  width: 120px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
 }
 
 .jobtype-alta-field .jobtype-alta-control,
@@ -533,48 +516,41 @@ body .p-dialog.jobtype-alta-dialog .jobtype-relate-button.p-button {
   border-radius: 2px !important;
 }
 
-@media (max-width: 1050px) {
-  body .p-dialog.jobtype-alta-dialog {
-    width: calc(100vw - 16px) !important;
-    max-width: calc(100vw - 16px) !important;
-  }
-
-  .jobtype-alta-form {
-    grid-template-columns: 90px minmax(0, 1.2fr) minmax(0, 1fr) 88px 105px;
-    gap: 8px;
-  }
-
-  body .p-dialog.jobtype-alta-dialog .jobtype-add-button,
-  body .p-dialog.jobtype-alta-dialog .jobtype-add-button.p-button {
-    width: 105px !important;
-    min-width: 105px !important;
-    max-width: 105px !important;
-  }
+/* Adaptación del AutoComplete conectado al backend a la maqueta aprobada. */
+body .p-dialog.jobtype-alta-dialog .jobtype-alta-autocomplete,
+body .p-dialog.jobtype-alta-dialog .jobtype-alta-field .p-autocomplete {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  display: flex !important;
+  background: #fff !important;
+  opacity: 1 !important;
 }
 
-@media (max-width: 760px) {
-  body .p-dialog.jobtype-alta-dialog {
-    width: calc(100vw - 12px) !important;
-    max-width: calc(100vw - 12px) !important;
-    height: calc(100dvh - 12px) !important;
-    max-height: calc(100dvh - 12px) !important;
-  }
+body .p-dialog.jobtype-alta-dialog .jobtype-alta-autocomplete .p-autocomplete-input,
+body .p-dialog.jobtype-alta-dialog .jobtype-alta-autocomplete input,
+body .p-dialog.jobtype-alta-dialog .jobtype-alta-field .p-autocomplete .p-autocomplete-input {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  flex: 1 1 auto !important;
+  padding: 0 8px !important;
+  border: 1px solid var(--fm-border-strong, #b8c9d3) !important;
+  border-radius: 2px !important;
+  background: #fff !important;
+  opacity: 1 !important;
+  box-sizing: border-box !important;
+}
 
-  .jobtype-alta-content {
-    grid-template-rows: auto minmax(260px, 1fr);
-    overflow-y: auto;
-  }
-
-  .jobtype-alta-form {
-    grid-template-columns: 1fr;
-  }
-
-  .jobtype-alta-form > *,
-  body .p-dialog.jobtype-alta-dialog .jobtype-add-button,
-  body .p-dialog.jobtype-alta-dialog .jobtype-add-button.p-button {
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    grid-column: 1 !important;
-  }
+body .p-dialog.jobtype-alta-dialog .jobtype-alta-autocomplete--invalid .p-autocomplete-input,
+body .p-dialog.jobtype-alta-dialog .jobtype-alta-autocomplete--invalid input,
+body .p-dialog.jobtype-alta-dialog .jobtype-alta-autocomplete--invalid .p-autocomplete-input:focus,
+body .p-dialog.jobtype-alta-dialog .jobtype-alta-autocomplete--invalid input:focus {
+  border-color: #d32f2f !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 1px #d32f2f inset !important;
 }
