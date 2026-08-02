@@ -72,7 +72,7 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed } from 'vue'
 import { FilterMatchMode } from '@primevue/core/api'
 import FmButton from '@/components/shared/FmButton.vue'
 import LoadingOverlay from '@/modules/shared/components/LoadingOverlay.vue'
@@ -92,65 +92,6 @@ const mainPageRows = ref(100)
 const showAlta = ref(false)
 const showEditar = ref(false)
 const showDesactivar = ref(false)
-
-let popupButtonObserver = null
-let popupButtonFrame = null
-
-const popupButtonSelector = [
-  '.p-dialog .jobtype-add-button',
-  '.p-dialog .jobtype-relate-button',
-  '.p-dialog .jobtype-contrato-edit-update',
-  '.jobtype-alta-unsaved-dialog .jobtype-alta-unsaved__button',
-  '.jobtype-contrato-unsaved-dialog .jobtype-contrato-unsaved__button',
-  '.jobtype-contrato-delete-confirm-dialog .jobtype-contrato-delete-confirm__button'
-].join(', ')
-
-const setImportantStyle = (element, property, value) => {
-  if (
-    element.style.getPropertyValue(property) === value &&
-    element.style.getPropertyPriority(property) === 'important'
-  ) {
-    return
-  }
-
-  element.style.setProperty(property, value, 'important')
-}
-
-const applyPopupButtonDesign = () => {
-  document.querySelectorAll(popupButtonSelector).forEach((button) => {
-    if (!(button instanceof HTMLElement)) return
-
-    const label = button.textContent?.trim().toUpperCase() ?? ''
-    const isOutline = label.includes('CANCELAR') || label.includes('RECHAZAR')
-
-    button.dataset.jobtypePopupButton = 'true'
-    button.dataset.jobtypePopupButtonVariant = isOutline ? 'outline' : 'primary'
-
-    setImportantStyle(button, 'width', 'auto')
-    setImportantStyle(button, 'min-width', '110px')
-    setImportantStyle(button, 'max-width', 'none')
-    setImportantStyle(button, 'height', '34px')
-    setImportantStyle(button, 'min-height', '34px')
-    setImportantStyle(button, 'max-height', '34px')
-    setImportantStyle(button, 'padding', '0 16px')
-    setImportantStyle(button, 'border-radius', '8px')
-    setImportantStyle(button, 'gap', '7px')
-    setImportantStyle(button, 'font-size', '12px')
-    setImportantStyle(button, 'font-weight', '600')
-    setImportantStyle(button, 'line-height', '1')
-    setImportantStyle(button, 'box-shadow', '0 4px 12px rgba(0, 73, 84, 0.13)')
-    setImportantStyle(button, 'transform', 'none')
-  })
-}
-
-const schedulePopupButtonDesign = () => {
-  if (popupButtonFrame !== null) return
-
-  popupButtonFrame = requestAnimationFrame(() => {
-    popupButtonFrame = null
-    applyPopupButtonDesign()
-  })
-}
 
 const editForm = ref({
   tareaContratoId: 0,
@@ -249,29 +190,6 @@ const exportarExcel = () => {
   anchor.click()
   URL.revokeObjectURL(url)
 }
-
-onMounted(async () => {
-  await nextTick()
-  applyPopupButtonDesign()
-
-  popupButtonObserver = new MutationObserver(schedulePopupButtonDesign)
-  popupButtonObserver.observe(document.body, {
-    childList: true,
-    subtree: true,
-    attributes: true,
-    attributeFilter: ['class', 'style']
-  })
-})
-
-onBeforeUnmount(() => {
-  popupButtonObserver?.disconnect()
-  popupButtonObserver = null
-
-  if (popupButtonFrame !== null) {
-    cancelAnimationFrame(popupButtonFrame)
-    popupButtonFrame = null
-  }
-})
 </script>
 
 <style scoped>
@@ -323,45 +241,5 @@ onBeforeUnmount(() => {
   max-height: none !important;
   flex: 1 1 auto !important;
   overflow: auto !important;
-}
-
-:global(body [data-jobtype-popup-button='true']),
-:global(body [data-jobtype-popup-button='true'] .p-button-label) {
-  font-size: 12px !important;
-  font-weight: 600 !important;
-  line-height: 1 !important;
-}
-
-:global(body [data-jobtype-popup-button='true'][data-jobtype-popup-button-variant='primary']) {
-  border: 1px solid #00a9bd !important;
-  background: #00a9bd !important;
-  color: #fff !important;
-}
-
-:global(body [data-jobtype-popup-button='true'][data-jobtype-popup-button-variant='primary']:hover:not(:disabled)) {
-  border-color: #008fa1 !important;
-  background: #008fa1 !important;
-  color: #fff !important;
-}
-
-:global(body [data-jobtype-popup-button='true'][data-jobtype-popup-button-variant='outline']) {
-  border: 1px solid #00a9bd !important;
-  background: #fff !important;
-  color: #008fa1 !important;
-  box-shadow: none !important;
-}
-
-:global(body [data-jobtype-popup-button='true'][data-jobtype-popup-button-variant='outline']:hover:not(:disabled)) {
-  border-color: #008fa1 !important;
-  background: #e4f9fc !important;
-  color: #006f7d !important;
-}
-
-:global(body [data-jobtype-popup-button='true']:disabled) {
-  border-color: #c9d2d7 !important;
-  background: #dbe1e4 !important;
-  color: #7c8a92 !important;
-  box-shadow: none !important;
-  opacity: 1 !important;
 }
 </style>
