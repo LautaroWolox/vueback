@@ -1,156 +1,29 @@
 <template>
   <div
     class="fm-screen fm-screen--pad report-sas-page"
-    :class="{ 'report-sas-page--fullscreen': hasLoadedRows }"
+    :class="{ 'report-sas-page--fullscreen': store.hasRows }"
   >
-    <Accordion value="0" class="fm-accordion report-sas-accordion">
-      <AccordionPanel value="0">
+    <Accordion
+      v-model:value="activePanels"
+      multiple
+      class="fm-accordion report-sas-accordion"
+    >
+      <AccordionPanel value="0" class="report-sas-results-panel">
         <AccordionHeader>REPORTE SAS</AccordionHeader>
 
         <AccordionContent>
-          <div v-if="error" class="report-error">
-            <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
-            <span>Error al cargar los datos del reporte SAS.</span>
+          <div v-if="store.error" class="report-sas-error" role="alert">
+            <i class="pi pi-exclamation-triangle" aria-hidden="true" />
+            <span>{{ store.error }}</span>
           </div>
 
           <FmGridShell
             class="report-sas-grid-shell"
-            :loading="isFetching"
+            :loading="store.loading"
             loading-title="Cargando reporte"
             loading-message="Consultando materiales descargados"
           >
-            <DataTable
-              ref="dt"
-              v-model:filters="filters"
-              v-model:first="first"
-              v-model:rows="pageRows"
-              :value="processedData"
-              class="fm-pass-grid report-sas-grid"
-              dataKey="nroOT"
-              paginator
-              filterDisplay="row"
-              :rowsPerPageOptions="rowsOptions"
-              scrollable
-              scrollHeight="flex"
-              resizableColumns
-              columnResizeMode="expand"
-              removableSort
-              sortMode="multiple"
-              showGridlines
-              :tableStyle="gridTableStyle"
-            >
-              <template
-                #paginatorcontainer="{
-                  first: paginatorFirst,
-                  last,
-                  page,
-                  pageCount,
-                  rows,
-                  totalRecords,
-                  firstPageCallback,
-                  lastPageCallback,
-                  prevPageCallback,
-                  nextPageCallback,
-                  rowChangeCallback,
-                  changePageCallback
-                }"
-              >
-                <FmGridPaginator
-                  :first="paginatorFirst"
-                  :last="last"
-                  :page="page"
-                  :page-count="pageCount"
-                  :rows="rows"
-                  :total-records="totalRecords"
-                  :rows-options="rowsOptions"
-                  :show-counter="true"
-                  :auto-max-rows="false"
-                  :counter-text="totalRecords === 0 ? 'No hay resultados' : ''"
-                  @first-page="firstPageCallback"
-                  @prev-page="prevPageCallback"
-                  @next-page="nextPageCallback"
-                  @last-page="lastPageCallback"
-                  @page-change="changePageCallback"
-                  @rows-change="rowChangeCallback"
-                >
-                  <template #actions>
-                    <FmGridActions
-                      size="large"
-                      :show-delete="false"
-                      :show-refresh="false"
-                      export-title="Descargar reporte"
-                      @export="exportarExcel"
-                    />
-                  </template>
-                </FmGridPaginator>
-              </template>
-
-              <template #empty>
-                <div class="fm-grid-empty">No hay resultados</div>
-              </template>
-
-              <Column
-                v-for="column in dynamicColumns"
-                :key="column.field"
-                :field="column.field"
-                :header="column.header"
-                :filterField="column.field"
-                :showFilterMenu="false"
-                :exportable="column.exportable !== false"
-                :style="getColumnStyle(column.field)"
-                :headerStyle="getColumnStyle(column.field)"
-                :bodyStyle="getColumnStyle(column.field)"
-                sortable
-                filter
-              >
-                <template #filter="{ filterModel, filterCallback }">
-                  <div class="fm-filter-cell">
-                    <span class="fm-filter-prefix">~</span>
-                    <InputText
-                      v-model="filterModel.value"
-                      type="text"
-                      class="fm-column-filter"
-                      @input="filterCallback()"
-                    />
-                    <button
-                      type="button"
-                      class="report-filter-clear"
-                      title="Limpiar filtro"
-                      aria-label="Limpiar filtro"
-                      @click="clearColumnFilter(filterModel, filterCallback)"
-                    >×</button>
-                  </div>
-                </template>
-
-                <template #body="{ data: row, index }">
-                  <div v-if="column.field === 'legajoNOLDAP'" class="legajo-cell-wrapper">
-                    <button
-                      type="button"
-                      class="legajo-preview"
-                      :class="{ expanded: isExpanded(index, column.field) }"
-                      @click="toggleExpand(index, column.field)"
-                    >
-                      <span v-if="!isExpanded(index, column.field)">
-                        {{ getPreview(row[column.field]) }}
-                      </span>
-                      <span v-else>
-                        {{ getLegajosArray(row[column.field]).join(', ') }}
-                      </span>
-                      <i
-                        v-if="isExpandable(row[column.field])"
-                        class="pi"
-                        :class="isExpanded(index, column.field) ? 'pi-chevron-up' : 'pi-chevron-down'"
-                        aria-hidden="true"
-                      ></i>
-                    </button>
-                  </div>
-
-                  <span v-else class="fm-cell-text" :title="String(row[column.field] ?? '')">
-                    {{ row[column.field] ?? '' }}
-                  </span>
-                </template>
-              </Column>
-            </DataTable>
+            <Tabla />
           </FmGridShell>
         </AccordionContent>
       </AccordionPanel>
@@ -158,258 +31,36 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { useFetch } from '@vueuse/core'
-import { FilterMatchMode } from '@primevue/core/api'
-import InputText from 'primevue/inputtext'
-import type { IDataReportSass } from './interfaces/index'
-import { reporteSasColumns } from './columns/reporteSas'
-import { useExcelExport } from '../../composables/useExportExcel'
+<script setup>
+import { onBeforeUnmount, onMounted, ref } from 'vue'
+import Tabla from './components/Tabla.vue'
+import { useReporteSasStore } from './store/reporteSasStore'
 
-interface ExpandedState {
-  [key: string]: boolean
-}
+const store = useReporteSasStore()
+const activePanels = ref(['0'])
 
-interface ColumnFilterModel {
-  value: string | null
-}
-
-interface ReportColumn {
-  field: string
-  header: string
-  filter?: boolean
-  exportable?: boolean
-}
-
-type ReportRow = IDataReportSass & Record<string, unknown>
-type FilterMap = Record<string, { value: string | null; matchMode: string }>
-
-const rowsOptions = [10, 20, 50, 100, 200]
-const first = ref(0)
-const pageRows = ref(Math.max(...rowsOptions))
-const dt = ref()
-const expandedCells = ref<ExpandedState>({})
-const filters = ref<FilterMap>({})
-const { exportToExcel, parseDataFromTable } = useExcelExport()
-
-const configuredColumns: ReportColumn[] = reporteSasColumns.map((column) => ({
-  field: column.field,
-  header: column.header,
-  filter: column.filter,
-  exportable: 'exportable' in column ? column.exportable : true
-}))
-
-const configuredColumnWidths: Record<string, number> = {
-  nroOT: 125,
-  estadoOT: 110,
-  gestionada: 105,
-  codTarea: 120,
-  localidad: 145,
-  codPostal: 115,
-  legajoOperadorDescarga: 165,
-  nomApeOperadorDescarga: 210,
-  fechaDescarga: 155,
-  legajoNOLDAP: 260,
-  fechaCierreOT: 155,
-  centro: 100,
-  almacen: 105,
-  serialCodMaterial: 175,
-  descMaterial: 220,
-  cantidadMaterial: 105,
-  tipoDescarga: 130,
-  mensajeSAP: 240,
-  fechaNotificacionSAP: 175
-}
-
-const { data, isFetching, error } = useFetch(
-  '/pc/extraccionDatosGM/searchMatDescargados.html',
-  { immediate: true }
-).json<ReportRow[]>()
-
-const processedData = computed<ReportRow[]>(() =>
-  (data.value ?? []).map((item) => {
-    const processedItem: ReportRow = { ...item }
-
-    if (processedItem.legajoNOLDAP && typeof processedItem.legajoNOLDAP === 'string') {
-      processedItem.legajoNOLDAP = processedItem.legajoNOLDAP
-        .split(',')
-        .map((legajo) => legajo.trim())
-        .filter(Boolean)
-        .join(',')
-    }
-
-    return processedItem
+onMounted(() => {
+  store.fetchRows().catch(() => {
+    // El mensaje de error queda disponible en el store y se muestra en pantalla.
   })
-)
-
-const hasLoadedRows = computed(() => !isFetching.value && processedData.value.length > 0)
-
-const returnedFields = computed<string[]>(() => {
-  const fields: string[] = []
-  const seen = new Set<string>()
-
-  processedData.value.forEach((row) => {
-    Object.keys(row).forEach((field) => {
-      if (!seen.has(field)) {
-        seen.add(field)
-        fields.push(field)
-      }
-    })
-  })
-
-  return fields
 })
 
-const formatColumnHeader = (field: string) => {
-  const acronyms = new Set(['id', 'ot', 'sap', 'noldap'])
-
-  return field
-    .replace(/_/g, ' ')
-    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
-    .trim()
-    .split(/\s+/)
-    .map((word) => {
-      const normalized = word.toLowerCase()
-      if (acronyms.has(normalized)) return normalized.toUpperCase()
-      return normalized.charAt(0).toUpperCase() + normalized.slice(1)
-    })
-    .join(' ')
-}
-
-const dynamicColumns = computed<ReportColumn[]>(() => {
-  if (!returnedFields.value.length) return configuredColumns
-
-  const returnedFieldSet = new Set(returnedFields.value)
-  const configuredFieldSet = new Set(configuredColumns.map((column) => column.field))
-
-  const knownColumns = configuredColumns.filter((column) => returnedFieldSet.has(column.field))
-  const additionalColumns = returnedFields.value
-    .filter((field) => !configuredFieldSet.has(field))
-    .map((field) => ({
-      field,
-      header: formatColumnHeader(field),
-      filter: true,
-      exportable: true
-    }))
-
-  return [...knownColumns, ...additionalColumns]
+onBeforeUnmount(() => {
+  store.clearStore()
 })
-
-const calculateColumnWidth = (column: ReportColumn) => {
-  const configuredWidth = configuredColumnWidths[column.field] ?? 110
-  const sampleLengths = processedData.value
-    .slice(0, 100)
-    .map((row) => String(row[column.field] ?? '').length)
-
-  const longestContent = Math.max(column.header.length, ...sampleLengths, 0)
-  const estimatedWidth = longestContent * 7 + 44
-
-  return Math.min(320, Math.max(configuredWidth, estimatedWidth))
-}
-
-const dynamicColumnWidths = computed<Record<string, number>>(() =>
-  Object.fromEntries(
-    dynamicColumns.value.map((column) => [column.field, calculateColumnWidth(column)])
-  )
-)
-
-const gridTableStyle = computed(() => {
-  const totalWidth = dynamicColumns.value.reduce(
-    (total, column) => total + (dynamicColumnWidths.value[column.field] ?? 130),
-    0
-  )
-
-  return {
-    width: totalWidth > 900 ? `${totalWidth}px` : '100%',
-    minWidth: `${Math.max(totalWidth, 900)}px`,
-    tableLayout: 'fixed'
-  }
-})
-
-watch(
-  dynamicColumns,
-  (columns) => {
-    const currentFilters = filters.value
-    const nextFilters: FilterMap = {}
-
-    columns.forEach((column) => {
-      nextFilters[column.field] = currentFilters[column.field] ?? {
-        value: null,
-        matchMode: FilterMatchMode.CONTAINS
-      }
-    })
-
-    filters.value = nextFilters
-    first.value = 0
-  },
-  { immediate: true }
-)
-
-const clearColumnFilter = (
-  filterModel: ColumnFilterModel,
-  filterCallback: () => void
-) => {
-  filterModel.value = null
-  filterCallback()
-}
-
-const exportarExcel = () => {
-  const { rows, fields } = parseDataFromTable(dt)
-
-  exportToExcel({
-    rows,
-    fields,
-    columns: dynamicColumns.value,
-    filename: 'reporteSAS.xlsx',
-    columnTypes: {},
-    groupField: 'codTarea'
-  })
-}
-
-const getColumnStyle = (field: string) => {
-  const width = dynamicColumnWidths.value[field] ?? 130
-
-  return {
-    width: `${width}px`,
-    minWidth: `${width}px`
-  }
-}
-
-const getExpandKey = (rowIndex: number, fieldName: string) => `${rowIndex}_${fieldName}`
-const isExpanded = (rowIndex: number, fieldName: string) => Boolean(
-  expandedCells.value[getExpandKey(rowIndex, fieldName)]
-)
-const toggleExpand = (rowIndex: number, fieldName: string) => {
-  const key = getExpandKey(rowIndex, fieldName)
-  expandedCells.value[key] = !expandedCells.value[key]
-}
-
-const getLegajosArray = (value: unknown): string[] => {
-  if (!value) return []
-  if (Array.isArray(value)) return value.map(String)
-  if (typeof value === 'string') {
-    return value
-      .split(',')
-      .map((item) => item.trim())
-      .filter(Boolean)
-  }
-  return [String(value)]
-}
-
-const isExpandable = (value: unknown) => getLegajosArray(value).length > 2
-const getPreview = (value: unknown) => {
-  const items = getLegajosArray(value)
-  if (items.length <= 2) return items.join(', ')
-  return `${items.slice(0, 2).join(', ')} (+${items.length - 2} más)`
-}
 </script>
 
 <style scoped>
 .report-sas-page {
+  width: 100%;
   height: calc(100dvh - 82px);
   min-height: 520px;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
+  background: #fff;
+  color: #111;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .report-sas-page--fullscreen {
@@ -427,125 +78,76 @@ const getPreview = (value: unknown) => {
 }
 
 .report-sas-accordion,
-.report-sas-accordion :deep(.p-accordionpanel) {
-  height: 100%;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.report-sas-page--fullscreen .report-sas-accordion {
+.report-sas-results-panel {
   width: 100%;
-  gap: 0;
-}
-
-.report-sas-accordion :deep(.p-accordioncontent) {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.report-sas-accordion :deep(.p-accordioncontent-content) {
   height: 100%;
   min-height: 0;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  padding: 0;
-  overflow: hidden;
+}
+
+.report-sas-page :deep(.report-sas-accordion.p-accordion) {
+  gap: 0 !important;
+}
+
+.report-sas-page :deep(.report-sas-results-panel.p-accordionpanel) {
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.report-sas-page :deep(.report-sas-results-panel .p-accordionheader) {
+  flex: 0 0 auto !important;
+}
+
+.report-sas-page :deep(.report-sas-results-panel .p-accordioncontent),
+.report-sas-page :deep(.report-sas-results-panel .p-accordioncontent-content) {
+  height: 100% !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: #fff !important;
 }
 
 .report-sas-grid-shell {
-  flex: 1 1 auto;
   width: 100%;
   height: 100%;
+  min-width: 0;
   min-height: 0;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-.report-sas-grid,
-.report-sas-grid.p-datatable {
-  flex: 1 1 auto;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.report-sas-grid :deep(.p-datatable-table-container),
-.report-sas-grid :deep(.p-datatable-wrapper),
-.report-sas-grid :deep([data-pc-section="tablecontainer"]) {
-  flex: 1 1 auto;
-  width: 100%;
-  min-height: 0;
-  overflow: auto;
-  background: #fff;
-}
-
-.report-sas-grid :deep(.p-datatable-thead > tr > th) {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.report-sas-grid :deep(.p-datatable-paginator-bottom),
-.report-sas-grid :deep(> .p-paginator) {
-  flex: 0 0 40px;
-  width: 100%;
-  height: 40px;
-  min-height: 40px;
-  padding: 0;
-  overflow: hidden;
-}
-
-.report-filter-clear {
-  width: 16px;
-  min-width: 16px;
-  height: 24px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: #111;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.report-filter-clear:hover {
-  color: #00a9bd;
-}
-
-.report-error {
+.report-sas-error {
   min-height: 44px;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 0 0 8px;
+  margin: 0;
   padding: 9px 12px;
   border: 1px solid #efd2d6;
   background: #fff6f7;
   color: #a12c38;
+  font-size: 13px;
+  box-sizing: border-box;
 }
 
-.legajo-preview {
-  width: 100%;
-  min-height: 27px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 3px 7px;
-  border: 1px solid #cfe1e6;
-  border-radius: 4px;
-  background: #fff;
-  color: #314957;
-  font-size: 11px;
-  text-align: left;
-  cursor: pointer;
+@media (max-width: 900px) {
+  .report-sas-page,
+  .report-sas-page--fullscreen {
+    position: static;
+    width: 100%;
+    height: calc(100dvh - 64px);
+    min-height: 420px;
+  }
 }
 </style>
