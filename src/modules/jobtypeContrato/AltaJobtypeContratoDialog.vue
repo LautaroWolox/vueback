@@ -50,7 +50,7 @@
             :minLength="4"
             class="jobtype-alta-autocomplete"
             :class="{ 'jobtype-alta-autocomplete--invalid': jobtypeInvalid }"
-            inputClass="jobtype-alta-control"
+            :inputClass="jobtypeInputClass"
             :aria-invalid="jobtypeInvalid"
             @complete="buscarJobtypes"
             @item-select="onJobtypeSelect"
@@ -68,7 +68,7 @@
             :minLength="4"
             class="jobtype-alta-autocomplete"
             :class="{ 'jobtype-alta-autocomplete--invalid': contratoInvalid }"
-            inputClass="jobtype-alta-control"
+            :inputClass="contratoInputClass"
             :aria-invalid="contratoInvalid"
             @complete="buscarContratos"
             @item-select="onContratoSelect"
@@ -322,6 +322,16 @@ const canAgregar = computed(() => Boolean(
 
 const jobtypeInvalid = computed(() => validationRequested.value && !jobtypeSelected.value)
 const contratoInvalid = computed(() => validationRequested.value && !contratoSelected.value)
+
+const jobtypeInputClass = computed(() => [
+  'jobtype-alta-control',
+  { 'jobtype-alta-control--invalid': jobtypeInvalid.value }
+])
+
+const contratoInputClass = computed(() => [
+  'jobtype-alta-control',
+  { 'jobtype-alta-control--invalid': contratoInvalid.value }
+])
 
 const hayDatosCargados = computed(() => {
   return Boolean(
@@ -622,12 +632,12 @@ const cerrar = () => {
   background: #fff;
 }
 
-:global(.p-dialog.jobtype-alta-dialog .jobtype-alta-autocomplete--invalid .p-autocomplete-input),
-:global(.p-dialog.jobtype-alta-dialog .jobtype-alta-autocomplete--invalid input),
-:global(.p-dialog.jobtype-alta-dialog .jobtype-alta-autocomplete--invalid .p-autocomplete-input:focus),
-:global(.p-dialog.jobtype-alta-dialog .jobtype-alta-autocomplete--invalid input:focus) {
-  border-color: #e57373 !important;
-  background: #fffafa !important;
-  box-shadow: 0 0 0 1px rgba(229, 115, 115, .22) inset !important;
+:global(.p-dialog.jobtype-alta-dialog input.jobtype-alta-control--invalid),
+:global(.p-dialog.jobtype-alta-dialog input.jobtype-alta-control--invalid:hover),
+:global(.p-dialog.jobtype-alta-dialog input.jobtype-alta-control--invalid:focus) {
+  border: 1px solid #e57373 !important;
+  background-color: #fffafa !important;
+  box-shadow: 0 0 0 1px rgba(229, 115, 115, .28) inset !important;
+  outline: none !important;
 }
 </style>
