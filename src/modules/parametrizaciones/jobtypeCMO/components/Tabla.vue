@@ -301,6 +301,28 @@ const exportarExcel = () => {
   font-size: 13px !important;
 }
 
+:global(#tabla-cmo-actividad .p-datatable-emptymessage > td),
+:global(#tabla-cmo-actividad .p-datatable-empty-message > td) {
+  height: 48px !important;
+  min-height: 48px !important;
+  padding: 0 !important;
+  vertical-align: middle !important;
+  background: #eafcff !important;
+}
+
+:global(#tabla-cmo-actividad .p-datatable-emptymessage .fm-grid-empty),
+:global(#tabla-cmo-actividad .p-datatable-empty-message .fm-grid-empty) {
+  width: 100% !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  background: #eafcff !important;
+  box-sizing: border-box !important;
+}
+
 :global(#tabla-cmo-actividad .fm-filter-cell),
 :global(#tabla-cmo-actividad .fm-column-filter),
 :global(#tabla-cmo-actividad .fm-filter-prefix),
