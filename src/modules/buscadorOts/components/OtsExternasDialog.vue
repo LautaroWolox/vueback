@@ -60,21 +60,18 @@
             @rows-change="rowChangeCallback"
           >
             <template #actions>
-              <button
-                type="button"
-                class="external-download-action"
-                title="Descargar"
-                aria-label="Descargar"
-                :disabled="rows.length === 0"
-              >
-                <i class="pi pi-download" aria-hidden="true"></i>
-              </button>
+              <FmGridActions
+                :show-delete="false"
+                :show-refresh="false"
+                :export-disabled="rows.length === 0"
+                export-title="Descargar"
+              />
             </template>
           </FmGridPaginator>
         </template>
 
         <template #empty>
-          <div class="external-grid-empty">No hay resultados</div>
+          <div class="fm-grid-empty">No hay resultados</div>
         </template>
 
         <Column
@@ -97,10 +94,9 @@
     </div>
 
     <template #footer>
-      <FmButton
-        label="CERRAR"
-        variant="outline"
-        @click="emit('update:visible', false)"
+      <FmDialogActions
+        secondary-label="CERRAR"
+        @secondary="emit('update:visible', false)"
       />
     </template>
   </Dialog>
@@ -111,7 +107,8 @@ import { ref } from 'vue'
 import Dialog from 'primevue/dialog'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import FmButton from '@/components/shared/FmButton.vue'
+import FmDialogActions from '@/components/shared/FmDialogActions.vue'
+import FmGridActions from '@/components/shared/FmGridActions.vue'
 import FmGridPaginator from '@/components/shared/FmGridPaginator.vue'
 
 const props = defineProps({
@@ -160,57 +157,6 @@ const columns = [
   flex: 1 1 auto;
   min-height: 0;
   overflow: auto;
-  background: #e8f9fc;
-}
-
-.external-grid :deep(.p-datatable-thead > tr > th) {
-  height: 36px;
-  padding: 0 14px;
-  background: #f4f6f7;
-  color: #111;
-  font-size: 11px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.external-grid :deep(.p-datatable-tbody > tr > td) {
-  height: 32px;
-  padding: 0 10px;
-  background: #e8f9fc;
-  color: #111;
-  font-size: 11px;
-}
-
-.external-grid :deep(.p-datatable-emptymessage > td),
-.external-grid :deep(.p-datatable-empty-message > td) {
-  height: 100%;
-  padding: 0;
-  border: 0;
-  background: #e8f9fc;
-  color: transparent;
-}
-
-.external-grid-empty {
-  min-height: 430px;
-  color: transparent;
-}
-
-.external-download-action {
-  width: 28px;
-  height: 28px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: #008fa1;
-  cursor: pointer;
-}
-
-.external-download-action:disabled {
-  color: #c5d2d8;
-  cursor: default;
 }
 
 :global(.p-dialog.busqueda-ots-external-dialog) {
@@ -227,7 +173,6 @@ const columns = [
   height: 52px !important;
   min-height: 52px !important;
   padding: 0 16px !important;
-  border-bottom: 1px solid #d7dfe3 !important;
   font-size: 18px !important;
   font-weight: 400 !important;
 }
@@ -243,9 +188,7 @@ const columns = [
   min-height: 60px !important;
   display: flex !important;
   align-items: center !important;
-  justify-content: flex-end !important;
   padding: 10px 16px !important;
-  border-top: 1px solid #d7dfe3 !important;
 }
 
 @media (max-width: 600px) {
