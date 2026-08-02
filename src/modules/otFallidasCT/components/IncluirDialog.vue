@@ -9,7 +9,7 @@
   >
     <div class="otf-include-form">
       <p class="otf-include-confirmation">
-        ¿Confirma que desea incluir OT seleccionada?
+        ¿Confirma que desea incluir la OT seleccionada?
       </p>
 
       <div class="fm-field otf-include-motivo-field">
@@ -47,17 +47,12 @@
     </div>
 
     <template #footer>
-      <FmButton
-        class="otf-include-cancel"
-        label="CANCELAR"
-        variant="outline"
-        @click="cerrar"
-      />
-      <FmButton
-        class="otf-include-accept"
-        label="ACEPTAR"
-        :disabled="!motivoSelected?.nombreCorto || store.loading"
-        @click="confirmar"
+      <FmDialogActions
+        secondary-label="CANCELAR"
+        primary-label="ACEPTAR"
+        :primary-disabled="!motivoSelected?.nombreCorto || store.loading"
+        @secondary="cerrar"
+        @primary="confirmar"
       />
     </template>
   </Dialog>
@@ -67,6 +62,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import FmCompactSelect from '@/components/shared/FmCompactSelect.vue'
+import FmDialogActions from '@/components/shared/FmDialogActions.vue'
 import { useFallidasCtStore } from '../store/CtFallidaStore'
 import { useCommonCtStore } from '@/store/commonCt'
 
@@ -89,6 +85,8 @@ const reset = () => {
 }
 
 const confirmar = async () => {
+  if (!motivoSelected.value?.nombreCorto || store.loading) return
+
   const nroOT = store.nroOT
   emit('update:visibleInc', false)
 
@@ -218,31 +216,10 @@ onMounted(() => commonCT.setMotivosExcInc())
 }
 
 :global(.otf-include-dialog .p-dialog-footer) {
-  min-height: 42px !important;
-  gap: 5px !important;
-  padding: 5px 12px !important;
-}
-
-:global(.otf-include-dialog .otf-include-cancel),
-:global(.otf-include-dialog .otf-include-accept) {
-  width: 88px !important;
-  min-width: 88px !important;
-  max-width: 88px !important;
-  height: 26px !important;
-  min-height: 26px !important;
-  max-height: 26px !important;
-  padding: 0 7px !important;
-  border-radius: 3px !important;
-  font-size: 10px !important;
-  font-weight: 400 !important;
-  box-shadow: 0 2px 5px rgba(0, 91, 104, .07) !important;
-  transform: none !important;
-}
-
-:global(.otf-include-dialog .otf-include-cancel .p-button-label),
-:global(.otf-include-dialog .otf-include-accept .p-button-label) {
-  font-size: 10px !important;
-  font-weight: 400 !important;
+  min-height: 52px !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 8px 12px !important;
 }
 
 @media (max-width: 600px) {
@@ -255,13 +232,6 @@ onMounted(() => commonCT.setMotivosExcInc())
 
   .otf-include-comment {
     resize: vertical;
-  }
-
-  :global(.otf-include-dialog .otf-include-cancel),
-  :global(.otf-include-dialog .otf-include-accept) {
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: none !important;
   }
 }
 </style>
