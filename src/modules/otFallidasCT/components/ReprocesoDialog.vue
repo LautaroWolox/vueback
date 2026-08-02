@@ -31,10 +31,9 @@
     </div>
 
     <template #footer>
-      <FmButton
-        label="CERRAR"
-        variant="outline"
-        @click="cerrar"
+      <FmDialogActions
+        secondary-label="CERRAR"
+        @secondary="cerrar"
       />
     </template>
   </Dialog>
@@ -42,6 +41,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import FmDialogActions from '@/components/shared/FmDialogActions.vue'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -114,7 +114,7 @@ const cerrar = () => emit('close')
 
 :global(.otf-reprocess-dialog .p-dialog-footer) {
   display: flex !important;
-  justify-content: flex-end !important;
+  align-items: center !important;
   padding: 12px 18px !important;
 }
 </style>
