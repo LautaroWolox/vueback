@@ -49,83 +49,35 @@
           changePageCallback
         }"
       >
-        <div class="otf-custom-paginator">
-          <FmGridActions
-            class="otf-custom-paginator__actions"
-            size="large"
-            :delete-disabled="!hasSelectedRows"
-            :refresh-disabled="!hasSelectedRows || reprocesoProcessing"
-            @export="exportarExcel"
-            @delete="excluir"
-            @refresh="reprocesar"
-          />
-
-          <div class="otf-custom-paginator__navigation" aria-label="Paginación">
-            <button
-              type="button"
-              class="otf-page-button"
-              title="Primera página"
-              aria-label="Primera página"
-              :disabled="page === 0 || pageCount === 0"
-              @click="firstPageCallback"
-            >|&lt;</button>
-
-            <button
-              type="button"
-              class="otf-page-button"
-              title="Página anterior"
-              aria-label="Página anterior"
-              :disabled="page === 0 || pageCount === 0"
-              @click="prevPageCallback"
-            >&lt;</button>
-
-            <span class="otf-page-label">Pagina</span>
-            <input
-              class="otf-page-input"
-              type="number"
-              min="1"
-              :max="Math.max(pageCount, 1)"
-              :value="pageCount ? page + 1 : 0"
-              :disabled="pageCount === 0"
-              aria-label="Número de página"
-              @change="changePageFromInput($event, pageCount, changePageCallback)"
+        <FmGridPaginator
+          :first="first"
+          :last="last"
+          :page="page"
+          :page-count="Math.max(pageCount, 1)"
+          :rows="rows"
+          :total-records="totalRecords"
+          :rows-options="[100, 250, 500]"
+          :show-rows-select="true"
+          :show-counter="true"
+          :counter-text="totalRecords === 0 ? 'No hay resultados' : ''"
+          @first-page="firstPageCallback"
+          @prev-page="prevPageCallback"
+          @next-page="nextPageCallback"
+          @last-page="lastPageCallback"
+          @page-change="changePageCallback"
+          @rows-change="rowChangeCallback"
+        >
+          <template #actions>
+            <FmGridActions
+              size="large"
+              :delete-disabled="!hasSelectedRows"
+              :refresh-disabled="!hasSelectedRows || reprocesoProcessing"
+              @export="exportarExcel"
+              @delete="excluir"
+              @refresh="reprocesar"
             />
-            <span class="otf-page-total">de {{ pageCount }}</span>
-
-            <button
-              type="button"
-              class="otf-page-button"
-              title="Página siguiente"
-              aria-label="Página siguiente"
-              :disabled="pageCount === 0 || page >= pageCount - 1"
-              @click="nextPageCallback"
-            >&gt;</button>
-
-            <button
-              type="button"
-              class="otf-page-button"
-              title="Última página"
-              aria-label="Última página"
-              :disabled="pageCount === 0 || page >= pageCount - 1"
-              @click="lastPageCallback"
-            >&gt;|</button>
-
-            <select
-              class="otf-rows-select"
-              :value="rows"
-              aria-label="Filas por página"
-              @change="changeRows($event, rowChangeCallback)"
-            >
-              <option v-for="option in [100, 250, 500]" :key="option" :value="option">
-                {{ option }}
-              </option>
-            </select>
-          </div>
-
-          <span class="otf-custom-paginator__counter">
-            Mostrando {{ totalRecords ? first + 1 : 0 }} - {{ last }} de {{ totalRecords }}
-          </span>
-        </div>
+          </template>
+        </FmGridPaginator>
       </template>
 
       <template #empty>
@@ -159,7 +111,13 @@
               class="fm-column-filter"
               @input="filterCallback()"
             />
-            <span class="fm-filter-more">...</span>
+            <button
+              type="button"
+              class="fm-filter-clear"
+              title="Limpiar filtro"
+              aria-label="Limpiar filtro"
+              @click="clearFilter(filterModel, filterCallback)"
+            >×</button>
           </div>
         </template>
 
@@ -346,20 +304,10 @@ const columnStyle = (column) => ({
   minWidth: '48px'
 })
 
-const changePageFromInput = (event, pageCount, changePageCallback) => {
-  if (!pageCount) return
-
-  const rawValue = Number(event.target.value)
-  const requestedPage = Number.isFinite(rawValue) ? rawValue : 1
-  const normalizedPage = Math.min(Math.max(requestedPage, 1), pageCount)
-
-  event.target.value = String(normalizedPage)
-  changePageCallback(normalizedPage - 1)
-}
-
-const changeRows = (event, rowChangeCallback) => {
-  const rows = Number(event.target.value)
-  if (Number.isFinite(rows) && rows > 0) rowChangeCallback(rows)
+const clearFilter = (filterModel, filterCallback) => {
+  filterModel.value = null
+  filterCallback()
+  currentFirst.value = 0
 }
 
 const hasNote = (data) => {
