@@ -11,15 +11,12 @@
     @hide="onHide"
   >
     <template #header>
-      <div class="jobtype-alta-header" style="grid-template-columns: minmax(0, 1fr) 52px">
-        <h2 class="jobtype-alta-header__title" style="margin-left: 20px">
-          Modificar CMO - Actividad
-        </h2>
+      <div class="jobtype-alta-header cmo-modificar-header">
+        <h2 class="jobtype-alta-header__title">Modificar CMO - Actividad</h2>
 
         <button
           type="button"
           class="jobtype-alta-header__close"
-          style="justify-self: center; margin-left: 0"
           title="Cerrar"
           aria-label="Cerrar"
           @click="cerrar"
@@ -28,14 +25,8 @@
     </template>
 
     <div class="jobtype-alta-content">
-      <div
-        class="jobtype-alta-form cmo-modificar-form"
-      >
-        <!-- Actividad (readonly) -->
-        <div
-          class="jobtype-alta-field fm-field"
-          style="width: 100% !important; min-width: 0 !important; max-width: none !important"
-        >
+      <div class="jobtype-alta-form cmo-modificar-form">
+        <div class="jobtype-alta-field fm-field">
           <label for="mod-actividad">Actividad</label>
           <InputText
             id="mod-actividad"
@@ -45,11 +36,7 @@
           />
         </div>
 
-        <!-- CMO actual (readonly) -->
-        <div
-          class="jobtype-alta-field fm-field"
-          style="width: 100% !important; min-width: 0 !important; max-width: none !important"
-        >
+        <div class="jobtype-alta-field fm-field">
           <label for="mod-cmo-actual">CMO actual</label>
           <InputText
             id="mod-cmo-actual"
@@ -59,11 +46,7 @@
           />
         </div>
 
-        <!-- Nuevo CMO (autocomplete) -->
-        <div
-          class="jobtype-alta-field fm-field"
-          style="width: 100% !important; min-width: 0 !important; max-width: none !important"
-        >
+        <div class="jobtype-alta-field fm-field">
           <label for="mod-nuevo-cmo">Nuevo CMO</label>
           <AutoComplete
             id="mod-nuevo-cmo"
@@ -81,7 +64,6 @@
         </div>
       </div>
 
-      <!-- Error de negocio inline -->
       <div v-if="errorMessage" class="cmo-modificar-error">
         <p class="cmo-modificar-error__item">{{ errorMessage }}</p>
       </div>
@@ -91,7 +73,6 @@
       <FmButton
         label="ACTUALIZAR"
         class="jobtype-relate-button"
-        style="width: 120px !important; min-width: 120px !important; max-width: 120px !important; border-radius: 0 !important"
         :disabled="!canActualizar || saving"
         @click="actualizar"
       />
@@ -110,8 +91,6 @@ import { useToast } from 'primevue/usetoast'
 import { useCmoActividadStore } from '../store/cmoActividadStore'
 import type { CmoAutocomplete, RelCmoActividad } from '../store/types'
 
-// ─── Props & Emits ────────────────────────────────────────────────
-
 const props = defineProps<{
   visible: boolean
   relacion: RelCmoActividad | null
@@ -122,13 +101,9 @@ const emit = defineEmits<{
   saved: []
 }>()
 
-// ─── Servicios ────────────────────────────────────────────────────
-
 const store = useCmoActividadStore()
 const confirm = useConfirm()
 const toast = useToast()
-
-// ─── Estado local ─────────────────────────────────────────────────
 
 const nuevoCmo = ref<CmoAutocomplete | string | null>(null)
 const cmoSuggestions = ref<CmoAutocomplete[]>([])
@@ -137,8 +112,6 @@ const saving = ref(false)
 const errorMessage = ref<string | null>(null)
 
 let cmoTimer: ReturnType<typeof setTimeout> | null = null
-
-// ─── Computed ─────────────────────────────────────────────────────
 
 const actividadDisplay = computed(() => {
   if (!props.relacion) return ''
@@ -154,8 +127,6 @@ const canActualizar = computed(() => {
   return nuevoCmo.value !== null && typeof nuevoCmo.value === 'object'
 })
 
-// ─── Resetear al cambiar de relación ─────────────────────────────
-
 watch(
   () => props.visible,
   (val) => {
@@ -167,8 +138,6 @@ watch(
     }
   }
 )
-
-// ─── Autocomplete CMO (debounce 300ms) ────────────────────────────
 
 const onSearchCmo = (event: { query: string }) => {
   if (cmoTimer) clearTimeout(cmoTimer)
@@ -185,8 +154,6 @@ const onSearchCmo = (event: { query: string }) => {
   }, 300)
 }
 
-// ─── Actualizar relación ──────────────────────────────────────────
-
 const actualizar = async () => {
   if (!canActualizar.value || !props.relacion || saving.value) return
 
@@ -201,10 +168,8 @@ const actualizar = async () => {
     )
 
     if (response?.mensaje) {
-      // Error de negocio (ej: relación repetida)
       errorMessage.value = response.mensaje
     } else {
-      // Éxito
       toast.add({
         severity: 'success',
         summary: 'Relación modificada',
@@ -226,19 +191,15 @@ const actualizar = async () => {
   }
 }
 
-// ─── Cerrar dialog ────────────────────────────────────────────────
-
 const cerrar = () => {
   if (nuevoCmo.value !== null && typeof nuevoCmo.value === 'object') {
     confirm.require({
-      message: 'Hay datos ingresados, confirma que desea cancelar?',
+      message: 'Hay datos ingresados. ¿Confirma que desea cancelar?',
       header: 'Confirmar cierre',
       icon: 'pi pi-exclamation-triangle',
       acceptLabel: 'Aceptar',
       rejectLabel: 'Cancelar',
-      accept: () => {
-        resetAndClose()
-      },
+      accept: resetAndClose,
     })
   } else {
     resetAndClose()
@@ -261,10 +222,20 @@ const onHide = () => {
 </script>
 
 <style scoped>
+.cmo-modificar-header {
+  grid-template-columns: minmax(0, 1fr) 52px;
+}
+
 .cmo-modificar-form {
   grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
   max-width: 960px !important;
   align-items: end !important;
+}
+
+.cmo-modificar-form .jobtype-alta-field {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
 }
 
 @media (max-width: 768px) {
