@@ -17,7 +17,7 @@
           title="Cerrar"
           @click="cerrar"
         >
-          <span aria-hidden="true">x</span>
+          <span aria-hidden="true">×</span>
         </button>
       </div>
     </template>
@@ -61,17 +61,12 @@
     </div>
 
     <template #footer>
-      <FmButton
-        class="otf-exclude-cancel"
-        label="CANCELAR"
-        variant="outline"
-        @click="cerrar"
-      />
-      <FmButton
-        class="otf-exclude-accept"
-        label="ACEPTAR"
-        :disabled="!motivoSelected?.nombreCorto || store.loading"
-        @click="confirmar"
+      <FmDialogActions
+        secondary-label="CANCELAR"
+        primary-label="ACEPTAR"
+        :primary-disabled="!motivoSelected?.nombreCorto || store.loading"
+        @secondary="cerrar"
+        @primary="confirmar"
       />
     </template>
   </Dialog>
@@ -81,6 +76,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import FmCompactSelect from '@/components/shared/FmCompactSelect.vue'
+import FmDialogActions from '@/components/shared/FmDialogActions.vue'
 import { useFallidasCtStore } from '../store/CtFallidaStore'
 import { useCommonCtStore } from '@/store/commonCt'
 
@@ -167,6 +163,8 @@ const reset = () => {
 }
 
 const confirmar = async () => {
+  if (!motivoSelected.value?.nombreCorto || store.loading) return
+
   emit('update:visibleExc', false)
   await store.sendExcluidas(motivoSelected.value.nombreCorto, comentario.value)
   reset()
@@ -282,8 +280,6 @@ onBeforeUnmount(stopNotaResizeObserver)
 
 .otf-note-textarea::placeholder {
   color: #747474;
-  font-family: monospace;
-  font-weight: 600;
   opacity: 1;
 }
 
@@ -299,42 +295,13 @@ onBeforeUnmount(stopNotaResizeObserver)
   font-weight: 400;
 }
 
-.otf-exclude-close {
-  width: 26px;
-  min-width: 26px;
-  height: 26px;
-  min-height: 26px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  color: #999;
-  font-family: Arial, sans-serif;
-  font-size: 18px;
-  font-weight: 400;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.otf-exclude-close:hover {
-  background: transparent;
-  color: #00a9bd;
-}
-
 :global(.p-dialog.otf-exclude-dialog.fm-dialog) {
   overflow: visible !important;
-  border-radius: 2px !important;
 }
 
 :global(.otf-exclude-dialog .p-dialog-header) {
   min-height: 46px !important;
   padding: 0 12px !important;
-  border-bottom: 1px solid #d5dadd !important;
-  border-radius: 2px 2px 0 0 !important;
-  background: #fff !important;
 }
 
 :global(.otf-exclude-dialog .p-dialog-content) {
@@ -344,67 +311,15 @@ onBeforeUnmount(stopNotaResizeObserver)
 }
 
 :global(.otf-exclude-dialog .p-dialog-footer) {
-  min-height: 42px !important;
+  min-height: 52px !important;
   display: flex !important;
   align-items: center !important;
-  justify-content: flex-end !important;
-  gap: 5px !important;
-  padding: 5px 12px !important;
-  border-top: 1px solid #d5dadd !important;
-  border-radius: 0 0 2px 2px !important;
-  background: #fff !important;
-}
-
-:global(.otf-exclude-dialog .otf-exclude-cancel),
-:global(.otf-exclude-dialog .otf-exclude-accept) {
-  width: 88px !important;
-  min-width: 88px !important;
-  max-width: 88px !important;
-  height: 26px !important;
-  min-height: 26px !important;
-  max-height: 26px !important;
-  padding: 0 7px !important;
-  border-radius: 3px !important;
-  font-size: 10px !important;
-  font-weight: 400 !important;
-  box-shadow: 0 2px 5px rgba(0, 91, 104, .07) !important;
-  transform: none !important;
-}
-
-:global(.otf-exclude-dialog .otf-exclude-cancel .p-button-label),
-:global(.otf-exclude-dialog .otf-exclude-accept .p-button-label) {
-  font-size: 10px !important;
-  font-weight: 400 !important;
-}
-
-:global(.otf-exclude-dialog .otf-exclude-cancel) {
-  border-color: #00a9bd !important;
-  background: #fff !important;
-  color: #00a0b4 !important;
-}
-
-:global(.otf-exclude-dialog .otf-exclude-accept:not(:disabled)) {
-  border-color: #00a9bd !important;
-  background: #00a9bd !important;
-  color: #fff !important;
-}
-
-:global(.otf-exclude-dialog .otf-exclude-accept:disabled) {
-  border-color: #d2d9dd !important;
-  background: #e6eaec !important;
-  color: #adb7bd !important;
-  box-shadow: none !important;
+  padding: 8px 12px !important;
 }
 
 @media (max-width: 600px) {
   .otf-exclude-header {
-    min-height: 40px;
     font-size: 17px;
-  }
-
-  .otf-exclude-confirmation,
-  .otf-exclude-content .fm-field label {
-    font-size: 12px;
   }
 
   .otf-motivo-field,
@@ -420,17 +335,6 @@ onBeforeUnmount(stopNotaResizeObserver)
 
   :global(.otf-exclude-dialog .p-dialog-content) {
     padding: 12px 10px 14px !important;
-  }
-
-  :global(.otf-exclude-dialog .p-dialog-footer) {
-    flex-direction: column-reverse !important;
-  }
-
-  :global(.otf-exclude-dialog .otf-exclude-cancel),
-  :global(.otf-exclude-dialog .otf-exclude-accept) {
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: none !important;
   }
 }
 </style>
