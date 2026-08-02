@@ -1,6 +1,10 @@
 @layer fieldmanager {
   /* Ajustes puntuales de módulos que conservaban medidas históricas rígidas. */
   @media (min-width: 961px) {
+    body {
+      min-width: 0;
+    }
+
     #app .jobtype-screen,
     #app .busqueda-ots-page,
     #app .ot-fallidas-ct,
