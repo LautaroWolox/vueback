@@ -46,9 +46,10 @@
             :suggestions="jobtypeSuggestions"
             optionLabel="valor"
             :minLength="4"
-            :disabled="!form.pais"
             class="jobtype-alta-autocomplete"
+            :class="{ 'jobtype-alta-autocomplete--invalid': jobtypeInvalid }"
             inputClass="jobtype-alta-control"
+            :aria-invalid="jobtypeInvalid"
             @complete="buscarJobtypes"
             @item-select="onJobtypeSelect"
             @clear="jobtypeSelected = null"
@@ -63,9 +64,10 @@
             :suggestions="contratoSuggestions"
             optionLabel="valor"
             :minLength="4"
-            :disabled="!form.pais"
             class="jobtype-alta-autocomplete"
+            :class="{ 'jobtype-alta-autocomplete--invalid': contratoInvalid }"
             inputClass="jobtype-alta-control"
+            :aria-invalid="contratoInvalid"
             @complete="buscarContratos"
             @item-select="onContratoSelect"
             @clear="contratoSelected = null"
@@ -172,14 +174,14 @@
               <span class="jobtype-cell-text" :title="data.relTarea">{{ data.relTarea }}</span>
             </template>
           </Column>
-          <Column field="relContrato" header="NOMBRE_CONTRATO" :style="{ width: '20%' }">
-            <template #body="{ data }">
-              <span class="jobtype-cell-text" :title="data.relContrato">{{ data.relContrato }}</span>
-            </template>
-          </Column>
           <Column field="origen" header="ORIGEN" :style="{ width: '20%' }">
             <template #body="{ data }">
               <span class="jobtype-cell-text" :title="data.origen">{{ data.origen }}</span>
+            </template>
+          </Column>
+          <Column field="relContrato" header="NOMBRE_CONTRATO" :style="{ width: '20%' }">
+            <template #body="{ data }">
+              <span class="jobtype-cell-text" :title="data.relContrato">{{ data.relContrato }}</span>
             </template>
           </Column>
           <Column field="paisLabel" header="PAIS" :style="{ width: '20%' }">
@@ -264,6 +266,7 @@ import FmButton from '@/components/shared/FmButton.vue'
 import FmGridPaginator from '@/components/shared/FmGridPaginator.vue'
 import FmGridActions from '@/components/shared/FmGridActions.vue'
 import { useJobtypeContratoStore } from './jobtypeContratoStore'
+import '@/assets/css/jobtype-alta-visual-fix.css'
 
 const props = defineProps({
   visible: { type: Boolean, default: false }
@@ -281,13 +284,6 @@ const paisOptions = [
   { label: 'PY', value: '2' }
 ]
 
-const form = reactive({
-  pais: '',
-  jobtype: '',
-  contrato: '',
-  origen: ''
-})
-
 const origenOptions = computed(() => {
   if (form.pais === '2') return [{ label: 'FAN', value: 'FAN' }]
 
@@ -296,6 +292,13 @@ const origenOptions = computed(() => {
     { label: 'FAN', value: 'FAN' },
     { label: 'MXM', value: 'MXM' }
   ]
+})
+
+const form = reactive({
+  pais: '',
+  jobtype: '',
+  contrato: '',
+  origen: ''
 })
 
 const jobtypeSuggestions = ref([])
@@ -311,6 +314,9 @@ const showConfirmCierre = ref(false)
 const canAgregar = computed(() => Boolean(
   form.pais && jobtypeSelected.value && contratoSelected.value && form.origen
 ))
+
+const jobtypeInvalid = computed(() => Boolean(form.pais && !jobtypeSelected.value))
+const contratoInvalid = computed(() => Boolean(form.pais && !contratoSelected.value))
 
 const hayDatosCargados = computed(() => {
   return Boolean(
@@ -331,6 +337,14 @@ watch(() => form.pais, (pais) => {
   contratoSelected.value = null
 })
 
+watch(() => form.jobtype, (value) => {
+  if (value !== jobtypeSelected.value) jobtypeSelected.value = null
+})
+
+watch(() => form.contrato, (value) => {
+  if (value !== contratoSelected.value) contratoSelected.value = null
+})
+
 watch(() => props.visible, (val) => {
   if (val) resetForm()
 })
@@ -349,6 +363,11 @@ const resetForm = () => {
 }
 
 const buscarJobtypes = async (event) => {
+  if (!form.pais) {
+    jobtypeSuggestions.value = []
+    return
+  }
+
   jobtypeSuggestions.value = await store.buscarJobtypes(event.query, form.pais)
 }
 
