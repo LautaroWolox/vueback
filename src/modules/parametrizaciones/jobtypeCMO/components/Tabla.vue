@@ -1,29 +1,32 @@
 <template>
   <FmGridShell
+    class="cmo-grid-shell"
     :loading="store.loading"
     loading-title="Cargando relaciones"
     loading-message="Consultando CMO-Actividad"
   >
     <DataTable
+      id="tabla-cmo-actividad"
       ref="dt"
       v-model:filters="filters"
       v-model:selection="selectedRow"
       v-model:first="mainFirst"
       v-model:rows="mainPageRows"
-      class="jobtype-main-grid fm-pass-grid"
+      class="jobtype-main-grid fm-pass-grid cmo-main-grid"
       :value="store.rows"
       dataKey="actividadManoObraId"
-      tableStyle="table-layout: fixed; width: 100%; min-width: 100%"
+      tableStyle="table-layout: fixed; min-width: 100%; width: 100%"
       scrollable
       scrollHeight="flex"
       :rowClass="rowClass"
       removableSort
-      sortMode="multiple"
-      :multiSortMeta="multiSortMeta"
+      sortMode="single"
+      sortField="codigoActividad"
+      :sortOrder="-1"
       filterDisplay="row"
       selectionMode="single"
       paginator
-      :rowsPerPageOptions="[10, 50, 100, 500]"
+      :rowsPerPageOptions="[100, 250, 500]"
       :resizableColumns="true"
       columnResizeMode="fit"
       showGridlines
@@ -56,7 +59,7 @@
           :page-count="pageCount"
           :rows="rows"
           :total-records="totalRecords"
-          :rows-options="[10, 50, 100, 500]"
+          :rows-options="[100, 250, 500]"
           :counter-text="totalRecords === 0 ? 'No hay resultados' : ''"
           @first-page="firstPageCallback"
           @prev-page="prevPageCallback"
@@ -100,26 +103,25 @@
         :bodyStyle="{ width: column.width }"
       >
         <template #filter="{ filterModel, filterCallback }">
-          <div class="jobtype-filter-cell">
-            <span class="jobtype-filter-symbol">~</span>
+          <div class="fm-filter-cell">
+            <span class="fm-filter-prefix">~</span>
             <InputText
               v-model="filterModel.value"
-              class="jobtype-filter-input"
+              class="fm-column-filter"
               type="text"
               @input="filterCallback()"
             />
-            <span class="jobtype-filter-clear" @click="clearFilter(filterModel, filterCallback)">x</span>
+            <span class="fm-filter-more">...</span>
           </div>
         </template>
         <template #body="{ data }">
-          <span class="jobtype-cell-text" :title="String(data[column.field] ?? '')">
+          <span class="fm-cell-text" :title="String(data[column.field] ?? '')">
             {{ data[column.field] ?? '' }}
           </span>
         </template>
       </Column>
     </DataTable>
 
-    <!-- Dialogs -->
     <AltaDialog
       v-model:visible="showAltaDialog"
       @saved="onDialogSaved"
@@ -131,7 +133,6 @@
       @saved="onDialogSaved"
     />
 
-    <!-- PrimeVue services -->
     <ConfirmDialog />
     <Toast />
   </FmGridShell>
@@ -160,34 +161,26 @@ const { exportToExcel } = useExcelExport()
 
 const dt = ref()
 const mainFirst = ref(0)
-const mainPageRows = ref(100)
+const mainPageRows = ref(500)
 const showAltaDialog = ref(false)
 const showModificarDialog = ref(false)
 
-// Sort default: codigoActividad descendente
-const multiSortMeta = ref([{ field: 'codigoActividad', order: -1 }])
-
-// Filtros inline client-side
 const filters = ref(
   Object.fromEntries(
     mainColumns.map(({ field }) => [field, { value: null, matchMode: FilterMatchMode.CONTAINS }])
   )
 )
 
-// Filas inactivas con estilo visual diferenciado
 const rowClass = (data: RelCmoActividad) => ({
   'row-inactive': data?.activo !== 'S',
 })
 
-// Selección de fila
 const selectedRow = ref<RelCmoActividad | null>(null)
 
 const onRowClick = ({ data }: { data: RelCmoActividad }) => {
   selectedRow.value = data
   store.setSelectedRow(data)
 }
-
-// ─── Acciones de botones ──────────────────────────────────────────
 
 const onAdd = () => {
   showAltaDialog.value = true
@@ -230,13 +223,9 @@ const onDelete = () => {
   })
 }
 
-// ─── Callback tras éxito de Alta o Modificar ──────────────────────
-
 const onDialogSaved = () => {
   store.fetchData()
 }
-
-// ─── Export Excel ────────────────────────────────────────────────
 
 const exportarExcel = () => {
   if (!store.rows.length) return
@@ -250,20 +239,77 @@ const exportarExcel = () => {
     filename: 'Configuracion_CMO_Actividad.xlsx',
   })
 }
-
-// ─── Filtros ──────────────────────────────────────────────────────
-
-const clearFilter = (
-  filterModel: { value: string | null },
-  filterCallback: () => void
-) => {
-  filterModel.value = null
-  filterCallback()
-}
 </script>
 
 <style scoped>
 .row-inactive {
   opacity: 0.5;
+}
+
+:global(.cmo-grid-shell) {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+:global(#tabla-cmo-actividad),
+:global(#tabla-cmo-actividad.p-datatable) {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+:global(#tabla-cmo-actividad .p-datatable-table-container),
+:global(#tabla-cmo-actividad .p-datatable-wrapper),
+:global(#tabla-cmo-actividad [data-pc-section="tablecontainer"]) {
+  width: 100% !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 1 1 auto !important;
+  overflow: auto !important;
+}
+
+:global(#tabla-cmo-actividad .p-datatable-table) {
+  width: 100% !important;
+  min-width: 100% !important;
+  table-layout: fixed !important;
+}
+
+:global(#tabla-cmo-actividad .p-sortable-column-badge),
+:global(#tabla-cmo-actividad .p-datatable-sort-badge),
+:global(#tabla-cmo-actividad [data-pc-section="sortbadge"]) {
+  display: none !important;
+}
+
+:global(#tabla-cmo-actividad .p-datatable-thead > tr > th) {
+  font-size: 12px !important;
+}
+
+:global(#tabla-cmo-actividad .p-datatable-tbody > tr > td) {
+  font-size: 13px !important;
+}
+
+:global(#tabla-cmo-actividad .fm-filter-cell),
+:global(#tabla-cmo-actividad .fm-column-filter),
+:global(#tabla-cmo-actividad .fm-filter-prefix),
+:global(#tabla-cmo-actividad .fm-filter-more) {
+  font-size: 12px !important;
+}
+
+:global(#tabla-cmo-actividad .fm-grid-paginator),
+:global(#tabla-cmo-actividad .fm-grid-paginator *) {
+  font-size: 13px !important;
 }
 </style>
