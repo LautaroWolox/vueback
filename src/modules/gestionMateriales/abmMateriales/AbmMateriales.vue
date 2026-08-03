@@ -155,6 +155,10 @@ const onMaterialCreated = () => {
 </script>
 
 <style>
+.abm-materiales-page {
+  margin-top: 4px !important;
+}
+
 #tabla-abm-materiales .p-datatable-tbody > tr.p-highlight > td,
 #tabla-abm-materiales .p-datatable-tbody > tr.p-datatable-row-selected > td {
   border-color: #78c5cf !important;
@@ -205,6 +209,9 @@ const onMaterialCreated = () => {
   height: 32px !important;
   min-height: 32px !important;
   max-height: 32px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   margin: 0 !important;
   padding: 0 !important;
   border: 1px solid #d7e0e4 !important;
@@ -226,24 +233,50 @@ const onMaterialCreated = () => {
 .abm-materiales-dialog .p-dialog-header-close-button:focus-visible {
   border-color: #00a9bd !important;
   background: #fff !important;
-  color: #008fa1 !important;
+  color: #00a9bd !important;
   box-shadow: 0 0 0 1px rgba(0, 169, 189, .12) !important;
   outline: none !important;
 }
 
 .abm-materiales-dialog-close-icon {
-  width: 18px !important;
-  height: 18px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  color: currentColor !important;
-  font-family: Arial, sans-serif !important;
-  font-size: 21px !important;
-  font-weight: 700 !important;
-  line-height: 1 !important;
+  position: relative !important;
+  width: 14px !important;
+  height: 14px !important;
+  display: block !important;
+  overflow: visible !important;
+  color: #111820 !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
   opacity: 1 !important;
   visibility: visible !important;
+}
+
+.abm-materiales-dialog-close-icon::before,
+.abm-materiales-dialog-close-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+  transform-origin: center;
+}
+
+.abm-materiales-dialog-close-icon::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.abm-materiales-dialog-close-icon::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.abm-materiales-dialog .p-dialog-close-button:hover .abm-materiales-dialog-close-icon,
+.abm-materiales-dialog .p-dialog-header-close-button:hover .abm-materiales-dialog-close-icon,
+.abm-materiales-dialog .p-dialog-close-button:focus-visible .abm-materiales-dialog-close-icon,
+.abm-materiales-dialog .p-dialog-header-close-button:focus-visible .abm-materiales-dialog-close-icon {
+  color: #00a9bd !important;
 }
 
 .abm-materiales-dialog__form {
