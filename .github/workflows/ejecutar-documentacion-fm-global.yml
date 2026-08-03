@@ -24,14 +24,17 @@ jobs:
         run: |
           python <<'PY'
           from pathlib import Path
-          import textwrap
 
           workflow = Path('.github/workflows/documentar-fm-global.yml').read_text(encoding='utf-8')
           begin = "          python <<'PY'\n"
           end = "\n          PY\n"
           start_index = workflow.index(begin) + len(begin)
           end_index = workflow.index(end, start_index)
-          script = textwrap.dedent(workflow[start_index:end_index])
+          extracted = workflow[start_index:end_index]
+          script = '\n'.join(
+              line[10:] if line.startswith('          ') else line
+              for line in extracted.splitlines()
+          ) + '\n'
           Path('/tmp/documentar_fm_global.py').write_text(script, encoding='utf-8')
           PY
           python /tmp/documentar_fm_global.py
