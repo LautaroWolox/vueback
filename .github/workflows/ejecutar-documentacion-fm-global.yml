@@ -1,0 +1,60 @@
+name: Ejecutar documentación de fm-global.css
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  documentar:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar rama
+        uses: actions/checkout@v4
+        with:
+          ref: consolidar-estilos-globales
+          fetch-depth: 0
+
+      - name: Extraer y ejecutar documentación
+        shell: bash
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          import textwrap
+
+          workflow = Path('.github/workflows/documentar-fm-global.yml').read_text(encoding='utf-8')
+          begin = "          python <<'PY'\n"
+          end = "\n          PY\n"
+          start_index = workflow.index(begin) + len(begin)
+          end_index = workflow.index(end, start_index)
+          script = textwrap.dedent(workflow[start_index:end_index])
+          Path('/tmp/documentar_fm_global.py').write_text(script, encoding='utf-8')
+          PY
+          python /tmp/documentar_fm_global.py
+
+      - name: Instalar dependencias
+        shell: bash
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+
+      - name: Validar compilación
+        run: npm run build
+
+      - name: Validar diferencias
+        run: git diff --check
+
+      - name: Guardar documentación
+        shell: bash
+        run: |
+          rm -f .github/workflows/documentar-fm-global.yml
+          rm -f .github/workflows/ejecutar-documentacion-fm-global.yml
+          rm -f .github/documentar-fm-global.trigger
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Documentar alcance de estilos globales y por pantalla"
+          git push origin HEAD:consolidar-estilos-globales
