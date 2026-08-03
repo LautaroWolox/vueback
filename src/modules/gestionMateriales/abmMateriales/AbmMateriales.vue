@@ -113,7 +113,7 @@ const filters = ref(
 const buscar = async () => {
   resultsExpanded.value = true
   first.value = 0
-n  selectedRow.value = null
+  selectedRow.value = null
 
   try {
     await store.fetchMateriales()
