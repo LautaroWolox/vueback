@@ -222,6 +222,21 @@ const onMaterialCreated = () => {
   color: #007f90 !important;
 }
 
+.abm-materiales-dialog-close-icon {
+  width: 18px !important;
+  height: 18px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: currentColor !important;
+  font-family: Arial, sans-serif !important;
+  font-size: 21px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
 .abm-materiales-dialog__form {
   gap: 15px !important;
   padding: 22px 22px 24px !important;
