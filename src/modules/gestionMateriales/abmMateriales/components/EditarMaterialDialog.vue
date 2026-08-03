@@ -15,7 +15,10 @@
       </div>
     </template>
 
-    <form class="abm-materiales-dialog__form" @submit.prevent="guardar">
+    <form
+      class="abm-materiales-dialog__form abm-materiales-dialog__form--edit"
+      @submit.prevent="guardar"
+    >
       <div class="abm-materiales-dialog__field abm-materiales-dialog__field--full">
         <label for="edit-material-description">CÓDIGO - DESC MATERIAL</label>
         <InputText
@@ -25,7 +28,7 @@
         />
       </div>
 
-      <div class="abm-materiales-dialog__field">
+      <div class="abm-materiales-dialog__field abm-materiales-dialog__field--full">
         <label for="edit-min-threshold">UMBRAL MÍNIMO</label>
         <InputNumber
           id="edit-min-threshold"
@@ -35,7 +38,7 @@
         />
       </div>
 
-      <div class="abm-materiales-dialog__field">
+      <div class="abm-materiales-dialog__field abm-materiales-dialog__field--full">
         <label for="edit-medium-threshold">UMBRAL MEDIO</label>
         <InputNumber
           id="edit-medium-threshold"
@@ -51,7 +54,7 @@
         </small>
       </div>
 
-      <div class="abm-materiales-dialog__field">
+      <div class="abm-materiales-dialog__field abm-materiales-dialog__field--full">
         <label for="edit-max-threshold">UMBRAL MÁXIMO</label>
         <InputNumber
           id="edit-max-threshold"
@@ -104,7 +107,7 @@ const props = defineProps({
 const emit = defineEmits(['update:visible', 'saved'])
 const store = useAbmMaterialesStore()
 const authStore = useAuthStore()
-const dialogStyle = 'width: min(560px, calc(100vw - 28px)); max-width: 560px;'
+const dialogStyle = 'width: min(500px, calc(100vw - 28px)); max-width: 500px;'
 
 const form = reactive({
   umbralMedio: null,
