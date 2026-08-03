@@ -154,7 +154,6 @@ import Column from 'primevue/column'
 import InputText from 'primevue/inputtext'
 import FmGridPaginator from '@/components/shared/FmGridPaginator.vue'
 import FmGridActions from '@/components/shared/FmGridActions.vue'
-import { useExcelExport } from '@/composables/useExportExcel'
 import { useReporteSasStore } from '../store/reporteSasStore'
 import {
   createReporteSasFilters,
@@ -163,8 +162,18 @@ import {
   reporteSasTableStyle,
 } from './columns'
 
+const props = defineProps({
+  exportToExcel: {
+    type: Function,
+    required: true,
+  },
+  parseDataFromTable: {
+    type: Function,
+    required: true,
+  },
+})
+
 const store = useReporteSasStore()
-const { exportToExcel } = useExcelExport()
 
 const dt = ref(null)
 const first = ref(0)
@@ -217,19 +226,20 @@ const toggleExpanded = (row, field) => {
 }
 
 const exportarExcel = () => {
-  if (!store.rows.length) return
+  const { rows, fields } = props.parseDataFromTable(dt)
+  if (!rows.length || !fields.length) return
 
-  const exportColumns = reporteSasColumns.filter(
-    (column) => column.exportable !== false
-  )
-  const fields = exportColumns.map((column) => column.field)
+  const exportColumns = fields
+    .map((field) => reporteSasColumns.find((column) => column.field === field))
+    .filter(Boolean)
 
-  exportToExcel({
-    rows: store.rows,
+  props.exportToExcel({
+    rows,
     fields,
     columns: exportColumns,
     filename: 'reporteSAS.xlsx',
     columnTypes: {},
+    valueTransformers: {},
     groupField: 'codTarea',
   })
 }
