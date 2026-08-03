@@ -309,11 +309,7 @@ const routes = [
         path: 'busquedaOtsGcc.html',
         name: 'BUOT',
         beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/busquedaOtsGcc.html',
-          titleParam: 'Búsqueda de Ots'
-        }
+        component: () => import('../modules/buscadorOts/BuscadorOts.vue')
       }
     ]
   }
