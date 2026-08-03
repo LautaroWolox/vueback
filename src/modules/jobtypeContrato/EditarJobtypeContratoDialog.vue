@@ -70,6 +70,20 @@
           @clear="contratoSelectedItem = null"
         />
       </div>
+
+      <div class="jobtype-contrato-edit-field jobtype-contrato-edit-field--origen">
+        <label for="edit-origen">Origen</label>
+        <Select
+          id="edit-origen"
+          v-model="origenSeleccionado"
+          :options="origenOptions"
+          optionLabel="label"
+          optionValue="value"
+          :disabled="isPY"
+          class="jobtype-contrato-edit-control"
+          :class="{ 'jobtype-contrato-edit-control--readonly': isPY }"
+        />
+      </div>
     </div>
 
     <template #footer>
@@ -139,6 +153,7 @@ import { ref, computed, watch } from 'vue'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import AutoComplete from 'primevue/autocomplete'
+import Select from 'primevue/select'
 import FmButton from '@/components/shared/FmButton.vue'
 import { useJobtypeContratoStore } from './jobtypeContratoStore'
 
@@ -147,7 +162,8 @@ const props = defineProps({
   tareaContratoId: { type: Number, default: 0 },
   jobtype: { type: String, default: '' },
   contratoActual: { type: String, default: '' },
-  pais: { type: String, default: '' }
+  pais: { type: String, default: '' },
+  origen: { type: String, default: '' }
 })
 
 const emit = defineEmits(['update:visible', 'actualizado'])
@@ -161,14 +177,23 @@ const nuevoContrato = ref('')
 const contratoSuggestions = ref([])
 const contratoSelectedItem = ref(null)
 const showConfirmCierre = ref(false)
+const origenSeleccionado = ref('')
 
-const hayCambios = computed(() => Boolean(contratoSelectedItem.value))
-const puedeActualizar = computed(() => Boolean(contratoSelectedItem.value))
+const origenOptions = [
+  { label: 'FAN', value: 'FAN' },
+  { label: 'MXM', value: 'MXM' }
+]
+
+const isPY = computed(() => props.pais === 'PY')
+
+const hayCambios = computed(() => Boolean(contratoSelectedItem.value) || origenSeleccionado.value !== props.origen)
+const puedeActualizar = computed(() => Boolean(contratoSelectedItem.value) || origenSeleccionado.value !== props.origen)
 
 watch(() => props.visible, (val) => {
   if (val) {
     nuevoContrato.value = ''
     contratoSelectedItem.value = null
+    origenSeleccionado.value = props.origen || ''
     showConfirmCierre.value = false
   }
 })
@@ -185,9 +210,14 @@ const actualizar = async () => {
   if (!puedeActualizar.value) return
 
   try {
-    await store.actualizarRelacion(props.tareaContratoId, contratoSelectedItem.value.contratoId)
+    await store.actualizarRelacion(
+      props.tareaContratoId,
+      contratoSelectedItem.value ? contratoSelectedItem.value.contratoId : 0,
+      origenSeleccionado.value
+    )
     nuevoContrato.value = ''
     contratoSelectedItem.value = null
+    origenSeleccionado.value = ''
     emit('update:visible', false)
     emit('actualizado')
   } catch {
@@ -219,6 +249,7 @@ const confirmarCierre = () => {
 const cerrar = () => {
   nuevoContrato.value = ''
   contratoSelectedItem.value = null
+  origenSeleccionado.value = ''
   emit('update:visible', false)
 }
 </script>
@@ -267,7 +298,7 @@ const cerrar = () => {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
   grid-template-areas:
     'jobtype contrato pais'
-    '. nuevo .';
+    '. nuevo origen';
   align-items: start;
   column-gap: 20px;
   row-gap: 14px;
@@ -278,6 +309,7 @@ const cerrar = () => {
 .jobtype-contrato-edit-field--contrato { grid-area: contrato; }
 .jobtype-contrato-edit-field--pais { grid-area: pais; }
 .jobtype-contrato-edit-field--nuevo { grid-area: nuevo; }
+.jobtype-contrato-edit-field--origen { grid-area: origen; }
 
 .jobtype-contrato-edit-field {
   min-width: 0;
@@ -471,7 +503,8 @@ const cerrar = () => {
       'jobtype'
       'contrato'
       'pais'
-      'nuevo';
+      'nuevo'
+      'origen';
     row-gap: 14px;
     padding: 16px 0 22px;
   }

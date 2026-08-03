@@ -72,6 +72,20 @@
           />
         </div>
 
+        <div class="jobtype-alta-field">
+          <label for="alta-origen">Origen</label>
+          <Select
+            id="alta-origen"
+            v-model="form.origen"
+            :options="origenOptions"
+            optionLabel="label"
+            optionValue="value"
+            :disabled="!form.pais || isPY"
+            overlayClass="jobtype-alta-select-overlay"
+            class="jobtype-alta-control"
+          />
+        </div>
+
         <FmButton
           label="AGREGAR"
           class="jobtype-add-button"
@@ -149,7 +163,7 @@
             </FmGridPaginator>
           </template>
 
-          <Column field="relCodigoTarea" header="CODIGO_TAREA" :style="{ width: '20%' }">
+          <Column field="relCodigoTarea" header="CODIGO_TAREA" :style="{ width: '15%' }">
             <template #body="{ data }">
               <span class="jobtype-cell-text" :title="data.relCodigoTarea">{{ data.relCodigoTarea }}</span>
             </template>
@@ -159,17 +173,26 @@
               <span class="jobtype-cell-text" :title="data.relTarea">{{ data.relTarea }}</span>
             </template>
           </Column>
-          <Column field="relContrato" header="NOMBRE_CONTRATO" :style="{ width: '30%' }">
+          <Column field="origen" header="ORIGEN" :style="{ width: '12%' }">
+            <template #body="{ data }">
+              <span class="jobtype-cell-text" :title="data.origen">{{ data.origen }}</span>
+            </template>
+          </Column>
+          <Column field="relContrato" header="NOMBRE_CONTRATO" :style="{ width: '28%' }">
             <template #body="{ data }">
               <span class="jobtype-cell-text" :title="data.relContrato">{{ data.relContrato }}</span>
             </template>
           </Column>
-          <Column field="paisLabel" header="PAIS" :style="{ width: '25%' }">
+          <Column field="paisLabel" header="PAIS" :style="{ width: '20%' }">
             <template #body="{ data }">
               <span class="jobtype-cell-text" :title="data.paisLabel">{{ data.paisLabel }}</span>
             </template>
           </Column>
         </DataTable>
+      </div>
+
+      <div v-if="duplicateMessage" class="jobtype-alta-duplicate-notice">
+        {{ duplicateMessage }}
       </div>
     </div>
 
@@ -266,8 +289,17 @@ const paisOptions = [
 const form = reactive({
   pais: '',
   jobtype: '',
-  contrato: ''
+  contrato: '',
+  origen: ''
 })
+
+const origenOptions = [
+  { label: '', value: '' },
+  { label: 'FAN', value: 'FAN' },
+  { label: 'MXM', value: 'MXM' }
+]
+
+const isPY = computed(() => form.pais === '2')
 
 const jobtypeSuggestions = ref([])
 const contratoSuggestions = ref([])
@@ -278,13 +310,15 @@ const altaSelectedRow = ref(null)
 const altaFirst = ref(0)
 const altaPageRows = ref(10)
 const showConfirmCierre = ref(false)
+const duplicateMessage = ref('')
 
-const canAgregar = computed(() => Boolean(jobtypeSelected.value && contratoSelected.value))
+const canAgregar = computed(() => Boolean(jobtypeSelected.value && contratoSelected.value && form.origen))
 
 const hayDatosCargados = computed(() => {
   return Boolean(
     form.jobtype ||
     form.contrato ||
+    form.origen ||
     jobtypeSelected.value ||
     contratoSelected.value ||
     altaRows.value.length
@@ -296,6 +330,11 @@ watch(() => form.pais, () => {
   form.contrato = ''
   jobtypeSelected.value = null
   contratoSelected.value = null
+  if (form.pais === '2') {
+    form.origen = 'FAN'
+  } else {
+    form.origen = ''
+  }
 })
 
 watch(() => props.visible, (val) => {
@@ -306,12 +345,14 @@ const resetForm = () => {
   form.pais = ''
   form.jobtype = ''
   form.contrato = ''
+  form.origen = ''
   jobtypeSelected.value = null
   contratoSelected.value = null
   altaRows.value = []
   altaSelectedRow.value = null
   altaFirst.value = 0
   showConfirmCierre.value = false
+  duplicateMessage.value = ''
 }
 
 const buscarJobtypes = async (event) => {
@@ -331,11 +372,21 @@ const onContratoSelect = (event) => {
 }
 
 const agregar = () => {
-  if (!jobtypeSelected.value || !contratoSelected.value) return
+  if (!jobtypeSelected.value || !contratoSelected.value || !form.origen) return
 
   const codigo = jobtypeSelected.value.codigo
-  if (altaRows.value.some((row) => row.relCodigoTarea === codigo)) return
+  const contratoId = contratoSelected.value.contratoId
+  const origen = form.origen
 
+  const duplicado = altaRows.value.some(
+    (row) => row.relCodigoTarea === codigo && row.relContratoId === contratoId && row.origen === origen
+  )
+  if (duplicado) {
+    duplicateMessage.value = `Ya se descargó una relación para el Jobtype ${codigo} con origen ${origen}`
+    return
+  }
+
+  duplicateMessage.value = ''
   const paisLabel = form.pais === '1' ? 'ARG/UY' : form.pais === '2' ? 'PY' : ''
 
   altaRows.value = [...altaRows.value, {
@@ -344,12 +395,15 @@ const agregar = () => {
     relTarea: jobtypeSelected.value.nombre,
     relContratoId: contratoSelected.value.contratoId,
     relContrato: contratoSelected.value.nombre,
+    origen,
     pais: paisLabel,
     paisLabel
   }]
 
+  form.pais = ''
   form.jobtype = ''
   form.contrato = ''
+  form.origen = ''
   jobtypeSelected.value = null
   contratoSelected.value = null
 }
@@ -372,6 +426,7 @@ const relacionar = async () => {
     relTarea: row.relTarea,
     relContratoId: row.relContratoId,
     relContrato: row.relContrato,
+    origen: row.origen,
     pais: row.pais
   }))
 

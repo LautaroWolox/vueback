@@ -5,6 +5,7 @@ export interface JobTypeContratoRow {
   tareaContratoId: number
   tareaCodigo: string
   tareaNombre: string
+  origen: string
   contratoNombre: string
   legajoModificacion: string
   fechaModificacion: string
@@ -24,6 +25,7 @@ export interface NuevaRelacion {
   relTarea: string
   relContratoId: number
   relContrato: string
+  origen: string
   pais: string
 }
 
@@ -89,7 +91,8 @@ export const useJobtypeContratoStore = defineStore('jobtypeContrato', () => {
 
   const actualizarRelacion = async (
     tareaContratoId: number,
-    tipoContratoId: number
+    tipoContratoId: number,
+    origen: string
   ): Promise<JobTypeContratoRow> => {
     loading.value = true
     error.value = null
@@ -97,7 +100,8 @@ export const useJobtypeContratoStore = defineStore('jobtypeContrato', () => {
     try {
       const params = new URLSearchParams({
         tareaContratoId: String(tareaContratoId),
-        tipoContratoId: String(tipoContratoId)
+        tipoContratoId: String(tipoContratoId),
+        origen
       })
 
       const response = await fetch(`/pc/jobtypeContrato/actualizarJobtype.html?${params}`)
