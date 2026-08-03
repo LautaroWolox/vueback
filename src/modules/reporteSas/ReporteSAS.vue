@@ -23,7 +23,10 @@
             loading-title="Cargando reporte"
             loading-message="Consultando materiales descargados"
           >
-            <Tabla />
+            <Tabla
+              :export-to-excel="exportToExcel"
+              :parse-data-from-table="parseDataFromTable"
+            />
           </FmGridShell>
         </AccordionContent>
       </AccordionPanel>
@@ -33,11 +36,13 @@
 
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { useExcelExport } from '@/composables/useExportExcel'
 import Tabla from './components/Tabla.vue'
 import { useReporteSasStore } from './store/reporteSasStore'
 
 const store = useReporteSasStore()
 const activePanels = ref(['0'])
+const { exportToExcel, parseDataFromTable } = useExcelExport()
 
 onMounted(() => {
   store.fetchRows().catch(() => {
