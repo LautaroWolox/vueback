@@ -1,7 +1,9 @@
 <template>
   <div class="fm-custom-paginator">
     <div class="fm-custom-paginator__actions">
-      <slot name="actions" />
+      <div class="fm-custom-paginator__actions-inner">
+        <slot name="actions" />
+      </div>
     </div>
 
     <div class="fm-custom-paginator__navigation" aria-label="Paginación">
@@ -153,10 +155,11 @@ watch(() => props.rowsOptions, scheduleMaximumRows, { deep: true })
 
 <style scoped>
 .fm-custom-paginator {
+  position: relative;
   width: 100%;
   min-height: 36px;
   display: grid !important;
-  grid-template-columns: minmax(100px, 1fr) auto minmax(100px, 1fr);
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   padding: 2px 4px;
   color: #111;
@@ -165,25 +168,71 @@ watch(() => props.rowsOptions, scheduleMaximumRows, { deep: true })
 }
 
 .fm-custom-paginator__actions {
+  position: absolute !important;
+  left: 4px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  display: block !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  z-index: 2;
+}
+
+.fm-custom-paginator__actions-inner {
   width: max-content !important;
   min-width: 0 !important;
-  max-width: 100% !important;
+  max-width: none !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: flex-start !important;
-  justify-self: start !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  white-space: nowrap !important;
+}
+
+.fm-custom-paginator__actions-inner :deep(.fm-grid-actions-final) {
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 4px !important;
+  padding: 0 !important;
+  margin: 0 !important;
   overflow: visible !important;
 }
 
-.fm-custom-paginator__actions :deep(.fm-grid-actions-final) {
-  width: max-content !important;
-  min-width: 0 !important;
-  max-width: 100% !important;
-  flex: 0 0 auto !important;
-  justify-content: flex-start !important;
+.fm-custom-paginator__actions-inner :deep(.fm-grid-actions-final > .p-button),
+.fm-custom-paginator__actions-inner :deep(.fm-grid-actions-final > .fm-grid-action-final) {
+  width: 24px !important;
+  min-width: 24px !important;
+  max-width: 24px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  max-height: 24px !important;
+  flex: 0 0 24px !important;
+  margin: 0 !important;
+}
+
+.fm-custom-paginator__actions-inner :deep(.fm-grid-actions-final--large > .p-button),
+.fm-custom-paginator__actions-inner :deep(.fm-grid-actions-final--large > .fm-grid-action-final) {
+  width: 28px !important;
+  min-width: 28px !important;
+  max-width: 28px !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  max-height: 28px !important;
+  flex-basis: 28px !important;
 }
 
 .fm-custom-paginator__navigation {
+  grid-column: 2;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -251,6 +300,7 @@ watch(() => props.rowsOptions, scheduleMaximumRows, { deep: true })
 }
 
 .fm-custom-paginator__counter {
+  grid-column: 3;
   justify-self: end;
   color: #111;
   white-space: nowrap;
@@ -258,16 +308,22 @@ watch(() => props.rowsOptions, scheduleMaximumRows, { deep: true })
 
 @media (max-width: 900px) {
   .fm-custom-paginator {
+    min-height: 72px;
     grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
     gap: 4px;
+    padding-top: 34px;
   }
 
   .fm-custom-paginator__actions {
-    justify-self: start !important;
+    left: 4px !important;
+    top: 4px !important;
+    transform: none !important;
   }
 
   .fm-custom-paginator__navigation,
   .fm-custom-paginator__counter {
+    grid-column: 1;
     justify-self: center;
   }
 }
