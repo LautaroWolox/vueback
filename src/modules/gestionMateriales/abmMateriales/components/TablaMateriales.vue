@@ -17,7 +17,6 @@
     filterDisplay="row"
     selectionMode="single"
     :metaKeySelection="false"
-    :isDataSelectable="isDataSelectable"
     :rowClass="rowClass"
     paginator
     :rowsPerPageOptions="[50, 100, 250, 500]"
