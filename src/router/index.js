@@ -14,7 +14,11 @@ const allowed = (to, from, next) => {
   } else if (!autenticado && !rutasLibres.includes(to.name)) {
     next({ name: '401' });
     return;
-  } else if (autenticado && (rutasPermitidas.includes(to.name) || (to.name === 'JOCM' && rutasPermitidas.includes('JOCO')))) {
+  } else if (autenticado && (
+    rutasPermitidas.includes(to.name) ||
+    (to.name === 'JOCM' && rutasPermitidas.includes('JOCO')) ||
+    (to.name === 'ABMM' && import.meta.env.DEV)
+  )) {
     next();
     return;
   } else {
@@ -110,6 +114,12 @@ const routes = [
             urlParam: '/gestionMaterialesOt.html',
             titleParam: 'Gestionar Materiales en OTs',
         }
+      },
+      {
+        path: 'abmMateriales.html',
+        name: 'ABMM',
+        beforeEnter: allowed,
+        component: () => import('../modules/gestionMateriales/abmMateriales/AbmMateriales.vue')
       },
       {
         path: 'gestionErrores.html',
