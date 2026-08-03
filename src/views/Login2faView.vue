@@ -16,17 +16,6 @@
         <span class="login-title__manager">Manager</span>
       </h1>
 
-      <div class="login-secure-label">
-        <span class="login-secure-label__line" aria-hidden="true"></span>
-        <span>ACCESO SEGURO</span>
-        <span class="login-secure-label__line" aria-hidden="true"></span>
-      </div>
-
-      <p class="login-description">
-        Conectate con tu usuario corporativo<br />
-        para ingresar al sistema.
-      </p>
-
       <Button
         icon="pi pi-sign-in"
         label="CONECTAR"
@@ -34,9 +23,9 @@
         type="button"
         @click="ingresar"
       />
-
-      <p class="login-copyright">PERSONAL ARGENTINA © 2025</p>
     </main>
+
+    <p class="login-copyright">PERSONAL ARGENTINA © 2025</p>
   </div>
 </template>
 
@@ -84,6 +73,7 @@ onMounted(async () => {
     radial-gradient(circle at center, rgba(217, 244, 246, .58) 0, rgba(239, 248, 249, .74) 34%, rgba(246, 249, 250, .96) 67%, #f5f8f9 100%);
   color: #111d22;
   isolation: isolate;
+  box-sizing: border-box;
 }
 
 .login-page::before {
@@ -152,35 +142,6 @@ onMounted(async () => {
   color: #08b5ba;
 }
 
-.login-secure-label {
-  width: 100%;
-  display: grid;
-  grid-template-columns: minmax(48px, 82px) auto minmax(48px, 82px);
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 30px;
-  color: #9aa5a9;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: .34em;
-  white-space: nowrap;
-}
-
-.login-secure-label__line {
-  width: 100%;
-  height: 1px;
-  background: rgba(10, 181, 186, .58);
-}
-
-.login-description {
-  margin: 30px 0 36px;
-  color: #7a8589;
-  font-size: 17px;
-  line-height: 1.55;
-  font-weight: 400;
-}
-
 .login-submit-button,
 :deep(.login-submit-button.p-button) {
   width: 236px !important;
@@ -190,6 +151,7 @@ onMounted(async () => {
   align-items: center !important;
   justify-content: center !important;
   gap: 12px !important;
+  margin-top: 38px !important;
   padding: 0 24px !important;
   border: 0 !important;
   border-radius: 18px !important;
@@ -220,11 +182,17 @@ onMounted(async () => {
 }
 
 .login-copyright {
-  margin: 37px 0 0;
-  color: #c0c6c8;
+  position: absolute;
+  right: 28px;
+  bottom: 20px;
+  z-index: 2;
+  margin: 0;
+  color: #aeb8bb;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: .2em;
+  text-align: right;
+  white-space: nowrap;
 }
 
 @media (max-width: 760px) {
@@ -248,28 +216,17 @@ onMounted(async () => {
     font-size: 45px;
   }
 
-  .login-secure-label {
-    grid-template-columns: minmax(30px, 56px) auto minmax(30px, 56px);
-    gap: 10px;
-    margin-top: 24px;
-    font-size: 10px;
-    letter-spacing: .24em;
-  }
-
-  .login-description {
-    margin: 26px 0 30px;
-    font-size: 15px;
-  }
-
   .login-submit-button,
   :deep(.login-submit-button.p-button) {
     width: min(236px, 82vw) !important;
     height: 56px !important;
     min-height: 56px !important;
+    margin-top: 32px !important;
   }
 
   .login-copyright {
-    margin-top: 32px;
+    right: 18px;
+    bottom: 16px;
     font-size: 10px;
     letter-spacing: .16em;
   }
