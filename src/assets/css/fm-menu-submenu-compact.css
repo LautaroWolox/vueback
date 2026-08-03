@@ -1,0 +1,105 @@
+/*
+ * Ajuste final de los submenús desplegables.
+ * Se carga después de los demás estilos del menú para evitar que PrimeVue
+ * restablezca fondos grises o alturas mayores.
+ */
+#app .main-menu .p-menubar-submenu,
+#app .main-menu .p-submenu-list,
+body > .p-menubar-submenu,
+body > .p-submenu-list {
+  padding: 0 !important;
+  background: #fff !important;
+}
+
+#app .main-menu .p-menubar-submenu .p-menubar-item,
+#app .main-menu .p-menubar-submenu .p-menuitem,
+#app .main-menu .p-submenu-list .p-menubar-item,
+#app .main-menu .p-submenu-list .p-menuitem,
+body > .p-menubar-submenu .p-menubar-item,
+body > .p-menubar-submenu .p-menuitem,
+body > .p-submenu-list .p-menubar-item,
+body > .p-submenu-list .p-menuitem {
+  height: 28px !important;
+  min-height: 28px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: #fff !important;
+}
+
+#app .main-menu .p-menubar-submenu .p-menubar-item-content,
+#app .main-menu .p-menubar-submenu .p-menuitem-content,
+#app .main-menu .p-submenu-list .p-menubar-item-content,
+#app .main-menu .p-submenu-list .p-menuitem-content,
+body > .p-menubar-submenu .p-menubar-item-content,
+body > .p-menubar-submenu .p-menuitem-content,
+body > .p-submenu-list .p-menubar-item-content,
+body > .p-submenu-list .p-menuitem-content {
+  height: 28px !important;
+  min-height: 28px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid #edf1f3 !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  box-sizing: border-box !important;
+}
+
+#app .main-menu .p-menubar-submenu .p-menubar-item:last-child > .p-menubar-item-content,
+#app .main-menu .p-menubar-submenu .p-menuitem:last-child > .p-menuitem-content,
+#app .main-menu .p-submenu-list .p-menubar-item:last-child > .p-menubar-item-content,
+#app .main-menu .p-submenu-list .p-menuitem:last-child > .p-menuitem-content,
+body > .p-menubar-submenu .p-menubar-item:last-child > .p-menubar-item-content,
+body > .p-menubar-submenu .p-menuitem:last-child > .p-menuitem-content,
+body > .p-submenu-list .p-menubar-item:last-child > .p-menubar-item-content,
+body > .p-submenu-list .p-menuitem:last-child > .p-menuitem-content {
+  border-bottom: 0 !important;
+}
+
+#app .main-menu .p-menubar-submenu .fm-menu-link--submenu,
+#app .main-menu .p-submenu-list .fm-menu-link--submenu,
+body > .p-menubar-submenu .fm-menu-link--submenu,
+body > .p-submenu-list .fm-menu-link--submenu {
+  width: 100% !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  padding: 0 12px !important;
+  gap: 8px !important;
+  background: #fff !important;
+  box-sizing: border-box !important;
+}
+
+#app .main-menu .p-menubar-submenu .fm-menu-label,
+#app .main-menu .p-submenu-list .fm-menu-label,
+body > .p-menubar-submenu .fm-menu-label,
+body > .p-submenu-list .fm-menu-label {
+  font-size: 11px !important;
+  line-height: 1 !important;
+}
+
+#app .main-menu .p-menubar-submenu .p-menubar-item-content:hover,
+#app .main-menu .p-menubar-submenu .p-menuitem-content:hover,
+#app .main-menu .p-submenu-list .p-menubar-item-content:hover,
+#app .main-menu .p-submenu-list .p-menuitem-content:hover,
+#app .main-menu .p-menubar-submenu .p-menubar-item.p-focus > .p-menubar-item-content,
+#app .main-menu .p-submenu-list .p-menubar-item.p-focus > .p-menubar-item-content,
+body > .p-menubar-submenu .p-menubar-item-content:hover,
+body > .p-menubar-submenu .p-menuitem-content:hover,
+body > .p-submenu-list .p-menubar-item-content:hover,
+body > .p-submenu-list .p-menuitem-content:hover {
+  background: #e9fafd !important;
+  box-shadow: inset 3px 0 0 #00a9bd !important;
+  transform: none !important;
+}
+
+#app .main-menu .p-menubar-submenu .p-menubar-item-content:hover .fm-menu-link--submenu,
+#app .main-menu .p-menubar-submenu .p-menuitem-content:hover .fm-menu-link--submenu,
+#app .main-menu .p-submenu-list .p-menubar-item-content:hover .fm-menu-link--submenu,
+#app .main-menu .p-submenu-list .p-menuitem-content:hover .fm-menu-link--submenu,
+body > .p-menubar-submenu .p-menubar-item-content:hover .fm-menu-link--submenu,
+body > .p-menubar-submenu .p-menuitem-content:hover .fm-menu-link--submenu,
+body > .p-submenu-list .p-menubar-item-content:hover .fm-menu-link--submenu,
+body > .p-submenu-list .p-menuitem-content:hover .fm-menu-link--submenu {
+  background: transparent !important;
+}
