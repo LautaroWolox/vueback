@@ -1,4 +1,70 @@
+/* === INICIO DOCUMENTACION GENERAL FM-GLOBAL === */
+/*
+ * GUÍA DE MANTENIMIENTO DE FM-GLOBAL.CSS
+ * ======================================
+ *
+ * Este archivo reúne los estilos que antes estaban separados en distintas hojas.
+ * Los comentarios no cambian la cascada CSS: sirven para indicar alcance, riesgo
+ * y pantallas afectadas antes de modificar una regla.
+ *
+ * CLASIFICACIÓN UTILIZADA
+ * -----------------------
+ * [GLOBAL CRÍTICO - NO TOCAR POR UNA SOLA PANTALLA]
+ *   Reglas base compartidas por toda la aplicación. Un cambio puede afectar menú,
+ *   formularios, grillas, diálogos, paginadores y todas las pantallas migradas.
+ *   Para corregir una pantalla puntual, crear una regla acotada bajo la clase raíz
+ *   de esa pantalla en lugar de modificar estos bloques.
+ *
+ * [GLOBAL COMPARTIDO - MODIFICAR CON PRUEBA REGRESIVA]
+ *   Reglas reutilizadas por varios módulos. Pueden tocarse únicamente cuando el
+ *   cambio deba aplicarse a todos los consumidores del componente compartido.
+ *
+ * [MÓDULO / PANTALLA]
+ *   Reglas acotadas a una pantalla o familia concreta. Los ajustes deben conservar
+ *   siempre la clase raíz del módulo para no filtrarse a otras vistas.
+ *
+ * [IFRAME LEGACY]
+ *   Reglas inyectadas dentro de páginas antiguas cargadas en iframe. No gobiernan
+ *   directamente los componentes Vue migrados.
+ *
+ * [ARCHIVADO - INACTIVO]
+ *   Código histórico conservado dentro de @media not all. No participa de la UI.
+ *   No debe activarse sin una revisión completa de conflictos y especificidad.
+ *
+ * REGLA GENERAL
+ * -------------
+ * Nunca resolver un problema visual de una sola pantalla modificando un bloque
+ * marcado como GLOBAL CRÍTICO. Primero usar la clase raíz del módulo, por ejemplo:
+ * .report-sas-page, .busqueda-ots-page, .ot-fallidas-ct o .jobtype-screen.
+ *
+ * ÍNDICE RÁPIDO
+ * -------------
+ * Globales críticos: fm-global, fm-responsive, desktop/notebook, menú y spacing.
+ * Globales compartidos: grillas, selects y estados vacíos.
+ * Módulos: Reporte SAS, Jobtype/CMO y Parametrizaciones.
+ * Legacy: responsive de páginas cargadas dentro de iframe.
+ * Archivados: fm-report-sas-fullscreen y nuestros.css.
+ */
+/* === FIN DOCUMENTACION GENERAL FM-GLOBAL === */
+
 /* ===== INICIO: fm-global.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [GLOBAL CRÍTICO - NO TOCAR POR UNA SOLA PANTALLA]
+ * PANTALLAS AFECTADAS: toda la aplicación Vue y todos los módulos migrados.
+ * RESPONSABILIDAD:
+ *   - variables de diseño, colores, tipografía, bordes, radios y sombras;
+ *   - normalización de html, body, #app y box-sizing;
+ *   - contenedores fm-screen, tarjetas, paneles y acordeones compartidos;
+ *   - filtros, campos, inputs, botones y estados disabled/focus;
+ *   - estructura base de grillas, tablas, filas, filtros y paginadores;
+ *   - diálogos, alertas, calendario, loader y menú base;
+ *   - breakpoints genéricos para tablet y móvil.
+ * ADVERTENCIA: no modificar para corregir Reporte SAS, Búsqueda de OTs,
+ * Registro OTs Fallidas, Jobtype o CMO de manera aislada. Crear una regla
+ * específica bajo la clase raíz de la pantalla correspondiente.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
 @layer fieldmanager {
   :root {
     --fm-cyan: #00a9bd;
@@ -888,6 +954,20 @@
 /* ===== FIN: fm-global.css ===== */
 
 /* ===== INICIO: fm-grid-resize.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [GLOBAL COMPARTIDO - MODIFICAR CON PRUEBA REGRESIVA]
+ * PANTALLAS AFECTADAS: todas las grillas PrimeVue con fm-pass-grid/fm-pt-datatable;
+ * además contiene ajustes dirigidos a Registro OTs Fallidas, Emulación y Reporte SAS.
+ * RESPONSABILIDAD:
+ *   - visibilidad de fila de filtros;
+ *   - controlador de redimensionamiento de columnas;
+ *   - cursores y estados durante el resize;
+ *   - estados visuales de filas seleccionadas, deshabilitadas y reprocesadas.
+ * ADVERTENCIA: las reglas generales de resize no deben tocarse por una sola tabla.
+ * Los selectores que comienzan con #tabla.otf-grid pertenecen a OTs Fallidas.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
 @layer fieldmanager {
   .fm-pass-grid .p-datatable-thead > tr.p-datatable-filter-row,
   .fm-pass-grid .p-datatable-thead > tr.p-filter-row,
@@ -1037,6 +1117,21 @@
 /* ===== FIN: fm-grid-resize.css ===== */
 
 /* ===== INICIO: fm-responsive.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [GLOBAL CRÍTICO - NO TOCAR POR UNA SOLA PANTALLA]
+ * PANTALLAS AFECTADAS: todas las pantallas migradas, componentes compartidos,
+ * grillas, formularios, diálogos, paginadores e iframes contenedores.
+ * RESPONSABILIDAD:
+ *   - variables responsive y tamaños mínimos;
+ *   - distribución flexible y grillas de formularios;
+ *   - scroll horizontal controlado de DataTable;
+ *   - dimensiones responsive de diálogos y paginadores;
+ *   - comportamiento para 1366, 1180, 1024, 900, 768 y 600 px.
+ * ADVERTENCIA: es el sistema responsive general. Para una pantalla concreta,
+ * agregar un selector con su clase raíz dentro del bloque específico del módulo.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
 @layer fieldmanager {
   :root {
     --fm-page-padding: clamp(4px, .55vw, 12px);
@@ -1823,6 +1918,19 @@
 /* ===== FIN: fm-responsive.css ===== */
 
 /* ===== INICIO: fm-legacy-responsive.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [IFRAME LEGACY]
+ * PANTALLAS AFECTADAS: páginas antiguas abiertas mediante IframeView/DetalleView,
+ * por ejemplo Gestión de Actas, reglas, notas y otras rutas aún no migradas.
+ * RESPONSABILIDAD:
+ *   - adaptar formularios, tablas, paginadores, diálogos y barras de acciones legacy;
+ *   - agregar scroll y límites de viewport dentro del documento del iframe;
+ *   - mejorar uso táctil y reducir movimiento cuando el sistema lo solicita.
+ * ADVERTENCIA: este bloque es extraído por responsiveIframes.js e inyectado dentro
+ * del iframe. No usarlo para corregir componentes Vue migrados.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
 body.fm-responsive-legacy {
   width: 100% !important;
   max-width: 100% !important;
@@ -2152,6 +2260,18 @@ body.fm-responsive-legacy [class*=button-bar] {
 /* ===== FIN: fm-legacy-responsive.css ===== */
 
 /* ===== INICIO: fm-menu-responsive.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [GLOBAL CRÍTICO - MENÚ]
+ * PANTALLAS AFECTADAS: navegación principal de todas las rutas autenticadas.
+ * RESPONSABILIDAD:
+ *   - comportamiento del menubar en notebook, tablet y móvil;
+ *   - apertura, posición y ancho de submenús;
+ *   - controles táctiles, scroll y adaptación del panel de navegación.
+ * ADVERTENCIA: no modificar por una opción puntual del menú. Los cambios afectan
+ * la navegación completa y deben probarse en escritorio, notebook y móvil.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
 @layer fieldmanager {
   @media (max-width: 1180px) {
     .menu-container .fm-menu-link--root {
@@ -2294,6 +2414,17 @@ body.fm-responsive-legacy [class*=button-bar] {
 /* ===== FIN: fm-menu-responsive.css ===== */
 
 /* ===== INICIO: fm-menu-tuning.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [GLOBAL CRÍTICO - MENÚ]
+ * PANTALLAS AFECTADAS: cabecera, menú principal y sector de usuario en toda la app.
+ * RESPONSABILIDAD:
+ *   - apariencia general del menú y sus enlaces;
+ *   - perfil del usuario, icono, datos y cierre de sesión;
+ *   - sombras, bordes, hover, estados activos y franja decorativa.
+ * ADVERTENCIA: no usar este bloque para ajustar contenido interno de una pantalla.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
 /* Ajustes visuales específicos del menú principal.
  * Se mantiene separado para no alterar los estilos generales de PrimeVue.
  */
@@ -2668,6 +2799,18 @@ body > .p-submenu-list .p-menuitem-content:hover {
 /* ===== FIN: fm-menu-tuning.css ===== */
 
 /* ===== INICIO: fm-report-sas-auto-height.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [MÓDULO / PANTALLA]
+ * PANTALLA AFECTADA: Reporte SAS.
+ * CLASES PRINCIPALES: .report-sas-page, .report-sas-grid-shell y .report-sas-grid.
+ * RESPONSABILIDAD:
+ *   - altura automática de la grilla;
+ *   - uso del espacio disponible entre cabecera, tabla y paginador;
+ *   - prevención de scroll duplicado y cortes verticales.
+ * MODIFICACIÓN: puede ajustarse para Reporte SAS, manteniendo siempre sus clases raíz.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
 /* Reporte SAS: crece con la cantidad de filas hasta completar la pantalla.
  * Al alcanzar la altura disponible, conserva el scroll interno de la grilla.
  */
@@ -2707,6 +2850,16 @@ body > .p-submenu-list .p-menuitem-content:hover {
 /* ===== FIN: fm-report-sas-auto-height.css ===== */
 
 /* ===== INICIO: fm-report-sas-fullscreen.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [ARCHIVADO - INACTIVO]
+ * PANTALLA HISTÓRICA: Reporte SAS.
+ * ESTADO: conservado dentro de @media not all; no participa de la cascada actual.
+ * RESPONSABILIDAD HISTÓRICA: forzar Reporte SAS a pantalla completa.
+ * ADVERTENCIA: no quitar @media not all ni reactivar estas reglas. Existe una
+ * implementación actual de tamaño completo y activarlo duplicaría especificidad.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
 /* Sección archivada: este archivo no estaba importado en la aplicación. */
 @media not all {
   #app .report-sas-page.report-sas-page--fullscreen {
@@ -2738,6 +2891,18 @@ body > .p-submenu-list .p-menuitem-content:hover {
 /* ===== FIN: fm-report-sas-fullscreen.css ===== */
 
 /* ===== INICIO: fm-select.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [GLOBAL COMPARTIDO - MODIFICAR CON PRUEBA REGRESIVA]
+ * PANTALLAS AFECTADAS: todos los Select y MultiSelect compartidos de PrimeVue.
+ * RESPONSABILIDAD:
+ *   - altura, tipografía, padding, iconos y panel desplegable;
+ *   - estados focus, disabled, hover y selección;
+ *   - consistencia visual de combos entre módulos.
+ * ADVERTENCIA: para un combo particular usar una clase del módulo. No cambiar este
+ * bloque para resolver solamente un Select de Jobtype, Reporte SAS u OTs Fallidas.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
 @layer fieldmanager {
   .p-select-overlay,
   .fm-pt-select-panel {
@@ -2815,6 +2980,19 @@ body > .p-submenu-list .p-menuitem-content:hover {
 /* ===== FIN: fm-select.css ===== */
 
 /* ===== INICIO: jobtype-contrato.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [MÓDULO / FAMILIA DE PANTALLAS]
+ * PANTALLAS AFECTADAS: Configuración Jobtype–Contrato y CMO–Actividad cuando
+ * reutilizan clases .jobtype-* y sus componentes compartidos.
+ * RESPONSABILIDAD:
+ *   - distribución de filtros, resultados, grillas y botones;
+ *   - modales de alta, modificación y confirmación;
+ *   - dimensiones y comportamiento visual de la familia Jobtype.
+ * ADVERTENCIA: aunque el nombre diga contrato, varias reglas son compartidas con CMO.
+ * Revisar ambas pantallas antes de modificar un selector .jobtype-* genérico.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
 /*
  * Jobtype-Contrato
  * Única hoja de estilos de la pantalla.
@@ -3374,6 +3552,17 @@ body .p-dialog.jobtype-alta-dialog .jobtype-alta-autocomplete--invalid input:foc
 /* ===== FIN: jobtype-contrato.css ===== */
 
 /* ===== INICIO: parametrizaciones-panel-accent.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [MÓDULO / FAMILIA DE PANTALLAS]
+ * PANTALLAS AFECTADAS: Jobtype–Contrato y CMO–Actividad.
+ * RESPONSABILIDAD:
+ *   - ancho final de paneles de parametrizaciones;
+ *   - línea turquesa vertical continua debajo de la cabecera;
+ *   - superposición del acento sobre filtros, tabla y paginador.
+ * ADVERTENCIA: conservar el pseudo-elemento y verificar ambas parametrizaciones.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
 /*
  * Ajuste compartido para Jobtype–Contrato y CMO–Actividad.
  * La línea turquesa comienza inmediatamente debajo de la cabecera
@@ -3412,6 +3601,17 @@ html body #app .jobtype-screen > .jobtype-panel::after {
 /* ===== FIN: parametrizaciones-panel-accent.css ===== */
 
 /* ===== INICIO: jobtype-required-validation.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [MÓDULO / FAMILIA DE PANTALLAS]
+ * PANTALLAS AFECTADAS: formularios y diálogos Jobtype–Contrato/CMO–Actividad.
+ * RESPONSABILIDAD:
+ *   - marca visual de campos obligatorios;
+ *   - estados inválidos y mensajes de validación;
+ *   - consistencia de borde/foco en formularios Jobtype.
+ * MODIFICACIÓN: limitar cualquier nueva regla a las clases del diálogo correspondiente.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
 /*
  * Validación visible de los campos obligatorios de Alta Jobtype-Contrato.
  * Se carga después de jobtype-contrato.css para prevalecer sobre PrimeVue.
@@ -3449,6 +3649,18 @@ html body .p-dialog.jobtype-alta-dialog
 /* ===== FIN: jobtype-required-validation.css ===== */
 
 /* ===== INICIO: parametrizaciones-grid-selection.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [MÓDULO / FAMILIA DE PANTALLAS]
+ * PANTALLAS AFECTADAS: grillas de Jobtype–Contrato y CMO–Actividad.
+ * RESPONSABILIDAD:
+ *   - color de fila seleccionada;
+ *   - hover, checkbox y estados de selección;
+ *   - prioridad visual sobre estilos generales de DataTable.
+ * ADVERTENCIA: no trasladar estas reglas a .fm-pass-grid global porque cambiaría
+ * todas las tablas migradas.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
 /*
  * Tipografía y selección compartidas para las grillas de Parametrizaciones.
  * Referencia visual: Registro OTs Fallidas.
@@ -3521,6 +3733,18 @@ html body #app #tabla-cmo-actividad .p-datatable-tbody > tr[aria-selected='true'
 /* ===== FIN: parametrizaciones-grid-selection.css ===== */
 
 /* ===== INICIO: fm-grid-empty-state.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [GLOBAL COMPARTIDO - MODIFICAR CON PRUEBA REGRESIVA]
+ * PANTALLAS AFECTADAS: todas las grillas que usan el estado vacío compartido.
+ * RESPONSABILIDAD:
+ *   - apariencia de “sin resultados”;
+ *   - altura mínima, fondo, alineación y mensaje vacío;
+ *   - compatibilidad con distintas clases de PrimeVue para empty message.
+ * ADVERTENCIA: un cambio se verá en Reporte SAS, Búsqueda de OTs, OTs Fallidas
+ * y otras tablas migradas.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
 /*
  * Estado vacío compartido para todas las grillas del aplicativo.
  * Referencia visual: franja celeste fina de 35 px con texto centrado.
@@ -3576,6 +3800,18 @@ html body #app .p-datatable.p-component .fm-grid-empty {
 /* ===== FIN: fm-grid-empty-state.css ===== */
 
 /* ===== INICIO: fm-desktop-notebook-responsive.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [GLOBAL CRÍTICO - NO TOCAR POR UNA SOLA PANTALLA]
+ * PANTALLAS AFECTADAS: layout general en 1920×1080, 1366×768, 1280×720 y 1024×768.
+ * RESPONSABILIDAD:
+ *   - altura disponible debajo del menú;
+ *   - contenedores principales, scroll y viewport;
+ *   - adaptación de tablas, filtros y diálogos a notebook/escritorio.
+ * ADVERTENCIA: modificar solo para una corrección transversal validada en todas
+ * las resoluciones objetivo.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
 @layer fieldmanager {
   /*
    * Primera etapa responsive del aplicativo.
@@ -3908,6 +4144,19 @@ html body #app .p-datatable.p-component .fm-grid-empty {
 /* ===== FIN: fm-desktop-notebook-responsive.css ===== */
 
 /* ===== INICIO: fm-desktop-notebook-modules.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [MULTI-MÓDULO - MODIFICAR CON PRUEBA REGRESIVA]
+ * PANTALLAS AFECTADAS: Jobtype–Contrato, CMO–Actividad, Búsqueda de OTs,
+ * Registro OTs Fallidas y Reporte SAS.
+ * RESPONSABILIDAD:
+ *   - correcciones puntuales de altura y flex para módulos con medidas históricas;
+ *   - expansión de grillas y contenido de acordeones;
+ *   - adaptación de modales Jobtype en notebook y 1024 px.
+ * ADVERTENCIA: revisar el selector antes de tocarlo: algunos son multi-módulo y
+ * otros están dirigidos específicamente a .jobtype-, .busqueda-ots-, .otf- o .report-sas-.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
 @layer fieldmanager {
   /* Ajustes puntuales de módulos que conservaban medidas históricas rígidas. */
   @media (min-width: 961px) {
@@ -4055,6 +4304,17 @@ html body #app .p-datatable.p-component .fm-grid-empty {
 /* ===== FIN: fm-desktop-notebook-modules.css ===== */
 
 /* ===== INICIO: fm-menu-spacing.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [GLOBAL CRÍTICO - MENÚ Y LAYOUT]
+ * PANTALLAS AFECTADAS: todas las rutas mostradas dentro del layout principal.
+ * RESPONSABILIDAD:
+ *   - altura efectiva de cabecera;
+ *   - separación inferior del menú;
+ *   - posición de .main-home y cálculo del área de contenido.
+ * ADVERTENCIA: cambiar estos valores desplaza todas las pantallas verticalmente.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
 @layer fieldmanager {
   /*
    * Reduce el espacio visual entre la franja de color del menú
@@ -4087,6 +4347,18 @@ html body #app .p-datatable.p-component .fm-grid-empty {
 /* ===== FIN: fm-menu-spacing.css ===== */
 
 /* ===== INICIO: fm-menu-submenu-compact.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [GLOBAL CRÍTICO - SUBMENÚS]
+ * PANTALLAS AFECTADAS: todos los submenús del menú principal.
+ * RESPONSABILIDAD:
+ *   - fondo blanco de desplegables;
+ *   - altura compacta de filas, padding y tipografía;
+ *   - divisores, hover turquesa y eliminación de separaciones excesivas.
+ * ADVERTENCIA: mantener este bloque al final de los estilos de menú porque su orden
+ * asegura que PrimeVue no restablezca fondos grises o alturas mayores.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
 /*
  * Ajuste final de los submenús desplegables.
  * Se carga después de los demás estilos del menú para evitar que PrimeVue
@@ -4195,6 +4467,15 @@ body > .p-submenu-list .p-menuitem-content:hover .fm-menu-link--submenu {
 /* ===== FIN: fm-menu-submenu-compact.css ===== */
 
 /* ===== INICIO: nuestros.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [ARCHIVADO - INACTIVO]
+ * ALCANCE HISTÓRICO: reglas antiguas globales de PrimeVue, botones y menubar.
+ * ESTADO: conservado dentro de @media not all; no participa de la cascada actual.
+ * ADVERTENCIA: no activar. Sus selectores globales entrarían en conflicto con
+ * fm-global.css, fm-menu-tuning.css y fm-menu-submenu-compact.css.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
 /* Sección archivada: este archivo no estaba importado en la aplicación. */
 @media not all {
   :root {
