@@ -1,9 +1,13 @@
 @layer fieldmanager {
   /*
-   * Acento visual compartido por las pantallas Jobtype–Contrato y CMO–Actividad.
-   * Ambas vistas utilizan .jobtype-panel para sus acordeones de filtros y resultados.
+   * Ajuste compartido para Jobtype–Contrato y CMO–Actividad.
+   * Conserva la línea turquesa a la izquierda y reduce apenas
+   * el ancho de los acordeones para que no lleguen hasta el borde derecho.
    */
   html body #app .jobtype-screen > .jobtype-panel {
+    width: calc(100% - 8px) !important;
+    max-width: calc(100% - 8px) !important;
+    margin-right: 8px !important;
     border-left: 3px solid var(--fm-cyan, #00a9bd) !important;
   }
 }
