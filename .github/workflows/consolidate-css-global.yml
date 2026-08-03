@@ -1,0 +1,205 @@
+name: Consolidar estilos globales
+
+on:
+  push:
+    branches:
+      - consolidar-estilos-globales
+
+permissions:
+  contents: write
+
+jobs:
+  consolidate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Consolidar hojas de estilo
+        shell: bash
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          import re
+
+          css_dir = Path('src/assets/css')
+          main_path = Path('src/main.js')
+          iframe_plugin_path = Path('src/plugins/responsiveIframes.js')
+
+          ordered_files = [
+              'fm-global.css',
+              'fm-grid-resize.css',
+              'fm-responsive.css',
+              'fm-legacy-responsive.css',
+              'fm-menu-responsive.css',
+              'fm-menu-tuning.css',
+              'fm-report-sas-auto-height.css',
+              'fm-report-sas-fullscreen.css',
+              'fm-select.css',
+              'jobtype-contrato.css',
+              'parametrizaciones-panel-accent.css',
+              'jobtype-required-validation.css',
+              'parametrizaciones-grid-selection.css',
+              'fm-grid-empty-state.css',
+              'fm-desktop-notebook-responsive.css',
+              'fm-desktop-notebook-modules.css',
+              'fm-menu-spacing.css',
+              'fm-menu-submenu-compact.css',
+              'nuestros.css',
+          ]
+
+          missing = [name for name in ordered_files if not (css_dir / name).is_file()]
+          if missing:
+              raise SystemExit(f'Faltan hojas de estilo esperadas: {missing}')
+
+          main_original = main_path.read_text(encoding='utf-8')
+          plugin_original = iframe_plugin_path.read_text(encoding='utf-8')
+
+          # Detecta referencias inesperadas antes de borrar archivos.
+          allowed_references = {
+              main_path.resolve(),
+              iframe_plugin_path.resolve(),
+          }
+          unexpected = []
+          for source in Path('src').rglob('*'):
+              if not source.is_file() or source.resolve() in {(css_dir / name).resolve() for name in ordered_files}:
+                  continue
+              if source.suffix.lower() not in {'.js', '.ts', '.vue', '.css', '.scss', '.html'}:
+                  continue
+              text = source.read_text(encoding='utf-8', errors='ignore')
+              matches = [name for name in ordered_files if name != 'fm-global.css' and name in text]
+              if matches and source.resolve() not in allowed_references:
+                  unexpected.append((str(source), matches))
+
+          if unexpected:
+              details = '\n'.join(f'{path}: {names}' for path, names in unexpected)
+              raise SystemExit(f'Referencias CSS no contempladas:\n{details}')
+
+          imported_from_main = {
+              name for name in ordered_files
+              if re.search(rf"^import\s+['\"][^'\"]*{re.escape(name)}['\"]\s*;?\s*$", main_original, re.MULTILINE)
+          }
+
+          sections = []
+          original_contents = {}
+          for name in ordered_files:
+              path = css_dir / name
+              content = path.read_text(encoding='utf-8').rstrip() + '\n'
+              original_contents[name] = content
+
+              start = f'/* ===== INICIO: {name} ===== */'
+              end = f'/* ===== FIN: {name} ===== */'
+
+              # Estos archivos estaban presentes pero no participaban de la cascada.
+              # Se conservan dentro del global sin activarlos para no reintroducir
+              # estilos obsoletos ni cambiar el comportamiento actual.
+              is_active = (
+                  name == 'fm-global.css'
+                  or name in imported_from_main
+                  or name == 'fm-legacy-responsive.css'
+              )
+
+              if is_active:
+                  body = content
+              else:
+                  body = (
+                      '/* Sección archivada: este archivo no estaba importado en la aplicación. */\n'
+                      '@media not all {\n'
+                      + '\n'.join(f'  {line}' if line else '' for line in content.splitlines())
+                      + '\n}\n'
+                  )
+
+              sections.append(f'{start}\n{body}{end}\n')
+
+          combined = '\n'.join(sections)
+
+          for name, content in original_contents.items():
+              if content.strip() not in combined:
+                  raise SystemExit(f'La consolidación perdió contenido de {name}')
+
+          (css_dir / 'fm-global.css').write_text(combined, encoding='utf-8')
+
+          # main.js conserva una única importación propia de estilos.
+          css_import_pattern = re.compile(
+              r"^import\s+['\"]\.\/assets\/css\/(?:"
+              + '|'.join(re.escape(name) for name in ordered_files if name != 'fm-global.css')
+              + r")['\"]\s*;?\s*\n?",
+              re.MULTILINE,
+          )
+          main_updated = css_import_pattern.sub('', main_original)
+          if main_updated.count("import './assets/css/fm-global.css'") != 1:
+              raise SystemExit('main.js debe conservar exactamente una importación de fm-global.css')
+          main_path.write_text(main_updated, encoding='utf-8')
+
+          # El iframe necesita únicamente la sección legacy, no todo el CSS global.
+          legacy_start = '/* ===== INICIO: fm-legacy-responsive.css ===== */'
+          legacy_end = '/* ===== FIN: fm-legacy-responsive.css ===== */'
+          plugin_updated = plugin_original.replace(
+              "import legacyResponsiveCss from '@/assets/css/fm-legacy-responsive.css?raw'",
+              "import globalCss from '@/assets/css/fm-global.css?raw'\n\n"
+              "const LEGACY_START = '/* ===== INICIO: fm-legacy-responsive.css ===== */'\n"
+              "const LEGACY_END = '/* ===== FIN: fm-legacy-responsive.css ===== */'\n\n"
+              "const legacyStartIndex = globalCss.indexOf(LEGACY_START)\n"
+              "const legacyEndIndex = globalCss.indexOf(LEGACY_END)\n\n"
+              "if (legacyStartIndex === -1 || legacyEndIndex === -1 || legacyEndIndex <= legacyStartIndex) {\n"
+              "  throw new Error('No se encontró la sección responsive legacy en fm-global.css')\n"
+              "}\n\n"
+              "const legacyResponsiveCss = globalCss\n"
+              "  .slice(legacyStartIndex + LEGACY_START.length, legacyEndIndex)\n"
+              "  .trim()"
+          )
+          if plugin_updated == plugin_original:
+              raise SystemExit('No se pudo adaptar responsiveIframes.js')
+          iframe_plugin_path.write_text(plugin_updated, encoding='utf-8')
+
+          for name in ordered_files:
+              if name != 'fm-global.css':
+                  (css_dir / name).unlink()
+
+          # Comprobaciones estructurales previas al build.
+          remaining_css = sorted(path.name for path in css_dir.glob('*.css'))
+          if remaining_css != ['fm-global.css']:
+              raise SystemExit(f'Deben quedar únicamente los estilos globales: {remaining_css}')
+
+          for source in Path('src').rglob('*'):
+              if not source.is_file() or source == css_dir / 'fm-global.css':
+                  continue
+              if source.suffix.lower() not in {'.js', '.ts', '.vue', '.css', '.scss', '.html'}:
+                  continue
+              text = source.read_text(encoding='utf-8', errors='ignore')
+              stale = [name for name in ordered_files if name != 'fm-global.css' and name in text]
+              # responsiveIframes conserva el nombre solo en los marcadores de extracción.
+              if source == iframe_plugin_path:
+                  stale = [name for name in stale if name != 'fm-legacy-responsive.css']
+              if stale:
+                  raise SystemExit(f'Referencias obsoletas en {source}: {stale}')
+          PY
+
+      - name: Instalar dependencias
+        shell: bash
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Validar compilación
+        run: npm run build
+
+      - name: Validar diferencias
+        run: git diff --check
+
+      - name: Guardar consolidación
+        shell: bash
+        run: |
+          rm -f .github/workflows/consolidate-css-global.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Consolidar estilos en fm-global.css"
+          git push origin HEAD:consolidar-estilos-globales
