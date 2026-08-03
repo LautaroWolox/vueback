@@ -15,6 +15,10 @@
       </div>
     </template>
 
+    <template #closeicon>
+      <span class="abm-materiales-dialog-close-icon" aria-hidden="true">×</span>
+    </template>
+
     <form
       class="abm-materiales-dialog__form abm-materiales-dialog__form--edit"
       @submit.prevent="guardar"
