@@ -104,8 +104,6 @@ jobs:
                   )
 
               section = f'{start}\n{body}{end}\n'
-              if start not in section or end not in section:
-                  raise SystemExit(f'No se pudo delimitar {name}')
               for line in content.splitlines():
                   if line.strip() and line.strip() not in section:
                       raise SystemExit(f'La consolidación perdió una regla de {name}: {line}')
@@ -147,9 +145,14 @@ jobs:
               if name != 'fm-global.css':
                   (css_dir / name).unlink()
 
-          remaining_css = sorted(path.name for path in css_dir.glob('*.css'))
-          if remaining_css != ['fm-global.css']:
-              raise SystemExit(f'Deben quedar únicamente los estilos globales: {remaining_css}')
+          remaining_targets = [
+              name for name in ordered_files
+              if name != 'fm-global.css' and (css_dir / name).exists()
+          ]
+          if remaining_targets:
+              raise SystemExit(f'No se eliminaron todos los CSS consolidados: {remaining_targets}')
+          if not (css_dir / 'theme.css').is_file():
+              raise SystemExit('theme.css debe conservarse como hoja independiente')
 
           for source in Path('src').rglob('*'):
               if not source.is_file() or source == css_dir / 'fm-global.css':
