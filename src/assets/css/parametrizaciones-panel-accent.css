@@ -1,25 +1,16 @@
-@layer fieldmanager {
-  /*
-   * Ajuste compartido para Jobtype–Contrato y CMO–Actividad.
-   * La línea turquesa se dibuja dentro de cada acordeón para evitar
-   * que el borde general del panel la sobrescriba.
-   */
-  html body #app .jobtype-screen > .jobtype-panel {
-    position: relative !important;
-    width: calc(100% - 8px) !important;
-    max-width: calc(100% - 8px) !important;
-    margin-right: 8px !important;
-  }
+/*
+ * Ajuste compartido para Jobtype–Contrato y CMO–Actividad.
+ * La línea turquesa pertenece al contenido expandido de cada acordeón,
+ * igual que en Registro de OTs Fallidas.
+ */
+html body #app .jobtype-screen > .jobtype-panel {
+  width: calc(100% - 8px) !important;
+  max-width: calc(100% - 8px) !important;
+  margin-right: 8px !important;
+}
 
-  html body #app .jobtype-screen > .jobtype-panel::before {
-    content: '';
-    position: absolute;
-    z-index: 20;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 3px;
-    background: var(--fm-cyan, #00a9bd);
-    pointer-events: none;
-  }
+html body #app .jobtype-screen > .jobtype-panel > .jobtype-panel__body,
+html body #app .jobtype-screen > .jobtype-panel > .jobtype-results-body {
+  border-left: 3px solid #00a9bd !important;
+  box-sizing: border-box !important;
 }
