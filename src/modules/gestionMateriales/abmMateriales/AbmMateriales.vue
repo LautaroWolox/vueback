@@ -153,3 +153,135 @@ const onMaterialCreated = () => {
   first.value = 0
 }
 </script>
+
+<style>
+#tabla-abm-materiales .p-datatable-tbody > tr.p-highlight > td,
+#tabla-abm-materiales .p-datatable-tbody > tr.p-datatable-row-selected > td {
+  border-color: #78c5cf !important;
+  background: #a9e0e7 !important;
+  color: #143d45 !important;
+  font-weight: 700 !important;
+}
+
+#tabla-abm-materiales .p-datatable-tbody > tr.p-highlight .abm-materiales-cell-text,
+#tabla-abm-materiales .p-datatable-tbody > tr.p-datatable-row-selected .abm-materiales-cell-text {
+  color: #143d45 !important;
+  font-weight: 700 !important;
+}
+
+.abm-materiales-dialog.p-dialog {
+  border: 1px solid #b7c4ca !important;
+  border-top: 3px solid #00a9bd !important;
+  border-radius: 9px !important;
+  box-shadow: 0 18px 42px rgba(22, 47, 59, .22) !important;
+}
+
+.abm-materiales-dialog .p-dialog-header {
+  min-height: 56px !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 20px !important;
+}
+
+.abm-materiales-dialog .p-dialog-title,
+.abm-materiales-dialog__header {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+}
+
+.abm-materiales-dialog .p-dialog-header-actions {
+  width: auto !important;
+  min-width: 0 !important;
+  height: auto !important;
+  margin-left: auto !important;
+  padding: 0 !important;
+}
+
+.abm-materiales-dialog .p-dialog-close-button,
+.abm-materiales-dialog .p-dialog-header-close-button {
+  width: 32px !important;
+  min-width: 32px !important;
+  max-width: 32px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 1px solid #d7e0e4 !important;
+  border-radius: 50% !important;
+  background: #f7fafb !important;
+  color: #84959d !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.abm-materiales-dialog .p-dialog-close-button:hover,
+.abm-materiales-dialog .p-dialog-header-close-button:hover {
+  border-color: #9fcbd1 !important;
+  background: #eaf8fa !important;
+  color: #007f90 !important;
+}
+
+.abm-materiales-dialog__form {
+  gap: 15px !important;
+  padding: 22px 22px 24px !important;
+}
+
+.abm-materiales-dialog__form--edit {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+.abm-materiales-dialog__form--add {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 16px 14px !important;
+}
+
+.abm-materiales-dialog__field--code,
+.abm-materiales-dialog__field--full {
+  grid-column: 1 / -1 !important;
+}
+
+.abm-materiales-dialog__field {
+  gap: 6px !important;
+}
+
+.abm-materiales-dialog__field label {
+  font-size: 11px !important;
+}
+
+.abm-materiales-dialog__field > .p-inputtext,
+.abm-materiales-dialog__field .p-inputnumber-input {
+  height: 40px !important;
+  min-height: 40px !important;
+  padding: 0 12px !important;
+  border-radius: 6px !important;
+  font-size: 13px !important;
+}
+
+.abm-materiales-dialog .p-dialog-footer {
+  min-height: 68px !important;
+  padding: 12px 20px !important;
+  background: #f9fbfc !important;
+}
+
+.abm-materiales-dialog__footer .fm-action-button,
+.abm-materiales-dialog__footer .fm-ui-button {
+  min-width: 120px !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0 18px !important;
+  border-radius: 7px !important;
+}
+
+@media (max-width: 700px) {
+  .abm-materiales-dialog__form--add,
+  .abm-materiales-dialog__form--edit {
+    grid-template-columns: 1fr !important;
+  }
+
+  .abm-materiales-dialog__field--code,
+  .abm-materiales-dialog__field--full {
+    grid-column: auto !important;
+  }
+}
+</style>
