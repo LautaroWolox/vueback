@@ -2,8 +2,7 @@ name: Consolidar estilos globales
 
 on:
   pull_request:
-    branches:
-      - main
+    branches: [main]
 
 permissions:
   contents: write
@@ -59,12 +58,9 @@ jobs:
 
           main_original = main_path.read_text(encoding='utf-8')
           plugin_original = iframe_plugin_path.read_text(encoding='utf-8')
-
-          allowed_references = {
-              main_path.resolve(),
-              iframe_plugin_path.resolve(),
-          }
           target_paths = {(css_dir / name).resolve() for name in ordered_files}
+          allowed_references = {main_path.resolve(), iframe_plugin_path.resolve()}
+
           unexpected = []
           for source in Path('src').rglob('*'):
               if not source.is_file() or source.resolve() in target_paths:
@@ -86,12 +82,8 @@ jobs:
           }
 
           sections = []
-          original_contents = {}
           for name in ordered_files:
-              path = css_dir / name
-              content = path.read_text(encoding='utf-8').rstrip() + '\n'
-              original_contents[name] = content
-
+              content = (css_dir / name).read_text(encoding='utf-8').rstrip() + '\n'
               start = f'/* ===== INICIO: {name} ===== */'
               end = f'/* ===== FIN: {name} ===== */'
 
@@ -111,14 +103,15 @@ jobs:
                       + '\n}\n'
                   )
 
-              sections.append(f'{start}\n{body}{end}\n')
+              section = f'{start}\n{body}{end}\n'
+              if start not in section or end not in section:
+                  raise SystemExit(f'No se pudo delimitar {name}')
+              for line in content.splitlines():
+                  if line.strip() and line.strip() not in section:
+                      raise SystemExit(f'La consolidación perdió una regla de {name}: {line}')
+              sections.append(section)
 
           combined = '\n'.join(sections)
-
-          for name, content in original_contents.items():
-              if content.strip() not in combined:
-                  raise SystemExit(f'La consolidación perdió contenido de {name}')
-
           (css_dir / 'fm-global.css').write_text(combined, encoding='utf-8')
 
           css_import_pattern = re.compile(
@@ -174,11 +167,7 @@ jobs:
       - name: Instalar dependencias
         shell: bash
         run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install
-          fi
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
       - name: Validar compilación
         run: npm run build
