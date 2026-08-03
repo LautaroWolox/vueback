@@ -1,0 +1,41 @@
+name: Integrar estilos ABM Materiales
+
+on:
+  push:
+    branches:
+      - ABM-Materiales
+    paths:
+      - .github/workflows/append-abm-materiales-css.yml
+
+permissions:
+  contents: write
+
+jobs:
+  append-styles:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout de la rama
+        uses: actions/checkout@v4
+        with:
+          ref: ABM-Materiales
+          fetch-depth: 0
+
+      - name: Incorporar estilos en fm-global.css
+        shell: bash
+        run: |
+          if ! grep -q "INICIO: abm-materiales.css" src/assets/css/fm-global.css; then
+            cat src/assets/css/.abm-materiales.pending.css >> src/assets/css/fm-global.css
+          fi
+
+      - name: Guardar consolidación
+        shell: bash
+        run: |
+          if git diff --quiet -- src/assets/css/fm-global.css; then
+            echo "La sección ya estaba integrada."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/assets/css/fm-global.css
+          git commit -m "Integrar estilos del ABM de materiales en fm-global"
+          git push origin HEAD:ABM-Materiales
