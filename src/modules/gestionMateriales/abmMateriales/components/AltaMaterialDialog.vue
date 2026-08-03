@@ -15,8 +15,11 @@
       </div>
     </template>
 
-    <form class="abm-materiales-dialog__form" @submit.prevent="guardar">
-      <div class="abm-materiales-dialog__field">
+    <form
+      class="abm-materiales-dialog__form abm-materiales-dialog__form--add"
+      @submit.prevent="guardar"
+    >
+      <div class="abm-materiales-dialog__field abm-materiales-dialog__field--code">
         <label for="add-material-code">CÓDIGO</label>
         <InputText
           id="add-material-code"
@@ -44,7 +47,7 @@
         </small>
       </div>
 
-      <div class="abm-materiales-dialog__field">
+      <div class="abm-materiales-dialog__field abm-materiales-dialog__field--threshold">
         <label for="add-min-threshold">UMBRAL MÍNIMO</label>
         <InputNumber
           id="add-min-threshold"
@@ -54,7 +57,7 @@
         />
       </div>
 
-      <div class="abm-materiales-dialog__field">
+      <div class="abm-materiales-dialog__field abm-materiales-dialog__field--threshold">
         <label for="add-medium-threshold">UMBRAL MEDIO</label>
         <InputNumber
           id="add-medium-threshold"
@@ -70,7 +73,7 @@
         </small>
       </div>
 
-      <div class="abm-materiales-dialog__field">
+      <div class="abm-materiales-dialog__field abm-materiales-dialog__field--threshold">
         <label for="add-max-threshold">UMBRAL MÁXIMO</label>
         <InputNumber
           id="add-max-threshold"
@@ -122,7 +125,7 @@ const props = defineProps({
 const emit = defineEmits(['update:visible', 'created'])
 const store = useAbmMaterialesStore()
 const authStore = useAuthStore()
-const dialogStyle = 'width: min(620px, calc(100vw - 28px)); max-width: 620px;'
+const dialogStyle = 'width: min(560px, calc(100vw - 28px)); max-width: 560px;'
 
 const createInitialForm = () => ({
   codigoMaterial: '',
