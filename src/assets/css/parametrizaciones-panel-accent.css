@@ -1,16 +1,35 @@
 /*
  * Ajuste compartido para Jobtype–Contrato y CMO–Actividad.
- * La línea turquesa pertenece al contenido expandido de cada acordeón,
- * igual que en Registro de OTs Fallidas.
+ * La línea turquesa comienza inmediatamente debajo de la cabecera
+ * y continúa hasta el final del contenido expandido.
  */
 html body #app .jobtype-screen > .jobtype-panel {
+  position: relative !important;
   width: calc(100% - 8px) !important;
   max-width: calc(100% - 8px) !important;
   margin-right: 8px !important;
 }
 
+/* Evita duplicar el borde aplicado en intentos anteriores. */
 html body #app .jobtype-screen > .jobtype-panel > .jobtype-panel__body,
 html body #app .jobtype-screen > .jobtype-panel > .jobtype-results-body {
-  border-left: 3px solid #00a9bd !important;
+  border-left: 0 !important;
   box-sizing: border-box !important;
+}
+
+/*
+ * La cabecera mide 27 px. La franja se superpone a filtros, tabla,
+ * espacio vacío y paginador para que no pueda quedar tapada.
+ */
+html body #app .jobtype-screen > .jobtype-panel::after {
+  content: '' !important;
+  position: absolute !important;
+  z-index: 9999 !important;
+  top: 27px !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 3px !important;
+  display: block !important;
+  background: #00a9bd !important;
+  pointer-events: none !important;
 }
