@@ -1,8 +1,5 @@
 <template>
-  <BuscadorOts v-if="isBuscadorOts" />
-
   <iframe
-    v-else
     ref="iframeRef"
     :src="iframeSrc"
     :title="titulo"
@@ -17,7 +14,6 @@
 <script setup>
 import { computed, onUnmounted, ref, watchEffect } from 'vue'
 import router from '@/router'
-import BuscadorOts from '@/modules/buscadorOts/BuscadorOts.vue'
 import { useLegacyIframeLayout } from '@/composables/useLegacyIframeLayout'
 import { useLegacyIframeViewport } from '@/composables/useLegacyIframeViewport'
 
@@ -34,7 +30,6 @@ const onIframeLoad = () => {
   applyLegacyViewport()
 }
 const titulo = computed(() => props.titleParam || sessionStorage.getItem('titleParam') || '')
-const isBuscadorOts = computed(() => props.urlParam === '/busquedaOtsGcc.html')
 
 watchEffect(() => {
   sessionStorage.setItem('urlParam', props.urlParam)
