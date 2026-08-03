@@ -1,0 +1,9 @@
+@layer fieldmanager {
+  /*
+   * Acento visual compartido por las pantallas Jobtype–Contrato y CMO–Actividad.
+   * Ambas vistas utilizan .jobtype-panel para sus acordeones de filtros y resultados.
+   */
+  html body #app .jobtype-screen > .jobtype-panel {
+    border-left: 3px solid var(--fm-cyan, #00a9bd) !important;
+  }
+}
