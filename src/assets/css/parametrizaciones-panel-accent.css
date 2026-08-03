@@ -1,13 +1,25 @@
 @layer fieldmanager {
   /*
    * Ajuste compartido para Jobtype–Contrato y CMO–Actividad.
-   * Conserva la línea turquesa a la izquierda y reduce apenas
-   * el ancho de los acordeones para que no lleguen hasta el borde derecho.
+   * La línea turquesa se dibuja dentro de cada acordeón para evitar
+   * que el borde general del panel la sobrescriba.
    */
   html body #app .jobtype-screen > .jobtype-panel {
+    position: relative !important;
     width: calc(100% - 8px) !important;
     max-width: calc(100% - 8px) !important;
     margin-right: 8px !important;
-    border-left: 3px solid var(--fm-cyan, #00a9bd) !important;
+  }
+
+  html body #app .jobtype-screen > .jobtype-panel::before {
+    content: '';
+    position: absolute;
+    z-index: 20;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 3px;
+    background: var(--fm-cyan, #00a9bd);
+    pointer-events: none;
   }
 }
