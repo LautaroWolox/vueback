@@ -1,11 +1,9 @@
 name: Validar ABM Materiales Final
 
 on:
-  push:
+  pull_request:
     branches:
-      - ABM-Materiales
-    paths:
-      - .github/workflows/validate-abm-materiales-final.yml
+      - main
 
 jobs:
   build:
