@@ -1,9 +1,9 @@
 name: Consolidar estilos globales
 
 on:
-  push:
+  pull_request:
     branches:
-      - consolidar-estilos-globales
+      - main
 
 permissions:
   contents: write
@@ -14,9 +14,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Descargar repositorio
+      - name: Descargar rama de trabajo
         uses: actions/checkout@v4
         with:
+          ref: consolidar-estilos-globales
           fetch-depth: 0
 
       - name: Consolidar hojas de estilo
@@ -59,14 +60,14 @@ jobs:
           main_original = main_path.read_text(encoding='utf-8')
           plugin_original = iframe_plugin_path.read_text(encoding='utf-8')
 
-          # Detecta referencias inesperadas antes de borrar archivos.
           allowed_references = {
               main_path.resolve(),
               iframe_plugin_path.resolve(),
           }
+          target_paths = {(css_dir / name).resolve() for name in ordered_files}
           unexpected = []
           for source in Path('src').rglob('*'):
-              if not source.is_file() or source.resolve() in {(css_dir / name).resolve() for name in ordered_files}:
+              if not source.is_file() or source.resolve() in target_paths:
                   continue
               if source.suffix.lower() not in {'.js', '.ts', '.vue', '.css', '.scss', '.html'}:
                   continue
@@ -94,9 +95,6 @@ jobs:
               start = f'/* ===== INICIO: {name} ===== */'
               end = f'/* ===== FIN: {name} ===== */'
 
-              # Estos archivos estaban presentes pero no participaban de la cascada.
-              # Se conservan dentro del global sin activarlos para no reintroducir
-              # estilos obsoletos ni cambiar el comportamiento actual.
               is_active = (
                   name == 'fm-global.css'
                   or name in imported_from_main
@@ -123,7 +121,6 @@ jobs:
 
           (css_dir / 'fm-global.css').write_text(combined, encoding='utf-8')
 
-          # main.js conserva una única importación propia de estilos.
           css_import_pattern = re.compile(
               r"^import\s+['\"]\.\/assets\/css\/(?:"
               + '|'.join(re.escape(name) for name in ordered_files if name != 'fm-global.css')
@@ -135,9 +132,6 @@ jobs:
               raise SystemExit('main.js debe conservar exactamente una importación de fm-global.css')
           main_path.write_text(main_updated, encoding='utf-8')
 
-          # El iframe necesita únicamente la sección legacy, no todo el CSS global.
-          legacy_start = '/* ===== INICIO: fm-legacy-responsive.css ===== */'
-          legacy_end = '/* ===== FIN: fm-legacy-responsive.css ===== */'
           plugin_updated = plugin_original.replace(
               "import legacyResponsiveCss from '@/assets/css/fm-legacy-responsive.css?raw'",
               "import globalCss from '@/assets/css/fm-global.css?raw'\n\n"
@@ -160,7 +154,6 @@ jobs:
               if name != 'fm-global.css':
                   (css_dir / name).unlink()
 
-          # Comprobaciones estructurales previas al build.
           remaining_css = sorted(path.name for path in css_dir.glob('*.css'))
           if remaining_css != ['fm-global.css']:
               raise SystemExit(f'Deben quedar únicamente los estilos globales: {remaining_css}')
@@ -172,7 +165,6 @@ jobs:
                   continue
               text = source.read_text(encoding='utf-8', errors='ignore')
               stale = [name for name in ordered_files if name != 'fm-global.css' and name in text]
-              # responsiveIframes conserva el nombre solo en los marcadores de extracción.
               if source == iframe_plugin_path:
                   stale = [name for name in stale if name != 'fm-legacy-responsive.css']
               if stale:
