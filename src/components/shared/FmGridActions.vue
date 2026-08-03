@@ -1,65 +1,64 @@
 <template>
-  <div
-    class="fm-grid-actions-final fm-responsive-grid-actions"
-    :class="{ 'fm-grid-actions-final--large': size === 'large' }"
-  >
-    <Button
-      v-if="showExport"
-      icon="pi pi-download"
-      text
-      rounded
-      class="fm-grid-action-final"
-      :disabled="exportDisabled"
-      :title="exportDisabled ? exportDisabledTitle : exportTitle"
-      :aria-label="exportDisabled ? exportDisabledTitle : exportTitle"
-      @click="$emit('export')"
-    />
-    <Button
-      v-if="showDelete"
-      icon="pi pi-trash"
-      text
-      rounded
-      class="fm-grid-action-final"
-      :class="{ 'fm-grid-action-final--disabled': deleteDisabled }"
-      :disabled="deleteDisabled"
-      :title="deleteDisabled ? deleteDisabledTitle : deleteTitle"
-      :aria-label="deleteDisabled ? deleteDisabledTitle : deleteTitle"
-      @click="$emit('delete')"
-    />
-    <Button
-      v-if="showEdit"
-      icon="pi pi-pen-to-square"
-      text
-      rounded
-      class="fm-grid-action-final"
-      :class="{ 'fm-grid-action-final--disabled': editDisabled }"
-      :disabled="editDisabled"
-      :title="editDisabled ? editDisabledTitle : editTitle"
-      :aria-label="editDisabled ? editDisabledTitle : editTitle"
-      @click="$emit('edit')"
-    />
-    <Button
-      v-if="showRefresh"
-      icon="pi pi-refresh"
-      text
-      rounded
-      class="fm-grid-action-final"
-      :disabled="refreshDisabled"
-      :title="refreshDisabled ? refreshDisabledTitle : refreshTitle"
-      :aria-label="refreshDisabled ? refreshDisabledTitle : refreshTitle"
-      @click="$emit('refresh')"
-    />
-    <Button
-      v-if="showAdd"
-      icon="pi pi-plus"
-      text
-      rounded
-      class="fm-grid-action-final"
-      :disabled="addDisabled"
-      :title="addDisabled ? addDisabledTitle : addTitle"
-      :aria-label="addDisabled ? addDisabledTitle : addTitle"
-      @click="$emit('add')"
-    />
+  <div class="fm-grid-actions-final">
+    <div class="fm-grid-actions-final__track" :class="{ 'fm-grid-actions-final__track--large': size === 'large' }">
+      <Button
+        v-if="showExport"
+        icon="pi pi-download"
+        text
+        rounded
+        class="fm-grid-action-final"
+        :disabled="exportDisabled"
+        :title="exportDisabled ? exportDisabledTitle : exportTitle"
+        :aria-label="exportDisabled ? exportDisabledTitle : exportTitle"
+        @click="$emit('export')"
+      />
+      <Button
+        v-if="showDelete"
+        icon="pi pi-trash"
+        text
+        rounded
+        class="fm-grid-action-final"
+        :class="{ 'fm-grid-action-final--disabled': deleteDisabled }"
+        :disabled="deleteDisabled"
+        :title="deleteDisabled ? deleteDisabledTitle : deleteTitle"
+        :aria-label="deleteDisabled ? deleteDisabledTitle : deleteTitle"
+        @click="$emit('delete')"
+      />
+      <Button
+        v-if="showEdit"
+        icon="pi pi-pen-to-square"
+        text
+        rounded
+        class="fm-grid-action-final"
+        :class="{ 'fm-grid-action-final--disabled': editDisabled }"
+        :disabled="editDisabled"
+        :title="editDisabled ? editDisabledTitle : editTitle"
+        :aria-label="editDisabled ? editDisabledTitle : editTitle"
+        @click="$emit('edit')"
+      />
+      <Button
+        v-if="showRefresh"
+        icon="pi pi-refresh"
+        text
+        rounded
+        class="fm-grid-action-final"
+        :disabled="refreshDisabled"
+        :title="refreshDisabled ? refreshDisabledTitle : refreshTitle"
+        :aria-label="refreshDisabled ? refreshDisabledTitle : refreshTitle"
+        @click="$emit('refresh')"
+      />
+      <Button
+        v-if="showAdd"
+        icon="pi pi-plus"
+        text
+        rounded
+        class="fm-grid-action-final"
+        :disabled="addDisabled"
+        :title="addDisabled ? addDisabledTitle : addTitle"
+        :aria-label="addDisabled ? addDisabledTitle : addTitle"
+        @click="$emit('add')"
+      />
+    </div>
   </div>
 </template>
 
@@ -95,27 +94,40 @@ defineEmits(['export', 'delete', 'edit', 'refresh', 'add'])
 
 <style scoped>
 .fm-grid-actions-final {
-  width: max-content !important;
+  width: auto !important;
   min-width: 0 !important;
-  max-width: 100% !important;
-  min-height: 26px;
+  max-width: none !important;
+  display: block !important;
   flex: 0 0 auto !important;
-  display: inline-flex !important;
-  align-items: center;
-  justify-content: flex-start !important;
-  gap: 6px !important;
-  padding: 1px 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
   overflow: visible !important;
 }
 
-.fm-grid-actions-final :deep(.fm-grid-action-final),
-.fm-grid-actions-final :deep(.p-button) {
+.fm-grid-actions-final__track {
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  min-height: 26px;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 4px !important;
+  padding: 1px 0 !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  white-space: nowrap !important;
+}
+
+.fm-grid-actions-final__track :deep(.fm-grid-action-final),
+.fm-grid-actions-final__track :deep(.p-button) {
   width: 24px !important;
   min-width: 24px !important;
   max-width: 24px !important;
   height: 24px !important;
   min-height: 24px !important;
   max-height: 24px !important;
+  flex: 0 0 24px !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -127,15 +139,14 @@ defineEmits(['export', 'delete', 'edit', 'refresh', 'add'])
   color: #111 !important;
   box-shadow: none !important;
   overflow: visible !important;
-  flex: 0 0 24px !important;
 }
 
-.fm-grid-actions-final :deep(.p-button-label) {
+.fm-grid-actions-final__track :deep(.p-button-label) {
   display: none !important;
 }
 
-.fm-grid-actions-final :deep(.p-button-icon),
-.fm-grid-actions-final :deep(.pi) {
+.fm-grid-actions-final__track :deep(.p-button-icon),
+.fm-grid-actions-final__track :deep(.pi) {
   width: 16px !important;
   min-width: 16px !important;
   height: 16px !important;
@@ -149,12 +160,12 @@ defineEmits(['export', 'delete', 'edit', 'refresh', 'add'])
   overflow: visible !important;
 }
 
-.fm-grid-actions-final--large {
+.fm-grid-actions-final__track--large {
   min-height: 30px;
 }
 
-.fm-grid-actions-final--large :deep(.fm-grid-action-final),
-.fm-grid-actions-final--large :deep(.p-button) {
+.fm-grid-actions-final__track--large :deep(.fm-grid-action-final),
+.fm-grid-actions-final__track--large :deep(.p-button) {
   width: 28px !important;
   min-width: 28px !important;
   max-width: 28px !important;
@@ -164,8 +175,8 @@ defineEmits(['export', 'delete', 'edit', 'refresh', 'add'])
   flex-basis: 28px !important;
 }
 
-.fm-grid-actions-final--large :deep(.p-button-icon),
-.fm-grid-actions-final--large :deep(.pi) {
+.fm-grid-actions-final__track--large :deep(.p-button-icon),
+.fm-grid-actions-final__track--large :deep(.pi) {
   width: 18px !important;
   min-width: 18px !important;
   height: 18px !important;
@@ -173,18 +184,18 @@ defineEmits(['export', 'delete', 'edit', 'refresh', 'add'])
   font-size: 18px !important;
 }
 
-.fm-grid-actions-final :deep(.p-button:enabled:hover),
-.fm-grid-actions-final :deep(.p-button:enabled:focus) {
+.fm-grid-actions-final__track :deep(.p-button:enabled:hover),
+.fm-grid-actions-final__track :deep(.p-button:enabled:focus) {
   background: transparent !important;
   color: #00a9bd !important;
   box-shadow: none !important;
 }
 
-.fm-grid-actions-final :deep(.p-button:disabled),
-.fm-grid-actions-final :deep(.p-button.p-disabled),
-.fm-grid-actions-final :deep(.fm-grid-action-final--disabled),
-.fm-grid-actions-final :deep(.fm-grid-action-final--disabled .p-button-icon),
-.fm-grid-actions-final :deep(.fm-grid-action-final--disabled .pi) {
+.fm-grid-actions-final__track :deep(.p-button:disabled),
+.fm-grid-actions-final__track :deep(.p-button.p-disabled),
+.fm-grid-actions-final__track :deep(.fm-grid-action-final--disabled),
+.fm-grid-actions-final__track :deep(.fm-grid-action-final--disabled .p-button-icon),
+.fm-grid-actions-final__track :deep(.fm-grid-action-final--disabled .pi) {
   background: transparent !important;
   color: #aeb7bd !important;
   opacity: 1 !important;
