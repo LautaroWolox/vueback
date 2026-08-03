@@ -113,7 +113,7 @@ const filters = ref(
 const buscar = async () => {
   resultsExpanded.value = true
   first.value = 0
-  selectedRow.value = null
+n  selectedRow.value = null
 
   try {
     await store.fetchMateriales()
@@ -208,18 +208,27 @@ const onMaterialCreated = () => {
   margin: 0 !important;
   padding: 0 !important;
   border: 1px solid #d7e0e4 !important;
-  border-radius: 50% !important;
-  background: #f7fafb !important;
-  color: #84959d !important;
-  box-shadow: none !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  color: #111820 !important;
+  box-shadow: 0 4px 12px rgba(18, 48, 60, .08) !important;
   transform: none !important;
+  transition:
+    border-color .15s ease,
+    color .15s ease,
+    background-color .15s ease,
+    box-shadow .15s ease !important;
 }
 
 .abm-materiales-dialog .p-dialog-close-button:hover,
-.abm-materiales-dialog .p-dialog-header-close-button:hover {
-  border-color: #9fcbd1 !important;
-  background: #eaf8fa !important;
-  color: #007f90 !important;
+.abm-materiales-dialog .p-dialog-header-close-button:hover,
+.abm-materiales-dialog .p-dialog-close-button:focus-visible,
+.abm-materiales-dialog .p-dialog-header-close-button:focus-visible {
+  border-color: #00a9bd !important;
+  background: #fff !important;
+  color: #008fa1 !important;
+  box-shadow: 0 0 0 1px rgba(0, 169, 189, .12) !important;
+  outline: none !important;
 }
 
 .abm-materiales-dialog-close-icon {
@@ -231,7 +240,7 @@ const onMaterialCreated = () => {
   color: currentColor !important;
   font-family: Arial, sans-serif !important;
   font-size: 21px !important;
-  font-weight: 400 !important;
+  font-weight: 700 !important;
   line-height: 1 !important;
   opacity: 1 !important;
   visibility: visible !important;
