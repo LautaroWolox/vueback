@@ -15,6 +15,7 @@ import './assets/css/fm-grid-empty-state.css'
 import './assets/css/fm-desktop-notebook-responsive.css'
 import './assets/css/fm-desktop-notebook-modules.css'
 import './assets/css/fm-menu-spacing.css'
+import './assets/css/fm-menu-submenu-compact.css'
 
 import Lara from '@primeuix/themes/lara'
 import { definePreset } from '@primeuix/themes'
