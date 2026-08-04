@@ -1,0 +1,340 @@
+name: Corregir Jobtype popups grilla y Excel
+
+on:
+  pull_request:
+    branches:
+      - fix-jobtype-popup-grid-excel
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+jobs:
+  fix-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar rama de corrección
+        uses: actions/checkout@v4
+        with:
+          ref: fix-jobtype-popup-grid-excel
+          fetch-depth: 0
+
+      - name: Descargar respaldo visual aprobado
+        run: git fetch origin backup-jobtype-contrato-pre-kiro:refs/remotes/origin/backup-jobtype-contrato-pre-kiro
+
+      - name: Preparar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Aplicar correcciones sin duplicar estilos
+        shell: bash
+        run: |
+          set -euo pipefail
+          python <<'PYCODE'
+          from pathlib import Path
+          import re
+          import shutil
+          import subprocess
+
+          root = Path('.')
+          backup_ref = 'origin/backup-jobtype-contrato-pre-kiro'
+
+          def git_show(path: str) -> str:
+              return subprocess.run(
+                  ['git', 'show', f'{backup_ref}:{path}'],
+                  check=True,
+                  capture_output=True,
+                  text=True
+              ).stdout.strip()
+
+          # 1) Reconstruir una única sección CSS de Jobtype-Contrato.
+          global_path = root / 'src/assets/css/fm-global.css'
+          global_css = global_path.read_text(encoding='utf-8')
+          section_start = '/* ===== INICIO: jobtype-contrato-consolidado-final.css ===== */'
+          section_end = '/* ===== FIN: jobtype-contrato-consolidado-final.css ===== */'
+          section_pattern = re.compile(
+              re.escape(section_start) + r'.*?' + re.escape(section_end),
+              flags=re.S
+          )
+          if not section_pattern.search(global_css):
+              raise SystemExit('No se encontró la sección consolidada actual de Jobtype-Contrato')
+          global_css = section_pattern.sub('', global_css).rstrip()
+
+          main_css = git_show('src/modules/parametrizaciones/jobtypeContrato/styles/jobtype-contrato.css')
+          dialogs_css = git_show('src/modules/parametrizaciones/jobtypeContrato/styles/jobtypeContratoDialogs.css')
+          single_row_css = git_show('src/modules/parametrizaciones/jobtypeContrato/styles/jobtypeContratoSingleRow.css')
+
+          functional_css = r'''
+          /* ── Reglas funcionales integradas ── */
+          .jobtype-screen,
+          body .p-dialog.joco-alta-dialog,
+          body .p-dialog.joco-edit-dialog {
+            position: relative;
+          }
+
+          #tabla-jobtype-contrato .p-datatable-tbody > tr.jobtype-row-inactive > td,
+          #tabla-jobtype-contrato .p-datatable-tbody > tr.jobtype-row-inactive:hover > td,
+          #tabla-jobtype-contrato .p-datatable-tbody > tr.jobtype-row-inactive.p-highlight > td {
+            background: #edf0f2 !important;
+            color: #75838b !important;
+            font-weight: 400 !important;
+            cursor: not-allowed !important;
+          }
+
+          #tabla-jobtype-contrato .p-datatable-tbody > tr.jobtype-row-inactive > td *,
+          #tabla-jobtype-contrato .p-datatable-tbody > tr.jobtype-row-inactive:hover > td * {
+            color: #75838b !important;
+            font-weight: 400 !important;
+          }
+
+          .jobtype-filter-clear {
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+          }
+
+          .joco-alta-notice {
+            grid-column: 1 / -1;
+            min-height: 28px;
+            display: flex;
+            align-items: center;
+            padding: 5px 9px;
+            border: 1px solid #efc3c3;
+            border-left: 3px solid #d9363e;
+            border-radius: 3px;
+            background: #fff7f7;
+            color: #8f2027;
+            font-size: 12px;
+            line-height: 1.35;
+          }
+
+          body .p-dialog.joco-alta-dialog .fm-typing-loader,
+          body .p-dialog.joco-edit-dialog .fm-typing-loader {
+            z-index: 20;
+            border-radius: inherit;
+          }
+
+          body .p-dialog.joco-alta-dialog button:disabled,
+          body .p-dialog.joco-edit-dialog button:disabled {
+            cursor: not-allowed;
+          }
+
+          /* ── La pantalla y la grilla ocupan todo el alto disponible ── */
+          .jobtype-screen {
+            height: calc(100dvh - 2px) !important;
+            min-height: 0 !important;
+            max-height: calc(100dvh - 2px) !important;
+          }
+
+          .jobtype-panel--results.is-expanded {
+            flex: 1 1 0 !important;
+            min-height: 0 !important;
+          }
+
+          .jobtype-results-body,
+          .jobtype-main-grid,
+          .jobtype-main-grid.p-datatable,
+          .jobtype-main-grid .p-datatable-table-container,
+          .jobtype-main-grid .p-datatable-wrapper,
+          .jobtype-main-grid [data-pc-section='tablecontainer'] {
+            min-height: 0 !important;
+          }
+
+          .jobtype-results-body,
+          .jobtype-main-grid,
+          .jobtype-main-grid.p-datatable {
+            flex: 1 1 auto !important;
+            height: 100% !important;
+          }
+
+          /* ── Responsive defensivo: ningún campo puede superponerse ── */
+          @media (max-width: 900px) {
+            html body .p-dialog.joco-alta-dialog .joco-alta-form {
+              grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+              row-gap: 16px !important;
+            }
+
+            html body .p-dialog.joco-alta-dialog .joco-alta-form > .joco-alta-field,
+            html body .p-dialog.joco-alta-dialog .joco-alta-form > .joco-alta-field--button {
+              grid-column: auto !important;
+              grid-row: auto !important;
+            }
+
+            html body .p-dialog.joco-alta-dialog .joco-alta-field--button {
+              grid-column: 2 !important;
+            }
+
+            body .p-dialog.joco-edit-dialog {
+              width: calc(100dvw - 24px) !important;
+              max-width: calc(100dvw - 24px) !important;
+              max-height: calc(100dvh - 24px) !important;
+            }
+
+            body .p-dialog.joco-edit-dialog .joco-edit-body {
+              overflow-y: auto !important;
+            }
+
+            body .p-dialog.joco-edit-dialog .joco-edit-form {
+              grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+              row-gap: 16px !important;
+            }
+
+            body .p-dialog.joco-edit-dialog .joco-edit-form > .joco-edit-field {
+              grid-column: auto !important;
+              grid-row: auto !important;
+              min-width: 0 !important;
+            }
+          }
+
+          @media (max-width: 560px) {
+            html body .p-dialog.joco-alta-dialog .joco-alta-form,
+            body .p-dialog.joco-edit-dialog .joco-edit-form {
+              grid-template-columns: 1fr !important;
+            }
+
+            html body .p-dialog.joco-alta-dialog .joco-alta-field--button {
+              grid-column: 1 !important;
+            }
+
+            html body .p-dialog.joco-alta-dialog .joco-alta-add-button.p-button,
+            html body .p-dialog.joco-alta-dialog .joco-alta-relate-button.p-button,
+            body .p-dialog.joco-edit-dialog .joco-edit-update-button.p-button {
+              width: 100% !important;
+              min-width: 0 !important;
+              max-width: 100% !important;
+            }
+          }
+          '''
+          functional_css = re.sub(r'^          ', '', functional_css, flags=re.M).strip()
+
+          documentation = '''/*
+           * CLASIFICACIÓN: [MÓDULO / PANTALLA]
+           * PANTALLA AFECTADA: Parametrizaciones > Jobtype-Contrato.
+           * RESPONSABILIDAD: pantalla completa, grilla, Alta, Edición,
+           * estados inactivos, validaciones y loaders.
+           * FUENTE ÚNICA: este bloque dentro de fm-global.css.
+           * SELECTORES RAÍZ: .jobtype-screen, .joco-alta-dialog y .joco-edit-dialog.
+           */'''
+
+          section = '\n\n'.join([
+              section_start,
+              documentation,
+              '/* Pantalla principal */\n' + main_css,
+              '/* Base visual de los diálogos */\n' + dialogs_css,
+              '/* Ajuste visual definitivo de Alta en una fila */\n' + single_row_css,
+              functional_css,
+              section_end
+          ])
+          global_path.write_text(global_css + '\n\n' + section + '\n', encoding='utf-8')
+
+          # 2) Usar el exportador Excel compartido y respetar la grilla filtrada.
+          page_path = root / 'src/modules/parametrizaciones/jobtypeContrato/pages/JobtypeContratoPage.vue'
+          page = page_path.read_text(encoding='utf-8')
+
+          if 'ref="tablaJobtypeRef"' not in page:
+              page = page.replace(
+                  '          id="tabla-jobtype-contrato"\n',
+                  '          id="tabla-jobtype-contrato"\n          ref="tablaJobtypeRef"\n',
+                  1
+              )
+
+          store_import = "import { useJobtypeContratoStore } from '../store/jobtypeContratoStore'"
+          excel_import = "import { useExcelExport } from '../../../../composables/useExportExcel'"
+          if excel_import not in page:
+              page = page.replace(store_import, store_import + '\n' + excel_import, 1)
+
+          store_init = 'const store = useJobtypeContratoStore()\n'
+          excel_init = (
+              "const tablaJobtypeRef = ref(null)\n"
+              "const { parseDataFromTable, exportToExcel } = useExcelExport()\n"
+          )
+          if 'const tablaJobtypeRef = ref(null)' not in page:
+              page = page.replace(store_init, store_init + excel_init, 1)
+
+          new_export = '''const exportarExcel = async () => {
+            const { rows, fields } = parseDataFromTable(tablaJobtypeRef)
+            if (!rows.length || !fields.length) return
+
+            const exportColumns = columns.filter((column) => fields.includes(column.field))
+
+            try {
+              await exportToExcel({
+                rows,
+                fields,
+                columns: exportColumns,
+                filename: 'Jobtype_Contrato.xlsx'
+              })
+            } catch (error) {
+              reportError(error)
+            }
+          }'''
+          new_export = re.sub(r'^          ', '', new_export, flags=re.M)
+          export_pattern = re.compile(
+              r'const exportarExcel = \(\) => \{.*?\n\}\n</script>',
+              flags=re.S
+          )
+          if not export_pattern.search(page):
+              raise SystemExit('No se encontró la exportación CSV actual')
+          page = export_pattern.sub(new_export + '\n</script>', page, count=1)
+          page_path.write_text(page, encoding='utf-8')
+
+          # 3) Eliminar hojas paralelas e imports particulares.
+          obsolete_css = root / 'src/assets/css/jobtype-contrato.css'
+          if obsolete_css.exists():
+              obsolete_css.unlink()
+
+          styles_dir = root / 'src/modules/parametrizaciones/jobtypeContrato/styles'
+          if styles_dir.exists():
+              shutil.rmtree(styles_dir)
+
+          main_path = root / 'src/main.js'
+          main_text = main_path.read_text(encoding='utf-8')
+          main_text = re.sub(
+              r"^import ['\"].*(?:jobtype-contrato|jobtypeContrato).*\.css['\"]\s*\n",
+              '',
+              main_text,
+              flags=re.M
+          )
+          main_path.write_text(main_text, encoding='utf-8')
+
+          # El workflow es temporal y no debe quedar en el commit funcional.
+          workflow_path = root / '.github/workflows/fix-jobtype-popup-grid-excel.yml'
+          if workflow_path.exists():
+              workflow_path.unlink()
+          PYCODE
+
+      - name: Validar estructura y ausencia de CSS paralelo
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q "INICIO: jobtype-contrato-consolidado-final.css" src/assets/css/fm-global.css
+          test "$(grep -c "INICIO: jobtype-contrato-consolidado-final.css" src/assets/css/fm-global.css)" -eq 1
+          test "$(grep -c "FIN: jobtype-contrato-consolidado-final.css" src/assets/css/fm-global.css)" -eq 1
+          test ! -f src/assets/css/jobtype-contrato.css
+          test ! -d src/modules/parametrizaciones/jobtypeContrato/styles
+          ! grep -R "<style" src/modules/parametrizaciones/jobtypeContrato --include='*.vue'
+          ! grep -R "jobtype-contrato.css\|jobtypeContrato.*css" src/main.js src/modules/parametrizaciones/jobtypeContrato --include='*.js' --include='*.vue' --include='*.ts'
+          grep -q "useExcelExport" src/modules/parametrizaciones/jobtypeContrato/pages/JobtypeContratoPage.vue
+          grep -q "Jobtype_Contrato.xlsx" src/modules/parametrizaciones/jobtypeContrato/pages/JobtypeContratoPage.vue
+          ! grep -q "Jobtype_Contrato.csv" src/modules/parametrizaciones/jobtypeContrato/pages/JobtypeContratoPage.vue
+          grep -q "ref=\"tablaJobtypeRef\"" src/modules/parametrizaciones/jobtypeContrato/pages/JobtypeContratoPage.vue
+          grep -q "height: calc(100dvh - 2px) !important" src/assets/css/fm-global.css
+          grep -q "grid-template-columns: repeat(2, minmax(0, 1fr)) !important" src/assets/css/fm-global.css
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar proyecto
+        run: npm run build
+
+      - name: Confirmar corrección validada
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Corregir popups, grilla y exportación Excel de Jobtype"
+          git push origin HEAD:fix-jobtype-popup-grid-excel
