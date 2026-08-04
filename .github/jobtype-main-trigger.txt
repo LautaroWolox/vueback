@@ -1,0 +1,1 @@
+Ejecutar integración funcional de Jobtype sobre la base exacta de main.
