@@ -1,0 +1,87 @@
+name: Integrar funcionalidad Jobtype sobre main v2
+
+on:
+  pull_request:
+    branches:
+      - jobtype-contrato-funcionalidad-main
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+jobs:
+  integrate-and-build-v2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar rama nueva basada en main
+        uses: actions/checkout@v4
+        with:
+          ref: jobtype-contrato-funcionalidad-main
+          fetch-depth: 0
+
+      - name: Preparar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Ejecutar integración corrigiendo el escape del mensaje
+        shell: bash
+        run: |
+          set -euo pipefail
+          python <<'PYCODE'
+          from pathlib import Path
+
+          workflow = Path('.github/workflows/integrate-jobtype-main-functionality.yml')
+          text = workflow.read_text(encoding='utf-8')
+          start_marker = "          python <<'PYCODE'\n"
+          end_marker = "\n          PYCODE"
+          start = text.index(start_marker) + len(start_marker)
+          end = text.index(end_marker, start)
+          script = text[start:end]
+
+          # Evita que el salto de línea se convierta en una cadena JS inválida.
+          script = script.replace(r".join('\n')", ".join(String.fromCharCode(10))")
+          script = script.replace(r".join('\\n')", ".join(String.fromCharCode(10))")
+
+          Path('/tmp/integrate_jobtype.py').write_text(script, encoding='utf-8')
+          PYCODE
+
+          python /tmp/integrate_jobtype.py
+          rm -f .github/workflows/integrate-jobtype-main-functionality-v2.yml
+
+      - name: Validar estructura, diseño y funcionalidad
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          test "$(grep -c 'INICIO: jobtype-contrato-main-funcionalidad.css' src/assets/css/fm-global.css)" -eq 1
+          test "$(grep -c 'FIN: jobtype-contrato-main-funcionalidad.css' src/assets/css/fm-global.css)" -eq 1
+          ! grep -R '<style' src/modules/parametrizaciones/jobtypeContrato --include='*.vue'
+          ! find src/modules/parametrizaciones/jobtypeContrato -type f -name '*.css' | grep -q .
+          grep -q 'Jobtype_Contrato.xlsx' src/modules/parametrizaciones/jobtypeContrato/JobtypeContrato.vue
+          grep -q 'useExcelExport' src/modules/parametrizaciones/jobtypeContrato/JobtypeContrato.vue
+          grep -q 'rowSelectable' src/modules/parametrizaciones/jobtypeContrato/components/Tabla.vue
+          grep -q 'isExistingActiveRelation' src/modules/parametrizaciones/jobtypeContrato/components/AltaDialog.vue
+          grep -q 'existeDuplicado' src/modules/parametrizaciones/jobtypeContrato/components/EditarDialog.vue
+          grep -q 'origen: string' src/modules/parametrizaciones/jobtypeContrato/store/jobtypeContratoStore.ts
+          grep -q "component: () => import('../modules/parametrizaciones/jobtypeContrato/JobtypeContrato.vue')" src/router/index.js
+          ! grep -R 'JobtypeContratoPage.vue\|AltaJobtypeContratoDialog.vue\|EditarJobtypeContratoDialog.vue' src/router src/modules/parametrizaciones/jobtypeContrato
+          test ! -f .github/workflows/integrate-jobtype-main-functionality.yml
+          test ! -f .github/workflows/integrate-jobtype-main-functionality-v2.yml
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar proyecto
+        run: npm run build
+
+      - name: Confirmar integración validada
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Integrar funcionalidad nueva de Jobtype sobre main"
+          git push origin HEAD:jobtype-contrato-funcionalidad-main
