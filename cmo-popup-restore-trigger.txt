@@ -1,1 +1,2 @@
 Restaurar los templates visuales exactos de main y conservar la funcionalidad nueva de CMO.
+Segundo pase: reconstruir el template completo antes de validar y compilar.
