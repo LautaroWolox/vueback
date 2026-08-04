@@ -1,0 +1,124 @@
+name: Validar integración Jobtype Kiro v3
+
+on:
+  pull_request:
+    branches:
+      - jobtype-contrato-integracion-kiro
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar rama de integración
+        uses: actions/checkout@v4
+        with:
+          ref: jobtype-contrato-integracion-kiro
+          fetch-depth: 0
+
+      - name: Descargar respaldo visual
+        run: git fetch origin backup-jobtype-contrato-pre-kiro:refs/remotes/origin/backup-jobtype-contrato-pre-kiro
+
+      - name: Preparar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Aplicar migración y desempaquetar archivos anidados
+        shell: bash
+        run: |
+          set -euo pipefail
+          python <<'PYCODE'
+          from pathlib import Path
+          import re
+          import textwrap
+
+          source = Path('.github/workflows/trigger-jobtype-kiro-pr.yml').read_text(encoding='utf-8')
+          match = re.search(r"          python <<'PYCODE'\n(.*?)\n          PYCODE", source, flags=re.S)
+          if not match:
+              raise SystemExit('No se encontró el script de integración original')
+
+          script = textwrap.dedent(match.group(1))
+          old_extract = "with tarfile.open(fileobj=io.BytesIO(archive), mode='r:gz') as tar:\n    tar.extractall(payload_dir)\n"
+          new_extract = """with tarfile.open(fileobj=io.BytesIO(archive), mode='r:gz') as tar:
+    tar.extractall(payload_dir)
+
+processed_archives = set()
+for level in range(4):
+    nested_archives = []
+    for candidate in payload_dir.rglob('*'):
+        if not candidate.is_file() or candidate in processed_archives:
+            continue
+        try:
+            if tarfile.is_tarfile(candidate):
+                nested_archives.append(candidate)
+        except OSError:
+            pass
+    if not nested_archives:
+        break
+    for nested_archive in nested_archives:
+        processed_archives.add(nested_archive)
+        target = nested_archive.parent / f'{nested_archive.name}.unpacked'
+        target.mkdir(parents=True, exist_ok=True)
+        with tarfile.open(nested_archive, mode='r:*') as nested_tar:
+            nested_tar.extractall(target)
+
+additions = list(payload_dir.rglob('jobtype-additions.css'))
+if len(additions) != 1:
+    discovered = '\\n'.join(str(path.relative_to(payload_dir)) for path in payload_dir.rglob('*') if path.is_file())
+    raise SystemExit(f'Paquete inválido: {len(additions)} archivos jobtype-additions.css. Contenido:\\n{discovered}')
+payload_root = additions[0].parent
+"""
+          if old_extract not in script:
+              raise SystemExit('No se encontró el bloque de extracción original')
+          script = script.replace(old_extract, new_extract)
+          script = script.replace(
+              "(payload_dir / 'jobtype-additions.css')",
+              "(payload_root / 'jobtype-additions.css')"
+          )
+          script = script.replace(
+              "shutil.copyfile(payload_dir / source, destination)",
+              "shutil.copyfile(payload_root / source, destination)"
+          )
+
+          exec(compile(script, '<jobtype-kiro-migration>', 'exec'))
+
+          for workflow in [
+              Path('.github/workflows/trigger-jobtype-kiro-pr-v2.yml'),
+              Path('.github/workflows/trigger-jobtype-kiro-pr-v3.yml'),
+          ]:
+              if workflow.exists():
+                  workflow.unlink()
+          PYCODE
+
+      - name: Validar centralización y estructura
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q "INICIO: jobtype-contrato-consolidado-final.css" src/assets/css/fm-global.css
+          ! grep -R "<style" src/modules/parametrizaciones/jobtypeContrato --include='*.vue'
+          ! grep -R "jobtypeContrato/styles" src/main.js src/modules/parametrizaciones/jobtypeContrato --include='*.js' --include='*.ts' --include='*.vue'
+          test ! -d src/modules/parametrizaciones/jobtypeContrato/styles
+          grep -q "rowSelectable" src/modules/parametrizaciones/jobtypeContrato/pages/JobtypeContratoPage.vue
+          grep -q "isExistingActiveRelation" src/modules/parametrizaciones/jobtypeContrato/dialogs/AltaJobtypeContratoDialog.vue
+          grep -q "existeDuplicado" src/modules/parametrizaciones/jobtypeContrato/dialogs/EditarJobtypeContratoDialog.vue
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar proyecto
+        run: npm run build
+
+      - name: Confirmar cambios validados
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Integrar nuevas funcionalidades de Jobtype-Contrato"
+          git push origin HEAD:jobtype-contrato-integracion-kiro
