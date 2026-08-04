@@ -86,6 +86,10 @@
       </div>
     </div>
 
+    <div v-if="errorMessage" class="jobtype-contrato-edit-error">
+      {{ errorMessage }}
+    </div>
+
     <template #footer>
       <FmButton
         label="ACTUALIZAR"
@@ -178,6 +182,7 @@ const contratoSuggestions = ref([])
 const contratoSelectedItem = ref(null)
 const showConfirmCierre = ref(false)
 const origenSeleccionado = ref('')
+const errorMessage = ref('')
 
 const origenOptions = [
   { label: 'FAN', value: 'FAN' },
@@ -195,6 +200,7 @@ watch(() => props.visible, (val) => {
     contratoSelectedItem.value = null
     origenSeleccionado.value = props.origen || ''
     showConfirmCierre.value = false
+    errorMessage.value = ''
   }
 })
 
@@ -209,6 +215,8 @@ const onContratoSelect = (event) => {
 const actualizar = async () => {
   if (!puedeActualizar.value) return
 
+  errorMessage.value = ''
+
   try {
     await store.actualizarRelacion(
       props.tareaContratoId,
@@ -220,8 +228,8 @@ const actualizar = async () => {
     origenSeleccionado.value = ''
     emit('update:visible', false)
     emit('actualizado')
-  } catch {
-    // error already in store.error
+  } catch (e) {
+    errorMessage.value = store.error || (e instanceof Error ? e.message : 'Error al actualizar')
   }
 }
 
@@ -250,6 +258,7 @@ const cerrar = () => {
   nuevoContrato.value = ''
   contratoSelectedItem.value = null
   origenSeleccionado.value = ''
+  errorMessage.value = ''
   emit('update:visible', false)
 }
 </script>
@@ -336,6 +345,16 @@ const cerrar = () => {
   background: #eeeeee;
   color: #444;
   opacity: 1;
+}
+
+.jobtype-contrato-edit-error {
+  width: 100%;
+  padding: 8px 0;
+  text-align: center;
+  color: #d32f2f;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.3;
 }
 
 :global(.p-dialog.jobtype-contrato-edit-dialog) {

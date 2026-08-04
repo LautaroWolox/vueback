@@ -106,10 +106,18 @@ export const useJobtypeContratoStore = defineStore('jobtypeContrato', () => {
 
       const response = await fetch(`/pc/jobtypeContrato/actualizarJobtype.html?${params}`)
 
-      if (!response.ok) throw new Error('Error de conexión. Contacte al administrador')
+      if (!response.ok) {
+        const text = await response.text()
+        throw new Error(text || 'Error de conexión. Contacte al administrador')
+      }
 
-      const data: JobTypeContratoRow = await response.json()
-      return data
+      const data = await response.json()
+
+      if (data && data.error) {
+        throw new Error(data.error)
+      }
+
+      return data as JobTypeContratoRow
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : 'Error de conexión. Contacte al administrador'
       throw e
