@@ -190,3 +190,30 @@ const onVisibleChange = (value) => {
   emit('update:visible', value)
 }
 </script>
+
+<style>
+.abm-materiales-edit-dialog .abm-materiales-dialog__form--edit {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  column-gap: 14px !important;
+}
+
+.abm-materiales-edit-dialog .abm-materiales-dialog__form--edit > .abm-materiales-dialog__field:nth-child(1),
+.abm-materiales-edit-dialog .abm-materiales-dialog__form--edit > .abm-materiales-dialog__field:nth-child(2) {
+  grid-column: 1 / -1 !important;
+}
+
+.abm-materiales-edit-dialog .abm-materiales-dialog__form--edit > .abm-materiales-dialog__field:nth-child(3),
+.abm-materiales-edit-dialog .abm-materiales-dialog__form--edit > .abm-materiales-dialog__field:nth-child(4) {
+  grid-column: auto !important;
+}
+
+@media (max-width: 700px) {
+  .abm-materiales-edit-dialog .abm-materiales-dialog__form--edit {
+    grid-template-columns: 1fr !important;
+  }
+
+  .abm-materiales-edit-dialog .abm-materiales-dialog__form--edit > .abm-materiales-dialog__field {
+    grid-column: auto !important;
+  }
+}
+</style>
