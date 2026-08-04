@@ -1,0 +1,97 @@
+name: Integrar funcionalidad CMO sobre main
+
+on:
+  pull_request:
+    branches:
+      - CMO
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+jobs:
+  integrate-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar rama CMO
+        uses: actions/checkout@v4
+        with:
+          ref: CMO
+          fetch-depth: 0
+
+      - name: Preparar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Aplicar funcionalidad sin reemplazar la arquitectura
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/cmo-payload
+          cat <<'PAYLOAD' | base64 -d > /tmp/cmo-payload/cmo.tar.gz
+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
+PAYLOAD
+          echo 'd79ed20386b10ae572e622bf1d340cc57a7c2f62c65aa0d5b0df3a0cf62bab3c  /tmp/cmo-payload/cmo.tar.gz' | sha256sum -c -
+          tar -xzf /tmp/cmo-payload/cmo.tar.gz -C /tmp/cmo-payload
+
+          cp -f /tmp/cmo-payload/src/modules/parametrizaciones/jobtypeCMO/JobtypeCMO.vue src/modules/parametrizaciones/jobtypeCMO/JobtypeCMO.vue
+          cp -f /tmp/cmo-payload/src/modules/parametrizaciones/jobtypeCMO/components/AltaDialog.vue src/modules/parametrizaciones/jobtypeCMO/components/AltaDialog.vue
+          cp -f /tmp/cmo-payload/src/modules/parametrizaciones/jobtypeCMO/components/AltaDialogBackend.vue src/modules/parametrizaciones/jobtypeCMO/components/AltaDialogBackend.vue
+          cp -f /tmp/cmo-payload/src/modules/parametrizaciones/jobtypeCMO/components/ModificarDialog.vue src/modules/parametrizaciones/jobtypeCMO/components/ModificarDialog.vue
+          cp -f /tmp/cmo-payload/src/modules/parametrizaciones/jobtypeCMO/components/Tabla.vue src/modules/parametrizaciones/jobtypeCMO/components/Tabla.vue
+
+          python <<'PYCODE'
+          from pathlib import Path
+          import re
+
+          css_path = Path('src/assets/css/fm-global.css')
+          css = css_path.read_text(encoding='utf-8')
+          section = Path('/tmp/cmo-payload/cmo-actividad.css').read_text(encoding='utf-8').strip()
+          start = '/* ===== INICIO: cmo-actividad.css ===== */'
+          end = '/* ===== FIN: cmo-actividad.css ===== */'
+          css = re.sub(re.escape(start) + r'.*?' + re.escape(end), '', css, flags=re.S).rstrip()
+          css_path.write_text(css + '\n\n' + section + '\n', encoding='utf-8')
+
+          workflow = Path('.github/workflows/integrate-cmo-functionality.yml')
+          if workflow.exists():
+              workflow.unlink()
+          PYCODE
+
+      - name: Validar estructura y reglas del módulo
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          test "$(grep -c 'INICIO: cmo-actividad.css' src/assets/css/fm-global.css)" -eq 1
+          test "$(grep -c 'FIN: cmo-actividad.css' src/assets/css/fm-global.css)" -eq 1
+          ! grep -R '<style' src/modules/parametrizaciones/jobtypeCMO --include='*.vue'
+          ! find src/modules/parametrizaciones/jobtypeCMO -type f -name '*.css' | grep -q .
+          grep -q 'cmo-actividad-page' src/modules/parametrizaciones/jobtypeCMO/JobtypeCMO.vue
+          grep -q 'rowSelectable' src/modules/parametrizaciones/jobtypeCMO/components/Tabla.vue
+          grep -q 'cmo-row-inactive' src/modules/parametrizaciones/jobtypeCMO/components/Tabla.vue
+          grep -q 'font-weight: 700' src/assets/css/fm-global.css
+          grep -q '#9ee7ee' src/assets/css/fm-global.css
+          grep -q 'FmTypingLoader' src/modules/parametrizaciones/jobtypeCMO/components/AltaDialogBackend.vue
+          grep -q 'FmTypingLoader' src/modules/parametrizaciones/jobtypeCMO/components/ModificarDialog.vue
+          grep -q 'existsActiveRelation' src/modules/parametrizaciones/jobtypeCMO/components/AltaDialogBackend.vue
+          grep -q 'existsActiveDuplicate' src/modules/parametrizaciones/jobtypeCMO/components/ModificarDialog.vue
+          grep -q 'Configuracion_CMO_Actividad.xlsx' src/modules/parametrizaciones/jobtypeCMO/components/Tabla.vue
+          test ! -f .github/workflows/integrate-cmo-functionality.yml
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar proyecto
+        run: npm run build
+
+      - name: Confirmar integración validada
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Integrar funcionalidad completa de CMO"
+          git push origin HEAD:CMO
