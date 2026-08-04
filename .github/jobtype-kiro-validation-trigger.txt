@@ -1,2 +1,3 @@
 Disparador técnico de validación para la integración aislada de Jobtype-Contrato.
 Segundo intento: detección segura de la carpeta interna del paquete.
+Tercer intento: extracción controlada de archivos comprimidos anidados.
