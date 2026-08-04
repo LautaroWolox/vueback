@@ -1,1 +1,2 @@
 Ejecutar integración funcional de CMO sobre la base exacta de main.
+Segundo pase: workflow corregido y validación completa.
