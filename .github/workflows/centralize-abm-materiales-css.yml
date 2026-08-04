@@ -41,6 +41,8 @@ jobs:
               for path in part_paths
           )
           section_bytes = base64.b64decode(encoded, validate=True)
+          Path('decoded-abm.css').write_bytes(section_bytes)
+
           expected_size = 18164
           expected_sha256 = '67af7589505db3fe7dc74a3743474de126aabfc8e29f17a6013abff9d2a85531'
           actual_sha256 = hashlib.sha256(section_bytes).hexdigest()
@@ -85,6 +87,13 @@ jobs:
 
           workflow_path = root / '.github/workflows/centralize-abm-materiales-css.yml'
           workflow_path.unlink()
+
+      - name: Adjuntar CSS decodificado si falla la validación
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: decoded-abm-css
+          path: decoded-abm.css
 
       - name: Confirmar cambios en ABM-Materiales
         run: |
