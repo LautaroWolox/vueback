@@ -192,9 +192,15 @@ const onVisibleChange = (value) => {
 </script>
 
 <style>
+.abm-materiales-edit-dialog .p-dialog-content {
+  flex: 0 0 auto !important;
+}
+
 .abm-materiales-edit-dialog .abm-materiales-dialog__form--edit {
   grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
   column-gap: 14px !important;
+  row-gap: 24px !important;
+  padding: 22px 22px 16px !important;
 }
 
 .abm-materiales-edit-dialog .abm-materiales-dialog__form--edit > .abm-materiales-dialog__field:nth-child(1) {
@@ -207,9 +213,16 @@ const onVisibleChange = (value) => {
   grid-column: auto !important;
 }
 
+.abm-materiales-edit-dialog .p-dialog-footer {
+  min-height: 58px !important;
+  padding: 10px 20px 12px !important;
+}
+
 @media (max-width: 700px) {
   .abm-materiales-edit-dialog .abm-materiales-dialog__form--edit {
     grid-template-columns: 1fr !important;
+    row-gap: 16px !important;
+    padding: 20px 18px 18px !important;
   }
 
   .abm-materiales-edit-dialog .abm-materiales-dialog__form--edit > .abm-materiales-dialog__field {
