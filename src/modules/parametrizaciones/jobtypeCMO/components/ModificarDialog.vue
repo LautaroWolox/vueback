@@ -97,7 +97,6 @@
       <FmButton
         label="ACTUALIZAR"
         class="jobtype-relate-button"
-        style="width: 120px !important; min-width: 120px !important; max-width: 120px !important; border-radius: 0 !important"
         :disabled="!canActualizar || saving"
         @click="actualizar"
       />

@@ -85,7 +85,6 @@
         <FmButton
           label="AGREGAR"
           class="jobtype-add-button"
-          style="width: 120px !important; min-width: 120px !important; max-width: 120px !important; border-radius: 0 !important"
           :disabled="!canAgregar || saving"
           @click="agregar"
         />
@@ -190,7 +189,6 @@
       <FmButton
         label="RELACIONAR"
         class="jobtype-relate-button"
-        style="width: 120px !important; min-width: 120px !important; max-width: 120px !important; border-radius: 0 !important"
         :disabled="previewRows.length === 0 || saving"
         @click="relacionar"
       />
