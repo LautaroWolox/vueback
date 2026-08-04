@@ -111,7 +111,7 @@ const props = defineProps({
 const emit = defineEmits(['update:visible', 'saved'])
 const store = useAbmMaterialesStore()
 const authStore = useAuthStore()
-const dialogStyle = 'width: min(500px, calc(100vw - 28px)); max-width: 500px;'
+const dialogStyle = 'width: min(560px, calc(100vw - 28px)); max-width: 560px;'
 
 const form = reactive({
   umbralMedio: null,
@@ -193,15 +193,15 @@ const onVisibleChange = (value) => {
 
 <style>
 .abm-materiales-edit-dialog .abm-materiales-dialog__form--edit {
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
   column-gap: 14px !important;
 }
 
-.abm-materiales-edit-dialog .abm-materiales-dialog__form--edit > .abm-materiales-dialog__field:nth-child(1),
-.abm-materiales-edit-dialog .abm-materiales-dialog__form--edit > .abm-materiales-dialog__field:nth-child(2) {
+.abm-materiales-edit-dialog .abm-materiales-dialog__form--edit > .abm-materiales-dialog__field:nth-child(1) {
   grid-column: 1 / -1 !important;
 }
 
+.abm-materiales-edit-dialog .abm-materiales-dialog__form--edit > .abm-materiales-dialog__field:nth-child(2),
 .abm-materiales-edit-dialog .abm-materiales-dialog__form--edit > .abm-materiales-dialog__field:nth-child(3),
 .abm-materiales-edit-dialog .abm-materiales-dialog__form--edit > .abm-materiales-dialog__field:nth-child(4) {
   grid-column: auto !important;
