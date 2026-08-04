@@ -45,6 +45,7 @@
       <div v-show="resultsExpanded" class="jobtype-results-body">
         <DataTable
           id="tabla-jobtype-contrato"
+          ref="tablaJobtypeRef"
           v-model:filters="mainFilters"
           v-model:selection="selectedRow"
           v-model:first="mainFirst"
@@ -207,8 +208,11 @@ import EditarJobtypeContratoDialog from '../dialogs/EditarJobtypeContratoDialog.
 import ConfirmarDesactivacionDialog from '../dialogs/ConfirmarDesactivacionDialog.vue'
 import { JOBTYPE_CONTRATO_COLUMNS, ROWS_OPTIONS } from '../config/columns'
 import { useJobtypeContratoStore } from '../store/jobtypeContratoStore'
+import { useExcelExport } from '../../../../composables/useExportExcel'
 
 const store = useJobtypeContratoStore()
+const tablaJobtypeRef = ref(null)
+const { parseDataFromTable, exportToExcel } = useExcelExport()
 
 const filtersExpanded = ref(true)
 const resultsExpanded = ref(false)
@@ -336,23 +340,21 @@ const refrescarDespuesDeCambio = async () => {
 const onRelacionado = () => refrescarDespuesDeCambio()
 const onActualizado = () => refrescarDespuesDeCambio()
 
-const exportarExcel = () => {
-  if (!store.relaciones.length) return
+const exportarExcel = async () => {
+  const { rows, fields } = parseDataFromTable(tablaJobtypeRef)
+  if (!rows.length || !fields.length) return
 
-  const exportCols = columns.filter((column) => column.exportable)
-  const escapeCsv = (value) => `"${String(value ?? '').replaceAll('"', '""')}"`
-  const headers = exportCols.map((column) => escapeCsv(column.header))
-  const lines = store.relaciones.map((row) =>
-    exportCols.map((column) => escapeCsv(row[column.field])).join(',')
-  )
-  const csv = `\uFEFF${[headers.join(','), ...lines].join('\n')}`
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-  const url = URL.createObjectURL(blob)
-  const anchor = document.createElement('a')
+  const exportColumns = columns.filter((column) => fields.includes(column.field))
 
-  anchor.href = url
-  anchor.download = 'Jobtype_Contrato.csv'
-  anchor.click()
-  URL.revokeObjectURL(url)
+  try {
+    await exportToExcel({
+      rows,
+      fields,
+      columns: exportColumns,
+      filename: 'Jobtype_Contrato.xlsx'
+    })
+  } catch (error) {
+    reportError(error)
+  }
 }
 </script>
