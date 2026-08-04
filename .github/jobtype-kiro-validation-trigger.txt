@@ -2,3 +2,4 @@ Disparador técnico de validación para la integración aislada de Jobtype-Contr
 Segundo intento: detección segura de la carpeta interna del paquete.
 Tercer intento: extracción controlada de archivos comprimidos anidados.
 Cuarto intento: sintaxis YAML validada para el extractor anidado.
+Quinto intento: insumos TypeScript y CSS completos cargados temporalmente.
