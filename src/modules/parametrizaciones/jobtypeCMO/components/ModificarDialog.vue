@@ -6,10 +6,18 @@
     :closable="false"
     :draggable="false"
     :resizable="false"
-    class="jobtype-alta-dialog"
+    class="jobtype-alta-dialog cmo-modificar-dialog"
+    :pt="{ root: { class: 'cmo-modificar-dialog' } }"
     @update:visible="$emit('update:visible', $event)"
     @hide="onHide"
   >
+    <FmTypingLoader
+      v-if="saving"
+      overlay
+      title="Actualizando relación"
+      message="Guardando el nuevo CMO"
+    />
+
     <template #header>
       <div class="jobtype-alta-header" style="grid-template-columns: minmax(0, 1fr) 52px">
         <h2 class="jobtype-alta-header__title" style="margin-left: 20px">
@@ -22,6 +30,7 @@
           style="justify-self: center; margin-left: 0"
           title="Cerrar"
           aria-label="Cerrar"
+          :disabled="saving"
           @click="cerrar"
         >×</button>
       </div>
@@ -31,7 +40,6 @@
       <div
         class="jobtype-alta-form cmo-modificar-form"
       >
-        <!-- Actividad (readonly) -->
         <div
           class="jobtype-alta-field fm-field"
           style="width: 100% !important; min-width: 0 !important; max-width: none !important"
@@ -45,7 +53,6 @@
           />
         </div>
 
-        <!-- CMO actual (readonly) -->
         <div
           class="jobtype-alta-field fm-field"
           style="width: 100% !important; min-width: 0 !important; max-width: none !important"
@@ -59,7 +66,6 @@
           />
         </div>
 
-        <!-- Nuevo CMO (autocomplete) -->
         <div
           class="jobtype-alta-field fm-field"
           style="width: 100% !important; min-width: 0 !important; max-width: none !important"
@@ -76,12 +82,12 @@
             inputClass="jobtype-alta-control"
             aria-required="true"
             placeholder="Escriba 3+ caracteres..."
+            :disabled="saving"
             @complete="onSearchCmo"
           />
         </div>
       </div>
 
-      <!-- Error de negocio inline -->
       <div v-if="errorMessage" class="cmo-modificar-error">
         <p class="cmo-modificar-error__item">{{ errorMessage }}</p>
       </div>
@@ -91,7 +97,6 @@
       <FmButton
         label="ACTUALIZAR"
         class="jobtype-relate-button"
-        style="width: 120px !important; min-width: 120px !important; max-width: 120px !important; border-radius: 0 !important"
         :disabled="!canActualizar || saving"
         @click="actualizar"
       />
@@ -106,11 +111,10 @@ import InputText from 'primevue/inputtext'
 import AutoComplete from 'primevue/autocomplete'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
+import FmTypingLoader from '@/components/shared/FmTypingLoader.vue'
 
 import { useCmoActividadStore } from '../store/cmoActividadStore'
 import type { CmoAutocomplete, RelCmoActividad } from '../store/types'
-
-// ─── Props & Emits ────────────────────────────────────────────────
 
 const props = defineProps<{
   visible: boolean
@@ -122,13 +126,9 @@ const emit = defineEmits<{
   saved: []
 }>()
 
-// ─── Servicios ────────────────────────────────────────────────────
-
 const store = useCmoActividadStore()
 const confirm = useConfirm()
 const toast = useToast()
-
-// ─── Estado local ─────────────────────────────────────────────────
 
 const nuevoCmo = ref<CmoAutocomplete | string | null>(null)
 const cmoSuggestions = ref<CmoAutocomplete[]>([])
@@ -137,8 +137,6 @@ const saving = ref(false)
 const errorMessage = ref<string | null>(null)
 
 let cmoTimer: ReturnType<typeof setTimeout> | null = null
-
-// ─── Computed ─────────────────────────────────────────────────────
 
 const actividadDisplay = computed(() => {
   if (!props.relacion) return ''
@@ -154,7 +152,16 @@ const canActualizar = computed(() => {
   return nuevoCmo.value !== null && typeof nuevoCmo.value === 'object'
 })
 
-// ─── Resetear al cambiar de relación ─────────────────────────────
+const normalize = (value: unknown) => String(value ?? '').trim().toUpperCase()
+const isActive = (value: unknown) => normalize(value) === 'S'
+
+const existsActiveDuplicate = (cmo: CmoAutocomplete) =>
+  store.rows.some((row) =>
+    row.actividadManoObraId !== props.relacion?.actividadManoObraId &&
+    isActive(row.activo) &&
+    normalize(row.codigoActividad) === normalize(props.relacion?.codigoActividad) &&
+    normalize(row.codigoS4) === normalize(cmo.codigoS4)
+  )
 
 watch(
   () => props.visible,
@@ -167,8 +174,6 @@ watch(
     }
   }
 )
-
-// ─── Autocomplete CMO (debounce 300ms) ────────────────────────────
 
 const onSearchCmo = (event: { query: string }) => {
   if (cmoTimer) clearTimeout(cmoTimer)
@@ -185,8 +190,6 @@ const onSearchCmo = (event: { query: string }) => {
   }, 300)
 }
 
-// ─── Actualizar relación ──────────────────────────────────────────
-
 const actualizar = async () => {
   if (!canActualizar.value || !props.relacion || saving.value) return
 
@@ -195,16 +198,20 @@ const actualizar = async () => {
 
   try {
     const cmo = nuevoCmo.value as CmoAutocomplete
+
+    if (existsActiveDuplicate(cmo)) {
+      errorMessage.value = 'La relación CMO-Actividad ya existe y se encuentra activa.'
+      return
+    }
+
     const response = await store.modificarRelacion(
       props.relacion.actividadManoObraId,
       cmo.id
     )
 
     if (response?.mensaje) {
-      // Error de negocio (ej: relación repetida)
       errorMessage.value = response.mensaje
     } else {
-      // Éxito
       toast.add({
         severity: 'success',
         summary: 'Relación modificada',
@@ -226,11 +233,10 @@ const actualizar = async () => {
   }
 }
 
-// ─── Cerrar dialog ────────────────────────────────────────────────
-
 const cerrar = () => {
   if (nuevoCmo.value !== null && typeof nuevoCmo.value === 'object') {
     confirm.require({
+      group: 'cmo-actividad',
       message: 'Hay datos ingresados, confirma que desea cancelar?',
       header: 'Confirmar cierre',
       icon: 'pi pi-exclamation-triangle',
@@ -259,32 +265,3 @@ const onHide = () => {
   errorMessage.value = null
 }
 </script>
-
-<style scoped>
-.cmo-modificar-form {
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  max-width: 960px !important;
-  align-items: end !important;
-}
-
-@media (max-width: 768px) {
-  .cmo-modificar-form {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-.cmo-modificar-error {
-  padding: 8px 16px 0;
-  margin: 0;
-}
-
-.cmo-modificar-error__item {
-  margin: 0;
-  padding: 4px 8px;
-  border-left: 3px solid #d32f2f;
-  background: #fff5f5;
-  color: #d32f2f;
-  font-size: 11px;
-  line-height: 1.4;
-}
-</style>

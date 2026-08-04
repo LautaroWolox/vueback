@@ -6,10 +6,18 @@
     :closable="false"
     :draggable="false"
     :resizable="false"
-    class="jobtype-alta-dialog"
+    class="jobtype-alta-dialog cmo-alta-dialog"
+    :pt="{ root: { class: 'cmo-alta-dialog' } }"
     @update:visible="$emit('update:visible', $event)"
     @hide="onHide"
   >
+    <FmTypingLoader
+      v-if="saving"
+      overlay
+      title="Relacionando"
+      message="Guardando relaciones CMO-Actividad"
+    />
+
     <template #header>
       <div class="jobtype-alta-header" style="grid-template-columns: minmax(0, 1fr) 52px">
         <h2 class="jobtype-alta-header__title" style="margin-left: 20px">
@@ -22,6 +30,7 @@
           style="justify-self: center; margin-left: 0"
           title="Cerrar"
           aria-label="Cerrar"
+          :disabled="saving"
           @click="cerrar"
         >×</button>
       </div>
@@ -47,6 +56,7 @@
             inputClass="jobtype-alta-control"
             aria-required="true"
             placeholder="Escriba 3+ caracteres..."
+            :disabled="saving"
             @complete="onSearchActividad"
           />
         </div>
@@ -67,6 +77,7 @@
             inputClass="jobtype-alta-control"
             aria-required="true"
             placeholder="Escriba 3+ caracteres..."
+            :disabled="saving"
             @complete="onSearchCmo"
           />
         </div>
@@ -74,8 +85,7 @@
         <FmButton
           label="AGREGAR"
           class="jobtype-add-button"
-          style="width: 120px !important; min-width: 120px !important; max-width: 120px !important; border-radius: 0 !important"
-          :disabled="!canAgregar"
+          :disabled="!canAgregar || saving"
           @click="agregar"
         />
       </div>
@@ -148,7 +158,7 @@
                   :show-export="false"
                   :show-delete="true"
                   :show-refresh="false"
-                  :delete-disabled="!selectedPreviewRow"
+                  :delete-disabled="!selectedPreviewRow || saving"
                   delete-title="Eliminar"
                   @delete="eliminarPreview"
                 />
@@ -179,7 +189,6 @@
       <FmButton
         label="RELACIONAR"
         class="jobtype-relate-button"
-        style="width: 120px !important; min-width: 120px !important; max-width: 120px !important; border-radius: 0 !important"
         :disabled="previewRows.length === 0 || saving"
         @click="relacionar"
       />
@@ -188,17 +197,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, ref } from 'vue'
 import Dialog from 'primevue/dialog'
 import AutoComplete from 'primevue/autocomplete'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
+import FmTypingLoader from '@/components/shared/FmTypingLoader.vue'
 
 import { useCmoActividadStore } from '../store/cmoActividadStore'
 import { altaPreviewColumns } from './columns'
 import type { ActividadAutocomplete, CmoAutocomplete, NuevaRelacion } from '../store/types'
-
-// ─── Props & Emits ────────────────────────────────────────────────
 
 defineProps<{
   visible: boolean
@@ -209,13 +217,9 @@ const emit = defineEmits<{
   saved: []
 }>()
 
-// ─── Servicios ────────────────────────────────────────────────
-
 const store = useCmoActividadStore()
 const confirm = useConfirm()
 const toast = useToast()
-
-// ─── Estado local ────────────────────────────────────────────────
 
 const actividadSelected = ref<ActividadAutocomplete | string | null>(null)
 const cmoSelected = ref<CmoAutocomplete | string | null>(null)
@@ -232,11 +236,8 @@ const previewPageRows = ref(10)
 const saving = ref(false)
 const errorMessages = ref<string[]>([])
 
-// Debounce timers
 let actividadTimer: ReturnType<typeof setTimeout> | null = null
 let cmoTimer: ReturnType<typeof setTimeout> | null = null
-
-// ─── Computed ─────────────────────────────────────────────────────
 
 const canAgregar = computed(() => {
   return (
@@ -247,7 +248,19 @@ const canAgregar = computed(() => {
   )
 })
 
-// ─── Autocomplete handlers (debounce 300ms) ───────────────────────
+const normalize = (value: unknown) => String(value ?? '').trim().toUpperCase()
+const isActive = (value: unknown) => normalize(value) === 'S'
+
+const existsActiveRelation = (actividad: ActividadAutocomplete, cmo: CmoAutocomplete) =>
+  store.rows.some((row) =>
+    isActive(row.activo) &&
+    normalize(row.codigoActividad) === normalize(actividad.codigo) &&
+    normalize(row.codigoS4) === normalize(cmo.codigoS4)
+  )
+
+const hasUnsavedData = computed(() => Boolean(
+  previewRows.value.length || actividadSelected.value || cmoSelected.value
+))
 
 const onSearchActividad = (event: { query: string }) => {
   if (actividadTimer) clearTimeout(actividadTimer)
@@ -279,16 +292,19 @@ const onSearchCmo = (event: { query: string }) => {
   }, 300)
 }
 
-// ─── Agregar a preview ────────────────────────────────────────────
-
 const agregar = () => {
   if (!canAgregar.value) return
 
   const actividad = actividadSelected.value as ActividadAutocomplete
   const cmo = cmoSelected.value as CmoAutocomplete
 
-  // Validar duplicado por idActividad en preview
   if (previewRows.value.some((row) => row.idActividad === actividad.id && row.idCmo === cmo.id)) {
+    errorMessages.value = ['La relación seleccionada ya fue agregada al listado.']
+    return
+  }
+
+  if (existsActiveRelation(actividad, cmo)) {
+    errorMessages.value = ['La relación CMO-Actividad ya existe y se encuentra activa.']
     return
   }
 
@@ -305,13 +321,9 @@ const agregar = () => {
   previewRows.value = [...previewRows.value, row]
   selectedPreviewRow.value = row
   errorMessages.value = []
-
-  // Limpiar campos
   actividadSelected.value = null
   cmoSelected.value = null
 }
-
-// ─── Eliminar de preview ──────────────────────────────────────────
 
 const eliminarPreview = () => {
   if (!selectedPreviewRow.value) return
@@ -323,21 +335,30 @@ const onPreviewRowClick = ({ data }: { data: NuevaRelacion & { id: string } }) =
   selectedPreviewRow.value = data
 }
 
-// ─── Enviar relaciones al backend ─────────────────────────────────
-
 const relacionar = async () => {
   if (previewRows.value.length === 0 || saving.value) return
+
+  const duplicates = previewRows.value.filter((row) =>
+    store.rows.some((existing) =>
+      isActive(existing.activo) &&
+      normalize(existing.codigoActividad) === normalize(row.codigoActividad) &&
+      normalize(existing.codigoS4) === normalize(row.codigoS4)
+    )
+  )
+
+  if (duplicates.length) {
+    errorMessages.value = ['Una o más relaciones ya existen y se encuentran activas.']
+    return
+  }
 
   saving.value = true
   errorMessages.value = []
 
   try {
-    // Preparar payload sin el campo 'id' local
     const payload: NuevaRelacion[] = previewRows.value.map(({ id, ...rest }) => rest)
     const responses = await store.crearRelaciones(payload)
 
     if (responses.length === 0) {
-      // Éxito total
       toast.add({
         severity: 'success',
         summary: 'Relaciones creadas',
@@ -347,7 +368,6 @@ const relacionar = async () => {
       resetAndClose()
       emit('saved')
     } else {
-      // Errores de negocio — mostrar inline
       errorMessages.value = responses.map((r) => r.mensaje)
     }
   } catch {
@@ -362,11 +382,10 @@ const relacionar = async () => {
   }
 }
 
-// ─── Cerrar dialog ────────────────────────────────────────────────
-
 const cerrar = () => {
-  if (previewRows.value.length > 0) {
+  if (hasUnsavedData.value) {
     confirm.require({
+      group: 'cmo-actividad',
       message: 'Hay datos ingresados, confirma que desea cancelar?',
       header: 'Confirmar cierre',
       icon: 'pi pi-exclamation-triangle',
@@ -394,8 +413,12 @@ const resetAndClose = () => {
   emit('update:visible', false)
 }
 
+onBeforeUnmount(() => {
+  if (actividadTimer) clearTimeout(actividadTimer)
+  if (cmoTimer) clearTimeout(cmoTimer)
+})
+
 const onHide = () => {
-  // Cleanup al cerrar
   actividadSelected.value = null
   cmoSelected.value = null
   previewRows.value = []
@@ -403,33 +426,3 @@ const onHide = () => {
   errorMessages.value = []
 }
 </script>
-
-<style scoped>
-.cmo-alta-form {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 120px !important;
-  max-width: 860px !important;
-  align-items: end !important;
-}
-
-@media (max-width: 768px) {
-  .cmo-alta-form {
-    grid-template-columns: 1fr !important;
-    max-width: none !important;
-  }
-}
-
-.cmo-alta-errors {
-  padding: 4px 16px;
-  margin: 0;
-}
-
-.cmo-alta-errors__item {
-  margin: 2px 0;
-  padding: 4px 8px;
-  border-left: 3px solid #d32f2f;
-  background: #fff5f5;
-  color: #d32f2f;
-  font-size: 11px;
-  line-height: 1.4;
-}
-</style>
