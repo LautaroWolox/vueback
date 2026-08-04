@@ -1,0 +1,212 @@
+name: Actualizar Jobtype con estilos globales
+
+on:
+  push:
+    branches:
+      - arquitectura-componentes-globales
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar rama Jobtype
+        uses: actions/checkout@v4
+        with:
+          ref: arquitectura-componentes-globales
+          fetch-depth: 0
+
+      - name: Obtener infraestructura visual actual
+        run: git fetch origin main
+
+      - name: Consolidar menú, margen y CSS
+        shell: bash
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          import re
+          import subprocess
+
+          root = Path('.')
+          css_dir = Path('src/assets/css')
+          global_path = css_dir / 'fm-global.css'
+          theme_path = css_dir / 'theme.css'
+          main_path = Path('src/main.js')
+          iframe_plugin = Path('src/plugins/responsiveIframes.js')
+
+          latest_global = subprocess.check_output(
+              ['git', 'show', 'origin/main:src/assets/css/fm-global.css'],
+              text=True,
+          )
+
+          # ABM Materiales pertenece a otra funcionalidad y no debe entrar en Jobtype.
+          latest_global = re.sub(
+              r'\n?/\* ===== INICIO: abm-materiales\.css ===== \*/.*?'
+              r'/\* ===== FIN: abm-materiales\.css ===== \*/\n?',
+              '\n',
+              latest_global,
+              flags=re.DOTALL,
+          ).rstrip() + '\n'
+
+          extras = []
+
+          # Conserva CSS propio de esta rama que todavía no exista como sección
+          # dentro del global actual.
+          for path in sorted(css_dir.glob('*.css')):
+              if path in {global_path, theme_path}:
+                  continue
+              marker = f'/* ===== INICIO: {path.name} ===== */'
+              if marker not in latest_global:
+                  extras.append(path)
+
+          # Centraliza también hojas CSS pertenecientes a los módulos.
+          for path in sorted(Path('src').rglob('*.css')):
+              if path.parent == css_dir or path in {global_path, theme_path}:
+                  continue
+              extras.append(path)
+
+          seen = set()
+          ordered_extras = []
+          for path in extras:
+              resolved = path.resolve()
+              if resolved not in seen:
+                  seen.add(resolved)
+                  ordered_extras.append(path)
+
+          sections = [latest_global]
+          for path in ordered_extras:
+              relative = path.as_posix()
+              content = path.read_text(encoding='utf-8').strip()
+              if not content:
+                  continue
+              sections.append(
+                  '\n'.join([
+                      f'/* ===== INICIO: {relative} ===== */',
+                      '/* [MÓDULO / PANTALLA] Estilos centralizados desde la rama Jobtype. */',
+                      content,
+                      f'/* ===== FIN: {relative} ===== */',
+                      '',
+                  ])
+              )
+
+          global_path.write_text('\n'.join(sections).rstrip() + '\n', encoding='utf-8')
+
+          # responsiveIframes debe leer su sección desde el único CSS global.
+          if iframe_plugin.is_file():
+              plugin = iframe_plugin.read_text(encoding='utf-8')
+              old_import = "import legacyResponsiveCss from '@/assets/css/fm-legacy-responsive.css?raw'"
+              if old_import in plugin:
+                  replacement = """import globalCss from '@/assets/css/fm-global.css?raw'
+
+const LEGACY_START = '/* ===== INICIO: fm-legacy-responsive.css ===== */'
+const LEGACY_END = '/* ===== FIN: fm-legacy-responsive.css ===== */'
+
+const legacyStartIndex = globalCss.indexOf(LEGACY_START)
+const legacyEndIndex = globalCss.indexOf(LEGACY_END)
+
+if (legacyStartIndex === -1 || legacyEndIndex === -1 || legacyEndIndex <= legacyStartIndex) {
+  throw new Error('No se encontró la sección responsive legacy en fm-global.css')
+}
+
+const legacyResponsiveCss = globalCss
+  .slice(legacyStartIndex + LEGACY_START.length, legacyEndIndex)
+  .trim()"""
+                  plugin = plugin.replace(old_import, replacement)
+                  iframe_plugin.write_text(plugin, encoding='utf-8')
+
+          local_css_import = re.compile(
+              r"^\s*import\s+['\"](?P<path>(?:\.{1,2}/|@/)[^'\"]+\.css(?:\?raw)?)['\"]\s*;?\s*$",
+              re.MULTILINE,
+          )
+
+          for source in Path('src').rglob('*'):
+              if not source.is_file() or source.suffix.lower() not in {'.js', '.ts', '.vue'}:
+                  continue
+              text = source.read_text(encoding='utf-8')
+
+              def replace_import(match):
+                  imported = match.group('path')
+                  if imported.endswith('theme.css') or imported.endswith('fm-global.css'):
+                      return match.group(0)
+                  return ''
+
+              updated = local_css_import.sub(replace_import, text)
+              updated = re.sub(r'\n{3,}', '\n\n', updated)
+              if updated != text:
+                  source.write_text(updated, encoding='utf-8')
+
+          main_text = main_path.read_text(encoding='utf-8')
+          # Debe existir exactamente una importación del CSS global.
+          main_text = re.sub(
+              r"^\s*import\s+['\"]\.\/assets\/css\/fm-global\.css['\"]\s*;?\s*$",
+              '',
+              main_text,
+              flags=re.MULTILINE,
+          )
+          anchor = "import 'primeflex/primeflex.css'"
+          global_import = "import './assets/css/fm-global.css'"
+          if anchor in main_text:
+              main_text = main_text.replace(anchor, anchor + '\n' + global_import, 1)
+          else:
+              main_text = global_import + '\n' + main_text
+          main_text = re.sub(r'\n{3,}', '\n\n', main_text)
+          main_path.write_text(main_text, encoding='utf-8')
+
+          # Elimina las hojas que ya fueron absorbidas por fm-global.css.
+          for path in sorted(css_dir.glob('*.css')):
+              if path not in {global_path, theme_path}:
+                  path.unlink()
+          for path in ordered_extras:
+              if path.exists() and path not in {global_path, theme_path}:
+                  path.unlink()
+
+          # Trae la guía de mantenimiento de la infraestructura visual actual.
+          try:
+              readme = subprocess.check_output(
+                  ['git', 'show', 'origin/main:README_ESTILOS.md'],
+                  text=True,
+              )
+              Path('README_ESTILOS.md').write_text(readme, encoding='utf-8')
+          except subprocess.CalledProcessError:
+              pass
+
+          if main_path.read_text(encoding='utf-8').count(global_import) != 1:
+              raise SystemExit('main.js debe importar fm-global.css exactamente una vez')
+
+          remaining_css = [
+              str(path) for path in Path('src').rglob('*.css')
+              if path not in {global_path, theme_path}
+          ]
+          if remaining_css:
+              raise SystemExit(f'Quedaron hojas CSS dispersas: {remaining_css}')
+
+          global_text = global_path.read_text(encoding='utf-8')
+          required_sections = [
+              '/* ===== INICIO: fm-menu-responsive.css ===== */',
+              '/* ===== INICIO: fm-menu-tuning.css ===== */',
+              '/* ===== INICIO: fm-menu-spacing.css ===== */',
+              '/* ===== INICIO: fm-menu-submenu-compact.css ===== */',
+          ]
+          missing = [section for section in required_sections if section not in global_text]
+          if missing:
+              raise SystemExit(f'Faltan secciones visuales globales: {missing}')
+          PY
+
+      - name: Validar aplicación
+        run: |
+          npm ci
+          npm run build
+          git diff --check
+
+      - name: Confirmar actualización de Jobtype
+        run: |
+          rm -f .github/workflows/sync-jobtype-global.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Actualizar Jobtype con menú, margen y CSS global"
+          git push origin HEAD:arquitectura-componentes-globales
