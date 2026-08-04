@@ -19,6 +19,7 @@
       scrollable
       scrollHeight="flex"
       :rowClass="rowClass"
+      :rowSelectable="isRowSelectable"
       removableSort
       sortMode="single"
       sortField="codigoActividad"
@@ -73,8 +74,8 @@
               :show-refresh="false"
               :show-edit="true"
               :show-add="true"
-              :delete-disabled="!store.selectedRow"
-              :edit-disabled="!store.selectedRow"
+              :delete-disabled="!canOperate"
+              :edit-disabled="!canOperate"
               export-title="Descargar"
               delete-title="Desactivar"
               edit-title="Modificar"
@@ -133,13 +134,13 @@
       @saved="onDialogSaved"
     />
 
-    <ConfirmDialog />
+    <ConfirmDialog group="cmo-actividad" class="cmo-confirm-dialog" />
     <Toast />
   </FmGridShell>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import InputText from 'primevue/inputtext'
 import ConfirmDialog from 'primevue/confirmdialog'
 import Toast from 'primevue/toast'
@@ -171,13 +172,30 @@ const filters = ref(
   )
 )
 
+const isActive = (data: RelCmoActividad | null | undefined) =>
+  String(data?.activo ?? '').trim().toUpperCase() === 'S'
+
 const rowClass = (data: RelCmoActividad) => ({
-  'row-inactive': data?.activo !== 'S',
+  'cmo-row-inactive': !isActive(data),
 })
 
+const isRowSelectable = (event: { data?: RelCmoActividad } | RelCmoActividad) =>
+  isActive('data' in event ? event.data : event)
+
 const selectedRow = ref<RelCmoActividad | null>(null)
+const canOperate = computed(() => isActive(store.selectedRow))
+
+const clearSelection = () => {
+  selectedRow.value = null
+  store.setSelectedRow(null)
+}
 
 const onRowClick = ({ data }: { data: RelCmoActividad }) => {
+  if (!isActive(data)) {
+    clearSelection()
+    return
+  }
+
   selectedRow.value = data
   store.setSelectedRow(data)
 }
@@ -187,14 +205,15 @@ const onAdd = () => {
 }
 
 const onEdit = () => {
-  if (!store.selectedRow) return
+  if (!canOperate.value) return
   showModificarDialog.value = true
 }
 
 const onDelete = () => {
-  if (!store.selectedRow) return
+  if (!canOperate.value) return
 
   confirm.require({
+    group: 'cmo-actividad',
     message: 'Confirma que desea desactivar la relación seleccionada?',
     header: 'Confirmar desactivación',
     icon: 'pi pi-exclamation-triangle',
@@ -209,8 +228,7 @@ const onDelete = () => {
           detail: 'La relación fue desactivada correctamente',
           life: 3000,
         })
-        store.setSelectedRow(null)
-        selectedRow.value = null
+        clearSelection()
       } catch {
         toast.add({
           severity: 'error',
@@ -223,115 +241,22 @@ const onDelete = () => {
   })
 }
 
-const onDialogSaved = () => {
-  store.fetchData()
+const onDialogSaved = async () => {
+  clearSelection()
+  await store.fetchData()
 }
 
 const exportarExcel = () => {
-  if (!store.rows.length) return
+  const rows = dt.value?.filteredValue ?? store.rows
+  if (!rows.length) return
 
   const fields = mainColumns.map((c) => c.field)
 
   exportToExcel({
-    rows: store.rows,
+    rows,
     fields,
     columns: mainColumns,
     filename: 'Configuracion_CMO_Actividad.xlsx',
   })
 }
 </script>
-
-<style scoped>
-.row-inactive {
-  opacity: 0.5;
-}
-
-:global(.cmo-grid-shell) {
-  width: 100% !important;
-  height: 100% !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
-  flex: 1 1 auto !important;
-  display: flex !important;
-  flex-direction: column !important;
-  overflow: hidden !important;
-}
-
-:global(#tabla-cmo-actividad),
-:global(#tabla-cmo-actividad.p-datatable) {
-  width: 100% !important;
-  height: 100% !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
-  flex: 1 1 auto !important;
-  display: flex !important;
-  flex-direction: column !important;
-  overflow: hidden !important;
-}
-
-:global(#tabla-cmo-actividad .p-datatable-table-container),
-:global(#tabla-cmo-actividad .p-datatable-wrapper),
-:global(#tabla-cmo-actividad [data-pc-section="tablecontainer"]) {
-  width: 100% !important;
-  height: auto !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  flex: 1 1 auto !important;
-  overflow: auto !important;
-}
-
-:global(#tabla-cmo-actividad .p-datatable-table) {
-  width: 100% !important;
-  min-width: 100% !important;
-  table-layout: fixed !important;
-}
-
-:global(#tabla-cmo-actividad .p-sortable-column-badge),
-:global(#tabla-cmo-actividad .p-datatable-sort-badge),
-:global(#tabla-cmo-actividad [data-pc-section="sortbadge"]) {
-  display: none !important;
-}
-
-:global(#tabla-cmo-actividad .p-datatable-thead > tr > th) {
-  font-size: 12px !important;
-}
-
-:global(#tabla-cmo-actividad .p-datatable-tbody > tr > td) {
-  font-size: 13px !important;
-}
-
-:global(#tabla-cmo-actividad .p-datatable-emptymessage > td),
-:global(#tabla-cmo-actividad .p-datatable-empty-message > td) {
-  height: 48px !important;
-  min-height: 48px !important;
-  padding: 0 !important;
-  vertical-align: middle !important;
-  background: #eafcff !important;
-}
-
-:global(#tabla-cmo-actividad .p-datatable-emptymessage .fm-grid-empty),
-:global(#tabla-cmo-actividad .p-datatable-empty-message .fm-grid-empty) {
-  width: 100% !important;
-  height: 48px !important;
-  min-height: 48px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 0 !important;
-  background: #eafcff !important;
-  box-sizing: border-box !important;
-}
-
-:global(#tabla-cmo-actividad .fm-filter-cell),
-:global(#tabla-cmo-actividad .fm-column-filter),
-:global(#tabla-cmo-actividad .fm-filter-prefix),
-:global(#tabla-cmo-actividad .fm-filter-more) {
-  font-size: 12px !important;
-}
-
-:global(#tabla-cmo-actividad .fm-grid-paginator),
-:global(#tabla-cmo-actividad .fm-grid-paginator *) {
-  font-size: 13px !important;
-}
-</style>
