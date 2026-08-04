@@ -23,6 +23,8 @@ export default defineConfig(({ mode }) => {
         '/pc/': {
           target: env.VITE_ORIGIN,
           changeOrigin: true,
+          timeout: 120000,
+          proxyTimeout: 120000,
         },
       },
     },

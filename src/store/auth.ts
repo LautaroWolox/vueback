@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { EncryptStorageNoble } from 'encrypt-storage';
+import { EncryptStorage } from 'encrypt-storage';
 import { useFetch } from '@vueuse/core'
 
 interface Usuario {
@@ -116,9 +116,9 @@ const resolveSurname = (perfil: SetPerfilParams) => {
 }
 
 const clave = import.meta.env.VITE_PARAMETER1;
-export const authStore = new EncryptStorageNoble('autorizacion', {
+export const authStore = new EncryptStorage(clave, {
     stateManagementUse: true,
-    prefix: '@app',
+    prefix: '@app:autorizacion',
     storageType: 'sessionStorage',
 });
 

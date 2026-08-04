@@ -139,14 +139,9 @@ export const getRutas = (rutas:any) => {
                             visible: hasMenu('CORE')
                         },
                         {
-                            label: 'Monitoreo y Ejecución de Reglas',
-                            command: () => { router.push({ name: 'MORE' }); },
-                            visible: hasMenu('MORE')
-                        },
-                        {
-                            label: 'Regla Prueba Masiva',
-                            command: () => { router.push({ name: 'PUMA' }); },
-                            visible: hasMenu('PUMA')
+                            label: 'Configuración CMO-Actividad',
+                            command: () => { router.push({ name: 'CMOA' }); },
+                            visible: hasMenu('CMOA') || hasMenu('JOCO')
                         }
                     ]
                 },

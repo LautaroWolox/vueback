@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia'
-import { EncryptStorageNoble } from 'encrypt-storage';
+import { EncryptStorage } from 'encrypt-storage';
 import { useFetch } from '@vueuse/core'
 import type { StoreState, LoadStatus, Contratista, ActividadMotivo } from './interfaces/ctTypes.ts'
 
-export const commonCtStore = new EncryptStorageNoble('commonCerti', {
+const clave = import.meta.env.VITE_PARAMETER1;
+export const commonCtStore = new EncryptStorage(clave, {
     stateManagementUse: true,
-    prefix: '@app',
+    prefix: '@app:commonCerti',
     storageType: 'sessionStorage',
 });
 export const useCommonCtStore = defineStore('commonCT', {
