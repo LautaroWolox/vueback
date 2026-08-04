@@ -478,7 +478,8 @@ const relacionar = async () => {
         rel.activo === 'S' &&
         rel.tareaCodigo === row.relCodigoTarea &&
         rel.contratoNombre === row.relContrato &&
-        rel.origen === row.origen
+        rel.origen === row.origen &&
+        rel.pais === row.paisLabel
     )
   )
 

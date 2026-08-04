@@ -237,7 +237,8 @@ const actualizar = async () => {
       row.tareaContratoId !== props.tareaContratoId &&
       row.contratoNombre === nuevoContratoNombre &&
       row.origen === nuevoOrigen &&
-      row.tareaNombre === props.jobtype
+      row.tareaNombre === props.jobtype &&
+      row.pais === props.pais
   )
 
   if (duplicado) {
