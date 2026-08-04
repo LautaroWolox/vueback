@@ -1,2 +1,3 @@
 Ejecutar restauración visual de los popups CMO sobre la rama CMO.
 Reejecutar validación técnica.
+Segundo pase simplificado.
