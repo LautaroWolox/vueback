@@ -5,7 +5,13 @@
       'jobtype-contrato-screen--grid-expanded': resultsExpanded
     }"
   >
-    <LoadingOverlay :loading="store.loading && !showAlta && !showEditar && !showDesactivar" />
+    <FmTypingLoader
+      v-if="store.loading && !showAlta && !showEditar && !showDesactivar"
+      overlay
+      variant="grid"
+      title="Cargando Información"
+      message="Preparando Grilla"
+    />
 
     <section class="jobtype-panel jobtype-panel--filters">
       <button
@@ -86,7 +92,7 @@ import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { FilterMatchMode } from '@primevue/core/api'
 import FmButton from '@/components/shared/FmButton.vue'
 import FmAlertDialog from '@/components/shared/FmAlertDialog.vue'
-import LoadingOverlay from '@/modules/shared/components/LoadingOverlay.vue'
+import FmTypingLoader from '@/components/shared/FmTypingLoader.vue'
 import Tabla from './components/Tabla.vue'
 import AltaDialog from './components/AltaDialog.vue'
 import EditarDialog from './components/EditarDialog.vue'
