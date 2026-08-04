@@ -1,0 +1,352 @@
+name: Corregir layout definitivo de popups CMO
+
+on:
+  pull_request:
+    branches:
+      - CMO
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+jobs:
+  fix-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar rama CMO
+        uses: actions/checkout@v4
+        with:
+          ref: CMO
+          fetch-depth: 0
+
+      - name: Preparar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Corregir únicamente la cascada visual de CMO
+        shell: bash
+        run: |
+          set -euo pipefail
+          python <<'PYCODE'
+          from pathlib import Path
+          import re
+
+          module = Path('src/modules/parametrizaciones/jobtypeCMO')
+          alta_wrapper = module / 'components/AltaDialog.vue'
+          alta = module / 'components/AltaDialogBackend.vue'
+          modificar = module / 'components/ModificarDialog.vue'
+          css_path = Path('src/assets/css/fm-global.css')
+
+          # La clase se coloca directamente en el Dialog real. No se depende del
+          # fallthrough de atributos del componente contenedor.
+          alta_text = alta.read_text(encoding='utf-8')
+          alta_text = alta_text.replace(
+              'class="jobtype-alta-dialog"',
+              'class="jobtype-alta-dialog cmo-alta-dialog"',
+              1
+          )
+          alta.write_text(alta_text, encoding='utf-8')
+
+          modificar_text = modificar.read_text(encoding='utf-8')
+          modificar_text = modificar_text.replace(
+              'class="jobtype-alta-dialog"',
+              'class="jobtype-alta-dialog cmo-modificar-dialog"',
+              1
+          )
+          modificar.write_text(modificar_text, encoding='utf-8')
+
+          # El wrapper no define medidas ni estilos. La única fuente visual es
+          # fm-global.css y la clase está en el Dialog real.
+          wrapper_text = alta_wrapper.read_text(encoding='utf-8')
+          wrapper_text = re.sub(r'\s*:style="dialogStyle"', '', wrapper_text)
+          wrapper_text = re.sub(
+              r'\n// Mismas dimensiones.*?margin:0 !important;\'\n',
+              '\n',
+              wrapper_text,
+              flags=re.S
+          )
+          alta_wrapper.write_text(wrapper_text, encoding='utf-8')
+
+          css = css_path.read_text(encoding='utf-8')
+          start = '/* ===== INICIO: cmo-actividad.css ===== */'
+          end = '/* ===== FIN: cmo-actividad.css ===== */'
+          css = re.sub(
+              re.escape(start) + r'.*?' + re.escape(end),
+              '',
+              css,
+              flags=re.S
+          ).rstrip()
+
+          section = r'''
+/* ===== INICIO: cmo-actividad.css ===== */
+/*
+ * CLASIFICACIÓN: [MÓDULO / PANTALLA]
+ * PANTALLA: Parametrizaciones > CMO-Actividad.
+ * BASE VISUAL: componentes actuales de main.
+ * ALCANCE: #tabla-cmo-actividad, .cmo-alta-dialog y .cmo-modificar-dialog.
+ * No modificar reglas genéricas de Jobtype-Contrato para resolver CMO.
+ */
+
+/* Alta: mismo tamaño aprobado que Alta Jobtype-Contrato. */
+body .p-dialog.jobtype-alta-dialog.cmo-alta-dialog {
+  width: min(1440px, calc(100vw - 24px)) !important;
+  height: min(680px, 56vw, calc(100dvh - 24px)) !important;
+  max-width: calc(100vw - 24px) !important;
+  max-height: calc(100dvh - 24px) !important;
+  margin: 0 !important;
+}
+
+/*
+ * La pantalla Jobtype-Contrato fuerza el primer y cuarto campo a 120px.
+ * CMO sólo tiene Actividad, CMO y AGREGAR, por eso se restablecen
+ * explícitamente sus dos campos a ancho flexible.
+ */
+html body .p-dialog.cmo-alta-dialog .cmo-alta-form {
+  width: min(860px, 100%) !important;
+  max-width: 860px !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 120px !important;
+  grid-template-rows: auto !important;
+  grid-auto-flow: row !important;
+  align-items: end !important;
+  gap: 10px 14px !important;
+}
+
+html body .p-dialog.cmo-alta-dialog .cmo-alta-form > .jobtype-alta-field,
+html body .p-dialog.cmo-alta-dialog .cmo-alta-form > .jobtype-alta-field:nth-child(1),
+html body .p-dialog.cmo-alta-dialog .cmo-alta-form > .jobtype-alta-field:nth-child(2) {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  grid-column: auto !important;
+  grid-row: auto !important;
+}
+
+html body .p-dialog.cmo-alta-dialog .cmo-alta-form .p-autocomplete,
+html body .p-dialog.cmo-alta-dialog .cmo-alta-form .p-autocomplete-input,
+html body .p-dialog.cmo-alta-dialog .cmo-alta-form .jobtype-alta-control {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+
+html body .p-dialog.cmo-alta-dialog .cmo-alta-form > .jobtype-add-button,
+html body .p-dialog.cmo-alta-dialog .cmo-alta-form > .jobtype-add-button.p-button {
+  width: 120px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
+  grid-column: 3 !important;
+  grid-row: 1 !important;
+  align-self: end !important;
+  border-radius: 0 !important;
+}
+
+body .p-dialog.cmo-alta-dialog .jobtype-alta-grid-wrap {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+body .p-dialog.cmo-alta-dialog input::placeholder {
+  color: transparent !important;
+  opacity: 0 !important;
+}
+
+/* Edición: popup compacto, tres campos en una sola fila. */
+body .p-dialog.jobtype-alta-dialog.cmo-modificar-dialog {
+  width: min(900px, calc(100vw - 32px)) !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-width: 900px !important;
+  max-height: calc(100dvh - 32px) !important;
+  margin: 0 !important;
+}
+
+html body .p-dialog.cmo-modificar-dialog .cmo-modificar-form {
+  width: 100% !important;
+  max-width: 960px !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-template-rows: auto !important;
+  grid-auto-flow: row !important;
+  align-items: end !important;
+  gap: 10px 14px !important;
+}
+
+html body .p-dialog.cmo-modificar-dialog .cmo-modificar-form > .jobtype-alta-field,
+html body .p-dialog.cmo-modificar-dialog .cmo-modificar-form > .jobtype-alta-field:nth-child(1),
+html body .p-dialog.cmo-modificar-dialog .cmo-modificar-form > .jobtype-alta-field:nth-child(2),
+html body .p-dialog.cmo-modificar-dialog .cmo-modificar-form > .jobtype-alta-field:nth-child(3) {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  grid-column: auto !important;
+  grid-row: auto !important;
+}
+
+html body .p-dialog.cmo-modificar-dialog .cmo-modificar-form .p-autocomplete,
+html body .p-dialog.cmo-modificar-dialog .cmo-modificar-form .p-autocomplete-input,
+html body .p-dialog.cmo-modificar-dialog .cmo-modificar-form .jobtype-alta-control {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+
+.cmo-alta-errors {
+  padding: 4px 16px;
+  margin: 0;
+}
+
+.cmo-alta-errors__item,
+.cmo-modificar-error__item {
+  margin: 2px 0;
+  padding: 4px 8px;
+  border-left: 3px solid #d32f2f;
+  background: #fff5f5;
+  color: #d32f2f;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.cmo-modificar-error {
+  padding: 8px 16px 0;
+  margin: 0;
+}
+
+/* Grilla principal: ocupar el alto disponible. */
+.cmo-grid-shell,
+#tabla-cmo-actividad,
+#tabla-cmo-actividad.p-datatable {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+#tabla-cmo-actividad .p-datatable-table-container,
+#tabla-cmo-actividad .p-datatable-wrapper,
+#tabla-cmo-actividad [data-pc-section="tablecontainer"] {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 1 1 auto !important;
+  overflow: auto !important;
+}
+
+#tabla-cmo-actividad .p-datatable-table {
+  width: 100% !important;
+  min-width: 100% !important;
+  table-layout: fixed !important;
+}
+
+#tabla-cmo-actividad .p-sortable-column-badge,
+#tabla-cmo-actividad .p-datatable-sort-badge,
+#tabla-cmo-actividad [data-pc-section="sortbadge"] {
+  display: none !important;
+}
+
+/* Selección: turquesa y texto en negrita. */
+#tabla-cmo-actividad .p-datatable-tbody > tr.p-highlight > td,
+#tabla-cmo-actividad .p-datatable-tbody > tr.p-datatable-row-selected > td,
+#tabla-cmo-actividad .p-datatable-tbody > tr[data-p-selected='true'] > td,
+#tabla-cmo-actividad .p-datatable-tbody > tr[aria-selected='true'] > td {
+  background: #9ee7ee !important;
+  border-color: #78c5cf !important;
+  color: #143d45 !important;
+  font-weight: 700 !important;
+}
+
+#tabla-cmo-actividad .p-datatable-tbody > tr.p-highlight > td *,
+#tabla-cmo-actividad .p-datatable-tbody > tr.p-datatable-row-selected > td *,
+#tabla-cmo-actividad .p-datatable-tbody > tr[data-p-selected='true'] > td *,
+#tabla-cmo-actividad .p-datatable-tbody > tr[aria-selected='true'] > td * {
+  color: #143d45 !important;
+  font-weight: 700 !important;
+}
+
+/* Relaciones inactivas: grisadas y no operables. */
+#tabla-cmo-actividad .p-datatable-tbody > tr.cmo-row-inactive > td,
+#tabla-cmo-actividad .p-datatable-tbody > tr.cmo-row-inactive:hover > td,
+#tabla-cmo-actividad .p-datatable-tbody > tr.cmo-row-inactive.p-highlight > td,
+#tabla-cmo-actividad .p-datatable-tbody > tr.cmo-row-inactive.p-datatable-row-selected > td,
+#tabla-cmo-actividad .p-datatable-tbody > tr.cmo-row-inactive[data-p-selected='true'] > td,
+#tabla-cmo-actividad .p-datatable-tbody > tr.cmo-row-inactive[aria-selected='true'] > td {
+  background: #edf0f2 !important;
+  border-color: #d5dde1 !important;
+  color: #75838b !important;
+  font-weight: 400 !important;
+  cursor: not-allowed !important;
+}
+
+#tabla-cmo-actividad .p-datatable-tbody > tr.cmo-row-inactive > td * {
+  color: #75838b !important;
+  font-weight: 400 !important;
+}
+
+@media (max-width: 768px) {
+  html body .p-dialog.cmo-alta-dialog .cmo-alta-form,
+  html body .p-dialog.cmo-modificar-dialog .cmo-modificar-form {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  html body .p-dialog.cmo-alta-dialog .cmo-alta-form > .jobtype-add-button,
+  html body .p-dialog.cmo-alta-dialog .cmo-alta-form > .jobtype-add-button.p-button {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    grid-column: 1 !important;
+    grid-row: auto !important;
+  }
+}
+/* ===== FIN: cmo-actividad.css ===== */
+'''.strip()
+
+          css_path.write_text(css + '\n\n' + section + '\n', encoding='utf-8')
+
+          # Eliminar archivos técnicos que quedaron de intentos anteriores.
+          for workflow in Path('.github/workflows').glob('restore-cmo-popups*.yml'):
+              workflow.unlink()
+          current_workflow = Path('.github/workflows/fix-cmo-popup-layout-final.yml')
+          if current_workflow.exists():
+              current_workflow.unlink()
+          PYCODE
+
+      - name: Validar corrección
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          test "$(grep -c 'INICIO: cmo-actividad.css' src/assets/css/fm-global.css)" -eq 1
+          test "$(grep -c 'FIN: cmo-actividad.css' src/assets/css/fm-global.css)" -eq 1
+          grep -q 'class="jobtype-alta-dialog cmo-alta-dialog"' src/modules/parametrizaciones/jobtypeCMO/components/AltaDialogBackend.vue
+          grep -q 'class="jobtype-alta-dialog cmo-modificar-dialog"' src/modules/parametrizaciones/jobtypeCMO/components/ModificarDialog.vue
+          grep -q 'grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 120px' src/assets/css/fm-global.css
+          grep -q 'cmo-alta-form > .jobtype-alta-field:nth-child(1)' src/assets/css/fm-global.css
+          grep -q 'cmo-modificar-form > .jobtype-alta-field:nth-child(3)' src/assets/css/fm-global.css
+          ! grep -R '<style' src/modules/parametrizaciones/jobtypeCMO --include='*.vue'
+          ! find src/modules/parametrizaciones/jobtypeCMO -type f -name '*.css' | grep -q .
+          ! find .github/workflows -maxdepth 1 -type f -name 'restore-cmo-popups*.yml' | grep -q .
+          test ! -f .github/workflows/fix-cmo-popup-layout-final.yml
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar proyecto
+        run: npm run build
+
+      - name: Confirmar corrección
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Corregir definitivamente layout de popups CMO"
+          git push origin HEAD:CMO
