@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - ABM-Materiales
+  pull_request:
+    branches:
+      - ABM-Materiales
+  workflow_dispatch:
 
 permissions:
   contents: write
