@@ -1,0 +1,161 @@
+name: Validar integración Jobtype Kiro por PR
+
+on:
+  pull_request:
+    branches:
+      - jobtype-contrato-integracion-kiro
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar rama de integración
+        uses: actions/checkout@v4
+        with:
+          ref: jobtype-contrato-integracion-kiro
+          fetch-depth: 0
+
+      - name: Descargar respaldo visual
+        run: git fetch origin backup-jobtype-contrato-pre-kiro:refs/remotes/origin/backup-jobtype-contrato-pre-kiro
+
+      - name: Preparar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Aplicar funcionalidad y centralizar estilos
+        shell: bash
+        run: |
+          set -euo pipefail
+          python <<'PYCODE'
+          from pathlib import Path
+          import base64, io, re, shutil, subprocess, tarfile
+
+          root = Path('.')
+          source_workflow = root / '.github/workflows/apply-jobtype-kiro.yml'
+          source_text = source_workflow.read_text(encoding='utf-8')
+          match = re.search(r'JOBTYPE_PAYLOAD:\s*"([A-Za-z0-9+/=]+)"', source_text)
+          if not match:
+              raise SystemExit('No se encontró el paquete de migración')
+
+          payload_dir = Path('/tmp/jobtype-payload')
+          payload_dir.mkdir(parents=True, exist_ok=True)
+          archive = base64.b64decode(match.group(1))
+          with tarfile.open(fileobj=io.BytesIO(archive), mode='r:gz') as tar:
+              tar.extractall(payload_dir)
+
+          mapping = {
+              'JobtypeContratoPage.vue': root / 'src/modules/parametrizaciones/jobtypeContrato/pages/JobtypeContratoPage.vue',
+              'AltaJobtypeContratoDialog.vue': root / 'src/modules/parametrizaciones/jobtypeContrato/dialogs/AltaJobtypeContratoDialog.vue',
+              'EditarJobtypeContratoDialog.vue': root / 'src/modules/parametrizaciones/jobtypeContrato/dialogs/EditarJobtypeContratoDialog.vue',
+              'jobtypeContratoApi.ts': root / 'src/modules/parametrizaciones/jobtypeContrato/api/jobtypeContratoApi.ts',
+              'jobtypeContratoStore.ts': root / 'src/modules/parametrizaciones/jobtypeContrato/store/jobtypeContratoStore.ts',
+          }
+
+          def git_show(path: Path) -> str:
+              return subprocess.run(
+                  ['git', 'show', f'origin/backup-jobtype-contrato-pre-kiro:{path.as_posix()}'],
+                  check=True, capture_output=True, text=True
+              ).stdout
+
+          def extract_styles(text: str) -> str:
+              blocks = re.findall(r'<style(?:\s+[^>]*)?>(.*?)</style>', text, flags=re.S | re.I)
+              css = '\n\n'.join(block.strip() for block in blocks if block.strip())
+              return re.sub(r':deep\(([^()]*)\)', r'\1', css)
+
+          global_path = root / 'src/assets/css/fm-global.css'
+          global_css = global_path.read_text(encoding='utf-8')
+          start = '/* ===== INICIO: jobtype-contrato-consolidado-final.css ===== */'
+          end = '/* ===== FIN: jobtype-contrato-consolidado-final.css ===== */'
+          if start in global_css and end in global_css:
+              before, rest = global_css.split(start, 1)
+              _, after = rest.split(end, 1)
+              global_css = before.rstrip() + '\n' + after.lstrip('\n')
+
+          style_paths = [
+              Path('src/modules/parametrizaciones/jobtypeContrato/styles/jobtype-contrato.css'),
+              Path('src/modules/parametrizaciones/jobtypeContrato/styles/jobtypeContratoSingleRow.css'),
+          ]
+          component_paths = [
+              Path('src/modules/parametrizaciones/jobtypeContrato/dialogs/AltaJobtypeContratoDialog.vue'),
+              Path('src/modules/parametrizaciones/jobtypeContrato/dialogs/EditarJobtypeContratoDialog.vue'),
+              Path('src/modules/parametrizaciones/jobtypeContrato/pages/JobtypeContratoPage.vue'),
+          ]
+          dialogs_css = Path('src/modules/parametrizaciones/jobtypeContrato/styles/jobtypeContratoDialogs.css')
+
+          pieces = []
+          for path in style_paths:
+              pieces.append(f'/* Fuente consolidada: {path.as_posix()} */\n{git_show(path).strip()}')
+          for path in component_paths:
+              css = extract_styles(git_show(path))
+              if css:
+                  pieces.append(f'/* Estilos locales migrados desde: {path.as_posix()} */\n{css}')
+          pieces.append(f'/* Fuente consolidada: {dialogs_css.as_posix()} */\n{git_show(dialogs_css).strip()}')
+          pieces.append((payload_dir / 'jobtype-additions.css').read_text(encoding='utf-8').strip())
+
+          documentation = '''/*
+           * CLASIFICACIÓN: [MÓDULO / PANTALLA]
+           * PANTALLA AFECTADA: Parametrizaciones > Jobtype-Contrato.
+           * RESPONSABILIDAD: conservar el diseño aprobado y sumar Origen,
+           * validaciones de duplicados, loaders y bloqueo de filas inactivas.
+           * SELECTORES RAÍZ: .jobtype-screen, .joco-alta-dialog, .joco-edit-dialog.
+           */'''
+          section = '\n\n'.join([start, documentation, *pieces, end])
+          global_path.write_text(global_css.rstrip() + '\n\n' + section + '\n', encoding='utf-8')
+
+          for source, destination in mapping.items():
+              destination.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copyfile(payload_dir / source, destination)
+
+          main_path = root / 'src/main.js'
+          main_text = main_path.read_text(encoding='utf-8')
+          main_text = re.sub(
+              r"^import ['\"]\./modules/parametrizaciones/jobtypeContrato/styles/[^'\"]+\.css['\"]\s*\n",
+              '', main_text, flags=re.M
+          )
+          main_path.write_text(main_text, encoding='utf-8')
+
+          styles_dir = root / 'src/modules/parametrizaciones/jobtypeContrato/styles'
+          if styles_dir.exists():
+              shutil.rmtree(styles_dir)
+
+          for workflow in [
+              root / '.github/workflows/apply-jobtype-kiro.yml',
+              root / '.github/workflows/trigger-jobtype-kiro-pr.yml',
+          ]:
+              if workflow.exists():
+                  workflow.unlink()
+          PYCODE
+
+      - name: Validar centralización y estructura
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q "INICIO: jobtype-contrato-consolidado-final.css" src/assets/css/fm-global.css
+          ! grep -R "<style" src/modules/parametrizaciones/jobtypeContrato --include='*.vue'
+          ! grep -R "jobtypeContrato/styles" src/main.js src/modules/parametrizaciones/jobtypeContrato --include='*.js' --include='*.ts' --include='*.vue'
+          test ! -d src/modules/parametrizaciones/jobtypeContrato/styles
+          grep -q "rowSelectable" src/modules/parametrizaciones/jobtypeContrato/pages/JobtypeContratoPage.vue
+          grep -q "isExistingActiveRelation" src/modules/parametrizaciones/jobtypeContrato/dialogs/AltaJobtypeContratoDialog.vue
+          grep -q "existeDuplicado" src/modules/parametrizaciones/jobtypeContrato/dialogs/EditarJobtypeContratoDialog.vue
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar proyecto
+        run: npm run build
+
+      - name: Confirmar cambios validados
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Integrar nuevas funcionalidades de Jobtype-Contrato"
+          git push origin HEAD:jobtype-contrato-integracion-kiro
