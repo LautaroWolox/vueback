@@ -1,0 +1,111 @@
+name: Restaurar popups CMO desde main
+
+on:
+  pull_request:
+    branches:
+      - CMO
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+jobs:
+  restore-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar rama CMO
+        uses: actions/checkout@v4
+        with:
+          ref: CMO
+          fetch-depth: 0
+
+      - name: Preparar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Restaurar templates exactos de main y conservar lógica nueva
+        shell: bash
+        run: |
+          set -euo pipefail
+          python <<'PYCODE'
+          from pathlib import Path
+          import re
+          import subprocess
+
+          files = [
+              Path('src/modules/parametrizaciones/jobtypeCMO/components/AltaDialogBackend.vue'),
+              Path('src/modules/parametrizaciones/jobtypeCMO/components/ModificarDialog.vue'),
+          ]
+
+          for path in files:
+              current = path.read_text(encoding='utf-8')
+              main = subprocess.check_output(
+                  ['git', 'show', f'origin/main:{path.as_posix()}'],
+                  text=True,
+                  encoding='utf-8'
+              )
+
+              template_match = re.search(r'<template>.*?</template>', main, flags=re.S)
+              script_match = re.search(r'<script setup lang="ts">.*?</script>', current, flags=re.S)
+              if not template_match or not script_match:
+                  raise SystemExit(f'No se pudo reconstruir {path}')
+
+              template = template_match.group(0)
+              script = script_match.group(0)
+
+              # Mantener el loader funcional sin alterar la grilla ni el formulario.
+              loader = '''\n    <FmTypingLoader\n      v-if="saving"\n      overlay\n      title="{}"\n      message="{}"\n    />\n'''
+              if path.name == 'AltaDialogBackend.vue':
+                  loader = loader.format('Relacionando', 'Guardando relaciones CMO-Actividad')
+              else:
+                  loader = loader.format('Actualizando relación', 'Guardando el nuevo CMO')
+
+              template = template.replace('  >\n    <template #header>', '  >' + loader + '\n    <template #header>', 1)
+
+              # Bloqueos funcionales durante guardado, sin cambiar estructura visual.
+              template = template.replace('aria-label="Cerrar"\n          @click="cerrar"', 'aria-label="Cerrar"\n          :disabled="saving"\n          @click="cerrar"')
+              template = template.replace('@complete="onSearchActividad"', ':disabled="saving"\n            @complete="onSearchActividad"')
+              template = template.replace('@complete="onSearchCmo"', ':disabled="saving"\n            @complete="onSearchCmo"')
+              template = template.replace(':disabled="!canAgregar"', ':disabled="!canAgregar || saving"')
+              template = template.replace(':delete-disabled="!selectedPreviewRow"', ':delete-disabled="!selectedPreviewRow || saving"')
+
+              # Los estilos de los bloques <style> de main ya están consolidados en fm-global.css.
+              path.write_text(template + '\n\n' + script + '\n', encoding='utf-8')
+
+          workflow = Path('.github/workflows/restore-cmo-dialogs-main.yml')
+          if workflow.exists():
+              workflow.unlink()
+          PYCODE
+
+      - name: Validar restauración visual y funcional
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          ! grep -R '<style' src/modules/parametrizaciones/jobtypeCMO --include='*.vue'
+          grep -q 'style="grid-template-columns: minmax(0, 1fr) 52px"' src/modules/parametrizaciones/jobtypeCMO/components/AltaDialogBackend.vue
+          grep -q 'style="width: 120px !important; min-width: 120px !important; max-width: 120px !important; border-radius: 0 !important"' src/modules/parametrizaciones/jobtypeCMO/components/AltaDialogBackend.vue
+          grep -q 'style="grid-template-columns: minmax(0, 1fr) 52px"' src/modules/parametrizaciones/jobtypeCMO/components/ModificarDialog.vue
+          grep -q 'existsActiveRelation' src/modules/parametrizaciones/jobtypeCMO/components/AltaDialogBackend.vue
+          grep -q 'existsActiveDuplicate' src/modules/parametrizaciones/jobtypeCMO/components/ModificarDialog.vue
+          grep -q 'FmTypingLoader' src/modules/parametrizaciones/jobtypeCMO/components/AltaDialogBackend.vue
+          grep -q 'FmTypingLoader' src/modules/parametrizaciones/jobtypeCMO/components/ModificarDialog.vue
+          test ! -f .github/workflows/restore-cmo-dialogs-main.yml
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar proyecto
+        run: npm run build
+
+      - name: Confirmar restauración validada
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Restaurar diseño original de popups CMO"
+          git push origin HEAD:CMO
