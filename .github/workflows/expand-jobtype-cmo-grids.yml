@@ -1,0 +1,84 @@
+name: Expandir grillas Jobtype y CMO
+
+on:
+  push:
+    branches:
+      - CMO
+
+permissions:
+  contents: write
+
+jobs:
+  update-and-build:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar rama CMO
+        uses: actions/checkout@v4
+        with:
+          ref: CMO
+          fetch-depth: 0
+
+      - name: Preparar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Activar altura completa en ambas pantallas
+        shell: bash
+        run: |
+          set -euo pipefail
+          python <<'PYCODE'
+          from pathlib import Path
+
+          jobtype_path = Path('src/modules/parametrizaciones/jobtypeContrato/JobtypeContrato.vue')
+          cmo_path = Path('src/modules/parametrizaciones/jobtypeCMO/JobtypeCMO.vue')
+
+          jobtype = jobtype_path.read_text(encoding='utf-8')
+          old_jobtype = "'jobtype-contrato-screen--grid-expanded': !filtersExpanded && resultsExpanded"
+          new_jobtype = "'jobtype-contrato-screen--grid-expanded': resultsExpanded"
+          if old_jobtype not in jobtype:
+              raise SystemExit('No se encontró la condición anterior de Jobtype-Contrato')
+          jobtype_path.write_text(jobtype.replace(old_jobtype, new_jobtype, 1), encoding='utf-8')
+
+          cmo = cmo_path.read_text(encoding='utf-8')
+          old_cmo = '<div class="jobtype-screen cmo-actividad-page">'
+          new_cmo = '''<div
+    class="jobtype-screen cmo-actividad-page"
+    :class="{ 'jobtype-contrato-screen--grid-expanded': resultsExpanded }"
+  >'''
+          if old_cmo not in cmo:
+              raise SystemExit('No se encontró el contenedor raíz anterior de CMO')
+          cmo_path.write_text(cmo.replace(old_cmo, new_cmo, 1), encoding='utf-8')
+          PYCODE
+
+      - name: Validar estructura
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          grep -q "'jobtype-contrato-screen--grid-expanded': resultsExpanded" src/modules/parametrizaciones/jobtypeContrato/JobtypeContrato.vue
+          grep -q "'jobtype-contrato-screen--grid-expanded': resultsExpanded" src/modules/parametrizaciones/jobtypeCMO/JobtypeCMO.vue
+          grep -q 'scrollHeight="flex"' src/modules/parametrizaciones/jobtypeContrato/components/Tabla.vue
+          grep -q 'scrollHeight="flex"' src/modules/parametrizaciones/jobtypeCMO/components/Tabla.vue
+          grep -q 'jobtype-contrato-screen--grid-expanded .jobtype-results-body' src/assets/css/fm-global.css
+          grep -q '#tabla-cmo-actividad.p-datatable' src/assets/css/fm-global.css
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar proyecto
+        run: npm run build
+
+      - name: Limpiar y confirmar
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/expand-jobtype-cmo-grids.yml
+          rm -f .github/expand-jobtype-cmo-grids.trigger
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Expandir grillas Jobtype y CMO a toda la pantalla"
+          git push origin HEAD:CMO
