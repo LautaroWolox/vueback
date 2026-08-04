@@ -1,14 +1,7 @@
 /* ── Estilos globales ── */
 import 'primeicons/primeicons.css'
 import 'primeflex/primeflex.css'
-import './assets/css/fm-tokens.css'       // tokens PRIMERO
 import './assets/css/fm-global.css'
-import './assets/css/fm-grid-resize.css'
-import './assets/css/fm-responsive.css'
-import './assets/css/fm-menu-responsive.css'
-import './assets/css/fm-menu-tuning.css'
-import './assets/css/fm-report-sas-auto-height.css'
-import './assets/css/fm-select.css'
 import './modules/parametrizaciones/jobtypeContrato/styles/jobtype-contrato.css'
 import './modules/parametrizaciones/jobtypeContrato/styles/jobtypeContratoSingleRow.css'
 
@@ -36,26 +29,26 @@ import { installReportSasAutoHeight } from './plugins/reportSasAutoHeight.js'
 import { fmComponents } from './plugins/fmComponents.js'
 
 /* ── Componentes PrimeVue ── */
-import Accordion      from 'primevue/accordion'
-import AccordionPanel  from 'primevue/accordionpanel'
+import Accordion from 'primevue/accordion'
+import AccordionPanel from 'primevue/accordionpanel'
 import AccordionHeader from 'primevue/accordionheader'
 import AccordionContent from 'primevue/accordioncontent'
-import AutoComplete   from 'primevue/autocomplete'
-import Button         from 'primevue/button'
-import Checkbox       from 'primevue/checkbox'
-import Column         from 'primevue/column'
-import DataTable      from 'primevue/datatable'
-import Dialog         from 'primevue/dialog'
-import InputText      from 'primevue/inputtext'
-import MultiSelect    from 'primevue/multiselect'
+import AutoComplete from 'primevue/autocomplete'
+import Button from 'primevue/button'
+import Checkbox from 'primevue/checkbox'
+import Column from 'primevue/column'
+import DataTable from 'primevue/datatable'
+import Dialog from 'primevue/dialog'
+import InputText from 'primevue/inputtext'
+import MultiSelect from 'primevue/multiselect'
 import ProgressSpinner from 'primevue/progressspinner'
-import Select         from 'primevue/select'
+import Select from 'primevue/select'
 
 /* ── Tema ── */
 const FieldManagerPreset = definePreset(Lara, {
   semantic: {
     primary: {
-      50:  '#e0fafa',
+      50: '#e0fafa',
       100: '#b3f1f1',
       200: '#80e7e8',
       300: '#4ddddd',
@@ -92,30 +85,30 @@ app.use(PrimeVue, {
       darkModeSelector: false
     }
   },
-  pt:            fmPrimePassThrough,
-  ripple:        true,
-  inputVariant:  'filled',
-  locale:        strings.locale
+  pt: fmPrimePassThrough,
+  ripple: true,
+  inputVariant: 'filled',
+  locale: strings.locale
 })
 
 /* ── Plugin Fm* (componentes globales FieldManager) ── */
 app.use(fmComponents)
 
 /* ── Componentes PrimeVue globales ── */
-app.component('Accordion',       Accordion)
-app.component('AccordionPanel',  AccordionPanel)
+app.component('Accordion', Accordion)
+app.component('AccordionPanel', AccordionPanel)
 app.component('AccordionHeader', AccordionHeader)
 app.component('AccordionContent', AccordionContent)
-app.component('AutoComplete',    AutoComplete)
-app.component('Button',          Button)
-app.component('CheckBox',        Checkbox)
-app.component('Column',          Column)
-app.component('DataTable',       DataTable)
-app.component('Dialog',          Dialog)
-app.component('InputText',       InputText)
-app.component('MultiSelect',     MultiSelect)
+app.component('AutoComplete', AutoComplete)
+app.component('Button', Button)
+app.component('CheckBox', Checkbox)
+app.component('Column', Column)
+app.component('DataTable', DataTable)
+app.component('Dialog', Dialog)
+app.component('InputText', InputText)
+app.component('MultiSelect', MultiSelect)
 app.component('ProgressSpinner', ProgressSpinner)
-app.component('Select',          Select)
+app.component('Select', Select)
 
 app.directive('tooltip', Tooltip)
 app.mount('#app')
