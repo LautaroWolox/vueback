@@ -1,0 +1,1 @@
+Restaurar los templates visuales exactos de main y conservar la funcionalidad nueva de CMO.
