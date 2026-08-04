@@ -7,6 +7,7 @@
     :draggable="false"
     :resizable="false"
     class="jobtype-alta-dialog cmo-modificar-dialog"
+    :pt="{ root: { class: 'cmo-modificar-dialog' } }"
     @update:visible="$emit('update:visible', $event)"
     @hide="onHide"
   >
@@ -39,7 +40,6 @@
       <div
         class="jobtype-alta-form cmo-modificar-form"
       >
-        <!-- Actividad (readonly) -->
         <div
           class="jobtype-alta-field fm-field"
           style="width: 100% !important; min-width: 0 !important; max-width: none !important"
@@ -53,7 +53,6 @@
           />
         </div>
 
-        <!-- CMO actual (readonly) -->
         <div
           class="jobtype-alta-field fm-field"
           style="width: 100% !important; min-width: 0 !important; max-width: none !important"
@@ -67,7 +66,6 @@
           />
         </div>
 
-        <!-- Nuevo CMO (autocomplete) -->
         <div
           class="jobtype-alta-field fm-field"
           style="width: 100% !important; min-width: 0 !important; max-width: none !important"
@@ -90,7 +88,6 @@
         </div>
       </div>
 
-      <!-- Error de negocio inline -->
       <div v-if="errorMessage" class="cmo-modificar-error">
         <p class="cmo-modificar-error__item">{{ errorMessage }}</p>
       </div>
@@ -120,8 +117,6 @@ import FmTypingLoader from '@/components/shared/FmTypingLoader.vue'
 import { useCmoActividadStore } from '../store/cmoActividadStore'
 import type { CmoAutocomplete, RelCmoActividad } from '../store/types'
 
-// ─── Props & Emits ────────────────────────────────────────────────
-
 const props = defineProps<{
   visible: boolean
   relacion: RelCmoActividad | null
@@ -132,13 +127,9 @@ const emit = defineEmits<{
   saved: []
 }>()
 
-// ─── Servicios ────────────────────────────────────────────────────
-
 const store = useCmoActividadStore()
 const confirm = useConfirm()
 const toast = useToast()
-
-// ─── Estado local ─────────────────────────────────────────────────
 
 const nuevoCmo = ref<CmoAutocomplete | string | null>(null)
 const cmoSuggestions = ref<CmoAutocomplete[]>([])
@@ -147,8 +138,6 @@ const saving = ref(false)
 const errorMessage = ref<string | null>(null)
 
 let cmoTimer: ReturnType<typeof setTimeout> | null = null
-
-// ─── Computed ─────────────────────────────────────────────────────
 
 const actividadDisplay = computed(() => {
   if (!props.relacion) return ''
@@ -175,8 +164,6 @@ const existsActiveDuplicate = (cmo: CmoAutocomplete) =>
     normalize(row.codigoS4) === normalize(cmo.codigoS4)
   )
 
-// ─── Resetear al cambiar de relación ─────────────────────────────
-
 watch(
   () => props.visible,
   (val) => {
@@ -188,8 +175,6 @@ watch(
     }
   }
 )
-
-// ─── Autocomplete CMO (debounce 300ms) ────────────────────────────
 
 const onSearchCmo = (event: { query: string }) => {
   if (cmoTimer) clearTimeout(cmoTimer)
@@ -205,8 +190,6 @@ const onSearchCmo = (event: { query: string }) => {
     }
   }, 300)
 }
-
-// ─── Actualizar relación ──────────────────────────────────────────
 
 const actualizar = async () => {
   if (!canActualizar.value || !props.relacion || saving.value) return
@@ -228,10 +211,8 @@ const actualizar = async () => {
     )
 
     if (response?.mensaje) {
-      // Error de negocio (ej: relación repetida)
       errorMessage.value = response.mensaje
     } else {
-      // Éxito
       toast.add({
         severity: 'success',
         summary: 'Relación modificada',
@@ -252,8 +233,6 @@ const actualizar = async () => {
     saving.value = false
   }
 }
-
-// ─── Cerrar dialog ────────────────────────────────────────────────
 
 const cerrar = () => {
   if (nuevoCmo.value !== null && typeof nuevoCmo.value === 'object') {
