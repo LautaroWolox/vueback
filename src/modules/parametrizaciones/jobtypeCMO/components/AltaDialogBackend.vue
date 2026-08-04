@@ -6,7 +6,7 @@
     :closable="false"
     :draggable="false"
     :resizable="false"
-    class="jobtype-alta-dialog"
+    class="jobtype-alta-dialog cmo-alta-dialog"
     @update:visible="$emit('update:visible', $event)"
     @hide="onHide"
   >
