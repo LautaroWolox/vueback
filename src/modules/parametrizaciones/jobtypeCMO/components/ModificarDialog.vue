@@ -6,7 +6,7 @@
     :closable="false"
     :draggable="false"
     :resizable="false"
-    class="jobtype-alta-dialog cmo-modificar-dialog"
+    class="jobtype-alta-dialog"
     @update:visible="$emit('update:visible', $event)"
     @hide="onHide"
   >
@@ -18,14 +18,15 @@
     />
 
     <template #header>
-      <div class="jobtype-alta-header cmo-modificar-header">
-        <h2 class="jobtype-alta-header__title cmo-modificar-title">
+      <div class="jobtype-alta-header" style="grid-template-columns: minmax(0, 1fr) 52px">
+        <h2 class="jobtype-alta-header__title" style="margin-left: 20px">
           Modificar CMO - Actividad
         </h2>
 
         <button
           type="button"
           class="jobtype-alta-header__close"
+          style="justify-self: center; margin-left: 0"
           title="Cerrar"
           aria-label="Cerrar"
           :disabled="saving"
@@ -41,6 +42,7 @@
         <!-- Actividad (readonly) -->
         <div
           class="jobtype-alta-field fm-field"
+          style="width: 100% !important; min-width: 0 !important; max-width: none !important"
         >
           <label for="mod-actividad">Actividad</label>
           <InputText
@@ -54,6 +56,7 @@
         <!-- CMO actual (readonly) -->
         <div
           class="jobtype-alta-field fm-field"
+          style="width: 100% !important; min-width: 0 !important; max-width: none !important"
         >
           <label for="mod-cmo-actual">CMO actual</label>
           <InputText
@@ -67,6 +70,7 @@
         <!-- Nuevo CMO (autocomplete) -->
         <div
           class="jobtype-alta-field fm-field"
+          style="width: 100% !important; min-width: 0 !important; max-width: none !important"
         >
           <label for="mod-nuevo-cmo">Nuevo CMO</label>
           <AutoComplete
@@ -96,6 +100,7 @@
       <FmButton
         label="ACTUALIZAR"
         class="jobtype-relate-button"
+        style="width: 120px !important; min-width: 120px !important; max-width: 120px !important; border-radius: 0 !important"
         :disabled="!canActualizar || saving"
         @click="actualizar"
       />

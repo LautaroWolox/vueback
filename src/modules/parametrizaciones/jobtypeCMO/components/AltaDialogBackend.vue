@@ -6,7 +6,7 @@
     :closable="false"
     :draggable="false"
     :resizable="false"
-    class="jobtype-alta-dialog cmo-alta-dialog"
+    class="jobtype-alta-dialog"
     @update:visible="$emit('update:visible', $event)"
     @hide="onHide"
   >
@@ -18,14 +18,15 @@
     />
 
     <template #header>
-      <div class="jobtype-alta-header cmo-alta-header">
-        <h2 class="jobtype-alta-header__title cmo-alta-title">
+      <div class="jobtype-alta-header" style="grid-template-columns: minmax(0, 1fr) 52px">
+        <h2 class="jobtype-alta-header__title" style="margin-left: 20px">
           Alta CMO - Actividad
         </h2>
 
         <button
           type="button"
           class="jobtype-alta-header__close"
+          style="justify-self: center; margin-left: 0"
           title="Cerrar"
           aria-label="Cerrar"
           :disabled="saving"
@@ -40,6 +41,7 @@
       >
         <div
           class="jobtype-alta-field fm-field"
+          style="width: 100% !important; min-width: 0 !important; max-width: none !important"
         >
           <label for="alta-actividad">Actividad</label>
           <AutoComplete
@@ -60,6 +62,7 @@
 
         <div
           class="jobtype-alta-field fm-field"
+          style="width: 100% !important; min-width: 0 !important; max-width: none !important"
         >
           <label for="alta-cmo">CMO</label>
           <AutoComplete
@@ -81,6 +84,7 @@
         <FmButton
           label="AGREGAR"
           class="jobtype-add-button"
+          style="width: 120px !important; min-width: 120px !important; max-width: 120px !important; border-radius: 0 !important"
           :disabled="!canAgregar || saving"
           @click="agregar"
         />
@@ -185,6 +189,7 @@
       <FmButton
         label="RELACIONAR"
         class="jobtype-relate-button"
+        style="width: 120px !important; min-width: 120px !important; max-width: 120px !important; border-radius: 0 !important"
         :disabled="previewRows.length === 0 || saving"
         @click="relacionar"
       />
