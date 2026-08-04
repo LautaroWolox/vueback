@@ -1,3 +1,4 @@
+# Activación controlada del flujo de integración.
 name: Integrar funcionalidades Jobtype Kiro
 
 on:
