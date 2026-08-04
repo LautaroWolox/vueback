@@ -203,6 +203,7 @@ const onMaterialCreated = () => {
 
 .abm-materiales-dialog .p-dialog-close-button,
 .abm-materiales-dialog .p-dialog-header-close-button {
+  position: relative !important;
   width: 32px !important;
   min-width: 32px !important;
   max-width: 32px !important;
@@ -228,9 +229,7 @@ const onMaterialCreated = () => {
 }
 
 .abm-materiales-dialog .p-dialog-close-button:hover,
-.abm-materiales-dialog .p-dialog-header-close-button:hover,
-.abm-materiales-dialog .p-dialog-close-button:focus-visible,
-.abm-materiales-dialog .p-dialog-header-close-button:focus-visible {
+.abm-materiales-dialog .p-dialog-header-close-button:hover {
   border-color: #00a9bd !important;
   background: #fff !important;
   color: #00a9bd !important;
@@ -238,8 +237,19 @@ const onMaterialCreated = () => {
   outline: none !important;
 }
 
+.abm-materiales-dialog .p-dialog-close-button:focus-visible,
+.abm-materiales-dialog .p-dialog-header-close-button:focus-visible {
+  border-color: #d7e0e4 !important;
+  background: #fff !important;
+  color: #111820 !important;
+  box-shadow: 0 4px 12px rgba(18, 48, 60, .08) !important;
+  outline: none !important;
+}
+
 .abm-materiales-dialog-close-icon {
-  position: relative !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
   width: 14px !important;
   height: 14px !important;
   display: block !important;
@@ -249,7 +259,8 @@ const onMaterialCreated = () => {
   line-height: 0 !important;
   opacity: 1 !important;
   visibility: visible !important;
-  transform: translate(2px, 1px) !important;
+  pointer-events: none !important;
+  transform: translate(-50%, -50%) !important;
 }
 
 .abm-materiales-dialog-close-icon::before,
@@ -274,10 +285,13 @@ const onMaterialCreated = () => {
 }
 
 .abm-materiales-dialog .p-dialog-close-button:hover .abm-materiales-dialog-close-icon,
-.abm-materiales-dialog .p-dialog-header-close-button:hover .abm-materiales-dialog-close-icon,
+.abm-materiales-dialog .p-dialog-header-close-button:hover .abm-materiales-dialog-close-icon {
+  color: #00a9bd !important;
+}
+
 .abm-materiales-dialog .p-dialog-close-button:focus-visible .abm-materiales-dialog-close-icon,
 .abm-materiales-dialog .p-dialog-header-close-button:focus-visible .abm-materiales-dialog-close-icon {
-  color: #00a9bd !important;
+  color: #111820 !important;
 }
 
 .abm-materiales-dialog__form {
