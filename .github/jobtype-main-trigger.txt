@@ -1,2 +1,3 @@
 Ejecutar integración funcional de Jobtype sobre la base exacta de main.
 Segundo pase: corregir únicamente el escape del mensaje y repetir el build.
+Tercer pase: normalizar la indentación del script temporal.
