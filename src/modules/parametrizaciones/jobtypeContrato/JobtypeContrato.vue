@@ -5,7 +5,7 @@
       'jobtype-contrato-screen--grid-expanded': !filtersExpanded && resultsExpanded
     }"
   >
-    <LoadingOverlay :loading="store.loading" />
+    <LoadingOverlay :loading="store.loading && !showAlta && !showEditar && !showDesactivar" />
 
     <section class="jobtype-panel jobtype-panel--filters">
       <button
@@ -36,6 +36,7 @@
 
       <div v-show="resultsExpanded" class="jobtype-results-body">
         <Tabla
+          ref="tablaRef"
           v-model:filters="mainFilters"
           v-model:selected-row="selectedRow"
           v-model:first="mainFirst"
@@ -45,7 +46,7 @@
           @export="exportarExcel"
           @delete="solicitarDesactivacion"
           @edit="editarSeleccionado"
-          @add="showAlta = true"
+          @add="abrirAlta"
         />
       </div>
     </section>
@@ -58,15 +59,24 @@
     <EditarDialog
       v-model:visible="showEditar"
       :tarea-contrato-id="editForm.tareaContratoId"
+      :contrato-tipo-id="editForm.contratoTipoId"
+      :jobtype-codigo="editForm.jobtypeCodigo"
       :jobtype="editForm.jobtype"
       :contrato-actual="editForm.contratoActual"
       :pais="editForm.pais"
+      :origen-actual="editForm.origenActual"
       @actualizado="onActualizado"
     />
 
     <ConfirmarDesactivacionDialog
       v-model:visible="showDesactivar"
       @confirmar="onDesactivacionConfirmada"
+    />
+
+    <FmAlertDialog
+      v-model:visible="showError"
+      title="Error"
+      :message="errorMessage"
     />
   </div>
 </template>
@@ -75,14 +85,18 @@
 import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { FilterMatchMode } from '@primevue/core/api'
 import FmButton from '@/components/shared/FmButton.vue'
+import FmAlertDialog from '@/components/shared/FmAlertDialog.vue'
 import LoadingOverlay from '@/modules/shared/components/LoadingOverlay.vue'
 import Tabla from './components/Tabla.vue'
 import AltaDialog from './components/AltaDialog.vue'
 import EditarDialog from './components/EditarDialog.vue'
 import ConfirmarDesactivacionDialog from './components/ConfirmarDesactivacionDialog.vue'
 import { useJobtypeContratoStore } from './store/jobtypeContratoStore'
+import { useExcelExport } from '@/composables/useExportExcel'
 
 const store = useJobtypeContratoStore()
+const tablaRef = ref(null)
+const { exportToExcel } = useExcelExport()
 
 const filtersExpanded = ref(true)
 const resultsExpanded = ref(false)
@@ -92,6 +106,8 @@ const mainPageRows = ref(100)
 const showAlta = ref(false)
 const showEditar = ref(false)
 const showDesactivar = ref(false)
+const showError = ref(false)
+const localError = ref('')
 
 let popupButtonObserver = null
 let popupButtonFrame = null
@@ -109,9 +125,7 @@ const setImportantStyle = (element, property, value) => {
   if (
     element.style.getPropertyValue(property) === value &&
     element.style.getPropertyPriority(property) === 'important'
-  ) {
-    return
-  }
+  ) return
 
   element.style.setProperty(property, value, 'important')
 }
@@ -154,25 +168,30 @@ const schedulePopupButtonDesign = () => {
 
 const editForm = ref({
   tareaContratoId: 0,
+  contratoTipoId: 0,
+  jobtypeCodigo: '',
   jobtype: '',
   contratoActual: '',
-  pais: ''
+  pais: '',
+  origenActual: ''
 })
 
 const columns = [
   { field: 'tareaContratoId', header: '', width: '0', hidden: true, exportable: false, filter: false, sort: false },
   { field: 'tareaId', header: '', width: '0', hidden: true, exportable: false, filter: false, sort: false },
   { field: 'contratoTipoId', header: '', width: '0', hidden: true, exportable: false, filter: false, sort: false },
-  { field: 'tareaCodigo', header: 'CODIGO_TAREA', width: '14.28%', exportable: true, filter: true, sort: true },
-  { field: 'tareaNombre', header: 'TAREA', width: '14.28%', exportable: true, filter: true, sort: true },
-  { field: 'contratoNombre', header: 'NOMBRE_CONTRATO', width: '14.28%', exportable: true, filter: true, sort: true },
-  { field: 'legajoModificacion', header: 'USUARIO_MODIFICACION', width: '14.28%', exportable: true, filter: true, sort: true },
-  { field: 'fechaModificacion', header: 'FECHA_MODIFICACION', width: '14.28%', exportable: true, filter: true, sort: true },
-  { field: 'activo', header: 'ACTIVO', width: '14.28%', exportable: true, filter: true, sort: true },
-  { field: 'pais', header: 'PAIS', width: '14.28%', exportable: true, filter: true, sort: true }
+  { field: 'tareaCodigo', header: 'CODIGO_TAREA', width: '12.5%', exportable: true, filter: true, sort: true },
+  { field: 'tareaNombre', header: 'TAREA', width: '12.5%', exportable: true, filter: true, sort: true },
+  { field: 'contratoNombre', header: 'NOMBRE_CONTRATO', width: '12.5%', exportable: true, filter: true, sort: true },
+  { field: 'origen', header: 'ORIGEN', width: '12.5%', exportable: true, filter: true, sort: true },
+  { field: 'legajoModificacion', header: 'USUARIO_MODIFICACION', width: '12.5%', exportable: true, filter: true, sort: true },
+  { field: 'fechaModificacion', header: 'FECHA_MODIFICACION', width: '12.5%', exportable: true, filter: true, sort: true },
+  { field: 'activo', header: 'ACTIVO', width: '12.5%', exportable: true, filter: true, sort: true },
+  { field: 'pais', header: 'PAIS', width: '12.5%', exportable: true, filter: true, sort: true }
 ]
 
 const visibleColumns = computed(() => columns.filter((col) => !col.hidden))
+const errorMessage = computed(() => localError.value || store.error || 'Error de conexión. Contacte al administrador')
 
 const mainFilters = ref(
   Object.fromEntries(
@@ -180,74 +199,104 @@ const mainFilters = ref(
   )
 )
 
+const normalize = (value) => String(value ?? '').trim().toUpperCase()
+const isRowActive = (row) => normalize(row?.activo) !== 'N'
+const puedeOperarSeleccion = computed(() => Boolean(selectedRow.value && isRowActive(selectedRow.value)))
+
+const reportError = (error) => {
+  localError.value = error instanceof Error
+    ? error.message
+    : (store.error || 'Error de conexión. Contacte al administrador')
+  showError.value = true
+}
+
 const buscar = async () => {
   resultsExpanded.value = true
   mainFirst.value = 0
   selectedRow.value = null
+  localError.value = ''
 
   try {
     await store.fetchRelaciones()
-  } catch {
-    // error already in store.error
+  } catch (error) {
+    reportError(error)
+  }
+}
+
+const abrirAlta = async () => {
+  localError.value = ''
+  try {
+    await store.fetchRelaciones()
+    showAlta.value = true
+  } catch (error) {
+    reportError(error)
   }
 }
 
 const editarSeleccionado = () => {
-  if (!selectedRow.value) return
+  if (!puedeOperarSeleccion.value) return
 
   editForm.value = {
     tareaContratoId: selectedRow.value.tareaContratoId,
-    jobtype: selectedRow.value.tareaNombre,
-    contratoActual: selectedRow.value.contratoNombre,
-    pais: selectedRow.value.pais
+    contratoTipoId: selectedRow.value.contratoTipoId,
+    jobtypeCodigo: selectedRow.value.tareaCodigo ?? '',
+    jobtype: selectedRow.value.tareaNombre ?? '',
+    contratoActual: selectedRow.value.contratoNombre ?? '',
+    pais: selectedRow.value.pais ?? '',
+    origenActual: selectedRow.value.origen ?? ''
   }
   showEditar.value = true
 }
 
 const solicitarDesactivacion = () => {
-  if (!selectedRow.value) return
+  if (!puedeOperarSeleccion.value) return
   showDesactivar.value = true
 }
 
 const onDesactivacionConfirmada = async () => {
-  if (!selectedRow.value) return
+  if (!puedeOperarSeleccion.value) return
 
   try {
     await store.desactivarRelacion(selectedRow.value.tareaContratoId)
     selectedRow.value = null
     await store.fetchRelaciones()
-  } catch {
-    // error already in store.error
+  } catch (error) {
+    reportError(error)
   }
 }
 
-const onRelacionado = async () => {
+const refrescarDespuesDeCambio = async () => {
   selectedRow.value = null
-  await store.fetchRelaciones()
+  mainFirst.value = 0
+  resultsExpanded.value = true
+  try {
+    await store.fetchRelaciones()
+  } catch (error) {
+    reportError(error)
+  }
 }
 
-const onActualizado = async () => {
-  selectedRow.value = null
-  await store.fetchRelaciones()
-}
+const onRelacionado = () => refrescarDespuesDeCambio()
+const onActualizado = () => refrescarDespuesDeCambio()
 
-const exportarExcel = () => {
-  if (!store.relaciones.length) return
+const exportarExcel = async () => {
+  const exportData = tablaRef.value?.getExportData?.()
+  const rows = exportData?.rows ?? []
+  const fields = exportData?.fields ?? []
+  if (!rows.length || !fields.length) return
 
-  const exportColumns = columns.filter((col) => col.exportable)
-  const headers = exportColumns.map((col) => col.header)
-  const lines = store.relaciones.map((row) =>
-    exportColumns.map((col) => JSON.stringify(row[col.field] ?? '')).join(',')
-  )
-  const csv = [headers.join(','), ...lines].join('\n')
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-  const url = URL.createObjectURL(blob)
-  const anchor = document.createElement('a')
+  const exportColumns = columns.filter((column) => fields.includes(column.field))
 
-  anchor.href = url
-  anchor.download = 'Jobtype_Contrato.csv'
-  anchor.click()
-  URL.revokeObjectURL(url)
+  try {
+    await exportToExcel({
+      rows,
+      fields,
+      columns: exportColumns,
+      filename: 'Jobtype_Contrato.xlsx'
+    })
+  } catch (error) {
+    reportError(error)
+  }
 }
 
 onMounted(async () => {
@@ -273,95 +322,3 @@ onBeforeUnmount(() => {
   }
 })
 </script>
-
-<style scoped>
-.jobtype-contrato-screen--grid-expanded {
-  height: calc(100vh - 64px) !important;
-  min-height: 0 !important;
-  padding-bottom: 4px !important;
-  overflow: hidden !important;
-}
-
-.jobtype-contrato-screen--grid-expanded .jobtype-panel--filters {
-  flex: 0 0 auto !important;
-}
-
-.jobtype-contrato-screen--grid-expanded .jobtype-panel--results {
-  flex: 1 1 auto !important;
-  min-height: 0 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  overflow: hidden !important;
-}
-
-.jobtype-contrato-screen--grid-expanded .jobtype-results-body {
-  width: 100% !important;
-  height: auto !important;
-  min-height: 0 !important;
-  flex: 1 1 auto !important;
-  display: flex !important;
-  overflow: hidden !important;
-}
-
-.jobtype-contrato-screen--grid-expanded :deep(.jobtype-contrato-main-grid),
-.jobtype-contrato-screen--grid-expanded :deep(.jobtype-contrato-main-grid.p-datatable) {
-  width: 100% !important;
-  height: 100% !important;
-  min-height: 0 !important;
-  flex: 1 1 auto !important;
-  display: flex !important;
-  flex-direction: column !important;
-  overflow: hidden !important;
-}
-
-.jobtype-contrato-screen--grid-expanded :deep(.jobtype-contrato-main-grid .p-datatable-table-container),
-.jobtype-contrato-screen--grid-expanded :deep(.jobtype-contrato-main-grid .p-datatable-wrapper),
-.jobtype-contrato-screen--grid-expanded :deep(.jobtype-contrato-main-grid [data-pc-section='tablecontainer']) {
-  width: 100% !important;
-  height: auto !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  flex: 1 1 auto !important;
-  overflow: auto !important;
-}
-
-:global(body [data-jobtype-popup-button='true']),
-:global(body [data-jobtype-popup-button='true'] .p-button-label) {
-  font-size: 12px !important;
-  font-weight: 600 !important;
-  line-height: 1 !important;
-}
-
-:global(body [data-jobtype-popup-button='true'][data-jobtype-popup-button-variant='primary']) {
-  border: 1px solid #00a9bd !important;
-  background: #00a9bd !important;
-  color: #fff !important;
-}
-
-:global(body [data-jobtype-popup-button='true'][data-jobtype-popup-button-variant='primary']:hover:not(:disabled)) {
-  border-color: #008fa1 !important;
-  background: #008fa1 !important;
-  color: #fff !important;
-}
-
-:global(body [data-jobtype-popup-button='true'][data-jobtype-popup-button-variant='outline']) {
-  border: 1px solid #00a9bd !important;
-  background: #fff !important;
-  color: #008fa1 !important;
-  box-shadow: none !important;
-}
-
-:global(body [data-jobtype-popup-button='true'][data-jobtype-popup-button-variant='outline']:hover:not(:disabled)) {
-  border-color: #008fa1 !important;
-  background: #e4f9fc !important;
-  color: #006f7d !important;
-}
-
-:global(body [data-jobtype-popup-button='true']:disabled) {
-  border-color: #c9d2d7 !important;
-  background: #dbe1e4 !important;
-  color: #7c8a92 !important;
-  box-shadow: none !important;
-  opacity: 1 !important;
-}
-</style>

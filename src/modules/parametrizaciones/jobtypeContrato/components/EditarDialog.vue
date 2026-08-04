@@ -11,6 +11,12 @@
     :style="dialogStyle"
     @update:visible="onVisibleChange"
   >
+    <FmTypingLoader
+      v-if="store.loading"
+      overlay
+      title="Actualizando relación"
+      message="Guardando los cambios"
+    />
     <template #header>
       <div class="jobtype-contrato-edit-header">
         <h2>Edición Jobtype-Contrato</h2>
@@ -19,6 +25,7 @@
           class="jobtype-contrato-edit-close"
           title="Cerrar"
           aria-label="Cerrar"
+          :disabled="store.loading"
           @click="solicitarCierre"
         >×</button>
       </div>
@@ -63,6 +70,7 @@
           :suggestions="contratoSuggestions"
           optionLabel="valor"
           :minLength="4"
+          :disabled="store.loading"
           class="jobtype-contrato-edit-autocomplete"
           inputClass="jobtype-contrato-edit-control"
           @complete="buscarContratos"
@@ -80,6 +88,7 @@
           optionLabel="label"
           optionValue="value"
           overlayClass="jobtype-contrato-edit-select-overlay"
+          :disabled="store.loading || esParaguay"
           class="jobtype-contrato-edit-control jobtype-contrato-edit-control--select"
         />
       </div>
@@ -89,7 +98,7 @@
       <FmButton
         label="ACTUALIZAR"
         class="jobtype-contrato-edit-update"
-        :disabled="!puedeActualizar"
+        :disabled="!puedeActualizar || store.loading"
         @click="actualizar"
       />
     </template>
@@ -145,6 +154,12 @@
       </div>
     </template>
   </Dialog>
+
+  <FmAlertDialog
+    v-model:visible="showError"
+    title="Error"
+    :message="errorMessage"
+  />
 </template>
 
 <script setup>
@@ -154,18 +169,22 @@ import InputText from 'primevue/inputtext'
 import AutoComplete from 'primevue/autocomplete'
 import Select from 'primevue/select'
 import FmButton from '@/components/shared/FmButton.vue'
+import FmAlertDialog from '@/components/shared/FmAlertDialog.vue'
+import FmTypingLoader from '@/components/shared/FmTypingLoader.vue'
 import { useJobtypeContratoStore } from '../store/jobtypeContratoStore'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
   tareaContratoId: { type: Number, default: 0 },
+  contratoTipoId: { type: Number, default: 0 },
+  jobtypeCodigo: { type: String, default: '' },
   jobtype: { type: String, default: '' },
   contratoActual: { type: String, default: '' },
-  pais: { type: String, default: '' }
+  pais: { type: String, default: '' },
+  origenActual: { type: String, default: '' }
 })
 
 const emit = defineEmits(['update:visible', 'actualizado'])
-
 const store = useJobtypeContratoStore()
 
 const dialogStyle = 'width: min(900px, calc(100vw - 32px)); max-width: 900px;'
@@ -176,31 +195,55 @@ const contratoSuggestions = ref([])
 const contratoSelectedItem = ref(null)
 const origenSeleccionado = ref('')
 const showConfirmCierre = ref(false)
+const showError = ref(false)
+const localError = ref('')
 
+const normalize = (value) => String(value ?? '').trim().toUpperCase()
+const normalizeCountry = (value) => {
+  const country = normalize(value).replaceAll(' ', '')
+  if (['1', 'ARG/UY', 'ARGUY', 'ARGENTINA/URUGUAY', 'ARG', 'AR', 'UY'].includes(country)) return 'ARG/UY'
+  if (['2', 'PY', 'PAR', 'PARAGUAY'].includes(country)) return 'PY'
+  return normalize(value)
+}
+
+const esParaguay = computed(() => normalizeCountry(props.pais) === 'PY')
+const origenInicial = computed(() => esParaguay.value ? 'FAN' : normalize(props.origenActual))
 const origenOptions = computed(() => {
-  if (props.pais === 'PY') return [{ label: 'FAN', value: 'FAN' }]
-
-  return [
-    { label: '', value: '' },
-    { label: 'FAN', value: 'FAN' },
-    { label: 'MXM', value: 'MXM' }
-  ]
+  const values = esParaguay.value ? ['FAN'] : ['', 'FAN', 'MXM']
+  const actual = normalize(props.origenActual)
+  if (actual && !values.includes(actual)) values.push(actual)
+  return values.map((value) => ({ label: value, value }))
 })
-
-const origenInicial = computed(() => props.pais === 'PY' ? 'FAN' : '')
-const hayCambios = computed(() => Boolean(
-  contratoSelectedItem.value || origenSeleccionado.value !== origenInicial.value
+const contratoFinalId = computed(() => Number(
+  contratoSelectedItem.value?.contratoId ?? props.contratoTipoId ?? 0
 ))
-const puedeActualizar = computed(() => Boolean(contratoSelectedItem.value))
+const contratoFinalNombre = computed(() =>
+  contratoSelectedItem.value?.nombre ?? props.contratoActual
+)
+const cambioContrato = computed(() => Boolean(
+  contratoSelectedItem.value && contratoFinalId.value !== Number(props.contratoTipoId)
+))
+const cambioOrigen = computed(() => normalize(origenSeleccionado.value) !== normalize(origenInicial.value))
+const hayCambios = computed(() => cambioContrato.value || cambioOrigen.value)
+const puedeActualizar = computed(() => Boolean(
+  hayCambios.value && contratoFinalId.value > 0 && origenSeleccionado.value
+))
+const errorMessage = computed(() => localError.value || store.error || 'Error de conexión. Contacte al administrador')
 
-watch(() => props.visible, (val) => {
-  if (val) {
-    nuevoContrato.value = ''
-    contratoSelectedItem.value = null
-    origenSeleccionado.value = origenInicial.value
-    showConfirmCierre.value = false
-  }
+watch(() => props.visible, (visible) => {
+  if (visible) resetForm()
+  else showConfirmCierre.value = false
 })
+
+const resetForm = () => {
+  nuevoContrato.value = ''
+  contratoSelectedItem.value = null
+  origenSeleccionado.value = origenInicial.value
+  showConfirmCierre.value = false
+  showError.value = false
+  localError.value = ''
+  store.clearError()
+}
 
 const buscarContratos = async (event) => {
   contratoSuggestions.value = await store.buscarContratos(event.query)
@@ -210,22 +253,47 @@ const onContratoSelect = (event) => {
   contratoSelectedItem.value = event.value
 }
 
+const existeDuplicado = () => store.relaciones.some((row) => {
+  if (Number(row.tareaContratoId) === Number(props.tareaContratoId)) return false
+  if (normalize(row.activo) === 'N') return false
+
+  const sameCountry = normalizeCountry(row.pais) === normalizeCountry(props.pais)
+  const rowJobtype = normalize(row.tareaCodigo || row.tareaNombre)
+  const currentJobtype = normalize(props.jobtypeCodigo || props.jobtype)
+  const sameContract = Number(row.contratoTipoId) === contratoFinalId.value ||
+    normalize(row.contratoNombre) === normalize(contratoFinalNombre.value)
+  const sameOrigin = normalize(row.origen) === normalize(origenSeleccionado.value)
+
+  return sameCountry && rowJobtype === currentJobtype && sameContract && sameOrigin
+})
+
 const actualizar = async () => {
-  if (!puedeActualizar.value) return
+  if (!puedeActualizar.value || store.loading) return
+
+  localError.value = ''
+  store.clearError()
+
+  if (existeDuplicado()) {
+    localError.value = 'La relación Jobtype / Contrato / País / Origen ya existe y se encuentra activa.'
+    showError.value = true
+    return
+  }
 
   try {
-    await store.actualizarRelacion(props.tareaContratoId, contratoSelectedItem.value.contratoId)
-    nuevoContrato.value = ''
-    contratoSelectedItem.value = null
-    origenSeleccionado.value = origenInicial.value
-    emit('update:visible', false)
+    await store.actualizarRelacion(
+      props.tareaContratoId,
+      contratoFinalId.value,
+      origenSeleccionado.value
+    )
+    cerrar()
     emit('actualizado')
   } catch {
-    // error already in store.error
+    showError.value = true
   }
 }
 
 const solicitarCierre = () => {
+  if (store.loading) return
   if (hayCambios.value) {
     showConfirmCierre.value = true
     return
@@ -233,304 +301,18 @@ const solicitarCierre = () => {
   cerrar()
 }
 
-const onVisibleChange = (val) => {
-  if (!val) solicitarCierre()
+const onVisibleChange = (visible) => {
+  if (!visible) solicitarCierre()
 }
 
-const cancelarCierre = () => {
-  showConfirmCierre.value = false
-}
-
+const cancelarCierre = () => { showConfirmCierre.value = false }
 const confirmarCierre = () => {
   showConfirmCierre.value = false
   cerrar()
 }
 
 const cerrar = () => {
-  nuevoContrato.value = ''
-  contratoSelectedItem.value = null
-  origenSeleccionado.value = origenInicial.value
+  resetForm()
   emit('update:visible', false)
 }
 </script>
-
-<style scoped>
-.jobtype-contrato-edit-header {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.jobtype-contrato-edit-header h2 {
-  margin: 0;
-  color: #263746;
-  font-size: 18px;
-  font-weight: 400;
-}
-
-.jobtype-contrato-edit-close,
-.jobtype-contrato-unsaved__close {
-  width: 28px;
-  height: 28px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: #c7c7c7;
-  font-size: 22px;
-  font-weight: 700;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.jobtype-contrato-edit-close:hover,
-.jobtype-contrato-unsaved__close:hover {
-  color: #00a9bd;
-}
-
-.jobtype-contrato-edit-content {
-  min-height: 170px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
-  grid-template-areas:
-    'jobtype contrato pais'
-    '. nuevo origen';
-  align-items: start;
-  column-gap: 20px;
-  row-gap: 14px;
-  padding: 16px 0 28px;
-}
-
-.jobtype-contrato-edit-field--jobtype { grid-area: jobtype; }
-.jobtype-contrato-edit-field--contrato { grid-area: contrato; }
-.jobtype-contrato-edit-field--pais { grid-area: pais; }
-.jobtype-contrato-edit-field--nuevo { grid-area: nuevo; }
-.jobtype-contrato-edit-field--origen { grid-area: origen; }
-
-.jobtype-contrato-edit-field {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-
-.jobtype-contrato-edit-field > label {
-  color: #202020;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.jobtype-contrato-edit-control {
-  width: 100%;
-  height: 32px;
-  min-height: 32px;
-  box-sizing: border-box;
-}
-
-:global(.jobtype-contrato-edit-autocomplete) {
-  width: 100% !important;
-  min-width: 0 !important;
-  display: flex !important;
-}
-
-:global(.jobtype-contrato-edit-autocomplete .p-autocomplete-input) {
-  width: 100% !important;
-  min-width: 0 !important;
-  flex: 1 1 auto !important;
-}
-
-:global(.jobtype-contrato-edit-control--select.p-select) {
-  width: 100% !important;
-  min-width: 0 !important;
-}
-
-:global(.jobtype-contrato-edit-control--select .p-select-label) {
-  display: flex;
-  align-items: center;
-  padding: 0 9px;
-  font-size: 13px;
-}
-
-.jobtype-contrato-edit-control--readonly:disabled {
-  border-color: #d1d1d1;
-  background: #eeeeee;
-  color: #444;
-  opacity: 1;
-}
-
-:global(.p-dialog.jobtype-contrato-edit-dialog) {
-  overflow: hidden;
-  border: 1px solid #bdbdbd;
-  border-radius: 0;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, .28);
-}
-
-:global(.jobtype-contrato-edit-dialog .p-dialog-header) {
-  min-height: 56px;
-  padding: 12px 16px;
-  border-bottom: 1px solid #dedede;
-  background: #fff;
-}
-
-:global(.jobtype-contrato-edit-dialog .p-dialog-content) {
-  padding: 0 16px;
-  background: #fff;
-}
-
-:global(.jobtype-contrato-edit-dialog .p-dialog-footer) {
-  min-height: 62px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 10px 16px;
-  border-top: 1px solid #dedede;
-  background: #fff;
-}
-
-:global(.jobtype-contrato-edit-dialog .jobtype-contrato-edit-update) {
-  width: 108px !important;
-  min-width: 108px !important;
-  max-width: 108px !important;
-  height: 32px !important;
-  min-height: 32px !important;
-  max-height: 32px !important;
-  border-radius: 16px !important;
-  font-size: 12px !important;
-}
-
-.jobtype-contrato-unsaved__header {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.jobtype-contrato-unsaved__header-main {
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.jobtype-contrato-unsaved__icon-circle {
-  width: 48px;
-  height: 48px;
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: #e9f8fa;
-}
-
-.jobtype-contrato-unsaved__header-icon {
-  color: #11aabd;
-  font-size: 23px;
-}
-
-.jobtype-contrato-unsaved__title {
-  color: #252b33;
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.jobtype-contrato-unsaved__content {
-  min-height: 72px;
-  display: flex;
-  align-items: center;
-  padding: 18px 4px;
-}
-
-.jobtype-contrato-unsaved__message {
-  color: #4b5563;
-  font-size: 15px;
-  line-height: 1.35;
-}
-
-.jobtype-contrato-unsaved__actions {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-.jobtype-contrato-unsaved__button {
-  appearance: none;
-  width: 100px;
-  min-width: 100px;
-  height: 30px;
-  min-height: 30px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 12px;
-  border: 1px solid #00acc1;
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1;
-  box-shadow: none;
-  outline: none;
-  cursor: pointer;
-}
-
-.jobtype-contrato-unsaved__button--cancel {
-  background: #fff;
-  color: #0097a7;
-}
-
-.jobtype-contrato-unsaved__button--accept {
-  background: #00acc1;
-  color: #fff;
-}
-
-:global(.p-dialog.jobtype-contrato-unsaved-dialog) {
-  overflow: hidden;
-  border: 1px solid #bdbdbd;
-  border-radius: 0;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, .28);
-}
-
-:global(.jobtype-contrato-unsaved-dialog .p-dialog-header) {
-  min-height: 68px;
-  padding: 12px 18px;
-  border-bottom: 1px solid #dedede;
-  background: #fff;
-}
-
-:global(.jobtype-contrato-unsaved-dialog .p-dialog-content) {
-  padding: 0 18px;
-  background: #fff;
-}
-
-:global(.jobtype-contrato-unsaved-dialog .p-dialog-footer) {
-  min-height: 60px;
-  display: flex;
-  align-items: center;
-  padding: 10px 18px;
-  border-top: 1px solid #dedede;
-  background: #fff;
-}
-
-@media (max-width: 760px) {
-  .jobtype-contrato-edit-content {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      'jobtype'
-      'contrato'
-      'pais'
-      'nuevo'
-      'origen';
-    row-gap: 14px;
-    padding: 16px 0 22px;
-  }
-}
-</style>

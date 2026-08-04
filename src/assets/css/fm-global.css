@@ -5266,3 +5266,693 @@ body > .p-submenu-list .p-menuitem-content:hover .fm-menu-link--submenu {
   }
 }
 /* ===== FIN: abm-materiales.css ===== */
+
+/* ===== INICIO: jobtype-contrato-main-funcionalidad.css ===== */
+
+/*
+     * CLASIFICACIÓN: [MÓDULO / PANTALLA]
+     * PANTALLA: Parametrizaciones > Jobtype-Contrato.
+     * BASE VISUAL: rama main, sin reemplazar templates ni medidas.
+     * FUNCIONALIDAD: origen, duplicados, filas inactivas, loaders y Excel.
+     * ÚNICA UBICACIÓN DE ESTILOS DEL MÓDULO: fm-global.css.
+     */
+
+/* --- Pantalla principal de main --- */
+.jobtype-contrato-screen--grid-expanded {
+  height: calc(100vh - 64px) !important;
+  min-height: 0 !important;
+  padding-bottom: 4px !important;
+  overflow: hidden !important;
+}
+
+.jobtype-contrato-screen--grid-expanded .jobtype-panel--filters {
+  flex: 0 0 auto !important;
+}
+
+.jobtype-contrato-screen--grid-expanded .jobtype-panel--results {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.jobtype-contrato-screen--grid-expanded .jobtype-results-body {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  overflow: hidden !important;
+}
+
+.jobtype-contrato-screen--grid-expanded .jobtype-contrato-main-grid,
+.jobtype-contrato-screen--grid-expanded .jobtype-contrato-main-grid.p-datatable {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.jobtype-contrato-screen--grid-expanded .jobtype-contrato-main-grid .p-datatable-table-container,
+.jobtype-contrato-screen--grid-expanded .jobtype-contrato-main-grid .p-datatable-wrapper,
+.jobtype-contrato-screen--grid-expanded .jobtype-contrato-main-grid [data-pc-section='tablecontainer'] {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 1 1 auto !important;
+  overflow: auto !important;
+}
+
+body [data-jobtype-popup-button='true'],
+body [data-jobtype-popup-button='true'] .p-button-label {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+}
+
+body [data-jobtype-popup-button='true'][data-jobtype-popup-button-variant='primary'] {
+  border: 1px solid #00a9bd !important;
+  background: #00a9bd !important;
+  color: #fff !important;
+}
+
+:global(body [data-jobtype-popup-button='true'][data-jobtype-popup-button-variant='primary']:hover:not(:disabled)) {
+  border-color: #008fa1 !important;
+  background: #008fa1 !important;
+  color: #fff !important;
+}
+
+body [data-jobtype-popup-button='true'][data-jobtype-popup-button-variant='outline'] {
+  border: 1px solid #00a9bd !important;
+  background: #fff !important;
+  color: #008fa1 !important;
+  box-shadow: none !important;
+}
+
+:global(body [data-jobtype-popup-button='true'][data-jobtype-popup-button-variant='outline']:hover:not(:disabled)) {
+  border-color: #008fa1 !important;
+  background: #e4f9fc !important;
+  color: #006f7d !important;
+}
+
+body [data-jobtype-popup-button='true']:disabled {
+  border-color: #c9d2d7 !important;
+  background: #dbe1e4 !important;
+  color: #7c8a92 !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+}
+
+/* --- Popup de Alta de main --- */
+.jobtype-alta-unsaved__header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.jobtype-alta-unsaved__header-main {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.jobtype-alta-unsaved__icon-circle {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #e9f8fa;
+}
+
+.jobtype-alta-unsaved__header-icon {
+  color: #11aabd;
+  font-size: 23px;
+}
+
+.jobtype-alta-unsaved__title {
+  color: #252b33;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.jobtype-alta-unsaved__close {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #c7c7c7;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.jobtype-alta-unsaved__close:hover {
+  color: #00a9bd;
+}
+
+.jobtype-alta-unsaved__content {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  padding: 18px 4px;
+}
+
+.jobtype-alta-unsaved__message {
+  color: #4b5563;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.jobtype-alta-unsaved__actions {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.jobtype-alta-unsaved__button {
+  appearance: none;
+  width: 100px;
+  min-width: 100px;
+  height: 30px;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border: 1px solid #00acc1;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.jobtype-alta-unsaved__button--cancel {
+  background: #fff;
+  color: #0097a7;
+}
+
+.jobtype-alta-unsaved__button--accept {
+  background: #00acc1;
+  color: #fff;
+}
+
+.p-dialog.jobtype-alta-unsaved-dialog {
+  overflow: hidden;
+  border: 1px solid #bdbdbd;
+  border-radius: 0;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .28);
+}
+
+.jobtype-alta-unsaved-dialog .p-dialog-header {
+  min-height: 68px;
+  padding: 12px 18px;
+  border-bottom: 1px solid #dedede;
+  background: #fff;
+}
+
+.jobtype-alta-unsaved-dialog .p-dialog-content {
+  padding: 0 18px;
+  background: #fff;
+}
+
+.jobtype-alta-unsaved-dialog .p-dialog-footer {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 10px 18px;
+  border-top: 1px solid #dedede;
+  background: #fff;
+}
+
+.p-dialog.jobtype-alta-dialog input.jobtype-alta-control--invalid,
+.p-dialog.jobtype-alta-dialog input.jobtype-alta-control--invalid:hover,
+.p-dialog.jobtype-alta-dialog input.jobtype-alta-control--invalid:focus {
+  border: 1px solid #e57373 !important;
+  background-color: #fffafa !important;
+  box-shadow: 0 0 0 1px rgba(229, 115, 115, .28) inset !important;
+  outline: none !important;
+}
+
+/* --- Popup de Edición de main --- */
+.jobtype-contrato-edit-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.jobtype-contrato-edit-header h2 {
+  margin: 0;
+  color: #263746;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.jobtype-contrato-edit-close,
+.jobtype-contrato-unsaved__close {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #c7c7c7;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.jobtype-contrato-edit-close:hover,
+.jobtype-contrato-unsaved__close:hover {
+  color: #00a9bd;
+}
+
+.jobtype-contrato-edit-content {
+  min-height: 170px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-areas:
+    'jobtype contrato pais'
+    '. nuevo origen';
+  align-items: start;
+  column-gap: 20px;
+  row-gap: 14px;
+  padding: 16px 0 28px;
+}
+
+.jobtype-contrato-edit-field--jobtype { grid-area: jobtype; }
+.jobtype-contrato-edit-field--contrato { grid-area: contrato; }
+.jobtype-contrato-edit-field--pais { grid-area: pais; }
+.jobtype-contrato-edit-field--nuevo { grid-area: nuevo; }
+.jobtype-contrato-edit-field--origen { grid-area: origen; }
+
+.jobtype-contrato-edit-field {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.jobtype-contrato-edit-field > label {
+  color: #202020;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.jobtype-contrato-edit-control {
+  width: 100%;
+  height: 32px;
+  min-height: 32px;
+  box-sizing: border-box;
+}
+
+.jobtype-contrato-edit-autocomplete {
+  width: 100% !important;
+  min-width: 0 !important;
+  display: flex !important;
+}
+
+.jobtype-contrato-edit-autocomplete .p-autocomplete-input {
+  width: 100% !important;
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+}
+
+.jobtype-contrato-edit-control--select.p-select {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.jobtype-contrato-edit-control--select .p-select-label {
+  display: flex;
+  align-items: center;
+  padding: 0 9px;
+  font-size: 13px;
+}
+
+.jobtype-contrato-edit-control--readonly:disabled {
+  border-color: #d1d1d1;
+  background: #eeeeee;
+  color: #444;
+  opacity: 1;
+}
+
+.p-dialog.jobtype-contrato-edit-dialog {
+  overflow: hidden;
+  border: 1px solid #bdbdbd;
+  border-radius: 0;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .28);
+}
+
+.jobtype-contrato-edit-dialog .p-dialog-header {
+  min-height: 56px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #dedede;
+  background: #fff;
+}
+
+.jobtype-contrato-edit-dialog .p-dialog-content {
+  padding: 0 16px;
+  background: #fff;
+}
+
+.jobtype-contrato-edit-dialog .p-dialog-footer {
+  min-height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 10px 16px;
+  border-top: 1px solid #dedede;
+  background: #fff;
+}
+
+.jobtype-contrato-edit-dialog .jobtype-contrato-edit-update {
+  width: 108px !important;
+  min-width: 108px !important;
+  max-width: 108px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  border-radius: 16px !important;
+  font-size: 12px !important;
+}
+
+.jobtype-contrato-unsaved__header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.jobtype-contrato-unsaved__header-main {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.jobtype-contrato-unsaved__icon-circle {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #e9f8fa;
+}
+
+.jobtype-contrato-unsaved__header-icon {
+  color: #11aabd;
+  font-size: 23px;
+}
+
+.jobtype-contrato-unsaved__title {
+  color: #252b33;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.jobtype-contrato-unsaved__content {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  padding: 18px 4px;
+}
+
+.jobtype-contrato-unsaved__message {
+  color: #4b5563;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.jobtype-contrato-unsaved__actions {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.jobtype-contrato-unsaved__button {
+  appearance: none;
+  width: 100px;
+  min-width: 100px;
+  height: 30px;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border: 1px solid #00acc1;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.jobtype-contrato-unsaved__button--cancel {
+  background: #fff;
+  color: #0097a7;
+}
+
+.jobtype-contrato-unsaved__button--accept {
+  background: #00acc1;
+  color: #fff;
+}
+
+.p-dialog.jobtype-contrato-unsaved-dialog {
+  overflow: hidden;
+  border: 1px solid #bdbdbd;
+  border-radius: 0;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .28);
+}
+
+.jobtype-contrato-unsaved-dialog .p-dialog-header {
+  min-height: 68px;
+  padding: 12px 18px;
+  border-bottom: 1px solid #dedede;
+  background: #fff;
+}
+
+.jobtype-contrato-unsaved-dialog .p-dialog-content {
+  padding: 0 18px;
+  background: #fff;
+}
+
+.jobtype-contrato-unsaved-dialog .p-dialog-footer {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 10px 18px;
+  border-top: 1px solid #dedede;
+  background: #fff;
+}
+
+@media (max-width: 760px) {
+  .jobtype-contrato-edit-content {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'jobtype'
+      'contrato'
+      'pais'
+      'nuevo'
+      'origen';
+    row-gap: 14px;
+    padding: 16px 0 22px;
+  }
+}
+
+/* --- Confirmación de desactivación de main --- */
+.jobtype-contrato-delete-confirm__header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.jobtype-contrato-delete-confirm__header-main {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.jobtype-contrato-delete-confirm__icon-circle {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #e9f8fa;
+}
+
+.jobtype-contrato-delete-confirm__header-icon {
+  color: #11aabd;
+  font-size: 23px;
+}
+
+.jobtype-contrato-delete-confirm__title {
+  color: #252b33;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.jobtype-contrato-delete-confirm__close {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #c7c7c7;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.jobtype-contrato-delete-confirm__close:hover {
+  color: #00a9bd;
+}
+
+.jobtype-contrato-delete-confirm__content {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  padding: 18px 4px;
+}
+
+.jobtype-contrato-delete-confirm__message {
+  color: #4b5563;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.jobtype-contrato-delete-confirm__actions {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.jobtype-contrato-delete-confirm__button {
+  appearance: none;
+  width: 100px;
+  min-width: 100px;
+  height: 30px;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border: 1px solid #00acc1;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.jobtype-contrato-delete-confirm__button--cancel {
+  background: #fff;
+  color: #0097a7;
+}
+
+.jobtype-contrato-delete-confirm__button--accept {
+  background: #00acc1;
+  color: #fff;
+}
+
+.p-dialog.jobtype-contrato-delete-confirm-dialog {
+  overflow: hidden;
+  border: 1px solid #bdbdbd;
+  border-radius: 0;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .28);
+}
+
+.jobtype-contrato-delete-confirm-dialog .p-dialog-header {
+  min-height: 68px;
+  padding: 12px 18px;
+  border-bottom: 1px solid #dedede;
+  background: #fff;
+}
+
+.jobtype-contrato-delete-confirm-dialog .p-dialog-content {
+  padding: 0 18px;
+  background: #fff;
+}
+
+.jobtype-contrato-delete-confirm-dialog .p-dialog-footer {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 10px 18px;
+  border-top: 1px solid #dedede;
+  background: #fff;
+}
+
+/* Funcionalidad nueva. No modifica las medidas ni la distribución de main. */
+body .p-dialog.jobtype-alta-dialog,
+body .p-dialog.jobtype-contrato-edit-dialog {
+  position: relative;
+}
+
+#tabla-jobtype-contrato .p-datatable-tbody > tr.jobtype-row-inactive > td,
+#tabla-jobtype-contrato .p-datatable-tbody > tr.jobtype-row-inactive:hover > td,
+#tabla-jobtype-contrato .p-datatable-tbody > tr.jobtype-row-inactive.p-highlight > td {
+  background: #edf0f2 !important;
+  color: #75838b !important;
+  font-weight: 400 !important;
+  cursor: not-allowed !important;
+}
+
+#tabla-jobtype-contrato .p-datatable-tbody > tr.jobtype-row-inactive > td * {
+  color: #75838b !important;
+  font-weight: 400 !important;
+}
+
+/* ===== FIN: jobtype-contrato-main-funcionalidad.css ===== */
