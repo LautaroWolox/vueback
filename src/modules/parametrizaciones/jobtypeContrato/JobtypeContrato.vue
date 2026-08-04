@@ -2,7 +2,7 @@
   <div
     class="jobtype-screen jobtype-contrato-screen"
     :class="{
-      'jobtype-contrato-screen--grid-expanded': !filtersExpanded && resultsExpanded
+      'jobtype-contrato-screen--grid-expanded': resultsExpanded
     }"
   >
     <LoadingOverlay :loading="store.loading && !showAlta && !showEditar && !showDesactivar" />
