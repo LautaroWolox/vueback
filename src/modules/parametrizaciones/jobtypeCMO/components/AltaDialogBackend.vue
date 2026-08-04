@@ -7,6 +7,7 @@
     :draggable="false"
     :resizable="false"
     class="jobtype-alta-dialog cmo-alta-dialog"
+    :pt="{ root: { class: 'cmo-alta-dialog' } }"
     @update:visible="$emit('update:visible', $event)"
     @hide="onHide"
   >
@@ -209,8 +210,6 @@ import { useCmoActividadStore } from '../store/cmoActividadStore'
 import { altaPreviewColumns } from './columns'
 import type { ActividadAutocomplete, CmoAutocomplete, NuevaRelacion } from '../store/types'
 
-// ─── Props & Emits ────────────────────────────────────────────────
-
 defineProps<{
   visible: boolean
 }>()
@@ -220,13 +219,9 @@ const emit = defineEmits<{
   saved: []
 }>()
 
-// ─── Servicios ────────────────────────────────────────────────
-
 const store = useCmoActividadStore()
 const confirm = useConfirm()
 const toast = useToast()
-
-// ─── Estado local ────────────────────────────────────────────────
 
 const actividadSelected = ref<ActividadAutocomplete | string | null>(null)
 const cmoSelected = ref<CmoAutocomplete | string | null>(null)
@@ -243,11 +238,8 @@ const previewPageRows = ref(10)
 const saving = ref(false)
 const errorMessages = ref<string[]>([])
 
-// Debounce timers
 let actividadTimer: ReturnType<typeof setTimeout> | null = null
 let cmoTimer: ReturnType<typeof setTimeout> | null = null
-
-// ─── Computed ─────────────────────────────────────────────────────
 
 const canAgregar = computed(() => {
   return (
@@ -271,8 +263,6 @@ const existsActiveRelation = (actividad: ActividadAutocomplete, cmo: CmoAutocomp
 const hasUnsavedData = computed(() => Boolean(
   previewRows.value.length || actividadSelected.value || cmoSelected.value
 ))
-
-// ─── Autocomplete handlers (debounce 300ms) ───────────────────────
 
 const onSearchActividad = (event: { query: string }) => {
   if (actividadTimer) clearTimeout(actividadTimer)
@@ -304,15 +294,12 @@ const onSearchCmo = (event: { query: string }) => {
   }, 300)
 }
 
-// ─── Agregar a preview ────────────────────────────────────────────
-
 const agregar = () => {
   if (!canAgregar.value) return
 
   const actividad = actividadSelected.value as ActividadAutocomplete
   const cmo = cmoSelected.value as CmoAutocomplete
 
-  // Validar duplicados en el preview y contra relaciones activas ya existentes.
   if (previewRows.value.some((row) => row.idActividad === actividad.id && row.idCmo === cmo.id)) {
     errorMessages.value = ['La relación seleccionada ya fue agregada al listado.']
     return
@@ -336,13 +323,9 @@ const agregar = () => {
   previewRows.value = [...previewRows.value, row]
   selectedPreviewRow.value = row
   errorMessages.value = []
-
-  // Limpiar campos
   actividadSelected.value = null
   cmoSelected.value = null
 }
-
-// ─── Eliminar de preview ──────────────────────────────────────────
 
 const eliminarPreview = () => {
   if (!selectedPreviewRow.value) return
@@ -353,8 +336,6 @@ const eliminarPreview = () => {
 const onPreviewRowClick = ({ data }: { data: NuevaRelacion & { id: string } }) => {
   selectedPreviewRow.value = data
 }
-
-// ─── Enviar relaciones al backend ─────────────────────────────────
 
 const relacionar = async () => {
   if (previewRows.value.length === 0 || saving.value) return
@@ -376,12 +357,10 @@ const relacionar = async () => {
   errorMessages.value = []
 
   try {
-    // Preparar payload sin el campo 'id' local
     const payload: NuevaRelacion[] = previewRows.value.map(({ id, ...rest }) => rest)
     const responses = await store.crearRelaciones(payload)
 
     if (responses.length === 0) {
-      // Éxito total
       toast.add({
         severity: 'success',
         summary: 'Relaciones creadas',
@@ -391,7 +370,6 @@ const relacionar = async () => {
       resetAndClose()
       emit('saved')
     } else {
-      // Errores de negocio — mostrar inline
       errorMessages.value = responses.map((r) => r.mensaje)
     }
   } catch {
@@ -405,8 +383,6 @@ const relacionar = async () => {
     saving.value = false
   }
 }
-
-// ─── Cerrar dialog ────────────────────────────────────────────────
 
 const cerrar = () => {
   if (hasUnsavedData.value) {
@@ -445,7 +421,6 @@ onBeforeUnmount(() => {
 })
 
 const onHide = () => {
-  // Cleanup al cerrar
   actividadSelected.value = null
   cmoSelected.value = null
   previewRows.value = []
