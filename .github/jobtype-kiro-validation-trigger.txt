@@ -1,0 +1,1 @@
+Disparador técnico de validación para la integración aislada de Jobtype-Contrato.
