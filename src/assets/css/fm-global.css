@@ -4572,3 +4572,723 @@ body > .p-submenu-list .p-menuitem-content:hover .fm-menu-link--submenu {
   }
 }
 /* ===== FIN: nuestros.css ===== */
+
+/* ===== INICIO: certificacion-contratista.css ===== */
+/* --- INICIO DOCUMENTACIÓN DE SECCIÓN ---
+ * CLASIFICACIÓN: [MÓDULO / PANTALLA]
+ * PANTALLAS: Certificación Contratista (BUOT, CORE, MORE, PUMA, COAC, COSA, NODE, NOCR y detalles).
+ * RESPONSABILIDAD: ajustes exclusivos del módulo Vue que reemplaza las pantallas legacy del iframe.
+ * REUTILIZA: fm-screen, fm-accordion, fm-filter-grid, fm-field, fm-actions, fm-pass-grid,
+ * fm-grid-shell, fm-dialog, FmButton, FmGridPaginator y FmAlertDialog.
+ * REGLA: no trasladar estos selectores a los bloques compartidos. Todos están encapsulados por
+ * .certificacion-contratista-page o .certificacion-contratista-dialog.
+ * --- FIN DOCUMENTACIÓN DE SECCIÓN --- */
+
+.certificacion-contratista-page {
+  width: 100%;
+  height: calc(100vh - 64px);
+  min-height: calc(100vh - 64px);
+  margin: -12px 0 0 !important;
+  padding: 0 6px 5px !important;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: #f7f9fa;
+}
+
+.certificacion-contratista-page > .fm-accordion {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 5px !important;
+}
+
+.certificacion-contratista-page > .fm-accordion > .p-accordionpanel {
+  flex: 0 0 auto;
+  margin: 0 !important;
+  border: 1px solid #d4dde1 !important;
+  border-left: 3px solid #00a9bd !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+  overflow: visible !important;
+}
+
+.certificacion-contratista-page > .fm-accordion > .p-accordionpanel:last-child {
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.certificacion-contratista-page > .fm-accordion > .p-accordionpanel:last-child .p-accordioncontent,
+.certificacion-contratista-page > .fm-accordion > .p-accordionpanel:last-child .p-accordioncontent-content {
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.certificacion-contratista-page .p-accordionheader {
+  min-height: 31px !important;
+  height: 31px !important;
+  padding: 5px 10px !important;
+  border: 0 !important;
+  border-bottom: 1px solid #dfe6e9 !important;
+  border-radius: 0 !important;
+  background: #f6f7f8 !important;
+  color: #17262d !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+}
+
+.certificacion-contratista-page .p-accordionheader:hover,
+.certificacion-contratista-page .p-accordionheader:focus-visible {
+  background: #edf9fa !important;
+  color: #007f90 !important;
+}
+
+.certificacion-contratista-page .p-accordioncontent,
+.certificacion-contratista-page .p-accordioncontent-content {
+  padding: 0 !important;
+  border: 0 !important;
+  background: #fff !important;
+}
+
+.certificacion-contratista-filters {
+  width: 100%;
+  padding: 12px 14px 10px;
+  box-sizing: border-box;
+}
+
+.certificacion-contratista-filters__grid {
+  grid-template-columns: repeat(5, minmax(145px, 1fr));
+  gap: 10px 12px;
+}
+
+.certificacion-contratista-filters__actions {
+  justify-content: center;
+  margin-top: 11px;
+}
+
+.certificacion-contratista-page .fm-field {
+  min-width: 0;
+  gap: 4px;
+}
+
+.certificacion-contratista-page .fm-field label,
+.certificacion-contratista-dialog .fm-field label {
+  color: #354952;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.certificacion-contratista-page .fm-field .p-inputtext,
+.certificacion-contratista-page .fm-field .p-select,
+.certificacion-contratista-page .fm-field .p-datepicker,
+.certificacion-contratista-dialog .fm-field .p-inputtext,
+.certificacion-contratista-dialog .fm-field .p-select,
+.certificacion-contratista-dialog .fm-field .p-datepicker,
+.certificacion-contratista-dialog .fm-field .p-autocomplete,
+.certificacion-contratista-dialog .fm-field .p-inputnumber {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.certificacion-contratista-page .fm-field .p-inputtext,
+.certificacion-contratista-page .fm-field .p-select,
+.certificacion-contratista-page .fm-field .p-datepicker-input,
+.certificacion-contratista-dialog .fm-field .p-inputtext,
+.certificacion-contratista-dialog .fm-field .p-select,
+.certificacion-contratista-dialog .fm-field .p-datepicker-input,
+.certificacion-contratista-dialog .fm-field .p-autocomplete-input,
+.certificacion-contratista-dialog .fm-field .p-inputnumber-input {
+  height: 34px !important;
+  min-height: 34px !important;
+  border-radius: 5px !important;
+  font-size: 12px !important;
+  box-shadow: none !important;
+}
+
+.certificacion-contratista-page textarea.p-inputtextarea,
+.certificacion-contratista-dialog textarea.p-inputtextarea {
+  width: 100% !important;
+  min-height: 82px;
+  border-radius: 5px !important;
+  font-size: 12px !important;
+  resize: vertical;
+}
+
+.certificacion-contratista-grid-shell,
+.certificacion-contratista-detail-grid-shell {
+  width: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fff;
+}
+
+.certificacion-contratista-grid,
+.certificacion-contratista-detail-grid {
+  width: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.certificacion-contratista-grid .p-datatable-table-container,
+.certificacion-contratista-grid .p-datatable-wrapper,
+.certificacion-contratista-grid [data-pc-section="tablecontainer"],
+.certificacion-contratista-detail-grid .p-datatable-table-container,
+.certificacion-contratista-detail-grid .p-datatable-wrapper,
+.certificacion-contratista-detail-grid [data-pc-section="tablecontainer"] {
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  overflow: auto !important;
+}
+
+.certificacion-contratista-grid .p-datatable-thead > tr > th,
+.certificacion-contratista-detail-grid .p-datatable-thead > tr > th,
+.certificacion-contratista-subgrid .p-datatable-thead > tr > th,
+.certificacion-contratista-nested-grid .p-datatable-thead > tr > th {
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 4px 7px !important;
+  border: 1px solid #cfd9de !important;
+  background: #edf2f4 !important;
+  color: #263840 !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  white-space: normal !important;
+}
+
+.certificacion-contratista-grid .p-datatable-tbody > tr > td,
+.certificacion-contratista-detail-grid .p-datatable-tbody > tr > td,
+.certificacion-contratista-subgrid .p-datatable-tbody > tr > td,
+.certificacion-contratista-nested-grid .p-datatable-tbody > tr > td {
+  height: 31px !important;
+  min-height: 31px !important;
+  padding: 3px 7px !important;
+  border: 1px solid #d7dfe3 !important;
+  color: #26343b !important;
+  font-size: 11px !important;
+  vertical-align: middle !important;
+}
+
+.certificacion-contratista-grid .p-datatable-tbody > tr:hover > td,
+.certificacion-contratista-detail-grid .p-datatable-tbody > tr:hover > td {
+  background: #edf9fa !important;
+}
+
+.certificacion-contratista-grid .p-datatable-tbody > tr.p-highlight > td,
+.certificacion-contratista-detail-grid .p-datatable-tbody > tr.p-highlight > td {
+  border-color: #75c8d2 !important;
+  background: #b7e7ec !important;
+  color: #153e45 !important;
+  font-weight: 600 !important;
+}
+
+.certificacion-contratista-cell--numeric {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.certificacion-contratista-row-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.certificacion-contratista-grid__open,
+.certificacion-contratista-row-actions .fm-grid-action-final {
+  width: 27px !important;
+  min-width: 27px !important;
+  height: 27px !important;
+  min-height: 27px !important;
+}
+
+.certificacion-contratista-grid-footer-actions {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 10px;
+  border-top: 1px solid #d9e1e5;
+  background: #f9fbfc;
+}
+
+.certificacion-contratista-detail-page {
+  height: auto;
+  min-height: calc(100vh - 64px);
+  overflow: auto;
+  padding-bottom: 12px !important;
+}
+
+.certificacion-contratista-detail-header {
+  margin-bottom: 6px;
+  border: 1px solid #d5dfe3;
+  border-top: 3px solid #00a9bd;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(22, 54, 67, .06);
+}
+
+.certificacion-contratista-detail-header__top {
+  min-height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 8px 16px;
+  border-bottom: 1px solid #dfe6e9;
+}
+
+.certificacion-contratista-detail-header h1 {
+  margin: 3px 0 0;
+  color: #21343d;
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.certificacion-contratista-back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #008a9b;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.certificacion-contratista-back-button:hover { color: #006b78; }
+
+.certificacion-contratista-status,
+.certificacion-contratista-flow-tag,
+.certificacion-contratista-boolean-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 23px;
+  padding: 3px 9px;
+  border: 1px solid #bfcbd0;
+  border-radius: 12px;
+  background: #f3f5f6;
+  color: #53646c;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.certificacion-contratista-status.is-success,
+.certificacion-contratista-flow-tag.is-success,
+.certificacion-contratista-boolean-tag.is-success {
+  border-color: #7ebf9b;
+  background: #e7f6ed;
+  color: #247245;
+}
+
+.certificacion-contratista-status.is-progress,
+.certificacion-contratista-flow-tag.is-progress {
+  border-color: #77c8d3;
+  background: #e2f7f9;
+  color: #007b8c;
+}
+
+.certificacion-contratista-status.is-danger,
+.certificacion-contratista-flow-tag.is-danger,
+.certificacion-contratista-boolean-tag.is-danger {
+  border-color: #e0a4ab;
+  background: #fbeaec;
+  color: #a12736;
+}
+
+.certificacion-contratista-status.is-neutral,
+.certificacion-contratista-flow-tag.is-neutral { border-color: #c4ced3; background: #f2f5f6; color: #52636b; }
+
+.certificacion-contratista-detail-summary {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(110px, 1fr));
+  gap: 0;
+}
+
+.certificacion-contratista-detail-summary > div {
+  min-width: 0;
+  padding: 8px 12px;
+  border-right: 1px solid #e2e7ea;
+}
+
+.certificacion-contratista-detail-summary > div:last-child { border-right: 0; }
+.certificacion-contratista-detail-summary span,
+.certificacion-contratista-ot-summary span,
+.certificacion-contratista-operator-card span,
+.certificacion-contratista-monitor-summary span {
+  display: block;
+  margin-bottom: 3px;
+  color: #708089;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.certificacion-contratista-detail-summary strong,
+.certificacion-contratista-ot-summary strong,
+.certificacion-contratista-operator-card strong,
+.certificacion-contratista-monitor-summary strong {
+  display: block;
+  overflow: hidden;
+  color: #283a42;
+  font-size: 12px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.certificacion-contratista-detail-controls {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 12px;
+}
+
+.certificacion-contratista-detail-filters {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(130px, 190px)) auto;
+  align-items: end;
+  gap: 9px;
+}
+
+.certificacion-contratista-detail-filters__actions { flex-wrap: nowrap; }
+.certificacion-contratista-detail-actions {
+  flex: 0 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.certificacion-contratista-detail-actions .fm-action-button {
+  min-width: 105px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 11px !important;
+  font-size: 10px !important;
+}
+
+.certificacion-contratista-row-expansion {
+  padding: 8px 10px 10px;
+  border-left: 3px solid #00a9bd;
+  background: #f5fafb;
+}
+
+.certificacion-contratista-row-expansion__header {
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.certificacion-contratista-row-expansion__header strong { color: #293d46; font-size: 12px; }
+.certificacion-contratista-row-expansion__header span { margin-left: 8px; color: #71818a; font-size: 11px; }
+.certificacion-contratista-nested-grid { max-height: 220px; }
+
+.certificacion-contratista-dialog.p-dialog {
+  max-width: calc(100vw - 24px) !important;
+  max-height: calc(100dvh - 24px) !important;
+  overflow: hidden !important;
+  border: 1px solid #b9c6cc !important;
+  border-top: 3px solid #00a9bd !important;
+  border-radius: 9px !important;
+  background: #fff !important;
+  box-shadow: 0 20px 52px rgba(20, 49, 61, .26) !important;
+}
+
+.certificacion-contratista-dialog .p-dialog-header {
+  min-height: 56px !important;
+  padding: 0 20px !important;
+  border-bottom: 1px solid #dce4e8 !important;
+  background: #fff !important;
+}
+
+.certificacion-contratista-dialog .p-dialog-title {
+  color: #243740 !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+}
+
+.certificacion-contratista-dialog .p-dialog-content {
+  padding: 0 !important;
+  overflow: auto !important;
+  background: #fff !important;
+}
+
+.certificacion-contratista-dialog .p-dialog-footer {
+  min-height: 60px !important;
+  padding: 10px 18px !important;
+  border-top: 1px solid #dce4e8 !important;
+  background: #f8fafb !important;
+}
+
+.certificacion-contratista-dialog__content { display: grid; gap: 14px; padding: 18px 20px; }
+.certificacion-contratista-dialog__footer { width: 100%; display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+.certificacion-contratista-dialog-loader,
+.certificacion-contratista-inline-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+  color: #53666f;
+  font-size: 12px;
+}
+
+.certificacion-contratista-confirm-dialog__body {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 22px 20px;
+}
+
+.certificacion-contratista-confirm-dialog__body > i { font-size: 31px; color: #e0a21c; }
+.certificacion-contratista-confirm-dialog__body > i.certificacion-contratista-confirm-dialog__icon--danger { color: #c13b4b; }
+.certificacion-contratista-confirm-dialog__body strong { display: block; color: #263a43; font-size: 15px; line-height: 1.35; }
+.certificacion-contratista-confirm-dialog__body p { margin: 7px 0 0; color: #687981; font-size: 12px; line-height: 1.45; }
+
+.certificacion-contratista-selection-summary {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1px 8px;
+  padding: 10px 12px;
+  border: 1px solid #c9e6ea;
+  border-left: 3px solid #00a9bd;
+  background: #f1fbfc;
+}
+.certificacion-contratista-selection-summary strong { grid-row: 1 / 3; align-self: center; color: #008b9c; font-size: 26px; }
+.certificacion-contratista-selection-summary span { color: #2b444d; font-size: 12px; font-weight: 700; }
+.certificacion-contratista-selection-summary small { overflow: hidden; color: #687a82; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.certificacion-contratista-field-counter { justify-self: end; color: #71828a; font-size: 10px; }
+.certificacion-contratista-checkbox-line { display: flex; align-items: center; gap: 8px; color: #3f535c; font-size: 12px; cursor: pointer; }
+
+.certificacion-contratista-rating-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.certificacion-contratista-rating-option {
+  min-height: 84px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #cbd6db;
+  border-radius: 7px;
+  background: #fff;
+  color: #4f626b;
+  cursor: pointer;
+}
+.certificacion-contratista-rating-option i { font-size: 23px; }
+.certificacion-contratista-rating-option.is-selected,
+.certificacion-contratista-rating-option:hover { border-color: #00a9bd; background: #e9fafc; color: #00899a; }
+
+.certificacion-contratista-transfer-grid,
+.certificacion-contratista-rule-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.certificacion-contratista-transfer-grid .fm-field--span-2 { grid-column: span 2; }
+
+.certificacion-contratista-activity-dialog .p-dialog-content { min-height: min(650px, calc(100dvh - 145px)); }
+.certificacion-contratista-activity-layout { min-height: 620px; display: flex; flex-direction: column; }
+.certificacion-contratista-ot-summary,
+.certificacion-contratista-operator-card,
+.certificacion-contratista-monitor-summary {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0;
+  border-bottom: 1px solid #dce4e8;
+  background: #f8fafb;
+}
+.certificacion-contratista-ot-summary > div,
+.certificacion-contratista-operator-card > div,
+.certificacion-contratista-monitor-summary > div { min-width: 0; padding: 9px 12px; border-right: 1px solid #e1e7ea; }
+
+.certificacion-contratista-tabs,
+.certificacion-contratista-result-tabs {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  overflow-x: auto;
+  border-bottom: 1px solid #ccd7dc;
+  background: #fff;
+}
+.certificacion-contratista-tabs button,
+.certificacion-contratista-result-tabs button {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border: 0;
+  border-right: 1px solid #e0e6e9;
+  border-bottom: 3px solid transparent;
+  background: #f8fafb;
+  color: #52656e;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.certificacion-contratista-tabs button span,
+.certificacion-contratista-result-tabs button span { min-width: 19px; padding: 2px 5px; border-radius: 10px; background: #dce5e8; font-size: 9px; }
+.certificacion-contratista-tabs button.is-active,
+.certificacion-contratista-result-tabs button.is-active { border-bottom-color: #00a9bd; background: #fff; color: #007f90; }
+.certificacion-contratista-tabs button.is-active span,
+.certificacion-contratista-result-tabs button.is-active span { background: #c9f0f4; color: #007d8e; }
+.certificacion-contratista-tab-panel { min-height: 0; flex: 1 1 auto; display: flex; flex-direction: column; padding: 13px 15px; overflow: auto; }
+.certificacion-contratista-tab-panel h3 { margin: 0 0 10px; color: #2b4049; font-size: 14px; }
+.certificacion-contratista-section-toolbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 9px; }
+.certificacion-contratista-section-toolbar h3 { margin: 0; }
+.certificacion-contratista-section-toolbar p { margin: 3px 0 0; color: #71818a; font-size: 11px; }
+.certificacion-contratista-inline-form { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: end; gap: 10px; margin-bottom: 10px; padding: 12px; border: 1px solid #d2e3e7; background: #f4fbfc; }
+.certificacion-contratista-inline-form .fm-field--span-2 { grid-column: span 2; }
+.certificacion-contratista-inline-form .fm-actions { grid-column: 1 / -1; justify-content: flex-end; }
+.certificacion-contratista-subgrid-shell { min-height: 260px; flex: 1 1 auto; overflow: hidden; }
+.certificacion-contratista-subgrid { height: 100%; }
+.certificacion-contratista-quantity-input,
+.certificacion-contratista-quantity-input .p-inputnumber-input { width: 94px !important; height: 27px !important; min-height: 27px !important; font-size: 11px !important; }
+.certificacion-contratista-section-actions { display: flex; justify-content: flex-end; padding-top: 9px; }
+.certificacion-contratista-inline-form--incident { max-width: 720px; grid-template-columns: 1fr 1fr auto; }
+
+.certificacion-contratista-ots-entry { display: grid; gap: 10px; padding: 13px 15px; }
+.certificacion-contratista-ots-counter { display: flex; justify-content: space-between; margin-top: 4px; color: #65777f; font-size: 10px; }
+.certificacion-contratista-result-tabs { flex: 0 0 auto; }
+.certificacion-contratista-input-action { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 7px; }
+.certificacion-contratista-operator-card { grid-template-columns: repeat(3, 1fr); border: 1px solid #d8e2e6; }
+
+.certificacion-contratista-rule-form { display: grid; gap: 13px; padding: 16px 18px; }
+.certificacion-contratista-rule-meta { grid-template-columns: 1fr 1.4fr 1fr 1fr; }
+.certificacion-contratista-rule-workspace { min-height: 460px; display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 12px; }
+.certificacion-contratista-rule-elements { min-height: 0; display: flex; flex-direction: column; border: 1px solid #ccd7dc; background: #f8fafb; }
+.certificacion-contratista-rule-elements__header { min-height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 7px 10px; border-bottom: 1px solid #d9e1e5; background: #edf2f4; color: #324750; font-size: 11px; }
+.certificacion-contratista-rule-elements__header span { padding: 2px 6px; border-radius: 10px; background: #c8eef2; color: #007f90; }
+.certificacion-contratista-rule-elements__list { min-height: 0; flex: 1 1 auto; display: grid; align-content: start; gap: 4px; padding: 7px; overflow: auto; }
+.certificacion-contratista-rule-elements__list button { display: grid; grid-template-columns: 20px 1fr 16px; align-items: center; gap: 6px; padding: 7px; border: 1px solid #d4dde1; border-radius: 4px; background: #fff; color: #40545d; text-align: left; cursor: pointer; }
+.certificacion-contratista-rule-elements__list button:hover { border-color: #00a9bd; background: #ecfafc; color: #007e8e; }
+.certificacion-contratista-rule-elements__list strong { display: block; font-size: 10px; }
+.certificacion-contratista-rule-elements__list small { display: block; margin-top: 2px; color: #7b8a91; font-size: 8px; }
+.certificacion-contratista-rule-editor { min-width: 0; display: grid; gap: 9px; }
+.certificacion-contratista-operator-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; }
+.certificacion-contratista-operator-toolbar span { margin-right: 5px; color: #586a73; font-size: 10px; font-weight: 700; }
+.certificacion-contratista-operator-toolbar button { min-width: 37px; height: 28px; padding: 0 8px; border: 1px solid #bdccd2; border-radius: 4px; background: #fff; color: #334a54; font-size: 10px; font-weight: 700; cursor: pointer; }
+.certificacion-contratista-operator-toolbar button:hover { border-color: #00a9bd; background: #eafafc; color: #007f90; }
+.certificacion-contratista-rule-results { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.certificacion-contratista-rule-preview { border: 1px solid #d8e1e5; background: #f8fafb; }
+.certificacion-contratista-rule-preview summary { padding: 8px 10px; color: #435861; font-size: 10px; font-weight: 700; cursor: pointer; }
+.certificacion-contratista-rule-preview pre { max-height: 220px; margin: 0; padding: 10px; overflow: auto; border-top: 1px solid #e0e6e9; background: #1f3039; color: #dff7fa; font-size: 10px; }
+.certificacion-contratista-rule-filters { grid-template-columns: repeat(2, minmax(180px, 300px)); }
+
+.certificacion-contratista-monitor-summary { grid-template-columns: repeat(3, minmax(120px, 1fr)) minmax(300px, auto); border-bottom: 1px solid #dce4e8; }
+.certificacion-contratista-monitor-summary .fm-actions { align-self: center; justify-content: flex-end; border-right: 0; }
+.certificacion-contratista-batch-progress { display: grid; grid-template-columns: auto minmax(200px, 1fr); align-items: center; gap: 14px; padding: 9px 12px; border-bottom: 1px solid #dbe3e7; background: #f8fafb; }
+.certificacion-contratista-batch-progress div { display: flex; align-items: baseline; gap: 5px; }
+.certificacion-contratista-batch-progress strong { color: #00899a; font-size: 20px; }
+.certificacion-contratista-batch-progress span { color: #687981; font-size: 10px; }
+.certificacion-contratista-batch-progress progress { width: 100%; height: 10px; accent-color: #00a9bd; }
+
+@media (max-width: 1280px) {
+  .certificacion-contratista-filters__grid { grid-template-columns: repeat(4, minmax(140px, 1fr)); }
+  .certificacion-contratista-detail-summary { grid-template-columns: repeat(4, minmax(120px, 1fr)); }
+  .certificacion-contratista-detail-summary > div { border-bottom: 1px solid #e2e7ea; }
+  .certificacion-contratista-detail-controls { align-items: stretch; flex-direction: column; }
+  .certificacion-contratista-detail-actions { justify-content: flex-start; }
+}
+
+@media (max-width: 900px) {
+  .certificacion-contratista-page { height: auto; min-height: calc(100dvh - 58px); overflow: visible; }
+  .certificacion-contratista-page > .fm-accordion > .p-accordionpanel:last-child { overflow: visible !important; }
+  .certificacion-contratista-filters__grid { grid-template-columns: repeat(2, minmax(135px, 1fr)); }
+  .certificacion-contratista-detail-summary { grid-template-columns: repeat(2, 1fr); }
+  .certificacion-contratista-detail-filters { grid-template-columns: repeat(2, minmax(130px, 1fr)); }
+  .certificacion-contratista-detail-filters__actions { grid-column: 1 / -1; justify-content: flex-start; }
+  .certificacion-contratista-transfer-grid,
+  .certificacion-contratista-rule-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .certificacion-contratista-rule-workspace { grid-template-columns: 220px minmax(0, 1fr); }
+  .certificacion-contratista-inline-form { grid-template-columns: repeat(2, 1fr); }
+  .certificacion-contratista-ot-summary { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 620px) {
+  .certificacion-contratista-page { margin-top: -6px !important; padding: 0 3px 5px !important; }
+  .certificacion-contratista-filters__grid,
+  .certificacion-contratista-detail-filters,
+  .certificacion-contratista-transfer-grid,
+  .certificacion-contratista-rule-meta,
+  .certificacion-contratista-rule-results,
+  .certificacion-contratista-inline-form,
+  .certificacion-contratista-inline-form--incident,
+  .certificacion-contratista-operator-card,
+  .certificacion-contratista-monitor-summary { grid-template-columns: 1fr; }
+  .certificacion-contratista-detail-summary { grid-template-columns: 1fr 1fr; }
+  .certificacion-contratista-detail-header__top { align-items: flex-start; flex-direction: column; }
+  .certificacion-contratista-detail-actions { display: grid; grid-template-columns: 1fr 1fr; }
+  .certificacion-contratista-detail-actions .fm-action-button { width: 100% !important; }
+  .certificacion-contratista-rule-workspace { grid-template-columns: 1fr; }
+  .certificacion-contratista-rule-elements { max-height: 240px; }
+  .certificacion-contratista-transfer-grid .fm-field--span-2,
+  .certificacion-contratista-inline-form .fm-field--span-2 { grid-column: auto; }
+  .certificacion-contratista-rating-options { grid-template-columns: repeat(2, 1fr); }
+  .certificacion-contratista-ot-summary { grid-template-columns: 1fr 1fr; }
+  .certificacion-contratista-dialog__footer { display: grid; grid-template-columns: 1fr 1fr; }
+  .certificacion-contratista-dialog__footer .fm-action-button { width: 100% !important; min-width: 0 !important; }
+}
+
+.certificacion-contratista-page .certificacion-contratista-history-expansion {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px 12px 54px;
+  border-top: 1px solid #dce4e8;
+  background: #f8fafb;
+}
+
+.certificacion-contratista-page .certificacion-contratista-history-expansion > strong {
+  color: #344b55;
+  font-size: 11px;
+}
+
+.certificacion-contratista-dialog__footer--activity {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+
+.certificacion-contratista-note-dialog__content {
+  min-height: 110px;
+  padding: 18px 20px;
+  color: #334750;
+  font-size: 14px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.certificacion-contratista-note-dialog__content p {
+  margin: 0;
+}
+
+/* ===== FIN: certificacion-contratista.css ===== */

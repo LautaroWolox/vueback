@@ -38,7 +38,19 @@ const routes = [
   {
     path: '/FM/detallActa.html',
     name: 'DEAC',
-    component: () => import('../views/DetalleView.vue'),
+    component: () => import('../modules/certificacionContratista/views/DocumentoDetalleView.vue'),
+    props: () => {
+      const legacyUrl = sessionStorage.getItem('urlDetalle') || ''
+      const tipo = legacyUrl.includes('Debito')
+        ? 'nota-debito'
+        : legacyUrl.includes('Credito')
+          ? 'nota-credito'
+          : 'acta'
+      return {
+        tipo,
+        numero: sessionStorage.getItem('nroActa') || ''
+      }
+    }
   },
   {
     path: '/FM',
@@ -233,71 +245,52 @@ const routes = [
         path: 'consultarActas.html',
         name: 'COAC',
         beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/consultarActas.html',
-          titleParam: 'consultarActas'
-        }
+        component: () => import('../modules/certificacionContratista/views/DocumentosListView.vue'),
+        props: { documentType: 'ACTA' }
       },
       {
         path: 'ordenTrabajoSinActa.html',
         name: 'COSA',
         beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/consultarOtSinACTA.html',
-          titleParam: 'consultar ots sin acta'
-        }
+        component: () => import('../modules/certificacionContratista/views/OtsSinActaView.vue')
       },
       {
         path: 'consultarNotaDebito.html',
         name: 'NODE',
         beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/consultarNotaDebito.html',
-          titleParam: 'consultar notas debito'
-        }
+        component: () => import('../modules/certificacionContratista/views/DocumentosListView.vue'),
+        props: { documentType: 'NOTA_DEBITO' }
       },
       {
         path: 'consultarNotaCredito.html',
         name: 'NOCR',
         beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/consultarNotaCredito.html',
-          titleParam: 'consultar notas credito'
-        }
+        component: () => import('../modules/certificacionContratista/views/DocumentosListView.vue'),
+        props: { documentType: 'NOTA_CREDITO' }
+      },
+      {
+        path: 'certificacion/:tipo/:numero',
+        name: 'CECO_DETALLE',
+        component: () => import('../modules/certificacionContratista/views/DocumentoDetalleView.vue'),
+        props: true
       },
       {
         path: 'consultarReglas.html',
         name: 'CORE',
         beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/consultarReglas.html',
-          titleParam: 'Consultar Reglas'
-        }
+        component: () => import('../modules/certificacionContratista/views/ConsultarReglasView.vue')
       },
       {
         path: 'monitoreoEjecucionreglas.html',
         name: 'MORE',
         beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/monitoreoEjecucionreglas.html',
-          titleParam: 'Monitoreo y Ejecución de Reglas'
-        }
+        component: () => import('../modules/certificacionContratista/views/MonitoreoReglasView.vue')
       },
       {
         path: 'pruebasMasivas.html',
         name: 'PUMA',
         beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/pruebasMasivas.html',
-          titleParam: 'Regla Prueba Masiva'
-        }
+        component: () => import('../modules/certificacionContratista/views/PruebasMasivasView.vue')
       },
       {
         path: 'registroOTFallidasReproceso.html',
@@ -309,11 +302,7 @@ const routes = [
         path: 'busquedaOtsGcc.html',
         name: 'BUOT',
         beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/busquedaOtsGcc.html',
-          titleParam: 'Búsqueda de Ots'
-        }
+        component: () => import('../modules/certificacionContratista/views/BusquedaOtsView.vue')
       }
     ]
   }
