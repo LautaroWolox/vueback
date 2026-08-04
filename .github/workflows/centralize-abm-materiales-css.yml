@@ -41,6 +41,18 @@ jobs:
               for path in part_paths
           )
           section_bytes = base64.b64decode(encoded, validate=True)
+
+          # Corrige dos alteraciones introducidas al transportar el bloque temporal.
+          section_bytes = section_bytes.replace(
+              b'border#\xa2 1px solid #c9d3d8',
+              b'border: 1px solid #c9d3d8',
+              1,
+          )
+          section_bytes = section_bytes.replace(
+              b'}\n@media (max-width: 1024px)',
+              b'}\n\n@media (max-width: 1024px)',
+              1,
+          )
           Path('decoded-abm.css').write_bytes(section_bytes)
 
           expected_size = 18164
