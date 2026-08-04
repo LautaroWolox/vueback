@@ -51,6 +51,7 @@
           :resizableColumns="true"
           columnResizeMode="fit"
           showGridlines
+          :rowClass="rowClass"
           @row-click="onRowClick"
         >
           <template
@@ -152,6 +153,7 @@
     <EditarJobtypeContratoDialog
       v-model:visible="showEditar"
       :tarea-contrato-id="editForm.tareaContratoId"
+      :contrato-tipo-id="editForm.contratoTipoId"
       :jobtype="editForm.jobtype"
       :contrato-actual="editForm.contratoActual"
       :pais="editForm.pais"
@@ -194,6 +196,7 @@ const showDesactivar = ref(false)
 
 const editForm = ref({
   tareaContratoId: 0,
+  contratoTipoId: 0,
   jobtype: '',
   contratoActual: '',
   pais: '',
@@ -235,7 +238,12 @@ const buscar = async () => {
 }
 
 const onRowClick = ({ data }) => {
+  if (data.activo === 'N') return
   selectedRow.value = data
+}
+
+const rowClass = (data) => {
+  return data.activo === 'N' ? 'jobtype-row-inactive' : ''
 }
 
 const clearFilter = (filterModel, filterCallback) => {
@@ -248,6 +256,7 @@ const editarSeleccionado = () => {
 
   editForm.value = {
     tareaContratoId: selectedRow.value.tareaContratoId,
+    contratoTipoId: selectedRow.value.contratoTipoId,
     jobtype: selectedRow.value.tareaNombre,
     contratoActual: selectedRow.value.contratoNombre,
     pais: selectedRow.value.pais,

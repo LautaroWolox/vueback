@@ -18,6 +18,7 @@
           class="jobtype-alta-header__close"
           title="Cerrar"
           aria-label="Cerrar"
+          :disabled="relating"
           @click="solicitarCierre"
         >×</button>
       </div>
@@ -200,9 +201,52 @@
       <FmButton
         label="RELACIONAR"
         class="jobtype-relate-button"
-        :disabled="altaRows.length === 0"
+        :disabled="altaRows.length === 0 || relating"
         @click="relacionar"
       />
+    </template>
+
+    <div v-if="relating" class="jobtype-alta-loading-overlay">
+      <ProgressSpinner />
+    </div>
+  </Dialog>
+
+  <Dialog
+    v-model:visible="showAlertDialog"
+    appendTo="body"
+    modal
+    :closable="false"
+    :close-on-escape="false"
+    :draggable="true"
+    :resizable="false"
+    class="jobtype-alta-alert-dialog"
+    :style="alertDialogStyle"
+  >
+    <template #header>
+      <div class="jobtype-alta-alert__header">
+        <span class="jobtype-alta-alert__title">Alerta</span>
+        <button
+          type="button"
+          class="jobtype-alta-alert__close"
+          title="Cerrar"
+          aria-label="Cerrar"
+          @click="showAlertDialog = false"
+        >×</button>
+      </div>
+    </template>
+
+    <div class="jobtype-alta-alert__content">
+      <span class="jobtype-alta-alert__message">{{ alertMessage }}</span>
+    </div>
+
+    <template #footer>
+      <div class="jobtype-alta-alert__actions">
+        <button
+          type="button"
+          class="jobtype-alta-alert__button"
+          @click="showAlertDialog = false"
+        >ACEPTAR</button>
+      </div>
     </template>
   </Dialog>
 
@@ -265,6 +309,7 @@ import Select from 'primevue/select'
 import AutoComplete from 'primevue/autocomplete'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
+import ProgressSpinner from 'primevue/progressspinner'
 import FmButton from '@/components/shared/FmButton.vue'
 import FmGridPaginator from '@/components/shared/FmGridPaginator.vue'
 import FmGridActions from '@/components/shared/FmGridActions.vue'
@@ -311,6 +356,11 @@ const altaFirst = ref(0)
 const altaPageRows = ref(10)
 const showConfirmCierre = ref(false)
 const duplicateMessage = ref('')
+const relating = ref(false)
+const showAlertDialog = ref(false)
+const alertMessage = ref('')
+
+const alertDialogStyle = 'width: min(540px, calc(100vw - 32px)); max-width: 540px;'
 
 const canAgregar = computed(() => Boolean(jobtypeSelected.value && contratoSelected.value && form.origen))
 
@@ -421,6 +471,24 @@ const onAltaRowClick = ({ data }) => {
 const relacionar = async () => {
   if (!altaRows.value.length) return
 
+  // Check for duplicates against the main grid (only active rows count)
+  const duplicados = altaRows.value.filter((row) =>
+    store.relaciones.some(
+      (rel) =>
+        rel.activo === 'S' &&
+        rel.tareaCodigo === row.relCodigoTarea &&
+        rel.contratoNombre === row.relContrato &&
+        rel.origen === row.origen
+    )
+  )
+
+  if (duplicados.length > 0) {
+    const codigos = duplicados.map((d) => d.relCodigoTarea).join(', ')
+    alertMessage.value = `Ya existe una relación Jobtype-Contrato para el jobtype ${codigos}`
+    showAlertDialog.value = true
+    return
+  }
+
   const payload = altaRows.value.map((row) => ({
     relCodigoTarea: row.relCodigoTarea,
     relTarea: row.relTarea,
@@ -430,26 +498,24 @@ const relacionar = async () => {
     pais: row.pais
   }))
 
+  relating.value = true
+
   try {
     const errores = await store.crearRelaciones(payload)
 
-    if (errores.length === 0) {
-      emit('update:visible', false)
-      emit('relacionado')
-    } else if (errores.length === 1) {
-      // Single error message — could show in an alert
-      console.warn(errores[0].mensaje)
-      emit('update:visible', false)
-      emit('relacionado')
-    } else {
-      // Multiple errors
-      const msgs = errores.map((e) => e.tareaCodigo).join(', ')
-      console.warn('Ya existe relación para los jobtypes:', msgs)
-      emit('update:visible', false)
-      emit('relacionado')
+    if (errores.length > 0) {
+      const msgs = errores.map((e) => e.mensaje).filter(Boolean).join('\n')
+      alertMessage.value = msgs || `Ya existe una relación para los jobtypes: ${errores.map((e) => e.tareaCodigo).join(', ')}`
+      showAlertDialog.value = true
     }
+
+    emit('update:visible', false)
+    emit('relacionado')
   } catch {
-    // error already in store.error
+    emit('update:visible', false)
+    emit('relacionado')
+  } finally {
+    relating.value = false
   }
 }
 
@@ -611,6 +677,125 @@ const cerrar = () => {
 }
 
 :global(.jobtype-alta-unsaved-dialog .p-dialog-footer) {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 10px 18px;
+  border-top: 1px solid #dedede;
+  background: #fff;
+}
+
+/* Loading overlay */
+.jobtype-alta-loading-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.7);
+  z-index: 9999;
+}
+
+/* Alert dialog */
+.jobtype-alta-alert__header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.jobtype-alta-alert__title {
+  color: #252b33;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.jobtype-alta-alert__close {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #c7c7c7;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.jobtype-alta-alert__close:hover {
+  color: #00a9bd;
+}
+
+.jobtype-alta-alert__content {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 18px 4px;
+}
+
+.jobtype-alta-alert__message {
+  color: #4b5563;
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: pre-line;
+}
+
+.jobtype-alta-alert__actions {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.jobtype-alta-alert__button {
+  appearance: none;
+  width: 100px;
+  min-width: 100px;
+  height: 30px;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border: 1px solid #00acc1;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: none;
+  outline: none;
+  cursor: pointer;
+  background: #fff;
+  color: #0097a7;
+}
+
+:global(.p-dialog.jobtype-alta-alert-dialog) {
+  overflow: hidden;
+  border: 1px solid #bdbdbd;
+  border-radius: 0;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .28);
+}
+
+:global(.jobtype-alta-alert-dialog .p-dialog-header) {
+  min-height: 56px;
+  padding: 12px 18px;
+  border-bottom: 1px solid #dedede;
+  background: #fff;
+}
+
+:global(.jobtype-alta-alert-dialog .p-dialog-content) {
+  padding: 0 18px;
+  background: #fff;
+}
+
+:global(.jobtype-alta-alert-dialog .p-dialog-footer) {
   min-height: 60px;
   display: flex;
   align-items: center;

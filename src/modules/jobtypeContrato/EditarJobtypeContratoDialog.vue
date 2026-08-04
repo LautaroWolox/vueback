@@ -19,6 +19,7 @@
           class="jobtype-contrato-edit-close"
           title="Cerrar"
           aria-label="Cerrar"
+          :disabled="updating"
           @click="solicitarCierre"
         >×</button>
       </div>
@@ -86,6 +87,10 @@
       </div>
     </div>
 
+    <div v-if="updating" class="jobtype-contrato-edit-loading">
+      <ProgressSpinner />
+    </div>
+
     <div v-if="errorMessage" class="jobtype-contrato-edit-error">
       {{ errorMessage }}
     </div>
@@ -94,7 +99,7 @@
       <FmButton
         label="ACTUALIZAR"
         class="jobtype-contrato-edit-update"
-        :disabled="!puedeActualizar"
+        :disabled="!puedeActualizar || updating"
         @click="actualizar"
       />
     </template>
@@ -158,12 +163,14 @@ import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import AutoComplete from 'primevue/autocomplete'
 import Select from 'primevue/select'
+import ProgressSpinner from 'primevue/progressspinner'
 import FmButton from '@/components/shared/FmButton.vue'
 import { useJobtypeContratoStore } from './jobtypeContratoStore'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
   tareaContratoId: { type: Number, default: 0 },
+  contratoTipoId: { type: Number, default: 0 },
   jobtype: { type: String, default: '' },
   contratoActual: { type: String, default: '' },
   pais: { type: String, default: '' },
@@ -183,6 +190,7 @@ const contratoSelectedItem = ref(null)
 const showConfirmCierre = ref(false)
 const origenSeleccionado = ref('')
 const errorMessage = ref('')
+const updating = ref(false)
 
 const origenOptions = [
   { label: 'FAN', value: 'FAN' },
@@ -217,10 +225,32 @@ const actualizar = async () => {
 
   errorMessage.value = ''
 
+  // Check for duplicate in existing data
+  const nuevoContratoNombre = contratoSelectedItem.value
+    ? contratoSelectedItem.value.nombre
+    : props.contratoActual
+  const nuevoOrigen = origenSeleccionado.value
+
+  const duplicado = store.relaciones.some(
+    (row) =>
+      row.activo === 'S' &&
+      row.tareaContratoId !== props.tareaContratoId &&
+      row.contratoNombre === nuevoContratoNombre &&
+      row.origen === nuevoOrigen &&
+      row.tareaNombre === props.jobtype
+  )
+
+  if (duplicado) {
+    errorMessage.value = `Ya existe una relación con el mismo Contrato y Origen`
+    return
+  }
+
+  updating.value = true
+
   try {
     await store.actualizarRelacion(
       props.tareaContratoId,
-      contratoSelectedItem.value ? contratoSelectedItem.value.contratoId : 0,
+      contratoSelectedItem.value ? contratoSelectedItem.value.contratoId : props.contratoTipoId,
       origenSeleccionado.value
     )
     nuevoContrato.value = ''
@@ -228,8 +258,11 @@ const actualizar = async () => {
     origenSeleccionado.value = ''
     emit('update:visible', false)
     emit('actualizado')
-  } catch (e) {
-    errorMessage.value = store.error || (e instanceof Error ? e.message : 'Error al actualizar')
+  } catch {
+    emit('update:visible', false)
+    emit('actualizado')
+  } finally {
+    updating.value = false
   }
 }
 
@@ -357,6 +390,16 @@ const cerrar = () => {
   line-height: 1.3;
 }
 
+.jobtype-contrato-edit-loading {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.7);
+  z-index: 9999;
+}
+
 :global(.p-dialog.jobtype-contrato-edit-dialog) {
   overflow: hidden;
   border: 1px solid #bdbdbd;
@@ -372,6 +415,7 @@ const cerrar = () => {
 }
 
 :global(.jobtype-contrato-edit-dialog .p-dialog-content) {
+  position: relative;
   padding: 0 16px;
   background: #fff;
 }

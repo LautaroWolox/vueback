@@ -9,8 +9,8 @@
    ========================= */
 .jobtype-screen {
   width: 100%;
-  height: calc(100vh - 2px);
-  min-height: 600px;
+  height: calc(100dvh - 36px);
+  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -203,6 +203,17 @@
 .jobtype-main-grid .p-datatable-tbody > tr.p-highlight > td,
 .jobtype-main-grid .p-datatable-tbody > tr:hover > td {
   background: #eefbfc !important;
+}
+
+.jobtype-main-grid .p-datatable-tbody > tr.jobtype-row-inactive > td {
+  background: #f5f5f5 !important;
+  color: #999 !important;
+  pointer-events: none;
+  cursor: default;
+}
+
+.jobtype-main-grid .p-datatable-tbody > tr.jobtype-row-inactive > td .jobtype-cell-text {
+  color: #999 !important;
 }
 
 .jobtype-cell-text {
