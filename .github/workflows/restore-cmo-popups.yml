@@ -1,0 +1,204 @@
+name: Restaurar popups CMO
+
+on:
+  pull_request:
+    branches:
+      - CMO
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+jobs:
+  restore-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar CMO
+        uses: actions/checkout@v4
+        with:
+          ref: CMO
+          fetch-depth: 0
+
+      - name: Preparar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Restaurar diseño aprobado en el CSS global
+        shell: bash
+        run: |
+          set -euo pipefail
+          python <<'PYCODE'
+          from pathlib import Path
+          import re
+
+          path = Path('src/assets/css/fm-global.css')
+          css = path.read_text(encoding='utf-8')
+
+          start = '/* ===== INICIO: restauracion-popups-cmo-aprobados.css ===== */'
+          end = '/* ===== FIN: restauracion-popups-cmo-aprobados.css ===== */'
+          css = re.sub(re.escape(start) + r'.*?' + re.escape(end), '', css, flags=re.S).rstrip()
+
+          block = r'''
+/* ===== INICIO: restauracion-popups-cmo-aprobados.css ===== */
+/*
+ * Restaura el diseño compacto aprobado de Alta y Edición CMO-Actividad.
+ * No altera templates, endpoints ni lógica funcional.
+ */
+body .p-dialog.jobtype-alta-dialog.cmo-alta-dialog,
+body .p-dialog.jobtype-alta-dialog.cmo-modificar-dialog {
+  width: min(980px, calc(100vw - 48px)) !important;
+  max-width: 980px !important;
+  height: min(560px, calc(100dvh - 48px)) !important;
+  max-height: calc(100dvh - 48px) !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+body .p-dialog.cmo-alta-dialog .p-dialog-content,
+body .p-dialog.cmo-modificar-dialog .p-dialog-content {
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+body .p-dialog.cmo-alta-dialog .jobtype-alta-content,
+body .p-dialog.cmo-modificar-dialog .jobtype-alta-content {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+body .p-dialog.cmo-alta-dialog .cmo-alta-form {
+  width: min(860px, 100%) !important;
+  max-width: 860px !important;
+  margin: 0 auto !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 120px !important;
+  align-items: end !important;
+  column-gap: 20px !important;
+  row-gap: 12px !important;
+  flex: 0 0 auto !important;
+}
+
+body .p-dialog.cmo-modificar-dialog .cmo-modificar-form {
+  width: min(860px, 100%) !important;
+  max-width: 860px !important;
+  margin: 0 auto !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  align-items: end !important;
+  gap: 20px !important;
+  flex: 0 0 auto !important;
+}
+
+body .p-dialog.cmo-alta-dialog .jobtype-alta-grid-wrap {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  overflow: hidden !important;
+}
+
+body .p-dialog.cmo-alta-dialog .jobtype-add-button,
+body .p-dialog.cmo-alta-dialog .jobtype-relate-button,
+body .p-dialog.cmo-modificar-dialog .jobtype-relate-button,
+body .p-dialog.cmo-alta-dialog [data-cmo-popup-button='true'],
+body .p-dialog.cmo-modificar-dialog [data-cmo-popup-button='true'] {
+  width: 120px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  padding: 0 13px !important;
+  border-radius: 6px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  box-shadow: 0 2px 6px rgba(0, 91, 104, 0.14) !important;
+  transform: none !important;
+}
+
+@media (max-width: 900px) {
+  body .p-dialog.jobtype-alta-dialog.cmo-alta-dialog,
+  body .p-dialog.jobtype-alta-dialog.cmo-modificar-dialog {
+    width: calc(100vw - 32px) !important;
+    max-width: calc(100vw - 32px) !important;
+    height: min(560px, calc(100dvh - 32px)) !important;
+    max-height: calc(100dvh - 32px) !important;
+  }
+
+  body .p-dialog.cmo-alta-dialog .cmo-alta-form {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  }
+
+  body .p-dialog.cmo-alta-dialog .jobtype-add-button {
+    grid-column: 2 !important;
+    justify-self: end !important;
+  }
+
+  body .p-dialog.cmo-modificar-dialog .cmo-modificar-form {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 600px) {
+  body .p-dialog.cmo-alta-dialog .cmo-alta-form {
+    grid-template-columns: 1fr !important;
+  }
+
+  body .p-dialog.cmo-alta-dialog .jobtype-add-button {
+    grid-column: 1 !important;
+    justify-self: end !important;
+  }
+}
+/* ===== FIN: restauracion-popups-cmo-aprobados.css ===== */
+'''.strip()
+
+          marker = '/* ===== FIN: cmo-actividad.css ===== */'
+          if marker not in css:
+              raise SystemExit('No se encontró la sección CMO en fm-global.css')
+
+          css = css.replace(marker, block + '\n\n' + marker, 1)
+          path.write_text(css.rstrip() + '\n', encoding='utf-8')
+
+          workflow = Path('.github/workflows/restore-cmo-popups.yml')
+          if workflow.exists():
+              workflow.unlink()
+          PYCODE
+
+      - name: Validar estructura y estilos
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          test "$(grep -c 'INICIO: restauracion-popups-cmo-aprobados.css' src/assets/css/fm-global.css)" -eq 1
+          test "$(grep -c 'FIN: restauracion-popups-cmo-aprobados.css' src/assets/css/fm-global.css)" -eq 1
+          grep -q 'width: min(980px, calc(100vw - 48px))' src/assets/css/fm-global.css
+          grep -q 'height: min(560px, calc(100dvh - 48px))' src/assets/css/fm-global.css
+          grep -q 'height: 36px' src/assets/css/fm-global.css
+          grep -q 'grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 120px' src/assets/css/fm-global.css
+          grep -q 'grid-template-columns: repeat(3, minmax(0, 1fr))' src/assets/css/fm-global.css
+          ! grep -R '<style' src/modules/parametrizaciones/jobtypeCMO --include='*.vue'
+          ! find src/modules/parametrizaciones/jobtypeCMO -type f -name '*.css' | grep -q .
+          test ! -f .github/workflows/restore-cmo-popups.yml
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar proyecto
+        run: npm run build
+
+      - name: Confirmar restauración validada
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Restaurar popups aprobados de CMO"
+          git push origin HEAD:CMO
