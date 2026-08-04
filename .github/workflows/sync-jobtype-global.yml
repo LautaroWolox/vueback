@@ -31,140 +31,157 @@ jobs:
           import re
           import subprocess
 
-          root = Path('.')
           css_dir = Path('src/assets/css')
           global_path = css_dir / 'fm-global.css'
           theme_path = css_dir / 'theme.css'
           main_path = Path('src/main.js')
           iframe_plugin = Path('src/plugins/responsiveIframes.js')
 
-          latest_global = subprocess.check_output(
+          global_css = subprocess.check_output(
               ['git', 'show', 'origin/main:src/assets/css/fm-global.css'],
               text=True,
           )
 
           # ABM Materiales pertenece a otra funcionalidad y no debe entrar en Jobtype.
-          latest_global = re.sub(
+          global_css = re.sub(
               r'\n?/\* ===== INICIO: abm-materiales\.css ===== \*/.*?'
               r'/\* ===== FIN: abm-materiales\.css ===== \*/\n?',
               '\n',
-              latest_global,
+              global_css,
               flags=re.DOTALL,
           ).rstrip() + '\n'
 
-          extras = []
+          extra_sections = []
+          css_files = sorted(Path('src').rglob('*.css'))
 
-          # Conserva CSS propio de esta rama que todavía no exista como sección
-          # dentro del global actual.
-          for path in sorted(css_dir.glob('*.css')):
+          # Conserva los ajustes actuales de Jobtype al final del global para que
+          # prevalezcan sobre la versión histórica ya consolidada.
+          for path in css_files:
               if path in {global_path, theme_path}:
                   continue
-              marker = f'/* ===== INICIO: {path.name} ===== */'
-              if marker not in latest_global:
-                  extras.append(path)
 
-          # Centraliza también hojas CSS pertenecientes a los módulos.
-          for path in sorted(Path('src').rglob('*.css')):
-              if path.parent == css_dir or path in {global_path, theme_path}:
-                  continue
-              extras.append(path)
-
-          seen = set()
-          ordered_extras = []
-          for path in extras:
-              resolved = path.resolve()
-              if resolved not in seen:
-                  seen.add(resolved)
-                  ordered_extras.append(path)
-
-          sections = [latest_global]
-          for path in ordered_extras:
-              relative = path.as_posix()
               content = path.read_text(encoding='utf-8').strip()
-              if not content:
+              marker = f'/* ===== INICIO: {path.name} ===== */'
+              is_jobtype = 'jobtypeContrato' in path.as_posix() or 'jobtype-contrato' in path.name
+
+              if content and (is_jobtype or marker not in global_css):
+                  extra_sections.append(
+                      '\n'.join([
+                          f'/* ===== INICIO: {path.as_posix()} ===== */',
+                          '/* [MÓDULO / PANTALLA] Ajuste vigente trasladado a fm-global.css. */',
+                          content,
+                          f'/* ===== FIN: {path.as_posix()} ===== */',
+                      ])
+                  )
+
+          # Los componentes Jobtype tampoco deben conservar bloques <style>.
+          jobtype_roots = [
+              Path('src/modules/parametrizaciones/jobtypeContrato'),
+              Path('src/modules/jobtypeContrato'),
+          ]
+          style_pattern = re.compile(r'<style(?:\s[^>]*)?>(.*?)</style>', re.DOTALL | re.IGNORECASE)
+
+          for root in jobtype_roots:
+              if not root.exists():
                   continue
-              sections.append(
-                  '\n'.join([
-                      f'/* ===== INICIO: {relative} ===== */',
-                      '/* [MÓDULO / PANTALLA] Estilos centralizados desde la rama Jobtype. */',
-                      content,
-                      f'/* ===== FIN: {relative} ===== */',
-                      '',
-                  ])
-              )
+              for vue_file in sorted(root.rglob('*.vue')):
+                  source = vue_file.read_text(encoding='utf-8')
+                  blocks = style_pattern.findall(source)
+                  for index, block in enumerate(blocks, start=1):
+                      css = block.strip()
+                      if css:
+                          extra_sections.append(
+                              '\n'.join([
+                                  f'/* ===== INICIO: {vue_file.as_posix()}#style-{index} ===== */',
+                                  '/* [MÓDULO / PANTALLA] Estilo del componente Jobtype centralizado. */',
+                                  css,
+                                  f'/* ===== FIN: {vue_file.as_posix()}#style-{index} ===== */',
+                              ])
+                          )
+                  cleaned = style_pattern.sub('', source)
+                  cleaned = re.sub(r'\n{3,}', '\n\n', cleaned).rstrip() + '\n'
+                  if cleaned != source:
+                      vue_file.write_text(cleaned, encoding='utf-8')
 
-          global_path.write_text('\n'.join(sections).rstrip() + '\n', encoding='utf-8')
+          if extra_sections:
+              global_css = global_css.rstrip() + '\n\n' + '\n\n'.join(extra_sections) + '\n'
+          global_path.write_text(global_css, encoding='utf-8')
 
-          # responsiveIframes debe leer su sección desde el único CSS global.
-          if iframe_plugin.is_file():
+          # responsiveIframes continúa leyendo sólo la sección legacy, ahora desde
+          # la única hoja CSS del proyecto.
+          if iframe_plugin.exists():
               plugin = iframe_plugin.read_text(encoding='utf-8')
-              old_import = "import legacyResponsiveCss from '@/assets/css/fm-legacy-responsive.css?raw'"
-              if old_import in plugin:
-                  replacement = """import globalCss from '@/assets/css/fm-global.css?raw'
+              raw_import = re.compile(
+                  r"^\s*import\s+legacyResponsiveCss\s+from\s+['\"]@/assets/css/"
+                  r"fm-legacy-responsive\.css\?raw['\"]\s*;?\s*$",
+                  re.MULTILINE,
+              )
+              replacement = """import globalCss from '@/assets/css/fm-global.css?raw'
 
 const LEGACY_START = '/* ===== INICIO: fm-legacy-responsive.css ===== */'
 const LEGACY_END = '/* ===== FIN: fm-legacy-responsive.css ===== */'
-
 const legacyStartIndex = globalCss.indexOf(LEGACY_START)
 const legacyEndIndex = globalCss.indexOf(LEGACY_END)
 
-if (legacyStartIndex === -1 || legacyEndIndex === -1 || legacyEndIndex <= legacyStartIndex) {
+if (legacyStartIndex === -1 || legacyEndIndex <= legacyStartIndex) {
   throw new Error('No se encontró la sección responsive legacy en fm-global.css')
 }
 
 const legacyResponsiveCss = globalCss
   .slice(legacyStartIndex + LEGACY_START.length, legacyEndIndex)
   .trim()"""
-                  plugin = plugin.replace(old_import, replacement)
-                  iframe_plugin.write_text(plugin, encoding='utf-8')
+              plugin = raw_import.sub(replacement, plugin)
+              iframe_plugin.write_text(plugin, encoding='utf-8')
 
+          # Quita importaciones locales de CSS, incluso cuando tienen comentarios
+          # al final de la línea. PrimeIcons y PrimeFlex no son rutas locales.
           local_css_import = re.compile(
-              r"^\s*import\s+['\"](?P<path>(?:\.{1,2}/|@/)[^'\"]+\.css(?:\?raw)?)['\"]\s*;?\s*$",
+              r"^\s*import\s+['\"](?P<path>(?:\.{1,2}/|@/)[^'\"]+\.css(?:\?raw)?)"
+              r"['\"]\s*;?\s*(?://.*)?$",
               re.MULTILINE,
           )
 
-          for source in Path('src').rglob('*'):
-              if not source.is_file() or source.suffix.lower() not in {'.js', '.ts', '.vue'}:
+          for source_file in Path('src').rglob('*'):
+              if not source_file.is_file() or source_file.suffix.lower() not in {'.js', '.ts', '.vue'}:
                   continue
-              text = source.read_text(encoding='utf-8')
+              source = source_file.read_text(encoding='utf-8')
 
-              def replace_import(match):
+              def remove_local_css(match):
                   imported = match.group('path')
-                  if imported.endswith('theme.css') or imported.endswith('fm-global.css'):
+                  if imported.endswith('fm-global.css') or imported.endswith('fm-global.css?raw'):
+                      return match.group(0)
+                  if imported.endswith('theme.css'):
                       return match.group(0)
                   return ''
 
-              updated = local_css_import.sub(replace_import, text)
-              updated = re.sub(r'\n{3,}', '\n\n', updated)
-              if updated != text:
-                  source.write_text(updated, encoding='utf-8')
+              cleaned = local_css_import.sub(remove_local_css, source)
+              cleaned = re.sub(r'\n{3,}', '\n\n', cleaned)
+              if cleaned != source:
+                  source_file.write_text(cleaned, encoding='utf-8')
 
-          main_text = main_path.read_text(encoding='utf-8')
-          # Debe existir exactamente una importación del CSS global.
-          main_text = re.sub(
+          # main.js carga fm-global.css una sola vez.
+          main_source = main_path.read_text(encoding='utf-8')
+          main_source = re.sub(
               r"^\s*import\s+['\"]\.\/assets\/css\/fm-global\.css['\"]\s*;?\s*$",
               '',
-              main_text,
+              main_source,
               flags=re.MULTILINE,
           )
-          anchor = "import 'primeflex/primeflex.css'"
           global_import = "import './assets/css/fm-global.css'"
-          if anchor in main_text:
-              main_text = main_text.replace(anchor, anchor + '\n' + global_import, 1)
+          anchor = "import 'primeflex/primeflex.css'"
+          if anchor in main_source:
+              main_source = main_source.replace(anchor, anchor + '\n' + global_import, 1)
           else:
-              main_text = global_import + '\n' + main_text
-          main_text = re.sub(r'\n{3,}', '\n\n', main_text)
-          main_path.write_text(main_text, encoding='utf-8')
+              main_source = global_import + '\n' + main_source
+          main_source = re.sub(r'\n{3,}', '\n\n', main_source)
+          main_path.write_text(main_source, encoding='utf-8')
 
-          # Elimina las hojas que ya fueron absorbidas por fm-global.css.
-          for path in sorted(css_dir.glob('*.css')):
-              if path not in {global_path, theme_path}:
-                  path.unlink()
-          for path in ordered_extras:
-              if path.exists() and path not in {global_path, theme_path}:
+          # Borra las hojas absorbidas; theme.css se conserva como tema base.
+          for path in css_files:
+              if path not in {global_path, theme_path} and path.exists():
                   path.unlink()
 
-          # Trae la guía de mantenimiento de la infraestructura visual actual.
+          # Documentación y archivos temporales.
           try:
               readme = subprocess.check_output(
                   ['git', 'show', 'origin/main:README_ESTILOS.md'],
@@ -174,26 +191,39 @@ const legacyResponsiveCss = globalCss
           except subprocess.CalledProcessError:
               pass
 
-          if main_path.read_text(encoding='utf-8').count(global_import) != 1:
-              raise SystemExit('main.js debe importar fm-global.css exactamente una vez')
+          Path('.github/jobtype-sync-probe.txt').unlink(missing_ok=True)
 
-          remaining_css = [
-              str(path) for path in Path('src').rglob('*.css')
-              if path not in {global_path, theme_path}
-          ]
-          if remaining_css:
-              raise SystemExit(f'Quedaron hojas CSS dispersas: {remaining_css}')
-
-          global_text = global_path.read_text(encoding='utf-8')
-          required_sections = [
+          # Validaciones estructurales antes del build.
+          final_global = global_path.read_text(encoding='utf-8')
+          required = [
               '/* ===== INICIO: fm-menu-responsive.css ===== */',
               '/* ===== INICIO: fm-menu-tuning.css ===== */',
               '/* ===== INICIO: fm-menu-spacing.css ===== */',
               '/* ===== INICIO: fm-menu-submenu-compact.css ===== */',
           ]
-          missing = [section for section in required_sections if section not in global_text]
+          missing = [marker for marker in required if marker not in final_global]
           if missing:
-              raise SystemExit(f'Faltan secciones visuales globales: {missing}')
+              raise SystemExit(f'Faltan secciones globales: {missing}')
+          if '/* ===== INICIO: abm-materiales.css ===== */' in final_global:
+              raise SystemExit('ABM Materiales no debe incorporarse a esta rama')
+          if main_path.read_text(encoding='utf-8').count(global_import) != 1:
+              raise SystemExit('main.js debe importar fm-global.css exactamente una vez')
+
+          remaining_css = [
+              path.as_posix() for path in Path('src').rglob('*.css')
+              if path not in {global_path, theme_path}
+          ]
+          if remaining_css:
+              raise SystemExit(f'Quedaron hojas CSS dispersas: {remaining_css}')
+
+          remaining_styles = []
+          for root in jobtype_roots:
+              if root.exists():
+                  for vue_file in root.rglob('*.vue'):
+                      if re.search(r'<style(?:\s|>)', vue_file.read_text(encoding='utf-8'), re.IGNORECASE):
+                          remaining_styles.append(vue_file.as_posix())
+          if remaining_styles:
+              raise SystemExit(f'Quedaron estilos locales en Jobtype: {remaining_styles}')
           PY
 
       - name: Validar aplicación
