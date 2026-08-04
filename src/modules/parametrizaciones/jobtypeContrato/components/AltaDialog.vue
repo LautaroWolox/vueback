@@ -11,6 +11,12 @@
     :style="altaDialogStyle"
     @update:visible="onVisibleChange"
   >
+    <FmTypingLoader
+      v-if="submitting"
+      overlay
+      title="Relacionando"
+      message="Guardando relaciones Jobtype-Contrato"
+    />
     <template #header>
       <div class="jobtype-alta-header">
         <h2 class="jobtype-alta-header__title">Alta Jobtype - Contrato</h2>
@@ -19,6 +25,7 @@
           class="jobtype-alta-header__close"
           title="Cerrar"
           aria-label="Cerrar"
+          :disabled="submitting"
           @click="solicitarCierre"
         >×</button>
       </div>
@@ -36,6 +43,7 @@
             optionValue="value"
             overlayClass="jobtype-alta-select-overlay"
             class="jobtype-alta-control"
+            :disabled="submitting"
             style="width: 120px !important; min-width: 120px !important; max-width: 120px !important"
           />
         </div>
@@ -48,6 +56,7 @@
             :suggestions="jobtypeSuggestions"
             optionLabel="valor"
             :minLength="4"
+            :disabled="submitting"
             class="jobtype-alta-autocomplete"
             :class="{ 'jobtype-alta-autocomplete--invalid': jobtypeInvalid }"
             :inputClass="jobtypeInputClass"
@@ -66,6 +75,7 @@
             :suggestions="contratoSuggestions"
             optionLabel="valor"
             :minLength="4"
+            :disabled="submitting"
             class="jobtype-alta-autocomplete"
             :class="{ 'jobtype-alta-autocomplete--invalid': contratoInvalid }"
             :inputClass="contratoInputClass"
@@ -86,6 +96,7 @@
             optionValue="value"
             overlayClass="jobtype-alta-select-overlay"
             class="jobtype-alta-control"
+            :disabled="submitting || form.pais === '2'"
             style="width: 120px !important; min-width: 120px !important; max-width: 120px !important"
           />
         </div>
@@ -93,6 +104,7 @@
         <FmButton
           label="AGREGAR"
           class="jobtype-add-button"
+          :disabled="!canAgregar || submitting"
           style="width: 120px !important; min-width: 120px !important; max-width: 120px !important; border-radius: 0 !important"
           @click="agregar"
         />
@@ -159,7 +171,7 @@
                   :show-export="false"
                   :show-delete="true"
                   :show-refresh="false"
-                  :delete-disabled="!altaSelectedRow"
+                  :delete-disabled="!altaSelectedRow || submitting"
                   delete-title="Eliminar"
                   @delete="eliminarPreview"
                 />
@@ -201,7 +213,7 @@
         label="RELACIONAR"
         class="jobtype-relate-button"
         style="width: 120px !important; min-width: 120px !important; max-width: 120px !important; border-radius: 0 !important"
-        :disabled="altaRows.length === 0"
+        :disabled="altaRows.length === 0 || submitting"
         @click="relacionar"
       />
     </template>
@@ -257,6 +269,12 @@
       </div>
     </template>
   </Dialog>
+
+  <FmAlertDialog
+    v-model:visible="showAlert"
+    title="Atención"
+    :message="alertMessage"
+  />
 </template>
 
 <script setup>
@@ -269,6 +287,8 @@ import Column from 'primevue/column'
 import FmButton from '@/components/shared/FmButton.vue'
 import FmGridPaginator from '@/components/shared/FmGridPaginator.vue'
 import FmGridActions from '@/components/shared/FmGridActions.vue'
+import FmAlertDialog from '@/components/shared/FmAlertDialog.vue'
+import FmTypingLoader from '@/components/shared/FmTypingLoader.vue'
 import { useJobtypeContratoStore } from '../store/jobtypeContratoStore'
 
 const props = defineProps({
@@ -276,7 +296,6 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:visible', 'relacionado'])
-
 const store = useJobtypeContratoStore()
 
 const altaDialogStyle = 'width: calc(100vw - 48px) !important; max-width: 1440px !important; height: min(680px, calc(100dvh - 48px)) !important; max-height: calc(100dvh - 48px) !important; margin: 0 !important;'
@@ -288,23 +307,7 @@ const paisOptions = [
   { label: 'PY', value: '2' }
 ]
 
-const form = reactive({
-  pais: '1',
-  jobtype: '',
-  contrato: '',
-  origen: 'FAN'
-})
-
-const origenOptions = computed(() => {
-  if (form.pais === '2') return [{ label: 'FAN', value: 'FAN' }]
-
-  return [
-    { label: '', value: '' },
-    { label: 'FAN', value: 'FAN' },
-    { label: 'MXM', value: 'MXM' }
-  ]
-})
-
+const form = reactive({ pais: '1', jobtype: '', contrato: '', origen: 'FAN' })
 const jobtypeSuggestions = ref([])
 const contratoSuggestions = ref([])
 const jobtypeSelected = ref(null)
@@ -315,33 +318,43 @@ const altaFirst = ref(0)
 const altaPageRows = ref(10)
 const showConfirmCierre = ref(false)
 const validationRequested = ref(false)
+const showAlert = ref(false)
+const alertMessage = ref('')
+const submitting = ref(false)
+
+const normalize = (value) => String(value ?? '').trim().toUpperCase()
+const normalizeCountry = (value) => {
+  const country = normalize(value).replaceAll(' ', '')
+  if (['1', 'ARG/UY', 'ARGUY', 'ARGENTINA/URUGUAY'].includes(country)) return 'ARG/UY'
+  if (['2', 'PY', 'PARAGUAY'].includes(country)) return 'PY'
+  return normalize(value)
+}
+
+const origenOptions = computed(() => form.pais === '2'
+  ? [{ label: 'FAN', value: 'FAN' }]
+  : [
+      { label: '', value: '' },
+      { label: 'FAN', value: 'FAN' },
+      { label: 'MXM', value: 'MXM' }
+    ]
+)
 
 const canAgregar = computed(() => Boolean(
   form.pais && jobtypeSelected.value && contratoSelected.value && form.origen
 ))
-
 const jobtypeInvalid = computed(() => validationRequested.value && !jobtypeSelected.value)
 const contratoInvalid = computed(() => validationRequested.value && !contratoSelected.value)
-
 const jobtypeInputClass = computed(() => [
   'jobtype-alta-control',
   { 'jobtype-alta-control--invalid': jobtypeInvalid.value }
 ])
-
 const contratoInputClass = computed(() => [
   'jobtype-alta-control',
   { 'jobtype-alta-control--invalid': contratoInvalid.value }
 ])
-
-const hayDatosCargados = computed(() => {
-  return Boolean(
-    form.jobtype ||
-    form.contrato ||
-    jobtypeSelected.value ||
-    contratoSelected.value ||
-    altaRows.value.length
-  )
-})
+const hayDatosCargados = computed(() => Boolean(
+  form.jobtype || form.contrato || jobtypeSelected.value || contratoSelected.value || altaRows.value.length
+))
 
 watch(() => form.pais, (pais) => {
   form.jobtype = ''
@@ -359,8 +372,8 @@ watch(() => form.contrato, (value) => {
   if (contratoSelected.value && value !== contratoSelected.value) contratoSelected.value = null
 })
 
-watch(() => props.visible, (val) => {
-  if (val) resetForm()
+watch(() => props.visible, (visible) => {
+  if (visible) resetForm()
 })
 
 const resetForm = () => {
@@ -375,6 +388,10 @@ const resetForm = () => {
   altaFirst.value = 0
   showConfirmCierre.value = false
   validationRequested.value = false
+  showAlert.value = false
+  alertMessage.value = ''
+  submitting.value = false
+  store.clearError()
 }
 
 const buscarJobtypes = async (event) => {
@@ -385,86 +402,118 @@ const buscarContratos = async (event) => {
   contratoSuggestions.value = await store.buscarContratos(event.query)
 }
 
-const onJobtypeSelect = (event) => {
-  jobtypeSelected.value = event.value
-}
+const onJobtypeSelect = (event) => { jobtypeSelected.value = event.value }
+const onContratoSelect = (event) => { contratoSelected.value = event.value }
+const onAltaRowClick = ({ data }) => { altaSelectedRow.value = data }
 
-const onContratoSelect = (event) => {
-  contratoSelected.value = event.value
-}
+const previewKey = (row) => [
+  normalize(row.relCodigoTarea),
+  Number(row.relContratoId || 0),
+  normalize(row.origen),
+  normalizeCountry(row.paisLabel || row.pais)
+].join('|')
+
+const isExistingActiveRelation = (preview) => store.relaciones.some((row) => {
+  if (normalize(row.activo) === 'N') return false
+
+  const sameTask = normalize(row.tareaCodigo) === normalize(preview.relCodigoTarea)
+  const sameContract = Number(row.contratoTipoId || 0) === Number(preview.relContratoId || 0) ||
+    normalize(row.contratoNombre) === normalize(preview.relContrato)
+  const sameOrigin = normalize(row.origen) === normalize(preview.origen)
+  const sameCountry = normalizeCountry(row.pais) === normalizeCountry(preview.paisLabel || preview.pais)
+  return sameTask && sameContract && sameOrigin && sameCountry
+})
 
 const agregar = () => {
   validationRequested.value = true
+  if (!canAgregar.value || submitting.value) return
 
-  if (!canAgregar.value) return
-
-  const codigo = jobtypeSelected.value.codigo
-  if (altaRows.value.some((row) => row.relCodigoTarea === codigo)) return
-
-  const paisLabel = form.pais === '1' ? 'ARG/UY' : form.pais === '2' ? 'PY' : ''
-
-  altaRows.value = [...altaRows.value, {
-    id: `${Date.now()}-${codigo}`,
-    relCodigoTarea: codigo,
+  const paisLabel = normalizeCountry(form.pais)
+  const nuevaFila = {
+    id: `${Date.now()}-${jobtypeSelected.value.codigo}-${contratoSelected.value.contratoId}`,
+    relCodigoTarea: jobtypeSelected.value.codigo,
     relTarea: jobtypeSelected.value.nombre,
-    relContratoId: contratoSelected.value.contratoId,
+    relContratoId: Number(contratoSelected.value.contratoId),
     relContrato: contratoSelected.value.nombre,
     origen: form.origen,
     pais: paisLabel,
     paisLabel
-  }]
+  }
 
+  if (altaRows.value.some((row) => previewKey(row) === previewKey(nuevaFila))) {
+    alertMessage.value = `La relación ${nuevaFila.relCodigoTarea} / ${nuevaFila.relContrato} / ${nuevaFila.origen} ya fue agregada.`
+    showAlert.value = true
+    return
+  }
+
+  if (isExistingActiveRelation(nuevaFila)) {
+    alertMessage.value = 'La relación Jobtype / Contrato / País / Origen ya existe y se encuentra activa.'
+    showAlert.value = true
+    return
+  }
+
+  altaRows.value = [...altaRows.value, nuevaFila]
+  altaSelectedRow.value = nuevaFila
   form.jobtype = ''
   form.contrato = ''
-  form.origen = form.pais ? 'FAN' : ''
+  form.origen = form.pais === '2' ? 'FAN' : ''
   jobtypeSelected.value = null
   contratoSelected.value = null
   validationRequested.value = false
 }
 
 const eliminarPreview = () => {
-  if (!altaSelectedRow.value) return
+  if (!altaSelectedRow.value || submitting.value) return
   altaRows.value = altaRows.value.filter((row) => row.id !== altaSelectedRow.value.id)
   altaSelectedRow.value = null
 }
 
-const onAltaRowClick = ({ data }) => {
-  altaSelectedRow.value = data
-}
-
 const relacionar = async () => {
-  if (!altaRows.value.length) return
+  if (!altaRows.value.length || submitting.value) return
 
-  const payload = altaRows.value.map((row) => ({
-    relCodigoTarea: row.relCodigoTarea,
-    relTarea: row.relTarea,
-    relContratoId: row.relContratoId,
-    relContrato: row.relContrato,
-    pais: row.pais
-  }))
+  const duplicates = altaRows.value.filter(isExistingActiveRelation)
+  if (duplicates.length) {
+    alertMessage.value = `Ya existe una relación activa para: ${duplicates.map((row) => row.relCodigoTarea).join(', ')}.`
+    showAlert.value = true
+    return
+  }
 
+  submitting.value = true
+  store.clearError()
   try {
-    const errores = await store.crearRelaciones(payload)
+    const errores = await store.crearRelaciones(
+      altaRows.value.map(({ relCodigoTarea, relTarea, relContratoId, relContrato, origen, pais }) => ({
+        relCodigoTarea,
+        relTarea,
+        relContratoId,
+        relContrato,
+        origen,
+        pais
+      }))
+    )
 
-    if (errores.length === 0) {
-      emit('update:visible', false)
-      emit('relacionado')
-    } else if (errores.length === 1) {
-      console.warn(errores[0].mensaje)
-      emit('update:visible', false)
-      emit('relacionado')
-    } else {
-      const msgs = errores.map((e) => e.tareaCodigo).join(', ')
-      console.warn('Ya existe relación para los jobtypes:', msgs)
-      emit('update:visible', false)
-      emit('relacionado')
+    if (errores.length) {
+      alertMessage.value = errores
+        .map((error) => error.mensaje || `No se pudo relacionar ${error.tareaCodigo}`)
+        .join(String.fromCharCode(10))
+      showAlert.value = true
+      return
     }
-  } catch {
-    // error already in store.error
+
+    cerrar()
+    emit('relacionado')
+  } catch (error) {
+    alertMessage.value = error instanceof Error
+      ? error.message
+      : (store.error || 'Error de conexión. Contacte al administrador')
+    showAlert.value = true
+  } finally {
+    submitting.value = false
   }
 }
 
 const solicitarCierre = () => {
+  if (submitting.value) return
   if (hayDatosCargados.value) {
     showConfirmCierre.value = true
     return
@@ -472,14 +521,11 @@ const solicitarCierre = () => {
   cerrar()
 }
 
-const onVisibleChange = (val) => {
-  if (!val) solicitarCierre()
+const onVisibleChange = (visible) => {
+  if (!visible) solicitarCierre()
 }
 
-const cancelarCierre = () => {
-  showConfirmCierre.value = false
-}
-
+const cancelarCierre = () => { showConfirmCierre.value = false }
 const confirmarCierre = () => {
   showConfirmCierre.value = false
   cerrar()
@@ -490,152 +536,3 @@ const cerrar = () => {
   emit('update:visible', false)
 }
 </script>
-
-<style scoped>
-.jobtype-alta-unsaved__header {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.jobtype-alta-unsaved__header-main {
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.jobtype-alta-unsaved__icon-circle {
-  width: 48px;
-  height: 48px;
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: #e9f8fa;
-}
-
-.jobtype-alta-unsaved__header-icon {
-  color: #11aabd;
-  font-size: 23px;
-}
-
-.jobtype-alta-unsaved__title {
-  color: #252b33;
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.jobtype-alta-unsaved__close {
-  width: 28px;
-  height: 28px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: #c7c7c7;
-  font-size: 22px;
-  font-weight: 700;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.jobtype-alta-unsaved__close:hover {
-  color: #00a9bd;
-}
-
-.jobtype-alta-unsaved__content {
-  min-height: 72px;
-  display: flex;
-  align-items: center;
-  padding: 18px 4px;
-}
-
-.jobtype-alta-unsaved__message {
-  color: #4b5563;
-  font-size: 15px;
-  line-height: 1.35;
-}
-
-.jobtype-alta-unsaved__actions {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-.jobtype-alta-unsaved__button {
-  appearance: none;
-  width: 100px;
-  min-width: 100px;
-  height: 30px;
-  min-height: 30px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 12px;
-  border: 1px solid #00acc1;
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1;
-  box-shadow: none;
-  outline: none;
-  cursor: pointer;
-}
-
-.jobtype-alta-unsaved__button--cancel {
-  background: #fff;
-  color: #0097a7;
-}
-
-.jobtype-alta-unsaved__button--accept {
-  background: #00acc1;
-  color: #fff;
-}
-
-:global(.p-dialog.jobtype-alta-unsaved-dialog) {
-  overflow: hidden;
-  border: 1px solid #bdbdbd;
-  border-radius: 0;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, .28);
-}
-
-:global(.jobtype-alta-unsaved-dialog .p-dialog-header) {
-  min-height: 68px;
-  padding: 12px 18px;
-  border-bottom: 1px solid #dedede;
-  background: #fff;
-}
-
-:global(.jobtype-alta-unsaved-dialog .p-dialog-content) {
-  padding: 0 18px;
-  background: #fff;
-}
-
-:global(.jobtype-alta-unsaved-dialog .p-dialog-footer) {
-  min-height: 60px;
-  display: flex;
-  align-items: center;
-  padding: 10px 18px;
-  border-top: 1px solid #dedede;
-  background: #fff;
-}
-
-:global(.p-dialog.jobtype-alta-dialog input.jobtype-alta-control--invalid),
-:global(.p-dialog.jobtype-alta-dialog input.jobtype-alta-control--invalid:hover),
-:global(.p-dialog.jobtype-alta-dialog input.jobtype-alta-control--invalid:focus) {
-  border: 1px solid #e57373 !important;
-  background-color: #fffafa !important;
-  box-shadow: 0 0 0 1px rgba(229, 115, 115, .28) inset !important;
-  outline: none !important;
-}
-</style>

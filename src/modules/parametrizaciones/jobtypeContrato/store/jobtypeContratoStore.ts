@@ -6,6 +6,7 @@ export interface JobTypeContratoRow {
   tareaCodigo: string
   tareaNombre: string
   contratoNombre: string
+  origen?: string
   legajoModificacion: string
   fechaModificacion: string
   activo: string
@@ -24,6 +25,7 @@ export interface NuevaRelacion {
   relTarea: string
   relContratoId: number
   relContrato: string
+  origen: string
   pais: string
 }
 
@@ -40,112 +42,74 @@ export interface ContratoItem {
   valor?: string
 }
 
+const DEFAULT_ERROR = 'Error de conexión. Contacte al administrador'
+
 export const useJobtypeContratoStore = defineStore('jobtypeContrato', () => {
   const relaciones = ref<JobTypeContratoRow[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
 
-  const fetchRelaciones = async (): Promise<void> => {
+  const clearError = () => { error.value = null }
+
+  const withLoading = async <T>(operation: () => Promise<T>): Promise<T> => {
     loading.value = true
     error.value = null
-
     try {
-      const response = await fetch('/pc/jobtypeContrato/getJobTypes.html')
-
-      if (!response.ok) throw new Error('Error de conexión. Contacte al administrador')
-
-      const data: JobTypeContratoRow[] = await response.json()
-      relaciones.value = data
-    } catch (e: unknown) {
-      error.value = e instanceof Error ? e.message : 'Error de conexión. Contacte al administrador'
-      throw e
+      return await operation()
+    } catch (exception: unknown) {
+      error.value = exception instanceof Error ? exception.message : DEFAULT_ERROR
+      throw exception
     } finally {
       loading.value = false
     }
   }
 
-  const crearRelaciones = async (nuevas: NuevaRelacion[]): Promise<JobTypeContratoError[]> => {
-    loading.value = true
-    error.value = null
+  const fetchRelaciones = (): Promise<void> => withLoading(async () => {
+    const response = await fetch('/pc/jobtypeContrato/getJobTypes.html')
+    if (!response.ok) throw new Error(DEFAULT_ERROR)
+    relaciones.value = await response.json()
+  })
 
-    try {
-      const response = await fetch('/pc/jobtypeContrato/nuevaRelJobtypeContrato.html', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ nuevasRelaciones: JSON.stringify(nuevas) })
-      })
+  const crearRelaciones = (nuevas: NuevaRelacion[]): Promise<JobTypeContratoError[]> => withLoading(async () => {
+    const response = await fetch('/pc/jobtypeContrato/nuevaRelJobtypeContrato.html', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ nuevasRelaciones: JSON.stringify(nuevas) })
+    })
+    if (!response.ok) throw new Error(DEFAULT_ERROR)
+    return await response.json()
+  })
 
-      if (!response.ok) throw new Error('Error de conexión. Contacte al administrador')
-
-      const errores: JobTypeContratoError[] = await response.json()
-      return errores
-    } catch (e: unknown) {
-      error.value = e instanceof Error ? e.message : 'Error de conexión. Contacte al administrador'
-      throw e
-    } finally {
-      loading.value = false
-    }
-  }
-
-  const actualizarRelacion = async (
+  const actualizarRelacion = (
     tareaContratoId: number,
-    tipoContratoId: number
-  ): Promise<JobTypeContratoRow> => {
-    loading.value = true
-    error.value = null
+    tipoContratoId: number,
+    origen: string
+  ): Promise<JobTypeContratoRow> => withLoading(async () => {
+    const params = new URLSearchParams({
+      tareaContratoId: String(tareaContratoId),
+      tipoContratoId: String(tipoContratoId),
+      origen
+    })
+    const response = await fetch(`/pc/jobtypeContrato/actualizarJobtype.html?${params}`)
+    if (!response.ok) throw new Error(DEFAULT_ERROR)
+    return await response.json()
+  })
 
-    try {
-      const params = new URLSearchParams({
-        tareaContratoId: String(tareaContratoId),
-        tipoContratoId: String(tipoContratoId)
-      })
-
-      const response = await fetch(`/pc/jobtypeContrato/actualizarJobtype.html?${params}`)
-
-      if (!response.ok) throw new Error('Error de conexión. Contacte al administrador')
-
-      const data: JobTypeContratoRow = await response.json()
-      return data
-    } catch (e: unknown) {
-      error.value = e instanceof Error ? e.message : 'Error de conexión. Contacte al administrador'
-      throw e
-    } finally {
-      loading.value = false
-    }
-  }
-
-  const desactivarRelacion = async (idRelacion: number): Promise<JobTypeContratoRow> => {
-    loading.value = true
-    error.value = null
-
-    try {
-      const response = await fetch('/pc/jobtypeContrato/desactivarRelJobContrato.html', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ idRelacion: String(idRelacion) })
-      })
-
-      if (!response.ok) throw new Error('Error de conexión. Contacte al administrador')
-
-      const data: JobTypeContratoRow = await response.json()
-      return data
-    } catch (e: unknown) {
-      error.value = e instanceof Error ? e.message : 'Error de conexión. Contacte al administrador'
-      throw e
-    } finally {
-      loading.value = false
-    }
-  }
+  const desactivarRelacion = (idRelacion: number): Promise<JobTypeContratoRow> => withLoading(async () => {
+    const response = await fetch('/pc/jobtypeContrato/desactivarRelJobContrato.html', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ idRelacion: String(idRelacion) })
+    })
+    if (!response.ok) throw new Error(DEFAULT_ERROR)
+    return await response.json()
+  })
 
   const buscarJobtypes = async (phrase: string, pais: string): Promise<AutocompleteItem[]> => {
     if (phrase.length <= 3) return []
-
     try {
       const response = await fetch(`/pc/jobtypeContrato/getJobTypeTarea/${encodeURIComponent(phrase)}/${encodeURIComponent(pais)}.html`)
-
-      if (!response.ok) return []
-
-      return await response.json()
+      return response.ok ? await response.json() : []
     } catch {
       return []
     }
@@ -153,13 +117,9 @@ export const useJobtypeContratoStore = defineStore('jobtypeContrato', () => {
 
   const buscarContratos = async (phrase: string): Promise<ContratoItem[]> => {
     if (phrase.length <= 3) return []
-
     try {
       const response = await fetch(`/pc/jobtypeContrato/getContrato/${encodeURIComponent(phrase)}.html`)
-
-      if (!response.ok) return []
-
-      return await response.json()
+      return response.ok ? await response.json() : []
     } catch {
       return []
     }
@@ -169,6 +129,7 @@ export const useJobtypeContratoStore = defineStore('jobtypeContrato', () => {
     relaciones,
     loading,
     error,
+    clearError,
     fetchRelaciones,
     crearRelaciones,
     actualizarRelacion,

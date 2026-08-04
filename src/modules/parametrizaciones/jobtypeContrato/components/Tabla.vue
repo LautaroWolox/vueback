@@ -1,6 +1,7 @@
 <template>
   <DataTable
     id="tabla-jobtype-contrato"
+    ref="dataTableRef"
     v-model:filters="filtersModel"
     v-model:selection="selectionModel"
     v-model:first="firstModel"
@@ -15,6 +16,8 @@
     sortMode="multiple"
     filterDisplay="row"
     selectionMode="single"
+    :rowSelectable="isRowSelectable"
+    :rowClass="rowClass"
     paginator
     :rowsPerPageOptions="[100, 250, 500]"
     :resizableColumns="true"
@@ -61,8 +64,8 @@
             :show-refresh="false"
             :show-edit="true"
             :show-add="true"
-            :delete-disabled="!selectionModel"
-            :edit-disabled="!selectionModel"
+            :delete-disabled="!canOperate"
+            :edit-disabled="!canOperate"
             export-title="Descargar"
             delete-title="Desactivar"
             edit-title="Editar"
@@ -113,7 +116,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import InputText from 'primevue/inputtext'
@@ -140,6 +143,8 @@ const emit = defineEmits([
   'add'
 ])
 
+const dataTableRef = ref(null)
+
 const filtersModel = computed({
   get: () => props.filters,
   set: (value) => emit('update:filters', value)
@@ -160,12 +165,28 @@ const rowsModel = computed({
   set: (value) => emit('update:rows', value)
 })
 
+const normalize = (value) => String(value ?? '').trim().toUpperCase()
+const isRowActive = (row) => normalize(row?.activo) !== 'N'
+const isRowSelectable = (event) => isRowActive(event?.data ?? event)
+const rowClass = (row) => isRowActive(row) ? '' : 'jobtype-row-inactive fm-disabled-row'
+const canOperate = computed(() => Boolean(selectionModel.value && isRowActive(selectionModel.value)))
+
 const onRowClick = ({ data }) => {
-  emit('update:selectedRow', data)
+  emit('update:selectedRow', isRowActive(data) ? data : null)
 }
 
 const clearFilter = (filterModel, filterCallback) => {
   filterModel.value = null
   filterCallback()
 }
+
+const getExportData = () => {
+  const rows = dataTableRef.value?.filteredValue ?? props.relaciones
+  const fields = props.columns
+    .filter((column) => column.exportable !== false)
+    .map((column) => column.field)
+  return { rows, fields }
+}
+
+defineExpose({ getExportData })
 </script>
