@@ -1,1 +1,1 @@
-Trigger definitivo actualizado después de abrir el PR.
+Trigger definitivo actualizado con workflow v2.
