@@ -5,3 +5,4 @@ Cuarto intento: sintaxis YAML validada para el extractor anidado.
 Quinto intento: insumos TypeScript y CSS completos cargados temporalmente.
 Sexto intento: diagnóstico individual de todas las verificaciones.
 Séptimo intento: prioridad a la edición corregida con validación de duplicados.
+Octavo intento: inversión controlada de la prioridad de fuentes.
