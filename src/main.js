@@ -2,9 +2,6 @@
 import 'primeicons/primeicons.css'
 import 'primeflex/primeflex.css'
 import './assets/css/fm-global.css'
-import './modules/parametrizaciones/jobtypeContrato/styles/jobtype-contrato.css'
-import './modules/parametrizaciones/jobtypeContrato/styles/jobtypeContratoSingleRow.css'
-
 import Lara from '@primeuix/themes/lara'
 import { definePreset } from '@primeuix/themes'
 import { createApp } from 'vue'

@@ -1,10 +1,10 @@
 <template>
   <div class="jobtype-screen">
     <FmTypingLoader
-      v-if="store.loading"
+      v-if="store.loading && !showAlta && !showEditar && !showDesactivar"
       overlay
       title="Cargando relaciones"
-      message="Consultando Jobtype-Contrato"
+      message="Procesando Jobtype-Contrato"
     />
 
     <section class="jobtype-panel jobtype-panel--filters">
@@ -49,7 +49,7 @@
           v-model:selection="selectedRow"
           v-model:first="mainFirst"
           v-model:rows="mainPageRows"
-          class="jobtype-main-grid"
+          class="jobtype-main-grid fm-pass-grid"
           :value="store.relaciones"
           dataKey="tareaContratoId"
           tableStyle="table-layout: fixed; width: 100%; min-width: 100%"
@@ -59,13 +59,19 @@
           sortMode="multiple"
           filterDisplay="row"
           selectionMode="single"
+          :rowSelectable="isRowSelectable"
+          :rowClass="rowClass"
           paginator
-          :rowsPerPageOptions="[100, 250, 500]"
+          :rowsPerPageOptions="ROWS_OPTIONS"
           :resizableColumns="true"
           columnResizeMode="fit"
           showGridlines
           @row-click="onRowClick"
         >
+          <template #empty>
+            <div class="fm-grid-empty">No hay resultados</div>
+          </template>
+
           <template
             #paginatorcontainer="{
               first,
@@ -89,7 +95,7 @@
               :page-count="pageCount"
               :rows="rows"
               :total-records="totalRecords"
-              :rows-options="[100, 250, 500]"
+              :rows-options="ROWS_OPTIONS"
               :show-rows-select="true"
               :show-counter="true"
               :counter-text="totalRecords === 0 ? 'No hay resultados' : ''"
@@ -105,16 +111,16 @@
                   :show-refresh="false"
                   :show-edit="true"
                   :show-add="true"
-                  :delete-disabled="!selectedRow"
-                  :edit-disabled="!selectedRow"
+                  :delete-disabled="!puedeOperarSeleccion"
+                  :edit-disabled="!puedeOperarSeleccion"
                   export-title="Descargar"
                   delete-title="Desactivar"
                   edit-title="Editar"
                   add-title="Nueva relación"
                   @export="exportarExcel"
-                  @delete="showDesactivar = true"
+                  @delete="solicitarDesactivacion"
                   @edit="editarSeleccionado"
-                  @add="showAlta = true"
+                  @add="abrirAlta"
                 />
               </template>
             </FmGridPaginator>
@@ -143,10 +149,13 @@
                   type="text"
                   @input="filterCallback()"
                 />
-                <span
+                <button
+                  type="button"
                   class="jobtype-filter-clear"
+                  title="Limpiar filtro"
+                  aria-label="Limpiar filtro"
                   @click="clearFilter(filterModel, filterCallback)"
-                >x</span>
+                >×</button>
               </div>
             </template>
 
@@ -169,6 +178,7 @@
       v-model:visible="showEditar"
       :tarea-contrato-id="editForm.tareaContratoId"
       :contrato-tipo-id="editForm.contratoTipoId"
+      :jobtype-codigo="editForm.jobtypeCodigo"
       :jobtype="editForm.jobtype"
       :contrato-actual="editForm.contratoActual"
       :pais="editForm.pais"
@@ -184,7 +194,7 @@
     <FmAlertDialog
       v-model:visible="showError"
       title="Error"
-      :message="store.error ?? ''"
+      :message="errorMessage"
     />
   </div>
 </template>
@@ -195,9 +205,8 @@ import { FilterMatchMode } from '@primevue/core/api'
 import AltaJobtypeContratoDialog from '../dialogs/AltaJobtypeContratoDialog.vue'
 import EditarJobtypeContratoDialog from '../dialogs/EditarJobtypeContratoDialog.vue'
 import ConfirmarDesactivacionDialog from '../dialogs/ConfirmarDesactivacionDialog.vue'
-import { JOBTYPE_CONTRATO_COLUMNS } from '../config/columns'
+import { JOBTYPE_CONTRATO_COLUMNS, ROWS_OPTIONS } from '../config/columns'
 import { useJobtypeContratoStore } from '../store/jobtypeContratoStore'
-import '../styles/jobtypeContratoDialogs.css'
 
 const store = useJobtypeContratoStore()
 
@@ -205,15 +214,17 @@ const filtersExpanded = ref(true)
 const resultsExpanded = ref(false)
 const selectedRow = ref(null)
 const mainFirst = ref(0)
-const mainPageRows = ref(100)
+const mainPageRows = ref(ROWS_OPTIONS[0])
 const showAlta = ref(false)
 const showEditar = ref(false)
 const showDesactivar = ref(false)
 const showError = ref(false)
+const localError = ref('')
 
 const editForm = ref({
   tareaContratoId: 0,
   contratoTipoId: 0,
+  jobtypeCodigo: '',
   jobtype: '',
   contratoActual: '',
   pais: '',
@@ -222,6 +233,8 @@ const editForm = ref({
 
 const columns = JOBTYPE_CONTRATO_COLUMNS
 const visibleColumns = computed(() => columns.filter((col) => !col.hidden))
+const errorMessage = computed(() => localError.value || store.error || 'Ocurrió un error inesperado')
+const puedeOperarSeleccion = computed(() => Boolean(selectedRow.value && isRowActive(selectedRow.value)))
 
 const mainFilters = ref(
   Object.fromEntries(
@@ -231,19 +244,44 @@ const mainFilters = ref(
   )
 )
 
+const normalizeFlag = (value) => String(value ?? '').trim().toUpperCase()
+const isRowActive = (row) => normalizeFlag(row?.activo) !== 'N'
+const isRowSelectable = (event) => isRowActive(event?.data ?? event)
+const rowClass = (data) => (isRowActive(data) ? '' : 'jobtype-row-inactive fm-disabled-row')
+
+const reportError = (error) => {
+  localError.value = error instanceof Error ? error.message : (store.error || 'Error de conexión. Contacte al administrador')
+  showError.value = true
+}
+
 const buscar = async () => {
   resultsExpanded.value = true
   mainFirst.value = 0
   selectedRow.value = null
+  localError.value = ''
 
   try {
     await store.fetchRelaciones()
-  } catch {
-    showError.value = true
+  } catch (error) {
+    reportError(error)
+  }
+}
+
+const abrirAlta = async () => {
+  localError.value = ''
+  try {
+    if (!store.relaciones.length) await store.fetchRelaciones()
+    showAlta.value = true
+  } catch (error) {
+    reportError(error)
   }
 }
 
 const onRowClick = ({ data }) => {
+  if (!isRowActive(data)) {
+    selectedRow.value = null
+    return
+  }
   selectedRow.value = data
 }
 
@@ -253,58 +291,61 @@ const clearFilter = (filterModel, filterCallback) => {
 }
 
 const editarSeleccionado = () => {
-  if (!selectedRow.value) return
+  if (!puedeOperarSeleccion.value) return
 
   editForm.value = {
     tareaContratoId: selectedRow.value.tareaContratoId,
     contratoTipoId: selectedRow.value.contratoTipoId,
-    jobtype: selectedRow.value.tareaNombre,
-    contratoActual: selectedRow.value.contratoNombre,
-    pais: selectedRow.value.pais,
+    jobtypeCodigo: selectedRow.value.tareaCodigo ?? '',
+    jobtype: selectedRow.value.tareaNombre ?? '',
+    contratoActual: selectedRow.value.contratoNombre ?? '',
+    pais: selectedRow.value.pais ?? '',
     origenActual: selectedRow.value.origen ?? ''
   }
   showEditar.value = true
 }
 
+const solicitarDesactivacion = () => {
+  if (!puedeOperarSeleccion.value) return
+  showDesactivar.value = true
+}
+
 const onDesactivacionConfirmada = async () => {
-  if (!selectedRow.value) return
+  if (!puedeOperarSeleccion.value) return
 
   try {
     await store.desactivarRelacion(selectedRow.value.tareaContratoId)
     selectedRow.value = null
     await store.fetchRelaciones()
-  } catch {
-    showError.value = true
+  } catch (error) {
+    reportError(error)
   }
 }
 
-const onRelacionado = async () => {
+const refrescarDespuesDeCambio = async () => {
   selectedRow.value = null
+  mainFirst.value = 0
+  resultsExpanded.value = true
   try {
     await store.fetchRelaciones()
-  } catch {
-    showError.value = true
+  } catch (error) {
+    reportError(error)
   }
 }
 
-const onActualizado = async () => {
-  selectedRow.value = null
-  try {
-    await store.fetchRelaciones()
-  } catch {
-    showError.value = true
-  }
-}
+const onRelacionado = () => refrescarDespuesDeCambio()
+const onActualizado = () => refrescarDespuesDeCambio()
 
 const exportarExcel = () => {
   if (!store.relaciones.length) return
 
   const exportCols = columns.filter((column) => column.exportable)
-  const headers = exportCols.map((column) => column.header)
+  const escapeCsv = (value) => `"${String(value ?? '').replaceAll('"', '""')}"`
+  const headers = exportCols.map((column) => escapeCsv(column.header))
   const lines = store.relaciones.map((row) =>
-    exportCols.map((column) => JSON.stringify(row[column.field] ?? '')).join(',')
+    exportCols.map((column) => escapeCsv(row[column.field])).join(',')
   )
-  const csv = [headers.join(','), ...lines].join('\n')
+  const csv = `\uFEFF${[headers.join(','), ...lines].join('\n')}`
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
   const url = URL.createObjectURL(blob)
   const anchor = document.createElement('a')
@@ -315,45 +356,3 @@ const exportarExcel = () => {
   URL.revokeObjectURL(url)
 }
 </script>
-
-<style scoped>
-.jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-tbody > tr.p-datatable-row-selected > td),
-.jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-tbody > tr.p-datatable-row-selected:hover > td),
-.jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-tbody > tr[data-p-selected='true'] > td),
-.jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-tbody > tr[data-p-selected='true']:hover > td),
-.jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-tbody > tr[aria-selected='true'] > td),
-.jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-tbody > tr[aria-selected='true']:hover > td) {
-  background: #9ee7ee !important;
-  color: #111 !important;
-}
-
-.jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-tbody > tr.p-datatable-row-selected > td *),
-.jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-tbody > tr[data-p-selected='true'] > td *),
-.jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-tbody > tr[aria-selected='true'] > td *) {
-  color: #111 !important;
-}
-
-.jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-emptymessage > td),
-.jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-empty-message > td) {
-  position: relative !important;
-  height: 120px !important;
-  padding: 0 !important;
-  text-align: center !important;
-  vertical-align: middle !important;
-  background: #e8f9fc !important;
-  color: transparent !important;
-}
-
-.jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-emptymessage > td)::after,
-.jobtype-screen :deep(#tabla-jobtype-contrato .p-datatable-empty-message > td)::after {
-  content: 'No hay resultados';
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #075f6d;
-  font-size: 12px;
-  font-weight: 400;
-}
-</style>

@@ -16,6 +16,8 @@ import type {
   NuevaRelacion
 } from '../models/types'
 
+const DEFAULT_ERROR = 'Error de conexión. Contacte al administrador'
+
 export const useJobtypeContratoStore = defineStore('jobtypeContrato', () => {
   const relaciones = ref<JobTypeContratoRow[]>([])
   const loading = ref(false)
@@ -26,13 +28,15 @@ export const useJobtypeContratoStore = defineStore('jobtypeContrato', () => {
     error.value = null
     try {
       return await fn()
-    } catch (e: unknown) {
-      error.value = e instanceof Error ? e.message : 'Error de conexión. Contacte al administrador'
-      throw e
+    } catch (exception: unknown) {
+      error.value = exception instanceof Error ? exception.message : DEFAULT_ERROR
+      throw exception
     } finally {
       loading.value = false
     }
   }
+
+  const clearError = () => { error.value = null }
 
   const fetchRelaciones = (): Promise<void> =>
     withLoading(async () => {
@@ -45,7 +49,7 @@ export const useJobtypeContratoStore = defineStore('jobtypeContrato', () => {
   const actualizarRelacion = (
     tareaContratoId: number,
     tipoContratoId: number,
-    origen?: string
+    origen: string
   ): Promise<JobTypeContratoRow> =>
     withLoading(() => apiActualizarRelacion(tareaContratoId, tipoContratoId, origen))
 
@@ -62,6 +66,7 @@ export const useJobtypeContratoStore = defineStore('jobtypeContrato', () => {
     relaciones,
     loading,
     error,
+    clearError,
     fetchRelaciones,
     crearRelaciones,
     actualizarRelacion,
