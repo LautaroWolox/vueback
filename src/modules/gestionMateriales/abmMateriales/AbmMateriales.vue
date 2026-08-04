@@ -249,6 +249,7 @@ const onMaterialCreated = () => {
   line-height: 0 !important;
   opacity: 1 !important;
   visibility: visible !important;
+  transform: translate(2px, 1px) !important;
 }
 
 .abm-materiales-dialog-close-icon::before,
