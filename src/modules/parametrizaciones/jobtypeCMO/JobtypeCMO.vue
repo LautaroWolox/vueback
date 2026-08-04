@@ -1,5 +1,8 @@
 <template>
-  <div class="jobtype-screen cmo-actividad-page">
+  <div
+    class="jobtype-screen cmo-actividad-page"
+    :class="{ 'jobtype-contrato-screen--grid-expanded': resultsExpanded }"
+  >
     <section class="jobtype-panel jobtype-panel--filters">
       <button
         type="button"
