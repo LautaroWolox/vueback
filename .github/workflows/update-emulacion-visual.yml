@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - Emulacion
+  pull_request:
+    branches:
+      - Emulacion
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: write
@@ -51,7 +55,6 @@ jobs:
               text = text.replace('<i class="pi pi-shield"></i>', '<i class="pi pi-key"></i>')
               path.write_text(text, encoding='utf-8')
 
-          # Extraer todos los estilos locales del módulo para mantener una única fuente global.
           extracted = []
           for path in sorted(module.rglob('*.vue')):
               text = path.read_text(encoding='utf-8')
