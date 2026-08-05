@@ -1,10 +1,10 @@
 <template>
   <div class="fm-field fm-field--span-4 emulation-legajo-field">
-    <label for="legajo">Legajo</label>
+    <label for="legajo">LEGAJO</label>
 
     <div class="emulation-legajo-control">
       <span class="emulation-legajo-icon" aria-hidden="true">
-        <i class="pi pi-id-card"></i>
+        <i class="pi pi-user"></i>
       </span>
 
       <InputText

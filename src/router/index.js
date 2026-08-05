@@ -16,8 +16,7 @@ const allowed = (to, from, next) => {
     return;
   } else if (autenticado && (
     rutasPermitidas.includes(to.name) ||
-    (to.name === 'JOCM' && rutasPermitidas.includes('JOCO')) ||
-    (to.name === 'ABMM' && import.meta.env.DEV)
+    (to.name === 'JOCM' && rutasPermitidas.includes('JOCO'))
   )) {
     next();
     return;
@@ -42,7 +41,19 @@ const routes = [
   {
     path: '/FM/detallActa.html',
     name: 'DEAC',
-    component: () => import('../views/DetalleView.vue'),
+    component: () => import('../modules/certificacionContratista/views/DocumentoDetalleView.vue'),
+    props: () => {
+      const legacyUrl = sessionStorage.getItem('urlDetalle') || ''
+      const tipo = legacyUrl.includes('Debito')
+        ? 'nota-debito'
+        : legacyUrl.includes('Credito')
+          ? 'nota-credito'
+          : 'acta'
+      return {
+        tipo,
+        numero: sessionStorage.getItem('nroActa') || ''
+      }
+    }
   },
   {
     path: '/FM',
@@ -119,7 +130,11 @@ const routes = [
         path: 'abmMateriales.html',
         name: 'ABMM',
         beforeEnter: allowed,
-        component: () => import('../modules/gestionMateriales/abmMateriales/AbmMateriales.vue')
+        component: () => import('../views/IframeView.vue'),
+        props: {
+          urlParam: '/abmMateriales.html',
+          titleParam: 'ABM Materiales'
+        }
       },
       {
         path: 'gestionErrores.html',
@@ -231,89 +246,82 @@ const routes = [
         path: 'jobtypeContrato.html',
         name: 'JOCO',
         beforeEnter: allowed,
-        component: () => import('../modules/parametrizaciones/jobtypeContrato/JobtypeContrato.vue')
+        component: () => import('../views/IframeView.vue'),
+        props: {
+          urlParam: '/jobtypeContrato.html',
+          titleParam: 'Jobtype - Contrato'
+        }
       },
       {
         path: 'jobtypeCMO.html',
         name: 'JOCM',
         beforeEnter: allowed,
-        component: () => import('../modules/parametrizaciones/jobtypeCMO/JobtypeCMO.vue')
+        component: () => import('../views/IframeView.vue'),
+        props: {
+          urlParam: '/jobtypeCMO.html',
+          titleParam: 'CMO - Actividad'
+        }
       },
       {
         path: 'consultarActas.html',
         name: 'COAC',
         beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/consultarActas.html',
-          titleParam: 'consultarActas'
-        }
+        component: () => import('../modules/certificacionContratista/views/DocumentosListView.vue'),
+        props: { documentType: 'ACTA' }
       },
       {
         path: 'ordenTrabajoSinActa.html',
         name: 'COSA',
         beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/consultarOtSinACTA.html',
-          titleParam: 'consultar ots sin acta'
-        }
+        component: () => import('../modules/certificacionContratista/views/OtsSinActaView.vue')
       },
       {
         path: 'consultarNotaDebito.html',
         name: 'NODE',
         beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/consultarNotaDebito.html',
-          titleParam: 'consultar notas debito'
-        }
+        component: () => import('../modules/certificacionContratista/views/DocumentosListView.vue'),
+        props: { documentType: 'NOTA_DEBITO' }
       },
       {
         path: 'consultarNotaCredito.html',
         name: 'NOCR',
         beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/consultarNotaCredito.html',
-          titleParam: 'consultar notas credito'
-        }
+        component: () => import('../modules/certificacionContratista/views/DocumentosListView.vue'),
+        props: { documentType: 'NOTA_CREDITO' }
+      },
+      {
+        path: 'certificacion/:tipo/:numero',
+        name: 'CECO_DETALLE',
+        component: () => import('../modules/certificacionContratista/views/DocumentoDetalleView.vue'),
+        props: true
       },
       {
         path: 'consultarReglas.html',
         name: 'CORE',
         beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/consultarReglas.html',
-          titleParam: 'Consultar Reglas'
-        }
+        component: () => import('../modules/certificacionContratista/views/ConsultarReglasView.vue')
       },
       {
         path: 'monitoreoEjecucionreglas.html',
         name: 'MORE',
         beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/monitoreoEjecucionreglas.html',
-          titleParam: 'Monitoreo y Ejecución de Reglas'
-        }
+        component: () => import('../modules/certificacionContratista/views/MonitoreoReglasView.vue')
       },
       {
         path: 'pruebasMasivas.html',
         name: 'PUMA',
         beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/pruebasMasivas.html',
-          titleParam: 'Regla Prueba Masiva'
-        }
+        component: () => import('../modules/certificacionContratista/views/PruebasMasivasView.vue')
       },
       {
         path: 'registroOTFallidasReproceso.html',
         name: 'ROTF',
         beforeEnter: allowed,
-        component: () => import('../modules/otFallidasCT/OtFallidasCT.vue')
+        component: () => import('../views/IframeView.vue'),
+        props: {
+          urlParam: '/registroOTFallidasReproceso.html',
+          titleParam: 'Registro de OTs Fallidas para Reproceso'
+        }
       },
       {
         path: 'busquedaOtsGcc.html',
@@ -322,9 +330,9 @@ const routes = [
         component: () => import('../views/IframeView.vue'),
         props: {
           urlParam: '/busquedaOtsGcc.html',
-          titleParam: 'Búsqueda de Ots'
+          titleParam: 'Búsqueda de OTs'
         }
-      }
+      },
     ]
   }
 ]
