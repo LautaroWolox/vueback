@@ -16,8 +16,7 @@ const allowed = (to, from, next) => {
     return;
   } else if (autenticado && (
     rutasPermitidas.includes(to.name) ||
-    (to.name === 'JOCM' && rutasPermitidas.includes('JOCO')) ||
-    (to.name === 'ABMM' && import.meta.env.DEV)
+    (to.name === 'JOCM' && rutasPermitidas.includes('JOCO'))
   )) {
     next();
     return;
@@ -119,7 +118,11 @@ const routes = [
         path: 'abmMateriales.html',
         name: 'ABMM',
         beforeEnter: allowed,
-        component: () => import('../modules/gestionMateriales/abmMateriales/AbmMateriales.vue')
+        component: () => import('../views/IframeView.vue'),
+        props: {
+          urlParam: '/abmMateriales.html',
+          titleParam: 'ABM Materiales'
+        }
       },
       {
         path: 'gestionErrores.html',
@@ -231,13 +234,21 @@ const routes = [
         path: 'jobtypeContrato.html',
         name: 'JOCO',
         beforeEnter: allowed,
-        component: () => import('../modules/parametrizaciones/jobtypeContrato/JobtypeContrato.vue')
+        component: () => import('../views/IframeView.vue'),
+        props: {
+          urlParam: '/jobtypeContrato.html',
+          titleParam: 'Jobtype - Contrato'
+        }
       },
       {
         path: 'jobtypeCMO.html',
         name: 'JOCM',
         beforeEnter: allowed,
-        component: () => import('../modules/parametrizaciones/jobtypeCMO/JobtypeCMO.vue')
+        component: () => import('../views/IframeView.vue'),
+        props: {
+          urlParam: '/jobtypeCMO.html',
+          titleParam: 'CMO - Actividad'
+        }
       },
       {
         path: 'consultarActas.html',
@@ -322,7 +333,7 @@ const routes = [
         component: () => import('../views/IframeView.vue'),
         props: {
           urlParam: '/busquedaOtsGcc.html',
-          titleParam: 'Búsqueda de Ots'
+          titleParam: 'Búsqueda de OTs'
         }
       }
     ]
