@@ -26,7 +26,7 @@ jobs:
           cache: npm
 
       - name: Aplicar alcance solicitado
-        run: python .github/scripts/prepare_curated_migrations.py
+        run: python .github/scripts/run_curated_migrations_v2.py
 
       - name: Validar estructura y rutas
         shell: bash
@@ -89,6 +89,7 @@ jobs:
         run: |
           set -euo pipefail
           rm -f .github/scripts/prepare_curated_migrations.py
+          rm -f .github/scripts/run_curated_migrations_v2.py
           rm -f .github/workflows/build-curated-migrations.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
