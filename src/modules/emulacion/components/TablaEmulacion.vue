@@ -156,10 +156,10 @@
                 <span
                   v-for="profile in selectedProfiles"
                   :key="profile"
-                  class="emulation-profile-chip"
+                  class="emulation-profile-item"
                 >
-                  <i class="pi pi-shield"></i>
-                  {{ profile }}
+                  <i class="pi pi-key"></i>
+                  <span>{{ profile }}</span>
                 </span>
                 <span v-if="!selectedProfiles.length" class="emulation-profile-empty">
                   Sin perfil informado
@@ -508,27 +508,26 @@ watch(() => store.confirmationVersion, () => {
 .emulation-profile-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 7px 16px;
 }
 
-.emulation-profile-chip {
-  min-height: 25px;
+.emulation-profile-item {
+  min-height: 22px;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 3px 9px;
-  border: 1px solid #a9dce3;
-  border-radius: 13px;
-  background: #eafcff;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: #176171;
   font-size: 11px;
   font-weight: 600;
-  box-sizing: border-box;
+  line-height: 1.4;
 }
 
-.emulation-profile-chip i {
+.emulation-profile-item i {
   color: #00a9bd;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .emulation-profile-empty {
