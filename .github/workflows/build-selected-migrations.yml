@@ -1,0 +1,84 @@
+name: Validar selección de migraciones
+
+on:
+  pull_request:
+    branches:
+      - migracion-reporte-emulacion-otfallidas
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+jobs:
+  prepare-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar rama aislada
+        uses: actions/checkout@v4
+        with:
+          ref: migracion-reporte-emulacion-otfallidas
+          fetch-depth: 0
+
+      - name: Preparar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Aplicar alcance solicitado
+        run: python .github/scripts/prepare_selected_migrations.py
+
+      - name: Validar estructura y rutas
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          node --check src/router/index.js
+
+          test -d src/modules/reporteSas
+          test -d src/modules/emulacion
+          test -d src/modules/otFallidasCT
+
+          test ! -e src/modules/gestionMateriales/abmMateriales
+          test ! -e src/modules/parametrizaciones/jobtypeContrato
+          test ! -e src/modules/parametrizaciones/jobtypeCMO
+          test ! -e src/modules/buscadorOts
+
+          grep -q "component: () => import('../modules/reporteSas/ReporteSAS.vue')" src/router/index.js
+          grep -q "component: () => import('../modules/emulacion/views/Emulacion.vue')" src/router/index.js
+          grep -q "component: () => import('../modules/otFallidasCT/OtFallidasCT.vue')" src/router/index.js
+
+          grep -A8 "path: 'abmMateriales.html'" src/router/index.js | grep -q "IframeView.vue"
+          grep -A8 "path: 'jobtypeContrato.html'" src/router/index.js | grep -q "IframeView.vue"
+          grep -A8 "path: 'jobtypeCMO.html'" src/router/index.js | grep -q "IframeView.vue"
+          grep -A8 "path: 'busquedaOtsGcc.html'" src/router/index.js | grep -q "IframeView.vue"
+
+          ! grep -q "gestionMateriales/abmMateriales" src/router/index.js
+          ! grep -q "parametrizaciones/jobtypeContrato" src/router/index.js
+          ! grep -q "parametrizaciones/jobtypeCMO" src/router/index.js
+          ! grep -q "modules/buscadorOts" src/router/index.js
+
+          grep -q '>LEGAJO<' src/modules/emulacion/components/filtros/inputs/Legajo.vue
+          grep -q 'pi pi-user' src/modules/emulacion/components/filtros/inputs/Legajo.vue
+          grep -q 'emulation-profile-item' src/modules/emulacion/components/ConfirmarEmulacionDialog.vue
+          grep -q 'emulation-profile-item' src/modules/emulacion/components/TablaEmulacion.vue
+
+          git diff --exit-code origin/main -- src/assets/css/fm-global.css
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar proyecto
+        run: npm run build
+
+      - name: Limpiar archivos técnicos y confirmar
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/scripts/prepare_selected_migrations.py
+          rm -f .github/workflows/build-selected-migrations.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Conservar Reporte SAS, Emulación y OTs Fallidas en Vue"
+          git push origin HEAD:migracion-reporte-emulacion-otfallidas
