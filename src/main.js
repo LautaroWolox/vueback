@@ -20,6 +20,7 @@ import { installResponsiveIframes } from './plugins/responsiveIframes.js'
 import { installUserMenuProfile } from './plugins/userMenuProfile.js'
 import { installGridPaginatorDefaults } from './plugins/gridPaginatorDefaults.js'
 import { installReportSasAutoHeight } from './plugins/reportSasAutoHeight.js'
+import { initializeTheme } from './composables/useTheme.js'
 
 import FmButton from './components/shared/FmButton.vue'
 import FmPanel from './components/shared/FmPanel.vue'
@@ -43,6 +44,8 @@ import Select from 'primevue/select'
 import ProgressSpinner from 'primevue/progressspinner'
 import MultiSelect from 'primevue/multiselect'
 import Dialog from 'primevue/dialog'
+
+initializeTheme()
 
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedState)
@@ -81,7 +84,7 @@ app.use(PrimeVue, {
         name: 'primevue',
         order: 'primevue, fieldmanager'
       },
-      darkModeSelector: false
+      darkModeSelector: '.fm-dark'
     }
   },
   pt: fmPrimePassThrough,

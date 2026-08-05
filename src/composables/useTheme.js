@@ -1,13 +1,4 @@
-from pathlib import Path
-
-source_path = Path('.github/scripts/apply_dark_mode.py')
-source = source_path.read_text(encoding='utf-8')
-
-start = source.index('THEME_PATH.write_text(')
-end_marker = '\n\n# ---------------------------------------------------------------------------\n# Inicialización PrimeVue y tema antes del montaje.'
-end = source.index(end_marker, start)
-
-composable = r'''import { computed, ref } from 'vue'
+import { computed, ref } from 'vue'
 
 const STORAGE_KEY = 'fm-theme'
 const DARK_CLASS = 'fm-dark'
@@ -93,10 +84,3 @@ export const useTheme = () => {
     toggleTheme
   }
 }
-'''
-
-replacement = "THEME_PATH.write_text(" + repr(composable) + ", encoding='utf-8')"
-patched = source[:start] + replacement + source[end:]
-
-compile(patched, str(source_path), 'exec')
-exec(compile(patched, str(source_path), 'exec'), {'__name__': '__main__'})

@@ -5,7 +5,26 @@
     <!-- <link rel="shortcut icon" type="image/png" href="resources/images/FM_logo.png"> -->
     <link rel="icon" href="./src/public/FM_logo.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f4f7f8">
     <title>Field Manager</title>
+    <script data-fm-theme-bootstrap>
+      (() => {
+        try {
+          const stored = localStorage.getItem('fm-theme')
+          const dark = stored === 'dark' || (
+            stored !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches
+          )
+          const theme = dark ? 'dark' : 'light'
+          document.documentElement.classList.toggle('fm-dark', dark)
+          document.documentElement.dataset.theme = theme
+          document.documentElement.style.colorScheme = theme
+          document.querySelector('meta[name="theme-color"]')
+            ?.setAttribute('content', dark ? '#0b1419' : '#f4f7f8')
+        } catch {
+          document.documentElement.dataset.theme = 'light'
+        }
+      })()
+    </script>
   </head>
   <body>
     <div id="app"></div>

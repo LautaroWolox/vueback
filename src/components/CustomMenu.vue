@@ -19,7 +19,27 @@
       </template>
 
       <template #end>
-        <div ref="userSectionRef" class="user-section">
+        <div class="menu-end-actions">
+          <Button
+            class="fm-theme-toggle"
+            text
+            type="button"
+            :title="themeToggleLabel"
+            :aria-label="themeToggleLabel"
+            :aria-pressed="isDark"
+            @click.stop="toggleTheme"
+          >
+            <i
+              class="pi fm-theme-toggle__icon"
+              :class="isDark ? 'pi-sun' : 'pi-moon'"
+              aria-hidden="true"
+            ></i>
+            <span class="fm-theme-toggle__label">
+              {{ isDark ? 'Claro' : 'Oscuro' }}
+            </span>
+          </Button>
+
+          <div ref="userSectionRef" class="user-section">
           <Button
             class="user-profile"
             text
@@ -69,6 +89,7 @@
               />
             </div>
           </div>
+          </div>
         </div>
       </template>
     </Menubar>
@@ -84,6 +105,7 @@ import Button from 'primevue/button'
 import Menubar from 'primevue/menubar'
 import router from '@/router'
 import { useAuthStore } from '@/store/auth'
+import { useTheme } from '@/composables/useTheme.js'
 import { getRutas } from './rutas'
 
 const authStore = useAuthStore()
@@ -93,6 +115,11 @@ const rutas = authStore.rutas
 const showDropdown = ref(false)
 const userSectionRef = ref<HTMLElement | null>(null)
 const items = ref(getRutas(rutas))
+const { isDark, toggleTheme } = useTheme()
+
+const themeToggleLabel = computed(() =>
+  isDark.value ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'
+)
 
 const userLabel = computed(() => nombre || legajo || 'Usuario')
 
