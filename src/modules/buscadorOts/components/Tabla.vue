@@ -150,6 +150,27 @@
           </span>
         </template>
       </Column>
+
+      <Column
+        header="Fallidas"
+        frozen
+        align-frozen="right"
+        :style="{ width: '72px' }"
+        :header-style="{ width: '72px' }"
+        :body-style="{ width: '72px', textAlign: 'center' }"
+      >
+        <template #body="{ data }">
+          <button
+            type="button"
+            class="busqueda-ots-grid-action busqueda-ots-grid-action--failed"
+            title="Ver órdenes de trabajo fallidas"
+            aria-label="Ver órdenes de trabajo fallidas"
+            @click="emit('open-failed', data)"
+          >
+            <i class="pi pi-times" aria-hidden="true"></i>
+          </button>
+        </template>
+      </Column>
     </DataTable>
   </div>
 </template>
@@ -168,7 +189,7 @@ defineProps({
   expanded: { type: Boolean, default: false }
 })
 
-const emit = defineEmits(['open-external'])
+const emit = defineEmits(['open-external', 'open-failed'])
 const store = useBuscadorOtsStore()
 const gridRef = ref(null)
 const columnFilters = ref(createColumnFilters())
