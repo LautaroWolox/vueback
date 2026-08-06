@@ -9,6 +9,9 @@ import type {
   StoreState,
 } from './types'
 
+const apiUrl = (path: string) => `${window.location.origin}${path}`
+const requestOptions: RequestInit = { credentials: 'include' }
+
 /**
  * Store del módulo Configuración CMO-Actividad.
  *
@@ -33,7 +36,8 @@ export const useCmoActividadStore = defineStore('cmoActividad', {
 
       try {
         const { data, error } = await useFetch(
-          '/pc/configuraCmoActividad/getRelsCmoActividad.html'
+          apiUrl('/pc/configuraCmoActividad/getRelsCmoActividad.html'),
+          requestOptions
         ).json<RelCmoActividad[]>()
 
         if (error.value) throw error.value
@@ -50,7 +54,8 @@ export const useCmoActividadStore = defineStore('cmoActividad', {
 
     async searchActividad(phrase: string): Promise<ActividadAutocomplete[]> {
       const { data, error } = await useFetch(
-        `/pc/configuraCmoActividad/getActividad/${encodeURIComponent(phrase)}.html`
+        apiUrl(`/pc/configuraCmoActividad/getActividad/${encodeURIComponent(phrase)}.html`),
+        requestOptions
       ).json<ActividadAutocomplete[]>()
 
       if (error.value) throw error.value
@@ -59,7 +64,8 @@ export const useCmoActividadStore = defineStore('cmoActividad', {
 
     async searchCmo(phrase: string): Promise<CmoAutocomplete[]> {
       const { data, error } = await useFetch(
-        `/pc/configuraCmoActividad/getCmo/${encodeURIComponent(phrase)}.html`
+        apiUrl(`/pc/configuraCmoActividad/getCmo/${encodeURIComponent(phrase)}.html`),
+        requestOptions
       ).json<CmoAutocomplete[]>()
 
       if (error.value) throw error.value
@@ -73,8 +79,9 @@ export const useCmoActividadStore = defineStore('cmoActividad', {
       body.append('nuevasRelaciones', JSON.stringify(relaciones))
 
       const { data, error } = await useFetch(
-        '/pc/configuraCmoActividad/nuevaRelActividadCmo.html',
+        apiUrl('/pc/configuraCmoActividad/nuevaRelActividadCmo.html'),
         {
+          ...requestOptions,
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: body.toString(),
@@ -85,7 +92,6 @@ export const useCmoActividadStore = defineStore('cmoActividad', {
 
       const responses = data.value ?? []
 
-      // Si no hay respuestas con error, refrescar la grilla
       if (responses.length === 0) {
         await this.fetchData()
       }
@@ -98,14 +104,14 @@ export const useCmoActividadStore = defineStore('cmoActividad', {
       nuevoIdCmo: number
     ): Promise<ActividadCmoResponse | null> {
       const { data, error } = await useFetch(
-        `/pc/configuraCmoActividad/modRelActividadCmo.html?Actividad=${actividadManoObraId}&CMO=${nuevoIdCmo}`
+        apiUrl(`/pc/configuraCmoActividad/modRelActividadCmo.html?Actividad=${actividadManoObraId}&CMO=${nuevoIdCmo}`),
+        requestOptions
       ).json<ActividadCmoResponse>()
 
       if (error.value) throw error.value
 
       const response = data.value ?? null
 
-      // Si no hay mensaje de error, refrescar la grilla
       if (!response?.mensaje) {
         await this.fetchData()
       }
@@ -118,8 +124,9 @@ export const useCmoActividadStore = defineStore('cmoActividad', {
       body.append('idRelacion', String(actividadManoObraId))
 
       const { error } = await useFetch(
-        '/pc/configuraCmoActividad/desactivarRelCmoActividad.html',
+        apiUrl('/pc/configuraCmoActividad/desactivarRelCmoActividad.html'),
         {
+          ...requestOptions,
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: body.toString(),
