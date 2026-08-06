@@ -20,6 +20,7 @@
           <Tabla
             :expanded="gridExpanded"
             @open-external="externalDialogVisible = true"
+            @open-failed="openFailedOrders"
           />
         </AccordionContent>
       </AccordionPanel>
@@ -28,6 +29,11 @@
     <OtsExternasDialog
       v-model:visible="externalDialogVisible"
       :rows="store.externalRows"
+    />
+
+    <OtsFallidasDialog
+      v-model:visible="failedDialogVisible"
+      :rows="failedRows"
     />
   </div>
 </template>
@@ -41,16 +47,59 @@ import AccordionContent from 'primevue/accordioncontent'
 import FiltrosBusqueda from './components/FiltrosBusqueda.vue'
 import Tabla from './components/Tabla.vue'
 import OtsExternasDialog from './components/OtsExternasDialog.vue'
+import OtsFallidasDialog from './components/OtsFallidasDialog.vue'
 import { useBuscadorOtsStore } from './store/buscadorOtsStore'
 
 const store = useBuscadorOtsStore()
 const activePanels = ref([])
 const externalDialogVisible = ref(false)
+const failedDialogVisible = ref(false)
+const failedRows = ref([])
 
 const gridExpanded = computed(() => {
   const active = (Array.isArray(activePanels.value) ? activePanels.value : [activePanels.value]).map(String)
   return !active.includes('0') && active.includes('1')
 })
+
+const normalizeFailedRow = (value, parent, index) => {
+  const source = value && typeof value === 'object' ? value : {}
+
+  return {
+    id: source.id ?? `${String(parent?.id ?? parent?.nroOt ?? 'ot')}-${index}`,
+    nroOt: String(source.nroOt ?? source.nroOrdenTrabajo ?? parent?.nroOt ?? ''),
+    codigoTarea: String(source.codigoTarea ?? source.codTarea ?? source.tareaCodigo ?? ''),
+    fechaUltimaModificacion: String(
+      source.fechaUltimaModificacion ??
+      source.fechaUltModOt ??
+      source.fechaModificacion ??
+      ''
+    ),
+    tecnicoNoLdap: String(
+      source.tecnicoNoLdap ??
+      source.tecnicoNoLDAP ??
+      source.tecnico ??
+      ''
+    ),
+    sistemaOrigen: String(source.sistemaOrigen ?? source.origen ?? ''),
+    descripcionError: String(
+      source.descripcionError ??
+      source.errorDescripcion ??
+      source.mensaje ??
+      ''
+    )
+  }
+}
+
+const openFailedOrders = (row) => {
+  const rawRows = Array.isArray(row?.ordenesFallidas)
+    ? row.ordenesFallidas
+    : Array.isArray(row?.fallidas)
+      ? row.fallidas
+      : []
+
+  failedRows.value = rawRows.map((item, index) => normalizeFailedRow(item, row, index))
+  failedDialogVisible.value = true
+}
 
 onBeforeUnmount(() => {
   store.resetStore()
