@@ -51,16 +51,6 @@ export const getRutas = (rutas:any) => {
             visible: hasMenu('GEMA'),
             items: [
                 {
-                    label: 'Validación OT de Redes',
-                    command: () => { router.push({ name: 'VARE' }); },
-                    visible: hasMenu('VARE')
-                },
-                {
-                    label: 'Errores de Gestión Sucursal',
-                    command: () => { router.push({ name: 'ERGS' }); },
-                    visible: hasMenu('ERGS')
-                },
-                {
                     label: 'Gestionar Materiales en OTs',
                     command: () => { router.push({ name: 'GEOT' }); },
                     visible: hasMenu('GEOT')
@@ -79,6 +69,16 @@ export const getRutas = (rutas:any) => {
                     label: 'Materiales Descargados',
                     command: () => { router.push({ name: 'MADE' }); },
                     visible: hasMenu('MADE')
+                },
+                {
+                    label: 'Errores de Gestión Sucursal',
+                    command: () => { router.push({ name: 'ERGS' }); },
+                    visible: hasMenu('ERGS')
+                },
+                {
+                    label: 'Validación OT de Redes',
+                    command: () => { router.push({ name: 'VARE' }); },
+                    visible: hasMenu('VARE')
                 }
             ]
         },
@@ -125,23 +125,23 @@ export const getRutas = (rutas:any) => {
             visible: hasMenu('CECO'),
             items: [
                 {
-                    label: 'Búsqueda de OTs',
-                    command: () => { router.push({ name: 'BUOT' }); },
-                    visible: hasMenu('BUOT')
+                    label: 'WorkAround',
+                    command: () => { router.push({ name: 'WOAR' }); },
+                    visible: hasMenu('WOAR')
                 },
                 {
-                    label: 'Gestión de Reglas',
-                    visible: hasMenu('GERE'),
+                    label: 'Parametrizaciones',
+                    visible: hasMenu('PARA'),
                     items: [
                         {
-                            label: 'Consultar Reglas',
-                            command: () => { router.push({ name: 'CORE' }); },
-                            visible: hasMenu('CORE')
+                            label: 'Configuración Jobtype-Contrato',
+                            command: () => { router.push({ name: 'JOCO' }); },
+                            visible: hasMenu('JOCO')
                         },
                         {
                             label: 'Configuración CMO-Actividad',
                             command: () => { router.push({ name: 'CMOA' }); },
-                            visible: hasMenu('CMOA') || hasMenu('JOCO')
+                            visible: hasMenu('CMOA')
                         }
                     ]
                 },
@@ -172,18 +172,23 @@ export const getRutas = (rutas:any) => {
                     ]
                 },
                 {
-                    label: 'Parametrizaciones',
-                    visible: hasMenu('PARA'),
+                    label: 'Gestión de Reglas',
+                    visible: hasMenu('GERE'),
                     items: [
                         {
-                            label: 'Configuración Jobtype-Contrato',
-                            command: () => { router.push({ name: 'JOCO' }); },
-                            visible: hasMenu('JOCO')
+                            label: 'Consultar Reglas',
+                            command: () => { router.push({ name: 'CORE' }); },
+                            visible: hasMenu('CORE')
                         },
                         {
-                            label: 'Configuración CMO-Actividad',
-                            command: () => { router.push({ name: 'JOCM' }); },
-                            visible: hasMenu('JOCM') || hasMenu('JOCO')
+                            label: 'Monitoreo y Ejecución de Reglas',
+                            command: () => { router.push({ name: 'MORE' }); },
+                            visible: hasMenu('MORE')
+                        },
+                        {
+                            label: 'Regla Prueba Masiva',
+                            command: () => { router.push({ name: 'PUMA' }); },
+                            visible: hasMenu('PUMA')
                         }
                     ]
                 },
@@ -191,6 +196,11 @@ export const getRutas = (rutas:any) => {
                     label: 'Registro OTs Fallidas',
                     command: () => { router.push({ name: 'ROTF' }); },
                     visible: hasMenu('ROTF')
+                },
+                {
+                    label: 'Búsqueda de Ots',
+                    command: () => { router.push({ name: 'BUOT' }); },
+                    visible: hasMenu('BUOT')
                 }
             ]
         }

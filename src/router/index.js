@@ -14,7 +14,7 @@ const allowed = (to, from, next) => {
   } else if (!autenticado && !rutasLibres.includes(to.name)) {
     next({ name: '401' });
     return;
-  } else if (autenticado && (rutasPermitidas.includes(to.name) || (to.name === 'JOCM' && rutasPermitidas.includes('JOCO')))) {
+  } else if (autenticado && rutasPermitidas.includes(to.name)) {
     next();
     return;
   } else {
@@ -27,7 +27,7 @@ const routes = [
   {
     path: '/login2fa.html',
     name: 'login2fa',
-    alias: ['/','/index.html'],
+    alias: ['/', '/index.html'],
     component: () => import('../views/Login2faView.vue')
   },
   {
@@ -228,16 +228,14 @@ const routes = [
         }
       },
       {
-        path: 'jobtypeCMO.html',
-        name: 'JOCM',
-        beforeEnter: allowed,
-        component: () => import('../modules/parametrizaciones/jobtypeCMO/JobtypeCMO.vue')
-      },
-      {
         path: 'configuraCmoActividad.html',
         name: 'CMOA',
         beforeEnter: allowed,
-        component: () => import('../modules/parametrizaciones/configuraCmoActividad/ConfiguraCmoActividad.vue')
+        component: () => import('../views/IframeView.vue'),
+        props: {
+          urlParam: '/configuraCmoActividad.html',
+          titleParam: 'configuracion cmo-actividad'
+        }
       },
       {
         path: 'consultarActas.html',
@@ -313,7 +311,11 @@ const routes = [
         path: 'registroOTFallidasReproceso.html',
         name: 'ROTF',
         beforeEnter: allowed,
-        component: () => import('../modules/otFallidasCT/OtFallidasCT.vue')
+        component: () => import('../views/IframeView.vue'),
+        props: {
+          urlParam: '/registroOTFallidasReproceso.html',
+          titleParam: 'Registro OTs Fallidas'
+        }
       },
       {
         path: 'busquedaOtsGcc.html',
@@ -335,3 +337,4 @@ const router = createRouter({
 });
 
 export default router;
+

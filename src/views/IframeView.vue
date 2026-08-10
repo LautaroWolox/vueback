@@ -1,75 +1,82 @@
 <template>
-  <BuscadorOts v-if="isBuscadorOts" />
-
-  <iframe
-    v-else
-    ref="iframeRef"
-    :src="iframeSrc"
-    :title="titulo"
-    width="100%"
-    frameborder="0"
-    allowfullscreen
-    class="legacy-iframe"
-    @load="onIframeLoad"
-  />
+    <iframe
+        :src="iframeSrc"
+        :title="titulo"
+        id="iframe"
+        frameborder="0"
+        allowfullscreen
+        @load="onIframeLoad"
+    />
 </template>
 
 <script setup>
-import { computed, onUnmounted, ref, watchEffect } from 'vue'
-import router from '@/router'
-import BuscadorOts from '@/modules/buscadorOts/BuscadorOts.vue'
-import { useLegacyIframeLayout } from '@/composables/useLegacyIframeLayout'
-import { useLegacyIframeViewport } from '@/composables/useLegacyIframeViewport'
+import { computed, watchEffect, onUnmounted, onMounted, watch } from 'vue';
+import router from '@/router';
+
+const urlBase = import.meta.env.VITE_FM_MV_URL;
+const allowedOrigin = import.meta.env.VITE_ORIGIN;
 
 const props = defineProps({
-  urlParam: { type: String, required: true },
-  titleParam: { type: String, required: true }
+    urlParam: {
+        type: String,
+        required: true
+    },
+    titleParam: {
+        type: String,
+        required: true
+    }
 })
-
-const iframeRef = ref(null)
-const { onIframeLoad: applyLegacyLayout } = useLegacyIframeLayout(iframeRef)
-const { onIframeLoad: applyLegacyViewport } = useLegacyIframeViewport(iframeRef)
-const onIframeLoad = () => {
-  applyLegacyLayout()
-  applyLegacyViewport()
-}
-const titulo = computed(() => props.titleParam || sessionStorage.getItem('titleParam') || '')
-const isBuscadorOts = computed(() => props.urlParam === '/busquedaOtsGcc.html')
 
 watchEffect(() => {
-  sessionStorage.setItem('urlParam', props.urlParam)
-  sessionStorage.setItem('titleParam', props.titleParam)
+    sessionStorage.setItem('urlParam', props.urlParam);
+    sessionStorage.setItem('titleParam', props.titleParam);
 })
 
-const iframeSrc = computed(() => `/pc${props.urlParam || sessionStorage.getItem('urlParam') || ''}`)
+const iframeSrc = computed(() => {
+    let pantalla = '';
+    if (props.urlParam !== undefined) {
+        pantalla = '/pc' + props.urlParam;
+    } else {
+        pantalla = '/pc'  + sessionStorage.getItem('urlParam');
+    }
+    return pantalla;
+});
 
-function handleRedirect(event) {
-  const origins = new Set([import.meta.env.VITE_ORIGIN, window.location.origin])
-  if (!origins.has(event.origin)) return
+watch(iframeSrc, (newValue, oldValue) => { oldValue, newValue });
 
-  const message = event.data
-  if (message?.type === 'redirect' && message.nroActa && message.url) {
-    sessionStorage.setItem('nroActa', message.nroActa)
-    sessionStorage.setItem('urlDetalle', message.url)
-    const route = router.resolve({ name: 'DEAC' })
-    window.open(route.href, '_blank')
-  }
+function onIframeLoad() {
+    console.trace('IFRAME LOAD EVENT', iframeSrc.value);
 }
 
-window.addEventListener('message', handleRedirect)
+const titulo = props.titleParam !== undefined ? props.titleParam : sessionStorage.getItem('titleParam');
+
+function handleRedirect(event) {
+    const origins = new Set([import.meta.env.VITE_ORIGIN,window.location.origin]);
+    if (!origins.has(event.origin)) return
+    console.log("origin: " + event.origin)
+    const message = event.data;
+    if (message && message.type === 'redirect' && message.nroActa && message.url) {
+        const { nroActa, url } = message;
+        console.log(url + ' - ' + nroActa);
+        sessionStorage.setItem('nroActa', nroActa);
+        sessionStorage.setItem('urlDetalle', url);
+        const route = router.resolve({ name: 'DEAC' });
+        window.open(route.href, '_blank');
+    }
+}
+
+window.addEventListener('message', handleRedirect);
 
 onUnmounted(() => {
-  window.removeEventListener('message', handleRedirect)
-})
+    window.removeEventListener('message', handleRedirect);
+});
 </script>
 
 <style scoped>
-.legacy-iframe {
-  width: 100%;
-  height: calc(100vh - 64px);
-  min-height: 520px;
-  display: block;
-  margin: -4px 0 0;
-  border: 0;
+#iframe {
+    position: absolute;
+    width: 100%;
+    height: 93%;
 }
 </style>
+
