@@ -85,11 +85,9 @@
               <button
                 type="button"
                 class="busqueda-ots-grid-action"
-                :class="{ 'busqueda-ots-grid-action--active': store.failedOnly }"
-                title="Filtrar fallidas"
-                aria-label="Filtrar fallidas"
-                :aria-pressed="store.failedOnly"
-                @click="store.toggleFailedFilter"
+                title="Órdenes de Trabajo Fallidas"
+                aria-label="Órdenes de Trabajo Fallidas"
+                @click="emit('open-failed')"
               >
                 <i class="pi pi-times" aria-hidden="true"></i>
               </button>
@@ -148,27 +146,6 @@
           <span class="fm-cell-text" :title="String(data[column.field] ?? '')">
             {{ data[column.field] ?? '' }}
           </span>
-        </template>
-      </Column>
-
-      <Column
-        header="Fallidas"
-        frozen
-        align-frozen="right"
-        :style="{ width: '72px' }"
-        :header-style="{ width: '72px' }"
-        :body-style="{ width: '72px', textAlign: 'center' }"
-      >
-        <template #body="{ data }">
-          <button
-            type="button"
-            class="busqueda-ots-grid-action busqueda-ots-grid-action--failed"
-            title="Ver órdenes de trabajo fallidas"
-            aria-label="Ver órdenes de trabajo fallidas"
-            @click="emit('open-failed', data)"
-          >
-            <i class="pi pi-times" aria-hidden="true"></i>
-          </button>
         </template>
       </Column>
     </DataTable>
@@ -311,11 +288,6 @@ const downloadResults = () => {
 .busqueda-ots-grid-action:disabled {
   color: #c7d3d8;
   cursor: default;
-}
-
-.busqueda-ots-grid-action--failed {
-  width: 24px;
-  min-width: 24px;
 }
 
 .busqueda-ots-column-filter {
