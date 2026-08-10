@@ -7,7 +7,7 @@
       message="Consultando la información del legajo"
     />
 
-    <Accordion v-model:value="active" multiple class="fm-accordion emulation-accordion">
+    <Accordion v-model:value="store.activeTab" multiple class="fm-accordion emulation-accordion">
       <AccordionPanel value="0" class="emulation-filter-panel">
         <AccordionHeader>
           <span class="emulation-accordion__title">FILTROS DE BÚSQUEDA</span>
@@ -23,12 +23,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import CajonFiltros from '../components/filtros/CajonFiltros.vue'
 import ConfirmarEmulacionDialog from '../components/ConfirmarEmulacionDialog.vue'
 import emulacionStore from '../store/emulacionStore.js'
 
-const active = ref(['0'])
 const store = emulacionStore()
 </script>
 
