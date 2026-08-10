@@ -68,24 +68,12 @@
                 </div>
 
                 <div class="fm-user-v3-person-row">
-                  <div class="fm-user-v3-person-cell">
-                    <span class="fm-user-v3-person-icon" aria-hidden="true">
-                      <i class="pi pi-user"></i>
-                    </span>
-                    <div class="fm-user-v3-person-copy">
-                      <small>Nombre</small>
-                      <strong :title="displayGivenName">{{ displayGivenName }}</strong>
-                    </div>
-                  </div>
-
-                  <div class="fm-user-v3-person-cell">
-                    <span class="fm-user-v3-person-icon" aria-hidden="true">
-                      <i class="pi pi-users"></i>
-                    </span>
-                    <div class="fm-user-v3-person-copy">
-                      <small>Apellido</small>
-                      <strong :title="displaySurname">{{ displaySurname }}</strong>
-                    </div>
+                  <span class="fm-user-v3-person-icon" aria-hidden="true">
+                    <i class="pi pi-users"></i>
+                  </span>
+                  <div class="fm-user-v3-person-copy">
+                    <small>Nombre y Apellido</small>
+                    <strong :title="fullName">{{ fullName }}</strong>
                   </div>
                 </div>
               </div>
@@ -518,7 +506,8 @@ onUnmounted(() => {
   background: #f8fbfc;
 }
 
-.fm-user-v3-legajo-row {
+.fm-user-v3-legajo-row,
+.fm-user-v3-person-row {
   min-height: 58px;
   display: flex;
   align-items: center;
@@ -526,20 +515,21 @@ onUnmounted(() => {
   padding: 8px 10px;
 }
 
+.fm-user-v3-person-row {
+  border-top: 1px solid #e4ecef;
+}
+
 .fm-user-v3-legajo-icon,
 .fm-user-v3-person-icon {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 8px;
   background: #dff7fa;
   color: #008b9d;
-}
-
-.fm-user-v3-legajo-icon {
-  width: 38px;
-  height: 38px;
-  flex: 0 0 38px;
 }
 
 .fm-user-v3-legajo-icon i,
@@ -550,6 +540,7 @@ onUnmounted(() => {
 .fm-user-v3-legajo-copy,
 .fm-user-v3-person-copy {
   min-width: 0;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -574,35 +565,6 @@ onUnmounted(() => {
   line-height: 1.25;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.fm-user-v3-person-row {
-  min-height: 68px;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  border-top: 1px solid #e4ecef;
-}
-
-.fm-user-v3-person-cell {
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 9px 8px;
-}
-
-.fm-user-v3-person-cell + .fm-user-v3-person-cell {
-  border-left: 1px solid #e4ecef;
-}
-
-.fm-user-v3-person-icon {
-  width: 32px;
-  height: 32px;
-  flex: 0 0 32px;
-}
-
-.fm-user-v3-person-copy {
-  flex: 1 1 auto;
 }
 
 .fm-user-v3-footer {
