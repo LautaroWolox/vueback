@@ -137,8 +137,21 @@ onBeforeUnmount(() => {
   gap: 6px;
 }
 
+/* El panel de búsqueda nunca debe comprimirse: sus botones forman parte de su altura real. */
+.busqueda-ots-filter-panel {
+  flex: 0 0 auto !important;
+  flex-shrink: 0 !important;
+  overflow: visible !important;
+}
+
 .busqueda-ots-page--both-open .busqueda-ots-filter-panel {
   margin-bottom: 14px;
+}
+
+/* Si ambos están abiertos, el que puede ceder altura es el panel de resultados. */
+.busqueda-ots-page--both-open .busqueda-ots-results-panel {
+  min-height: 0;
+  flex-shrink: 1 !important;
 }
 
 .busqueda-ots-page--grid-expanded .busqueda-ots-accordion,
