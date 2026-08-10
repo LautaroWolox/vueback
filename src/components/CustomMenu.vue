@@ -568,23 +568,27 @@ onUnmounted(() => {
 }
 
 .fm-user-v3-footer {
+  display: flex;
+  justify-content: center;
   padding: 0 10px 10px;
   background: #fff;
 }
 
 .fm-user-v3-logout,
 :deep(.fm-user-v3-logout.p-button) {
-  width: 100% !important;
-  min-height: 36px !important;
-  height: 36px !important;
+  width: 160px !important;
+  min-width: 160px !important;
+  max-width: 160px !important;
+  min-height: 32px !important;
+  height: 32px !important;
   justify-content: center !important;
-  gap: 8px !important;
+  gap: 7px !important;
   padding: 0 10px !important;
   border: 1px solid #00a9bd !important;
   border-radius: 7px !important;
   background: #fff !important;
   color: #008b9d !important;
-  font-size: 12px !important;
+  font-size: 11px !important;
   font-weight: 700 !important;
   box-shadow: none !important;
 }
