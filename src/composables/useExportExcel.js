@@ -2,14 +2,14 @@ import ExcelJS from "exceljs";
 
 export function useExcelExport() {
 
-  async function exportToExcel({ rows, fields, columns, filename = "datos.xlsx", columnTypes = {}, groupField }) {
+  async function exportToExcel({ rows, fields, columns, filename = "datos.xlsx", columnTypes = {}, valueTransformers = {}, groupField }) {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Datos");
     // encabezado con nombre de columna    
     const headerRow = worksheet.addRow(
       fields.map(field => {
         const colDef = columns.find(c => c.field === field);
-        return colDef ? colDef.header : field;
+        return colDef?.exportHeader ?? colDef?.header ?? field;
       })
     );
     // estilo encabezado
@@ -18,7 +18,7 @@ export function useExcelExport() {
     });
     // datos
     if (!groupField || !fields.includes(groupField)) {
-      rows.forEach(row => addRowToWorksheet(worksheet, row, fields, columnTypes));
+      rows.forEach(row => addRowToWorksheet(worksheet, row, fields, columnTypes,valueTransformers));
     } else {
       const grouped = {};
       rows.forEach(row => {
@@ -28,12 +28,12 @@ export function useExcelExport() {
       });
       Object.keys(grouped).forEach(key => {
         const columnDef = columns.find(c => c.field === groupField);
-        const groupHeaderLabel = columnDef?.header || groupField;
+        const groupHeaderLabel = columnDef?.exportHeader ?? columnDef?.header ?? groupField;
         const headerRow = worksheet.addRow([`${groupHeaderLabel}: ${key}`]);
         worksheet.mergeCells(headerRow.number, 1, headerRow.number, fields.length);
         headerRow.getCell(1).font = { bold: true };
         headerRow.getCell(1).alignment = { horizontal: 'left' };
-        grouped[key].forEach(row => addRowToWorksheet(worksheet, row, fields, columnTypes));
+        grouped[key].forEach(row => addRowToWorksheet(worksheet, row, fields, columnTypes, valueTransformers));
       });
     }
     // escribir a un archivo y descargar
@@ -46,6 +46,12 @@ export function useExcelExport() {
     link.download = filename;
     link.click();
     URL.revokeObjectURL(link.href);
+  }
+
+  function normalizeBlank(value) {
+    return typeof value === 'string' && value.trim() === ''
+      ? null
+      : value;
   }
 
   function groupBy(rows, fields, groupField) {
@@ -63,7 +69,6 @@ export function useExcelExport() {
       finalRows.push([{ __group: `${groupField}: ${key}` }]);
       finalRows.push(...grouped[key]);
     });
-
     return finalRows;
   }
 
@@ -115,24 +120,41 @@ export function useExcelExport() {
     return new Date(year, month - 1, day, hour, minute, second).getTime();
   }
 
-  function addRowToWorksheet(worksheet, row, fields, columnTypes) {
-    const newRow = worksheet.addRow(fields.map(f => row[f] ?? ""));
+  function addRowToWorksheet(worksheet, row, fields, columnTypes,valueTransformers) {
+    const newRow = worksheet.addRow(
+      fields.map(field => {
+        const originalValue = row[field];
+        const transformer = valueTransformers[field];
+        const exportValue = normalizeBlank(
+          transformer ? transformer(originalValue, row) : originalValue
+        );
+        return exportValue ?? null;
+      })
+    );
     fields.forEach((field, colIndex) => {
-      const value = row[field];
+      const originalValue = row[field];
+      const transformer = valueTransformers[field];
+      const value = normalizeBlank(transformer ? transformer(originalValue, row) : originalValue);
       const type = columnTypes[field] || "string";
       const cell = newRow.getCell(colIndex + 1);
       switch (type) {
         case "number":
-          cell.value = isNaN(value) || value === "" ? null : Number(value);
+          cell.value =
+            value === null ||
+            value === undefined ||
+            value === "" ||
+            isNaN(value)
+              ? null
+              : Number(value);
           break;
         case "date":
           cell.value = value ? new Date(value) : null;
           break;
         default:
-          cell.value = value;
+          cell.value = value ?? null;
       }
     });
-  }  
+  }
 
   return { parseDataFromTable, exportToExcel, groupBy, sortRows };
 }

@@ -14,7 +14,11 @@ const allowed = (to, from, next) => {
   } else if (!autenticado && !rutasLibres.includes(to.name)) {
     next({ name: '401' });
     return;
-  } else if (autenticado && rutasPermitidas.includes(to.name)) {
+  } else if (autenticado && (
+    rutasPermitidas.includes(to.name) ||
+    (to.name === 'JOCM' && rutasPermitidas.includes('JOCO')) ||
+    (to.name === 'ABMM' && import.meta.env.DEV)
+  )) {
     next();
     return;
   } else {
@@ -27,7 +31,7 @@ const routes = [
   {
     path: '/login2fa.html',
     name: 'login2fa',
-    alias: ['/', '/index.html'],
+    alias: ['/','/index.html'],
     component: () => import('../views/Login2faView.vue')
   },
   {
@@ -197,16 +201,6 @@ const routes = [
           titleParam: 'busqueda de OT en mapa'
         }
       },
-/*       {
-        path: 'busquedaTecnico.html',
-        name: 'BUTE',
-        beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/busquedaTecnico.html',
-          titleParam: 'busqueda tecnico'
-        }
-      }, */
       {
         path: 'workAround.html',
         name: 'WOAR',
@@ -224,7 +218,7 @@ const routes = [
         component: () => import('../views/IframeView.vue'),
         props: {
           urlParam: '/jobtypeContrato.html',
-          titleParam: 'configuracion jobtype-contrato'
+          titleParam: 'Configuración Jobtype-Contrato'
         }
       },
       {
@@ -234,7 +228,7 @@ const routes = [
         component: () => import('../views/IframeView.vue'),
         props: {
           urlParam: '/configuraCmoActividad.html',
-          titleParam: 'configuracion cmo-actividad'
+          titleParam: 'Configuración CMO-Actividad'
         }
       },
       {
@@ -311,11 +305,7 @@ const routes = [
         path: 'registroOTFallidasReproceso.html',
         name: 'ROTF',
         beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/registroOTFallidasReproceso.html',
-          titleParam: 'Registro OTs Fallidas'
-        }
+        component: () => import('../modules/otFallidasCT/OtFallidasCT.vue')
       },
       {
         path: 'busquedaOtsGcc.html',
@@ -337,4 +327,3 @@ const router = createRouter({
 });
 
 export default router;
-

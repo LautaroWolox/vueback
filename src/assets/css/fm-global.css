@@ -1,0 +1,6214 @@
+/* === INICIO DOCUMENTACION GENERAL FM-GLOBAL === */
+/*
+ * GUÍA DE MANTENIMIENTO DE FM-GLOBAL.CSS
+ * ======================================
+ *
+ * Este archivo reúne los estilos que antes estaban separados en distintas hojas.
+ * Los comentarios no cambian la cascada CSS: sirven para indicar alcance, riesgo
+ * y pantallas afectadas antes de modificar una regla.
+ *
+ * CLASIFICACIÓN UTILIZADA
+ * -----------------------
+ * [GLOBAL CRÍTICO - NO TOCAR POR UNA SOLA PANTALLA]
+ *   Reglas base compartidas por toda la aplicación. Un cambio puede afectar menú,
+ *   formularios, grillas, diálogos, paginadores y todas las pantallas migradas.
+ *   Para corregir una pantalla puntual, crear una regla acotada bajo la clase raíz
+ *   de esa pantalla en lugar de modificar estos bloques.
+ *
+ * [GLOBAL COMPARTIDO - MODIFICAR CON PRUEBA REGRESIVA]
+ *   Reglas reutilizadas por varios módulos. Pueden tocarse únicamente cuando el
+ *   cambio deba aplicarse a todos los consumidores del componente compartido.
+ *
+ * [MÓDULO / PANTALLA]
+ *   Reglas acotadas a una pantalla o familia concreta. Los ajustes deben conservar
+ *   siempre la clase raíz del módulo para no filtrarse a otras vistas.
+ *
+ * [IFRAME LEGACY]
+ *   Reglas inyectadas dentro de páginas antiguas cargadas en iframe. No gobiernan
+ *   directamente los componentes Vue migrados.
+ *
+ * [ARCHIVADO - INACTIVO]
+ *   Código histórico conservado dentro de @media not all. No participa de la UI.
+ *   No debe activarse sin una revisión completa de conflictos y especificidad.
+ *
+ * REGLA GENERAL
+ * -------------
+ * Nunca resolver un problema visual de una sola pantalla modificando un bloque
+ * marcado como GLOBAL CRÍTICO. Primero usar la clase raíz del módulo, por ejemplo:
+ * .report-sas-page, .busqueda-ots-page, .ot-fallidas-ct o .jobtype-screen.
+ *
+ * ÍNDICE RÁPIDO
+ * -------------
+ * Globales críticos: fm-global, fm-responsive, desktop/notebook, menú y spacing.
+ * Globales compartidos: grillas, selects y estados vacíos.
+ * Módulos: Reporte SAS, Jobtype/CMO y Parametrizaciones.
+ * Legacy: responsive de páginas cargadas dentro de iframe.
+ * Archivados: fm-report-sas-fullscreen y nuestros.css.
+ */
+/* === FIN DOCUMENTACION GENERAL FM-GLOBAL === */
+
+/* ===== INICIO: fm-global.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [GLOBAL CRÍTICO - NO TOCAR POR UNA SOLA PANTALLA]
+ * PANTALLAS AFECTADAS: toda la aplicación Vue y todos los módulos migrados.
+ * RESPONSABILIDAD:
+ *   - variables de diseño, colores, tipografía, bordes, radios y sombras;
+ *   - normalización de html, body, #app y box-sizing;
+ *   - contenedores fm-screen, tarjetas, paneles y acordeones compartidos;
+ *   - filtros, campos, inputs, botones y estados disabled/focus;
+ *   - estructura base de grillas, tablas, filas, filtros y paginadores;
+ *   - diálogos, alertas, calendario, loader y menú base;
+ *   - breakpoints genéricos para tablet y móvil.
+ * ADVERTENCIA: no modificar para corregir Reporte SAS, Búsqueda de OTs,
+ * Registro OTs Fallidas, Jobtype o CMO de manera aislada. Crear una regla
+ * específica bajo la clase raíz de la pantalla correspondiente.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
+@layer fieldmanager {
+  :root {
+    --fm-cyan: #00a9bd;
+    --fm-cyan-strong: #008fa1;
+    --fm-cyan-dark: #006f7d;
+    --fm-cyan-soft: #e4f9fc;
+    --fm-grid-empty: #eafcff;
+    --fm-bg: #f4f7f8;
+    --fm-white: #ffffff;
+    --fm-text: #263746;
+    --fm-text-muted: #607887;
+    --fm-border: #d4dde2;
+    --fm-border-strong: #c5d1d8;
+    --fm-header-bg: #f3f7f9;
+    --fm-danger: #d9363e;
+    --fm-radius-xs: 3px;
+    --fm-radius-sm: 5px;
+    --fm-radius-md: 8px;
+    --fm-radius-lg: 14px;
+    --fm-shadow-button: 0 5px 14px rgba(0, 73, 84, .14);
+    --fm-shadow-popup: 0 20px 55px rgba(20, 48, 59, .24);
+    --fm-font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 13px;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html,
+  body,
+  #app {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+  }
+
+  body {
+    background: var(--fm-bg);
+    color: var(--fm-text);
+    font-family: var(--fm-font);
+    font-size: 13px;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  .fm-screen,
+  .fm-module-page,
+  .fm-responsive-page {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100%;
+    color: var(--fm-text);
+  }
+
+  .fm-screen--pad {
+    padding: 7px 8px;
+  }
+
+  .fm-card,
+  .fm-panel,
+  .fm-ui-section {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 0 7px;
+    border: 1px solid var(--fm-border);
+    background: var(--fm-white);
+  }
+
+  .fm-card__header,
+  .fm-panel-header,
+  .fm-ui-section-header {
+    min-height: 31px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    border-bottom: 1px solid var(--fm-border);
+    background: #f8f9fa;
+    color: #101820;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .fm-card__body,
+  .fm-panel-content,
+  .fm-ui-section-body {
+    background: var(--fm-white);
+  }
+
+  .fm-card__body--accent,
+  .fm-panel-content--accent,
+  .fm-ui-section-body--accent,
+  .fm-accent-left {
+    border-left: 3px solid var(--fm-cyan);
+  }
+
+  .fm-accordion,
+  .fm-pt-accordion {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .fm-accordion .p-accordionpanel,
+  .fm-pt-accordion-panel {
+    border: 1px solid var(--fm-border) !important;
+    background: var(--fm-white) !important;
+  }
+
+  .fm-accordion .p-accordionheader,
+  .fm-pt-accordion-header {
+    min-height: 31px !important;
+    padding: 5px 10px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #f7f8f9 !important;
+    color: #111 !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+  }
+
+  .fm-accordion .p-accordioncontent-content,
+  .fm-pt-accordion-content {
+    padding: 0 !important;
+    border: 0 !important;
+    background: var(--fm-white) !important;
+  }
+
+  .fm-filters {
+    width: 100%;
+    padding: 12px 18px 13px;
+  }
+
+  .fm-filter-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 11px 14px;
+    align-items: end;
+  }
+
+  .fm-field {
+    min-width: 0;
+  }
+
+  .fm-field--span-2 { grid-column: span 2; }
+  .fm-field--span-3 { grid-column: span 3; }
+  .fm-field--span-4 { grid-column: span 4; }
+  .fm-field--span-6 { grid-column: span 6; }
+  .fm-field--span-8 { grid-column: span 8; }
+  .fm-field--span-12 { grid-column: span 12; }
+
+  .fm-field label,
+  .fm-field__label {
+    display: block;
+    margin: 0 0 5px;
+    color: #101820;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .fm-field .p-inputtext,
+  .fm-field .p-select,
+  .fm-field .p-multiselect,
+  .fm-field .p-datepicker,
+  .fm-input,
+  .fm-select,
+  .fm-pt-inputtext,
+  .fm-pt-select,
+  .fm-pt-multiselect {
+    width: 100% !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    border: 1px solid var(--fm-border-strong) !important;
+    border-radius: var(--fm-radius-xs) !important;
+    background: var(--fm-white) !important;
+    color: var(--fm-text) !important;
+    font-size: 12px !important;
+    box-shadow: none !important;
+  }
+
+  .fm-field .p-inputtext,
+  .fm-input,
+  .fm-pt-inputtext {
+    padding: 5px 8px !important;
+  }
+
+  .fm-field .p-select-label,
+  .fm-field .p-multiselect-label,
+  .fm-pt-select-label,
+  .fm-pt-multiselect-label {
+    padding: 5px 8px !important;
+    font-size: 12px !important;
+  }
+
+  .fm-field .p-inputtext:focus,
+  .fm-field .p-select.p-focus,
+  .fm-field .p-multiselect.p-focus,
+  .fm-input:focus,
+  .fm-select:focus {
+    border-color: var(--fm-cyan) !important;
+    box-shadow: 0 0 0 2px rgba(0, 169, 189, .14) !important;
+  }
+
+  .p-disabled,
+  .p-inputtext:disabled,
+  .p-select.p-disabled,
+  .p-multiselect.p-disabled,
+  .fm-field--disabled {
+    background: #edf1f3 !important;
+    color: #84939c !important;
+    opacity: 1 !important;
+  }
+
+  .fm-actions,
+  .fm-filter-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+  }
+
+  .fm-action-button,
+  .fm-btn,
+  .fm-ui-button {
+    min-width: 158px;
+    height: 38px;
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 0 16px !important;
+    border-radius: var(--fm-radius-md) !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    letter-spacing: .1px;
+    box-shadow: var(--fm-shadow-button) !important;
+    transition: background-color .16s ease, border-color .16s ease, color .16s ease, box-shadow .16s ease, transform .16s ease;
+  }
+
+  .fm-action-button .pi,
+  .fm-btn .pi,
+  .fm-ui-button__icon {
+    width: 17px;
+    height: 17px;
+    font-size: 17px;
+    line-height: 17px;
+    flex: 0 0 auto;
+  }
+
+  .fm-ui-button__icon {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .fm-action-button--primary,
+  .fm-btn--primary,
+  .fm-ui-button--primary {
+    border: 1px solid var(--fm-cyan) !important;
+    background: var(--fm-cyan) !important;
+    color: var(--fm-white) !important;
+  }
+
+  .fm-action-button--primary:hover:not(:disabled),
+  .fm-btn--primary:hover:not(:disabled),
+  .fm-ui-button--primary:hover:not(:disabled) {
+    border-color: var(--fm-cyan-strong) !important;
+    background: var(--fm-cyan-strong) !important;
+    box-shadow: 0 8px 18px rgba(0, 143, 161, .28) !important;
+    transform: translateY(-1px);
+  }
+
+  .fm-action-button--outline,
+  .fm-btn--outline,
+  .fm-ui-button--outline {
+    border: 1px solid var(--fm-cyan) !important;
+    background: var(--fm-white) !important;
+    color: var(--fm-cyan-strong) !important;
+  }
+
+  .fm-action-button--outline:hover:not(:disabled),
+  .fm-btn--outline:hover:not(:disabled),
+  .fm-ui-button--outline:hover:not(:disabled) {
+    border-color: var(--fm-cyan-strong) !important;
+    background: var(--fm-cyan-soft) !important;
+    color: var(--fm-cyan-dark) !important;
+    transform: translateY(-1px);
+  }
+
+  .fm-action-button:disabled,
+  .fm-btn:disabled,
+  .fm-ui-button:disabled {
+    border-color: #c9d2d7 !important;
+    background: #dbe1e4 !important;
+    color: #7c8a92 !important;
+    box-shadow: none !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+  }
+
+  .fm-icon-button,
+  .fm-icon-btn {
+    width: 27px;
+    min-width: 27px;
+    height: 27px;
+    min-height: 27px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: var(--fm-radius-sm) !important;
+    background: transparent !important;
+    color: #27404f !important;
+    box-shadow: none !important;
+  }
+
+  .fm-icon-button:hover,
+  .fm-icon-btn:hover {
+    background: var(--fm-cyan-soft) !important;
+    color: var(--fm-cyan-dark) !important;
+  }
+
+  .fm-grid-shell,
+  .fm-ui-grid-shell {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    border-left: 3px solid var(--fm-cyan);
+    background: var(--fm-white);
+  }
+
+  .fm-grid-title,
+  .fm-ui-grid-title {
+    min-height: 31px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 9px;
+    border: 1px solid var(--fm-border);
+    border-left: 0;
+    border-bottom: 0;
+    background: #f8f9fa;
+    color: #111;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .fm-pass-grid,
+  .fm-pt-datatable {
+    width: 100%;
+    max-width: 100%;
+    border: 0 !important;
+    background: var(--fm-white);
+  }
+
+  .fm-pass-grid .p-datatable-table-container,
+  .fm-pass-grid .p-datatable-wrapper,
+  .fm-pt-datatable-wrapper {
+    width: 100%;
+    max-width: 100%;
+    border: 1px solid var(--fm-border);
+    border-left: 0;
+    background: var(--fm-white);
+    overflow: auto !important;
+  }
+
+  .fm-pass-grid .p-datatable-table,
+  .fm-pt-datatable-table {
+    width: max-content;
+    min-width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+
+  .fm-pass-grid .p-datatable-thead > tr > th,
+  .fm-pass-grid .p-datatable-tbody > tr > td,
+  .fm-pt-datatable .p-datatable-thead > tr > th,
+  .fm-pt-datatable .p-datatable-tbody > tr > td {
+    border-right: 1px solid var(--fm-border-strong) !important;
+    border-bottom: 1px solid #dfe6ea !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    vertical-align: middle !important;
+  }
+
+  .fm-pass-grid .p-datatable-thead > tr > th,
+  .fm-pt-datatable .p-datatable-thead > tr > th {
+    height: 35px !important;
+    padding: 4px 7px !important;
+    background: var(--fm-header-bg) !important;
+    color: #173142 !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+  }
+
+  .fm-pass-grid .p-datatable-thead > tr.p-datatable-filter-row > th,
+  .fm-pass-grid .p-datatable-thead > tr.p-filter-row > th {
+    height: 34px !important;
+    padding: 3px 5px !important;
+    background: var(--fm-white) !important;
+  }
+
+  .fm-pass-grid .p-datatable-tbody > tr > td,
+  .fm-pt-datatable .p-datatable-tbody > tr > td {
+    height: 35px !important;
+    padding: 5px 8px !important;
+    color: var(--fm-text) !important;
+    font-size: 12px !important;
+  }
+
+  .fm-pass-grid .p-datatable-tbody > tr:hover > td {
+    background: #f1fbfc !important;
+  }
+
+  .fm-pass-grid .p-datatable-tbody > tr.p-highlight > td,
+  .fm-selected-row > td {
+    background: #9debf3 !important;
+    color: #112f39 !important;
+    font-weight: 600 !important;
+  }
+
+  .fm-enabled-row > td {
+    background: var(--fm-white);
+  }
+
+  .fm-disabled-row > td {
+    background: #eef1f3 !important;
+    color: #7b8991 !important;
+  }
+
+  .fm-filter-cell {
+    display: grid;
+    grid-template-columns: auto minmax(45px, 1fr) auto;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+  }
+
+  .fm-filter-prefix,
+  .fm-filter-more {
+    color: #263746;
+    font-weight: 700;
+  }
+
+  .fm-column-filter {
+    width: 100% !important;
+    height: 25px !important;
+    min-height: 25px !important;
+    padding: 2px 5px !important;
+    border: 1px solid var(--fm-border-strong) !important;
+    border-radius: 2px !important;
+    background: var(--fm-white) !important;
+    font-size: 11px !important;
+  }
+
+  .fm-cell-text {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .fm-grid-empty {
+    min-height: 92px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--fm-grid-empty);
+    color: #3e6879;
+    font-size: 12px;
+  }
+
+  .fm-pass-grid .p-paginator,
+  .fm-pt-paginator {
+    min-height: 39px !important;
+    padding: 3px 8px !important;
+    border: 1px solid var(--fm-border) !important;
+    border-top: 0 !important;
+    border-radius: 0 !important;
+    background: var(--fm-white) !important;
+    color: #1d3747 !important;
+  }
+
+  .fm-pass-grid .p-paginator .p-paginator-page,
+  .fm-pass-grid .p-paginator .p-paginator-first,
+  .fm-pass-grid .p-paginator .p-paginator-prev,
+  .fm-pass-grid .p-paginator .p-paginator-next,
+  .fm-pass-grid .p-paginator .p-paginator-last {
+    width: 30px !important;
+    min-width: 30px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    border-radius: 50% !important;
+    color: #45606f !important;
+  }
+
+  .fm-pass-grid .p-paginator .p-paginator-page.p-paginator-page-selected {
+    background: var(--fm-cyan-soft) !important;
+    color: var(--fm-cyan-dark) !important;
+  }
+
+  .fm-pass-grid .p-paginator-rpp-dropdown,
+  .fm-pass-grid .p-paginator .p-select {
+    width: 82px !important;
+    min-width: 82px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+  }
+
+  .fm-grid-actions-final {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 12px !important;
+    overflow: visible !important;
+  }
+
+  .fm-grid-action-final,
+  .fm-grid-actions-final .p-button {
+    width: 20px !important;
+    min-width: 20px !important;
+    height: 20px !important;
+    min-height: 20px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: #173142 !important;
+    box-shadow: none !important;
+  }
+
+  .fm-grid-actions-final--large .fm-grid-action-final,
+  .fm-grid-actions-final--large .p-button {
+    width: 25px !important;
+    min-width: 25px !important;
+    height: 25px !important;
+    min-height: 25px !important;
+  }
+
+  .fm-grid-action-final:hover,
+  .fm-grid-actions-final .p-button:hover {
+    background: transparent !important;
+    color: var(--fm-cyan-dark) !important;
+  }
+
+  .fm-grid-actions-final .pi {
+    font-size: 17px !important;
+  }
+
+  .fm-pt-checkbox-box,
+  .p-checkbox .p-checkbox-box {
+    width: 17px !important;
+    height: 17px !important;
+    border: 1px solid #9fb0ba !important;
+    border-radius: 4px !important;
+    background: var(--fm-white) !important;
+  }
+
+  .p-checkbox.p-highlight .p-checkbox-box,
+  .p-checkbox-checked .p-checkbox-box {
+    border-color: var(--fm-cyan) !important;
+    background: var(--fm-cyan) !important;
+  }
+
+  .fm-dialog,
+  .fm-alert-dialog,
+  .fm-pt-dialog {
+    max-width: calc(100vw - 24px) !important;
+    border: 1px solid #d7e0e5 !important;
+    border-radius: var(--fm-radius-lg) !important;
+    background: var(--fm-white) !important;
+    box-shadow: var(--fm-shadow-popup) !important;
+    overflow: hidden !important;
+  }
+
+  .fm-pt-dialog-header,
+  .fm-dialog .p-dialog-header,
+  .fm-alert-dialog .p-dialog-header {
+    min-height: 52px !important;
+    padding: 12px 18px !important;
+    border-bottom: 1px solid var(--fm-border) !important;
+    background: var(--fm-white) !important;
+    color: var(--fm-text) !important;
+  }
+
+  .fm-dialog .p-dialog-title,
+  .fm-alert-dialog .p-dialog-title {
+    font-size: 20px !important;
+    font-weight: 400 !important;
+  }
+
+  .fm-pt-dialog-content,
+  .fm-dialog .p-dialog-content,
+  .fm-alert-dialog .p-dialog-content {
+    padding: 16px 18px !important;
+    background: var(--fm-white) !important;
+    color: var(--fm-text) !important;
+  }
+
+  .fm-pt-dialog-footer,
+  .fm-dialog .p-dialog-footer,
+  .fm-alert-dialog .p-dialog-footer {
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 10px !important;
+    padding: 12px 18px !important;
+    border-top: 1px solid var(--fm-border) !important;
+    background: var(--fm-white) !important;
+  }
+
+  .fm-dialog .p-dialog-close-button,
+  .fm-alert-dialog .p-dialog-close-button {
+    width: 30px !important;
+    min-width: 30px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: #56707e !important;
+    box-shadow: none !important;
+  }
+
+  .fm-dialog .p-dialog-close-button:hover,
+  .fm-alert-dialog .p-dialog-close-button:hover {
+    background: var(--fm-cyan-soft) !important;
+    color: var(--fm-cyan-dark) !important;
+  }
+
+  .fm-alert-body {
+    min-height: 72px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    color: var(--fm-text);
+    font-size: 13px;
+  }
+
+  .fm-alert-triangle {
+    position: relative;
+    width: 0;
+    height: 0;
+    border-left: 22px solid transparent;
+    border-right: 22px solid transparent;
+    border-bottom: 40px solid #e53945;
+    filter: drop-shadow(0 4px 3px rgba(229, 57, 69, .20));
+  }
+
+  .fm-alert-triangle span {
+    position: absolute;
+    top: 14px;
+    left: -3px;
+    color: var(--fm-white);
+    font-size: 22px;
+    font-weight: 800;
+  }
+
+  .p-menubar {
+    min-height: 40px !important;
+    padding: 0 10px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: var(--fm-cyan) !important;
+    color: var(--fm-white) !important;
+  }
+
+  .p-menubar .p-menubar-root-list {
+    gap: 0 !important;
+  }
+
+  .p-menubar .p-menubar-item-content {
+    border-radius: 0 !important;
+    background: transparent !important;
+  }
+
+  .p-menubar .p-menubar-item-link {
+    min-height: 40px !important;
+    padding: 0 12px !important;
+  }
+
+  .p-menubar .p-menubar-item-label,
+  .p-menubar .p-menubar-item-icon,
+  .p-menubar .p-menubar-submenu-icon {
+    color: var(--fm-white) !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+  }
+
+  .p-menubar .p-menubar-root-list > .p-menubar-item > .p-menubar-item-content:hover,
+  .p-menubar .p-menubar-root-list > .p-menubar-item.p-focus > .p-menubar-item-content {
+    background: var(--fm-cyan-strong) !important;
+  }
+
+  .p-menubar .p-submenu-list {
+    min-width: 210px;
+    padding: 4px 0 !important;
+    border: 1px solid var(--fm-border) !important;
+    border-radius: 0 0 var(--fm-radius-sm) var(--fm-radius-sm) !important;
+    background: var(--fm-white) !important;
+    box-shadow: 0 10px 30px rgba(24, 55, 67, .20) !important;
+  }
+
+  .p-menubar .p-submenu-list .p-menubar-item-link {
+    min-height: 34px !important;
+    padding: 7px 12px !important;
+  }
+
+  .p-menubar .p-submenu-list .p-menubar-item-label,
+  .p-menubar .p-submenu-list .p-menubar-item-icon,
+  .p-menubar .p-submenu-list .p-menubar-submenu-icon {
+    color: var(--fm-text) !important;
+  }
+
+  .p-menubar .p-submenu-list .p-menubar-item-content:hover {
+    background: var(--fm-cyan-soft) !important;
+  }
+
+  .fm-date-button {
+    width: 100%;
+    min-height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 4px 7px;
+    border: 1px solid var(--fm-border-strong);
+    border-radius: var(--fm-radius-xs);
+    background: var(--fm-white);
+    color: var(--fm-text);
+  }
+
+  .fm-calendar,
+  .p-datepicker-panel {
+    width: 268px !important;
+    padding: 8px !important;
+    border: 1px solid var(--fm-border) !important;
+    border-radius: var(--fm-radius-md) !important;
+    background: var(--fm-white) !important;
+    box-shadow: var(--fm-shadow-popup) !important;
+  }
+
+  .fm-calendar-head,
+  .p-datepicker-header {
+    min-height: 34px !important;
+    padding: 2px !important;
+    border-bottom: 1px solid #e5eaed !important;
+  }
+
+  .p-datepicker-day {
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 50% !important;
+    font-size: 12px !important;
+  }
+
+  .p-datepicker-day-selected,
+  .p-datepicker-day.p-highlight {
+    background: var(--fm-cyan) !important;
+    color: var(--fm-white) !important;
+  }
+
+  .fm-typing-loader {
+    z-index: 1600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(234, 252, 255, .78);
+    backdrop-filter: blur(2px);
+  }
+
+  .fm-typing-loader--fullscreen {
+    position: fixed;
+    inset: 0;
+  }
+
+  .fm-typing-loader--overlay {
+    position: absolute;
+    inset: 0;
+  }
+
+  .fm-typing-loader--inline {
+    min-height: 170px;
+  }
+
+  .fm-typing-loader__box {
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    padding: 20px 26px;
+    border: 1px solid #d6e9ed;
+    border-radius: var(--fm-radius-lg);
+    background: rgba(255, 255, 255, .96);
+    box-shadow: 0 18px 42px rgba(20, 82, 92, .16);
+  }
+
+  .fm-typing-loader__image {
+    width: 116px;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  .fm-typing-loader__title {
+    color: var(--fm-cyan-strong);
+    font-size: 16px;
+  }
+
+  .fm-typing-loader__message {
+    color: var(--fm-text-muted);
+    font-size: 13px;
+  }
+
+  .fm-typing-loader__dots::after {
+    content: '';
+    animation: fm-loader-dots 1.25s steps(4, end) infinite;
+  }
+
+  @keyframes fm-loader-dots {
+    0% { content: ''; }
+    25% { content: '.'; }
+    50% { content: '..'; }
+    75%, 100% { content: '...'; }
+  }
+
+  @media (max-width: 1200px) {
+    .fm-screen--pad { padding: 6px; }
+    .fm-filter-grid { gap: 10px; }
+    .fm-field--span-2 { grid-column: span 3; }
+  }
+
+  @media (max-width: 900px) {
+    .fm-field--span-2,
+    .fm-field--span-3,
+    .fm-field--span-4 { grid-column: span 6; }
+
+    .fm-dialog,
+    .fm-alert-dialog { width: calc(100vw - 28px) !important; }
+  }
+
+  @media (max-width: 620px) {
+    .fm-screen--pad { padding: 4px; }
+    .fm-filters { padding: 10px; }
+    .fm-filter-grid { grid-template-columns: 1fr; }
+    .fm-field--span-2,
+    .fm-field--span-3,
+    .fm-field--span-4,
+    .fm-field--span-6,
+    .fm-field--span-8,
+    .fm-field--span-12 { grid-column: 1; }
+
+    .fm-actions,
+    .fm-filter-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .fm-action-button,
+    .fm-btn,
+    .fm-ui-button { width: 100%; }
+
+    .p-menubar { padding: 0 5px !important; }
+    .p-menubar .p-menubar-item-link { padding: 0 8px !important; }
+    .fm-typing-loader__box { min-width: min(250px, calc(100vw - 32px)); }
+  }
+}
+/* ===== FIN: fm-global.css ===== */
+
+/* ===== INICIO: fm-grid-resize.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [GLOBAL COMPARTIDO - MODIFICAR CON PRUEBA REGRESIVA]
+ * PANTALLAS AFECTADAS: todas las grillas PrimeVue con fm-pass-grid/fm-pt-datatable;
+ * además contiene ajustes dirigidos a Registro OTs Fallidas, Emulación y Reporte SAS.
+ * RESPONSABILIDAD:
+ *   - visibilidad de fila de filtros;
+ *   - controlador de redimensionamiento de columnas;
+ *   - cursores y estados durante el resize;
+ *   - estados visuales de filas seleccionadas, deshabilitadas y reprocesadas.
+ * ADVERTENCIA: las reglas generales de resize no deben tocarse por una sola tabla.
+ * Los selectores que comienzan con #tabla.otf-grid pertenecen a OTs Fallidas.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
+@layer fieldmanager {
+  .fm-pass-grid .p-datatable-thead > tr.p-datatable-filter-row,
+  .fm-pass-grid .p-datatable-thead > tr.p-filter-row,
+  .fm-pt-datatable .p-datatable-thead > tr.p-datatable-filter-row,
+  .fm-pt-datatable .p-datatable-thead > tr.p-filter-row {
+    display: table-row !important;
+    visibility: visible !important;
+  }
+
+  .fm-pass-grid .p-datatable-thead > tr > th,
+  .fm-pt-datatable .p-datatable-thead > tr > th {
+    position: relative !important;
+  }
+
+  .fm-pass-grid .p-column-resizer,
+  .fm-pass-grid .p-datatable-column-resizer,
+  .fm-pt-datatable .p-column-resizer,
+  .fm-pt-datatable .p-datatable-column-resizer {
+    position: absolute !important;
+    z-index: 12 !important;
+    top: 0 !important;
+    right: -4px !important;
+    width: 8px !important;
+    height: 100% !important;
+    display: block !important;
+    cursor: col-resize !important;
+    background: transparent !important;
+    touch-action: none;
+    user-select: none;
+  }
+
+  .fm-pass-grid .p-column-resizer::after,
+  .fm-pass-grid .p-datatable-column-resizer::after,
+  .fm-pt-datatable .p-column-resizer::after,
+  .fm-pt-datatable .p-datatable-column-resizer::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    bottom: 5px;
+    left: 3px;
+    width: 2px;
+    border-radius: 2px;
+    background: transparent;
+    transition: background-color .15s ease, box-shadow .15s ease;
+  }
+
+  .fm-pass-grid .p-column-resizer:hover::after,
+  .fm-pass-grid .p-datatable-column-resizer:hover::after,
+  .fm-pass-grid .p-column-resizer:active::after,
+  .fm-pass-grid .p-datatable-column-resizer:active::after,
+  .fm-pt-datatable .p-column-resizer:hover::after,
+  .fm-pt-datatable .p-datatable-column-resizer:hover::after {
+    background: #00a9bd;
+    box-shadow: 0 0 0 2px rgba(0, 169, 189, .14);
+  }
+
+  .otf-grid .p-datatable-thead > tr > th,
+  .otf-grid .p-datatable-tbody > tr > td,
+  .emulation-grid .p-datatable-thead > tr > th,
+  .emulation-grid .p-datatable-tbody > tr > td,
+  .report-sas-grid .p-datatable-thead > tr > th,
+  .report-sas-grid .p-datatable-tbody > tr > td {
+    max-width: none !important;
+  }
+
+  #app #tabla.otf-grid .p-datatable-table {
+    width: 100% !important;
+    min-width: 100% !important;
+    table-layout: fixed !important;
+  }
+
+  #app #tabla.otf-grid .fm-disabled-row > td,
+  #app #tabla.otf-grid .fm-disabled-row:hover > td,
+  #app #tabla.otf-grid .fm-reprocessed-row > td,
+  #app #tabla.otf-grid .fm-reprocessed-row:hover > td {
+    background: #edf0f2 !important;
+    color: #65737b !important;
+  }
+
+  #app #tabla.otf-grid .fm-disabled-row .fm-cell-text,
+  #app #tabla.otf-grid .fm-reprocessed-row .fm-cell-text {
+    color: #65737b !important;
+  }
+
+  #app #tabla.otf-grid .fm-disabled-row > td:first-child,
+  #app #tabla.otf-grid .fm-reprocessed-row > td:first-child,
+  #app #tabla.otf-grid .fm-disabled-row > td.p-datatable-column-selection,
+  #app #tabla.otf-grid .fm-reprocessed-row > td.p-datatable-column-selection {
+    cursor: not-allowed !important;
+  }
+
+  #app #tabla.otf-grid .fm-disabled-row .p-checkbox,
+  #app #tabla.otf-grid .fm-reprocessed-row .p-checkbox {
+    pointer-events: none !important;
+    cursor: not-allowed !important;
+    opacity: .45 !important;
+  }
+
+  #app #tabla.otf-grid .fm-disabled-row .p-checkbox-box,
+  #app #tabla.otf-grid .fm-reprocessed-row .p-checkbox-box {
+    border-color: #aeb8bd !important;
+    background: #e2e7ea !important;
+    box-shadow: none !important;
+  }
+
+  #app #tabla.otf-grid .fm-reprocessed-row .otf-row-action {
+    color: #8f9ba2 !important;
+  }
+
+  #app #tabla.otf-grid .fm-selected-row > td,
+  #app #tabla.otf-grid .fm-selected-row:hover > td,
+  #app #tabla.otf-grid .p-datatable-row-selected > td,
+  #app #tabla.otf-grid .p-highlight > td {
+    background: #d9f8fa !important;
+    color: #111 !important;
+  }
+
+  #app #tabla.otf-grid .fm-grid-action-final:disabled,
+  #app #tabla.otf-grid .fm-grid-action-final.p-disabled,
+  #app #tabla.otf-grid .fm-grid-actions-final .p-button:disabled,
+  #app #tabla.otf-grid .fm-grid-actions-final .p-button.p-disabled {
+    color: #aeb8bd !important;
+    opacity: .5 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+  }
+
+  #app #tabla.otf-grid .fm-grid-action-final:disabled .pi,
+  #app #tabla.otf-grid .fm-grid-action-final.p-disabled .pi {
+    color: #aeb8bd !important;
+  }
+
+  #app #tabla.otf-grid .otf-row-action--note-excluded {
+    color: #8f9ba2 !important;
+  }
+
+  #app #tabla.otf-grid .otf-row-action--note-excluded:hover {
+    color: #707d84 !important;
+  }
+
+  body.p-unselectable-text,
+  body.p-datatable-resizing {
+    cursor: col-resize !important;
+    user-select: none !important;
+  }
+}
+/* ===== FIN: fm-grid-resize.css ===== */
+
+/* ===== INICIO: fm-responsive.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [GLOBAL CRÍTICO - NO TOCAR POR UNA SOLA PANTALLA]
+ * PANTALLAS AFECTADAS: todas las pantallas migradas, componentes compartidos,
+ * grillas, formularios, diálogos, paginadores e iframes contenedores.
+ * RESPONSABILIDAD:
+ *   - variables responsive y tamaños mínimos;
+ *   - distribución flexible y grillas de formularios;
+ *   - scroll horizontal controlado de DataTable;
+ *   - dimensiones responsive de diálogos y paginadores;
+ *   - comportamiento para 1366, 1180, 1024, 900, 768 y 600 px.
+ * ADVERTENCIA: es el sistema responsive general. Para una pantalla concreta,
+ * agregar un selector con su clase raíz dentro del bloque específico del módulo.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
+@layer fieldmanager {
+  :root {
+    --fm-page-padding: clamp(4px, .55vw, 12px);
+    --fm-section-gap: clamp(6px, .6vw, 12px);
+    --fm-control-height: 36px;
+    --fm-touch-target: 40px;
+    --fm-grid-min-width: 760px;
+    --fm-dialog-gutter: 16px;
+    --fm-safe-bottom: env(safe-area-inset-bottom, 0px);
+    --fm-safe-left: env(safe-area-inset-left, 0px);
+    --fm-safe-right: env(safe-area-inset-right, 0px);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    min-width: 320px;
+    overflow-x: hidden;
+  }
+
+  #app,
+  .main-layout,
+  .fm-screen,
+  .fm-module-page,
+  .fm-responsive-page,
+  .fm-responsive-panel,
+  .fm-responsive-grid-shell {
+    min-width: 0;
+  }
+
+  img,
+  svg,
+  video,
+  canvas {
+    max-width: 100%;
+  }
+
+  .fm-screen--pad,
+  .fm-module-page,
+  .fm-responsive-page {
+    padding-right: max(var(--fm-page-padding), var(--fm-safe-right));
+    padding-left: max(var(--fm-page-padding), var(--fm-safe-left));
+  }
+
+  .fm-responsive-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fm-section-gap);
+    min-width: 0;
+  }
+
+  .fm-responsive-cluster,
+  .fm-responsive-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+
+  .fm-responsive-toolbar {
+    justify-content: space-between;
+  }
+
+  .fm-responsive-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    gap: 12px 14px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .fm-responsive-grid--compact {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr));
+  }
+
+  .fm-responsive-grid--wide {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr));
+  }
+
+  .fm-responsive-scroll {
+    width: 100%;
+    max-width: 100%;
+    overflow: auto;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .fm-desktop-only {
+    display: initial;
+  }
+
+  .fm-mobile-only {
+    display: none;
+  }
+
+  .fm-responsive-panel,
+  .fm-responsive-grid-shell,
+  .fm-card,
+  .fm-ui-section,
+  .fm-grid-shell {
+    container-type: inline-size;
+  }
+
+  .fm-card__header,
+  .fm-ui-section-header,
+  .fm-grid-title,
+  .fm-ui-grid-title {
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .fm-card__header > *,
+  .fm-ui-section-header > *,
+  .fm-grid-title > *,
+  .fm-ui-grid-title > * {
+    min-width: 0;
+  }
+
+  .fm-card__body,
+  .fm-ui-section-body,
+  .fm-panel-content,
+  .fm-filters {
+    min-width: 0;
+  }
+
+  .fm-filter-grid > *,
+  .fm-responsive-grid > * {
+    min-width: 0;
+  }
+
+  .fm-responsive-button,
+  .fm-action-button,
+  .fm-ui-button,
+  .fm-btn {
+    max-width: 100%;
+  }
+
+  .fm-responsive-grid-actions,
+  .fm-grid-actions-final {
+    max-width: 100%;
+  }
+
+  .fm-pass-grid .p-datatable-table-container,
+  .fm-pass-grid .p-datatable-wrapper,
+  .fm-pt-datatable-wrapper {
+    overscroll-behavior-inline: contain;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .fm-pass-grid .p-datatable-table,
+  .fm-pt-datatable-table {
+    min-width: min(100%, var(--fm-grid-min-width));
+  }
+
+  .fm-pass-grid .p-paginator,
+  .fm-pt-paginator,
+  .fm-responsive-paginator {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  .fm-responsive-dialog,
+  .fm-dialog,
+  .fm-alert-dialog,
+  .fm-pt-dialog {
+    width: min(var(--fm-dialog-width, 48rem), calc(100dvw - (var(--fm-dialog-gutter) * 2))) !important;
+    max-width: calc(100dvw - (var(--fm-dialog-gutter) * 2)) !important;
+    max-height: calc(100dvh - (var(--fm-dialog-gutter) * 2)) !important;
+  }
+
+  .fm-responsive-dialog .p-dialog-content,
+  .fm-dialog .p-dialog-content,
+  .fm-alert-dialog .p-dialog-content,
+  .fm-pt-dialog-content {
+    max-height: calc(100dvh - 150px);
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+
+  .fm-responsive-dialog .p-dialog-footer,
+  .fm-dialog .p-dialog-footer,
+  .fm-alert-dialog .p-dialog-footer,
+  .fm-pt-dialog-footer {
+    padding-bottom: calc(12px + var(--fm-safe-bottom)) !important;
+  }
+
+  .otf-custom-paginator,
+  .fm-custom-paginator {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .otf-custom-paginator__navigation,
+  .fm-custom-paginator__navigation {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .iframe-page,
+  .iframe-panel,
+  .iframe-stage,
+  .fm-legacy-frame {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  @container (max-width: 760px) {
+    .fm-card__header,
+    .fm-ui-section-header,
+    .fm-grid-title,
+    .fm-ui-grid-title {
+      min-height: 38px;
+      flex-wrap: wrap;
+      padding-top: 5px;
+      padding-bottom: 5px;
+    }
+  }
+
+  @media (min-width: 1600px) {
+    :root {
+      --fm-page-padding: 10px;
+      --fm-section-gap: 10px;
+      --fm-grid-min-width: 900px;
+    }
+
+    .fm-filter-grid {
+      gap: 12px 16px;
+    }
+
+    .fm-pass-grid .p-datatable-table-container,
+    .fm-pass-grid .p-datatable-wrapper {
+      max-height: min(62dvh, 680px);
+    }
+  }
+
+  @media (max-width: 1366px) {
+    :root {
+      --fm-control-height: 34px;
+      --fm-grid-min-width: 740px;
+    }
+
+    .fm-screen--pad {
+      padding: 6px;
+    }
+
+    .fm-filters {
+      padding: 10px 14px 11px;
+    }
+
+    .fm-action-button,
+    .fm-ui-button,
+    .fm-btn {
+      min-width: 138px;
+      height: 36px;
+      min-height: 36px;
+      font-size: 13px !important;
+    }
+
+    .fm-pass-grid .p-datatable-thead > tr > th {
+      height: 33px !important;
+    }
+
+    .fm-pass-grid .p-datatable-tbody > tr > td {
+      height: 34px !important;
+    }
+  }
+
+  @media (max-width: 1180px) {
+    :root {
+      --fm-grid-min-width: 720px;
+    }
+
+    .fm-field--span-2 {
+      grid-column: span 3;
+    }
+
+    .fm-field--span-3 {
+      grid-column: span 4;
+    }
+
+    .fm-field--span-4 {
+      grid-column: span 6;
+    }
+
+    .otf-custom-paginator,
+    .fm-custom-paginator {
+      grid-template-columns: minmax(90px, 1fr) auto minmax(130px, 1fr);
+    }
+  }
+
+  @media (max-width: 1024px) {
+    :root {
+      --fm-grid-min-width: 700px;
+      --fm-dialog-gutter: 12px;
+    }
+
+    .fm-screen--pad,
+    .fm-module-page,
+    .fm-responsive-page {
+      padding: 5px;
+    }
+
+    .fm-filter-grid {
+      gap: 9px 11px;
+    }
+
+    .fm-field--span-2,
+    .fm-field--span-3 {
+      grid-column: span 4;
+    }
+
+    .fm-field--span-4,
+    .fm-field--span-6 {
+      grid-column: span 6;
+    }
+
+    .fm-pass-grid .p-datatable-table-container,
+    .fm-pass-grid .p-datatable-wrapper,
+    .fm-pt-datatable-wrapper {
+      max-height: calc(100dvh - 270px);
+    }
+
+    .fm-alert-header {
+      min-height: 58px;
+      padding: 0 18px;
+    }
+
+    .fm-alert-title {
+      font-size: 24px;
+    }
+
+    .fm-alert-body--refined {
+      min-height: 118px;
+      gap: 22px;
+      padding: 22px 26px;
+    }
+
+    .fm-alert-message {
+      font-size: 18px;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .fm-field--span-2,
+    .fm-field--span-3,
+    .fm-field--span-4,
+    .fm-field--span-6 {
+      grid-column: span 6;
+    }
+
+    .otf-custom-paginator,
+    .fm-custom-paginator {
+      min-height: 78px;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px 10px;
+      padding: 5px 8px;
+    }
+
+    .otf-custom-paginator__actions,
+    .fm-custom-paginator__actions {
+      justify-self: start;
+    }
+
+    .otf-custom-paginator__counter,
+    .fm-custom-paginator__counter {
+      justify-self: end;
+    }
+
+    .otf-custom-paginator__navigation,
+    .fm-custom-paginator__navigation {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      justify-self: center;
+    }
+
+    .fm-responsive-dialog .p-dialog-footer,
+    .fm-dialog .p-dialog-footer,
+    .fm-alert-dialog .p-dialog-footer {
+      flex-wrap: wrap;
+    }
+  }
+
+  @media (max-width: 768px) {
+    :root {
+      --fm-grid-min-width: 680px;
+      --fm-page-padding: 4px;
+    }
+
+    .fm-card,
+    .fm-panel,
+    .fm-ui-section {
+      margin-bottom: 6px;
+    }
+
+    .fm-card__header,
+    .fm-panel-header,
+    .fm-ui-section-header,
+    .fm-grid-title,
+    .fm-ui-grid-title {
+      min-height: 38px;
+      padding: 5px 8px;
+      flex-wrap: wrap;
+    }
+
+    .fm-filters {
+      padding: 9px;
+    }
+
+    .fm-filter-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
+    }
+
+    .fm-field--span-2,
+    .fm-field--span-3,
+    .fm-field--span-4,
+    .fm-field--span-6,
+    .fm-field--span-8,
+    .fm-field--span-12 {
+      grid-column: span 1;
+    }
+
+    .fm-field--tablet-full {
+      grid-column: 1 / -1;
+    }
+
+    .fm-pass-grid .p-datatable-table-container,
+    .fm-pass-grid .p-datatable-wrapper,
+    .fm-pt-datatable-wrapper {
+      overflow-x: auto !important;
+      max-height: calc(100dvh - 250px);
+    }
+
+    .fm-pass-grid .p-paginator,
+    .fm-pt-paginator {
+      min-height: 48px !important;
+      padding: 5px !important;
+    }
+
+    .fm-pass-grid .p-paginator .p-paginator-page,
+    .fm-pass-grid .p-paginator .p-paginator-first,
+    .fm-pass-grid .p-paginator .p-paginator-prev,
+    .fm-pass-grid .p-paginator .p-paginator-next,
+    .fm-pass-grid .p-paginator .p-paginator-last {
+      width: 34px !important;
+      min-width: 34px !important;
+      height: 34px !important;
+      min-height: 34px !important;
+    }
+
+    .iframe-stage {
+      height: calc(100dvh - 106px) !important;
+      min-height: 420px !important;
+    }
+  }
+
+  @media (max-width: 600px) {
+    :root {
+      --fm-dialog-gutter: 8px;
+      --fm-grid-min-width: 660px;
+    }
+
+    .fm-mobile-only {
+      display: initial;
+    }
+
+    .fm-desktop-only {
+      display: none !important;
+    }
+
+    .fm-filter-grid,
+    .fm-responsive-grid,
+    .fm-responsive-grid--compact,
+    .fm-responsive-grid--wide {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .fm-field--span-2,
+    .fm-field--span-3,
+    .fm-field--span-4,
+    .fm-field--span-6,
+    .fm-field--span-8,
+    .fm-field--span-12 {
+      grid-column: 1;
+    }
+
+    .fm-actions,
+    .fm-filter-actions,
+    .fm-responsive-toolbar {
+      width: 100%;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .fm-actions > *,
+    .fm-filter-actions > *,
+    .fm-responsive-toolbar > *,
+    .fm-responsive-button,
+    .fm-action-button,
+    .fm-ui-button,
+    .fm-btn {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .fm-grid-title,
+    .fm-ui-grid-title {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .fm-responsive-grid-actions,
+    .fm-grid-actions-final {
+      width: auto !important;
+      align-self: flex-start;
+    }
+
+    .otf-custom-paginator,
+    .fm-custom-paginator {
+      min-height: 112px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+    }
+
+    .otf-custom-paginator__actions,
+    .otf-custom-paginator__navigation,
+    .otf-custom-paginator__counter,
+    .fm-custom-paginator__actions,
+    .fm-custom-paginator__navigation,
+    .fm-custom-paginator__counter {
+      justify-self: auto;
+      max-width: 100%;
+    }
+
+    .otf-custom-paginator__navigation,
+    .fm-custom-paginator__navigation {
+      overflow-x: auto;
+      justify-content: flex-start;
+      padding: 2px 4px;
+    }
+
+    .fm-responsive-dialog .p-dialog-header,
+    .fm-dialog .p-dialog-header,
+    .fm-alert-dialog .p-dialog-header {
+      min-height: 50px !important;
+      padding: 9px 12px !important;
+    }
+
+    .fm-responsive-dialog .p-dialog-content,
+    .fm-dialog .p-dialog-content,
+    .fm-alert-dialog .p-dialog-content {
+      max-height: calc(100dvh - 132px);
+      padding: 12px !important;
+    }
+
+    .fm-responsive-dialog .p-dialog-footer,
+    .fm-dialog .p-dialog-footer,
+    .fm-alert-dialog .p-dialog-footer {
+      min-height: auto !important;
+      flex-direction: column-reverse;
+      align-items: stretch !important;
+      padding: 10px 12px calc(10px + var(--fm-safe-bottom)) !important;
+    }
+
+    .fm-responsive-dialog .p-dialog-footer > *,
+    .fm-dialog .p-dialog-footer > *,
+    .fm-alert-dialog .p-dialog-footer > * {
+      width: 100% !important;
+      min-width: 0 !important;
+    }
+
+    .fm-alert-header {
+      min-height: 52px;
+      padding: 0 12px;
+    }
+
+    .fm-alert-title {
+      font-size: 21px;
+    }
+
+    .fm-alert-close-icon {
+      width: 36px;
+      min-width: 36px;
+      height: 36px;
+      min-height: 36px;
+    }
+
+    .fm-alert-body--refined {
+      min-height: 0;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 20px 18px;
+    }
+
+    .fm-alert-warning-icon {
+      width: 46px;
+      min-width: 46px;
+      height: 44px;
+    }
+
+    .fm-alert-message {
+      width: 100%;
+      font-size: 16px;
+      line-height: 1.4;
+    }
+
+    .fm-alert-close-action {
+      width: 100%;
+      min-width: 0;
+    }
+  }
+
+  @media (max-width: 430px) {
+    :root {
+      --fm-grid-min-width: 640px;
+    }
+
+    .fm-screen--pad,
+    .fm-module-page,
+    .fm-responsive-page {
+      padding: 3px;
+    }
+
+    .fm-card__header,
+    .fm-panel-header,
+    .fm-ui-section-header,
+    .fm-grid-title,
+    .fm-ui-grid-title {
+      padding-right: 7px;
+      padding-left: 7px;
+      font-size: 12px;
+    }
+
+    .fm-filters {
+      padding: 8px;
+    }
+
+    .fm-field label,
+    .fm-field__label {
+      font-size: 11px;
+    }
+
+    .fm-action-button,
+    .fm-ui-button,
+    .fm-btn {
+      min-height: 40px;
+      height: 40px;
+    }
+
+    .fm-pass-grid .p-datatable-thead > tr > th,
+    .fm-pass-grid .p-datatable-tbody > tr > td {
+      padding-right: 6px !important;
+      padding-left: 6px !important;
+    }
+
+    .fm-typing-loader__box {
+      width: calc(100dvw - 24px);
+      min-width: 0;
+      padding: 16px;
+    }
+  }
+
+  @media (max-height: 720px) and (min-width: 769px) {
+    .fm-pass-grid .p-datatable-table-container,
+    .fm-pass-grid .p-datatable-wrapper,
+    .fm-pt-datatable-wrapper {
+      max-height: calc(100dvh - 245px);
+    }
+
+    .iframe-stage {
+      height: calc(100dvh - 92px) !important;
+      min-height: 360px !important;
+    }
+
+    .fm-dialog .p-dialog-content,
+    .fm-alert-dialog .p-dialog-content,
+    .fm-responsive-dialog .p-dialog-content {
+      max-height: calc(100dvh - 125px);
+    }
+  }
+
+  @media (orientation: landscape) and (max-height: 520px) {
+    .fm-pass-grid .p-datatable-table-container,
+    .fm-pass-grid .p-datatable-wrapper {
+      max-height: calc(100dvh - 190px);
+    }
+
+    .fm-alert-body--refined {
+      min-height: 0;
+      padding-top: 14px;
+      padding-bottom: 14px;
+    }
+  }
+
+  @media (pointer: coarse) {
+    .fm-icon-button,
+    .fm-icon-btn,
+    .fm-grid-action-final,
+    .otf-row-action,
+    .otf-page-button,
+    .fm-page-button {
+      min-width: var(--fm-touch-target) !important;
+      min-height: var(--fm-touch-target) !important;
+    }
+
+    .fm-pass-grid .p-checkbox,
+    .fm-pass-grid .p-checkbox-input {
+      min-width: 32px;
+      min-height: 32px;
+    }
+  }
+
+  @media (hover: none) {
+    .fm-action-button:hover,
+    .fm-ui-button:hover,
+    .fm-btn:hover {
+      transform: none !important;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      animation-duration: .01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .01ms !important;
+    }
+  }
+
+  @media print {
+    body {
+      overflow: visible;
+      background: #fff;
+    }
+
+    .menu-container,
+    .fm-actions,
+    .fm-filter-actions,
+    .fm-grid-actions-final,
+    .p-paginator {
+      display: none !important;
+    }
+
+    .fm-screen,
+    .fm-module-page,
+    .fm-responsive-page,
+    .fm-card,
+    .fm-grid-shell {
+      width: 100% !important;
+      max-width: none !important;
+      padding: 0 !important;
+      border: 0 !important;
+      box-shadow: none !important;
+    }
+
+    .fm-pass-grid .p-datatable-table-container,
+    .fm-pass-grid .p-datatable-wrapper {
+      max-height: none !important;
+      overflow: visible !important;
+    }
+
+    .fm-pass-grid .p-datatable-table {
+      width: 100% !important;
+      min-width: 0 !important;
+    }
+  }
+}
+/* ===== FIN: fm-responsive.css ===== */
+
+/* ===== INICIO: fm-legacy-responsive.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [IFRAME LEGACY]
+ * PANTALLAS AFECTADAS: páginas antiguas abiertas mediante IframeView/DetalleView,
+ * por ejemplo Gestión de Actas, reglas, notas y otras rutas aún no migradas.
+ * RESPONSABILIDAD:
+ *   - adaptar formularios, tablas, paginadores, diálogos y barras de acciones legacy;
+ *   - agregar scroll y límites de viewport dentro del documento del iframe;
+ *   - mejorar uso táctil y reducir movimiento cuando el sistema lo solicita.
+ * ADVERTENCIA: este bloque es extraído por responsiveIframes.js e inyectado dentro
+ * del iframe. No usarlo para corregir componentes Vue migrados.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
+body.fm-responsive-legacy {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 320px !important;
+  margin: 0 !important;
+  overflow-x: hidden !important;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body.fm-responsive-legacy *,
+body.fm-responsive-legacy *::before,
+body.fm-responsive-legacy *::after {
+  box-sizing: border-box !important;
+}
+
+body.fm-responsive-legacy img,
+body.fm-responsive-legacy svg,
+body.fm-responsive-legacy video,
+body.fm-responsive-legacy canvas {
+  max-width: 100% !important;
+}
+
+body.fm-responsive-legacy form,
+body.fm-responsive-legacy fieldset,
+body.fm-responsive-legacy .panel,
+body.fm-responsive-legacy .card,
+body.fm-responsive-legacy .ui-panel,
+body.fm-responsive-legacy .ui-accordion,
+body.fm-responsive-legacy .accordion,
+body.fm-responsive-legacy .ui-accordion-content,
+body.fm-responsive-legacy .accordion-inner,
+body.fm-responsive-legacy .accordion-content {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+body.fm-responsive-legacy input:not([type=checkbox]):not([type=radio]),
+body.fm-responsive-legacy select,
+body.fm-responsive-legacy textarea,
+body.fm-responsive-legacy .ui-inputfield,
+body.fm-responsive-legacy .p-inputtext,
+body.fm-responsive-legacy .p-select,
+body.fm-responsive-legacy .ui-selectonemenu,
+body.fm-responsive-legacy .ui-autocomplete,
+body.fm-responsive-legacy .ui-autocomplete-input {
+  max-width: 100% !important;
+}
+
+body.fm-responsive-legacy .table-responsive,
+body.fm-responsive-legacy .ui-datatable-tablewrapper,
+body.fm-responsive-legacy .ui-datatable-scrollable-header,
+body.fm-responsive-legacy .ui-datatable-scrollable-body,
+body.fm-responsive-legacy .ui-datatable-scrollable-footer,
+body.fm-responsive-legacy .dataTables_wrapper,
+body.fm-responsive-legacy [class*=table-container],
+body.fm-responsive-legacy [class*=grid-container] {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  overscroll-behavior-inline: contain !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: thin !important;
+}
+
+body.fm-responsive-legacy table,
+body.fm-responsive-legacy .ui-datatable table,
+body.fm-responsive-legacy table.dataTable {
+  max-width: none !important;
+}
+
+body.fm-responsive-legacy .ui-paginator,
+body.fm-responsive-legacy .p-paginator,
+body.fm-responsive-legacy .dataTables_paginate,
+body.fm-responsive-legacy .pagination,
+body.fm-responsive-legacy .pager {
+  width: 100% !important;
+  max-width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  flex-wrap: wrap !important;
+}
+
+body.fm-responsive-legacy .ui-dialog,
+body.fm-responsive-legacy .p-dialog,
+body.fm-responsive-legacy .modal-dialog,
+body.fm-responsive-legacy .modal-content,
+body.fm-responsive-legacy [role=dialog] {
+  max-width: calc(100dvw - 24px) !important;
+  max-height: calc(100dvh - 24px) !important;
+}
+
+body.fm-responsive-legacy .ui-dialog-content,
+body.fm-responsive-legacy .p-dialog-content,
+body.fm-responsive-legacy .modal-body {
+  max-height: calc(100dvh - 150px) !important;
+  overflow: auto !important;
+  overscroll-behavior: contain !important;
+}
+
+body.fm-responsive-legacy .ui-dialog-buttonpane,
+body.fm-responsive-legacy .p-dialog-footer,
+body.fm-responsive-legacy .modal-footer {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+}
+
+body.fm-responsive-legacy .btn-toolbar,
+body.fm-responsive-legacy .button-bar,
+body.fm-responsive-legacy .actions,
+body.fm-responsive-legacy .form-actions,
+body.fm-responsive-legacy .toolbar,
+body.fm-responsive-legacy [class*=action-bar],
+body.fm-responsive-legacy [class*=button-bar] {
+  max-width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+}
+
+@media (max-width: 1366px) {
+  body.fm-responsive-legacy {
+    font-size: 12px !important;
+  }
+
+  body.fm-responsive-legacy table th,
+  body.fm-responsive-legacy table td,
+  body.fm-responsive-legacy .ui-datatable th,
+  body.fm-responsive-legacy .ui-datatable td {
+    padding-right: 6px !important;
+    padding-left: 6px !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  body.fm-responsive-legacy {
+    padding-right: 6px !important;
+    padding-left: 6px !important;
+  }
+
+  body.fm-responsive-legacy table,
+  body.fm-responsive-legacy .ui-datatable table,
+  body.fm-responsive-legacy table.dataTable {
+    min-width: 700px !important;
+  }
+
+  body.fm-responsive-legacy .ui-datatable-scrollable-body {
+    max-height: calc(100dvh - 230px) !important;
+  }
+
+  body.fm-responsive-legacy .ui-dialog,
+  body.fm-responsive-legacy .p-dialog,
+  body.fm-responsive-legacy .modal-dialog,
+  body.fm-responsive-legacy .modal-content,
+  body.fm-responsive-legacy [role=dialog] {
+    width: calc(100dvw - 24px) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  body.fm-responsive-legacy {
+    padding-right: 4px !important;
+    padding-left: 4px !important;
+  }
+
+  body.fm-responsive-legacy table,
+  body.fm-responsive-legacy .ui-datatable table,
+  body.fm-responsive-legacy table.dataTable {
+    min-width: 680px !important;
+  }
+
+  body.fm-responsive-legacy .row,
+  body.fm-responsive-legacy .form-row,
+  body.fm-responsive-legacy [class*=form-grid],
+  body.fm-responsive-legacy [class*=filter-grid] {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 9px !important;
+  }
+
+  body.fm-responsive-legacy .row > *,
+  body.fm-responsive-legacy .form-row > *,
+  body.fm-responsive-legacy [class*=form-grid] > *,
+  body.fm-responsive-legacy [class*=filter-grid] > * {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+  }
+
+  body.fm-responsive-legacy .ui-paginator,
+  body.fm-responsive-legacy .p-paginator,
+  body.fm-responsive-legacy .dataTables_paginate,
+  body.fm-responsive-legacy .pagination,
+  body.fm-responsive-legacy .pager {
+    min-height: 44px !important;
+    padding: 5px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  body.fm-responsive-legacy table,
+  body.fm-responsive-legacy .ui-datatable table,
+  body.fm-responsive-legacy table.dataTable {
+    min-width: 640px !important;
+  }
+
+  body.fm-responsive-legacy .row,
+  body.fm-responsive-legacy .form-row,
+  body.fm-responsive-legacy [class*=form-grid],
+  body.fm-responsive-legacy [class*=filter-grid] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  body.fm-responsive-legacy button:not(.ui-datepicker-trigger):not(.p-datepicker-trigger),
+  body.fm-responsive-legacy input[type=button],
+  body.fm-responsive-legacy input[type=submit],
+  body.fm-responsive-legacy .btn,
+  body.fm-responsive-legacy .ui-button,
+  body.fm-responsive-legacy .p-button {
+    max-width: 100% !important;
+  }
+
+  body.fm-responsive-legacy .btn-toolbar,
+  body.fm-responsive-legacy .button-bar,
+  body.fm-responsive-legacy .actions,
+  body.fm-responsive-legacy .form-actions,
+  body.fm-responsive-legacy .toolbar,
+  body.fm-responsive-legacy [class*=action-bar],
+  body.fm-responsive-legacy [class*=button-bar] {
+    width: 100% !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  body.fm-responsive-legacy .btn-toolbar > *,
+  body.fm-responsive-legacy .button-bar > *,
+  body.fm-responsive-legacy .actions > *,
+  body.fm-responsive-legacy .form-actions > *,
+  body.fm-responsive-legacy .toolbar > *,
+  body.fm-responsive-legacy [class*=action-bar] > *,
+  body.fm-responsive-legacy [class*=button-bar] > * {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  body.fm-responsive-legacy .ui-dialog-buttonpane,
+  body.fm-responsive-legacy .p-dialog-footer,
+  body.fm-responsive-legacy .modal-footer {
+    flex-direction: column-reverse !important;
+    align-items: stretch !important;
+  }
+
+  body.fm-responsive-legacy .ui-dialog-buttonpane > *,
+  body.fm-responsive-legacy .p-dialog-footer > *,
+  body.fm-responsive-legacy .modal-footer > * {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+}
+
+@media (max-width: 430px) {
+  body.fm-responsive-legacy {
+    min-width: 320px !important;
+    padding-right: 3px !important;
+    padding-left: 3px !important;
+  }
+
+  body.fm-responsive-legacy table,
+  body.fm-responsive-legacy .ui-datatable table,
+  body.fm-responsive-legacy table.dataTable {
+    min-width: 620px !important;
+  }
+
+  body.fm-responsive-legacy label,
+  body.fm-responsive-legacy legend {
+    font-size: 11px !important;
+  }
+}
+
+@media (max-height: 720px) and (min-width: 769px) {
+  body.fm-responsive-legacy .ui-datatable-scrollable-body,
+  body.fm-responsive-legacy .dataTables_scrollBody {
+    max-height: calc(100dvh - 220px) !important;
+  }
+
+  body.fm-responsive-legacy .ui-dialog-content,
+  body.fm-responsive-legacy .p-dialog-content,
+  body.fm-responsive-legacy .modal-body {
+    max-height: calc(100dvh - 125px) !important;
+  }
+}
+
+@media (pointer: coarse) {
+  body.fm-responsive-legacy button,
+  body.fm-responsive-legacy input[type=button],
+  body.fm-responsive-legacy input[type=submit],
+  body.fm-responsive-legacy .btn,
+  body.fm-responsive-legacy .ui-button,
+  body.fm-responsive-legacy .p-button,
+  body.fm-responsive-legacy .ui-paginator a,
+  body.fm-responsive-legacy .ui-paginator button,
+  body.fm-responsive-legacy .pagination a,
+  body.fm-responsive-legacy .pager a {
+    min-height: 40px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.fm-responsive-legacy *,
+  body.fm-responsive-legacy *::before,
+  body.fm-responsive-legacy *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+/* ===== FIN: fm-legacy-responsive.css ===== */
+
+/* ===== INICIO: fm-menu-responsive.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [GLOBAL CRÍTICO - MENÚ]
+ * PANTALLAS AFECTADAS: navegación principal de todas las rutas autenticadas.
+ * RESPONSABILIDAD:
+ *   - comportamiento del menubar en notebook, tablet y móvil;
+ *   - apertura, posición y ancho de submenús;
+ *   - controles táctiles, scroll y adaptación del panel de navegación.
+ * ADVERTENCIA: no modificar por una opción puntual del menú. Los cambios afectan
+ * la navegación completa y deben probarse en escritorio, notebook y móvil.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
+@layer fieldmanager {
+  @media (max-width: 1180px) {
+    .menu-container .fm-menu-link--root {
+      padding-right: 8px !important;
+      padding-left: 8px !important;
+    }
+
+    .menu-container .fm-menu-link--root .fm-menu-label {
+      font-size: 11px !important;
+    }
+
+    .menu-container .username {
+      display: none !important;
+    }
+  }
+
+  @media (max-width: 960px) {
+    .menu-container .main-menu.p-menubar {
+      height: auto !important;
+      min-height: 48px !important;
+      padding: 0 8px !important;
+    }
+
+    .menu-container .p-menubar-button {
+      width: 40px !important;
+      min-width: 40px !important;
+      height: 40px !important;
+      min-height: 40px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      border: 0 !important;
+      background: transparent !important;
+      color: #fff !important;
+    }
+
+    .menu-container .p-menubar-button:hover {
+      background: rgba(255, 255, 255, .14) !important;
+    }
+
+    .menu-container .p-menubar-root-list {
+      width: min(360px, calc(100dvw - 16px)) !important;
+      max-height: calc(100dvh - 62px) !important;
+      overflow-y: auto !important;
+      overscroll-behavior: contain;
+      padding: 5px 0 !important;
+      border: 1px solid #d5dee4 !important;
+      background: #fff !important;
+      box-shadow: 0 12px 32px rgba(18, 45, 57, .24) !important;
+    }
+
+    .menu-container .p-menubar-root-list > .p-menubar-item,
+    .menu-container .p-menubar-root-list > .p-menuitem,
+    .menu-container .p-menubar-root-list > .p-menubar-item > .p-menubar-item-content,
+    .menu-container .p-menubar-root-list > .p-menuitem > .p-menuitem-content {
+      width: 100% !important;
+      height: auto !important;
+      min-height: 40px !important;
+      background: #fff !important;
+    }
+
+    .menu-container .fm-menu-link--root {
+      width: 100% !important;
+      min-height: 40px !important;
+      height: auto !important;
+      justify-content: space-between !important;
+      padding: 8px 12px !important;
+      color: #213746 !important;
+    }
+
+    .menu-container .fm-menu-link--root .fm-menu-label,
+    .menu-container .fm-menu-link--root .fm-menu-chevron {
+      color: #213746 !important;
+    }
+
+    .menu-container .p-menubar-root-list > .p-menubar-item > .p-menubar-item-content:hover,
+    .menu-container .p-menubar-root-list > .p-menuitem > .p-menuitem-content:hover {
+      background: #e8fafd !important;
+    }
+
+    .menu-container .user-section {
+      height: 48px !important;
+      margin-left: auto !important;
+    }
+
+    .menu-container .dropdown-content {
+      max-width: calc(100dvw - 16px);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .menu-container .main-menu.p-menubar {
+      padding-right: max(5px, env(safe-area-inset-right, 0px)) !important;
+      padding-left: max(5px, env(safe-area-inset-left, 0px)) !important;
+    }
+
+    .menu-container .p-menubar-root-list {
+      width: calc(100dvw - 10px) !important;
+      max-width: none !important;
+    }
+
+    .menu-container .p-menubar-submenu,
+    .menu-container .p-submenu-list {
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: none !important;
+      position: static !important;
+      border-right: 0 !important;
+      border-left: 3px solid #00a9bd !important;
+      box-shadow: none !important;
+    }
+
+    .menu-container .dropdown-content {
+      position: fixed !important;
+      top: 52px !important;
+      right: 5px !important;
+      left: 5px !important;
+      width: auto !important;
+      min-width: 0 !important;
+    }
+
+    .menu-container .user-avatar {
+      width: 30px !important;
+      height: 30px !important;
+      flex-basis: 30px !important;
+    }
+
+    .menu-container .spacer {
+      height: 18px !important;
+    }
+  }
+
+  @media (pointer: coarse) and (max-width: 960px) {
+    .menu-container .fm-menu-link--root,
+    .menu-container .fm-menu-link--submenu {
+      min-height: 44px !important;
+    }
+  }
+}
+/* ===== FIN: fm-menu-responsive.css ===== */
+
+/* ===== INICIO: fm-menu-tuning.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [GLOBAL CRÍTICO - MENÚ]
+ * PANTALLAS AFECTADAS: cabecera, menú principal y sector de usuario en toda la app.
+ * RESPONSABILIDAD:
+ *   - apariencia general del menú y sus enlaces;
+ *   - perfil del usuario, icono, datos y cierre de sesión;
+ *   - sombras, bordes, hover, estados activos y franja decorativa.
+ * ADVERTENCIA: no usar este bloque para ajustar contenido interno de una pantalla.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
+/* Ajustes visuales específicos del menú principal.
+ * Se mantiene separado para no alterar los estilos generales de PrimeVue.
+ */
+
+/*
+ * Los submenús de PrimeVue pueden renderizarse fuera del árbol scoped de
+ * CustomMenu. Estas reglas globales garantizan que la versión compacta se
+ * aplique también a los paneles desplegados y a los submenús anidados.
+ */
+#app .p-menubar-submenu,
+#app .p-submenu-list,
+body > .p-menubar-submenu,
+body > .p-submenu-list {
+  min-width: 238px !important;
+  width: max-content !important;
+  max-width: 340px !important;
+  padding: 0 !important;
+  border: 1px solid #d8e1e5 !important;
+  border-top: 3px solid #00a9bd !important;
+  border-radius: 0 !important;
+  background: #eef3f5 !important;
+  box-shadow: 0 7px 18px rgba(18, 45, 57, .17) !important;
+  overflow: visible !important;
+  z-index: 3000 !important;
+}
+
+#app .p-menubar-submenu .p-menubar-submenu,
+#app .p-submenu-list .p-submenu-list,
+body > .p-menubar-submenu .p-menubar-submenu,
+body > .p-submenu-list .p-submenu-list {
+  min-width: 266px !important;
+  margin-top: -3px !important;
+}
+
+#app .p-menubar-submenu .p-menubar-item,
+#app .p-submenu-list .p-menubar-item,
+#app .p-submenu-list .p-menuitem,
+#app .p-menubar-submenu .p-menubar-item-content,
+#app .p-submenu-list .p-menubar-item-content,
+#app .p-submenu-list .p-menuitem-content,
+body > .p-menubar-submenu .p-menubar-item,
+body > .p-submenu-list .p-menubar-item,
+body > .p-submenu-list .p-menuitem,
+body > .p-menubar-submenu .p-menubar-item-content,
+body > .p-submenu-list .p-menubar-item-content,
+body > .p-submenu-list .p-menuitem-content {
+  min-height: 31px !important;
+  height: auto !important;
+  border-radius: 0 !important;
+}
+
+#app .p-menubar-submenu .p-menubar-item-content,
+#app .p-submenu-list .p-menubar-item-content,
+#app .p-submenu-list .p-menuitem-content,
+body > .p-menubar-submenu .p-menubar-item-content,
+body > .p-submenu-list .p-menubar-item-content,
+body > .p-submenu-list .p-menuitem-content {
+  margin: 1px 2px !important;
+  border-bottom: 0 !important;
+  background: #fff !important;
+  box-shadow:
+    0 1px 1px rgba(18, 45, 57, .05),
+    inset 0 -1px 0 #e6ecef !important;
+  transition:
+    background-color .13s ease,
+    box-shadow .13s ease,
+    transform .13s ease !important;
+}
+
+#app .p-menubar-submenu .fm-menu-link--submenu,
+#app .p-submenu-list .fm-menu-link--submenu,
+body > .p-menubar-submenu .fm-menu-link--submenu,
+body > .p-submenu-list .fm-menu-link--submenu {
+  width: 100% !important;
+  min-height: 31px !important;
+  gap: 9px !important;
+  padding: 6px 12px !important;
+  color: #273b46 !important;
+  background: transparent !important;
+  box-sizing: border-box !important;
+}
+
+#app .p-menubar-submenu .fm-menu-link--submenu .fm-menu-label,
+#app .p-submenu-list .fm-menu-link--submenu .fm-menu-label,
+body > .p-menubar-submenu .fm-menu-link--submenu .fm-menu-label,
+body > .p-submenu-list .fm-menu-link--submenu .fm-menu-label {
+  flex: 1 1 auto !important;
+  color: #273b46 !important;
+  font-size: 11px !important;
+  font-weight: 400 !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+}
+
+#app .p-menubar-submenu .fm-menu-link--submenu .fm-menu-chevron,
+#app .p-submenu-list .fm-menu-link--submenu .fm-menu-chevron,
+body > .p-menubar-submenu .fm-menu-link--submenu .fm-menu-chevron,
+body > .p-submenu-list .fm-menu-link--submenu .fm-menu-chevron {
+  flex: 0 0 auto !important;
+  margin-left: auto !important;
+  color: #82959f !important;
+  font-size: 8px !important;
+}
+
+#app .p-menubar-submenu .p-menubar-item-content:hover,
+#app .p-menubar-submenu .p-menubar-item.p-focus > .p-menubar-item-content,
+#app .p-menubar-submenu .p-menubar-item.p-menubar-item-active > .p-menubar-item-content,
+#app .p-submenu-list .p-menubar-item-content:hover,
+#app .p-submenu-list .p-menubar-item.p-focus > .p-menubar-item-content,
+#app .p-submenu-list .p-menuitem-content:hover,
+#app .p-submenu-list .p-menuitem.p-focus > .p-menuitem-content,
+body > .p-menubar-submenu .p-menubar-item-content:hover,
+body > .p-submenu-list .p-menubar-item-content:hover,
+body > .p-submenu-list .p-menuitem-content:hover {
+  background: #dff7fa !important;
+  box-shadow:
+    inset 0 3px 6px rgba(26, 78, 90, .18),
+    inset 0 0 0 1px rgba(0, 169, 189, .17) !important;
+  transform: translateY(1px) !important;
+}
+
+#app .main-menu .fm-menu-link--submenu .fm-menu-label {
+  font-size: 11px !important;
+}
+
+/* Usuario superior: sin contenedor rectangular. */
+#app .main-menu .user-profile.p-button {
+  width: auto !important;
+  min-width: 0 !important;
+  min-height: 32px !important;
+  height: 32px !important;
+  gap: 8px !important;
+  padding: 0 4px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#app .main-menu .user-profile.p-button:hover,
+#app .main-menu .user-profile.p-button[aria-expanded='true'] {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#app .main-menu .user-profile-icon {
+  width: 24px !important;
+  height: 24px !important;
+  flex: 0 0 24px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, .18) !important;
+  color: #fff !important;
+  font-size: 15px !important;
+}
+
+#app .main-menu .username {
+  max-width: 220px !important;
+  color: #fff !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: .01em;
+}
+
+#app .main-menu .dropdown-icon {
+  margin-left: 2px;
+  color: #fff !important;
+  font-size: 9px !important;
+}
+
+/* Panel desplegado: legajo, nombre y apellido siempre visibles. */
+#app .main-menu .dropdown-content {
+  width: 238px !important;
+}
+
+#app .main-menu .user-info {
+  padding: 9px !important;
+}
+
+#app .main-menu .info-item {
+  min-height: 116px !important;
+  align-items: flex-start !important;
+  gap: 11px !important;
+  padding: 10px !important;
+  border-color: #dce8ec !important;
+  background: #fff !important;
+}
+
+#app .main-menu .info-icon {
+  width: 34px !important;
+  height: 34px !important;
+  flex: 0 0 34px !important;
+  margin-top: 1px;
+  border-radius: 6px !important;
+  background: #dff7fa !important;
+  color: #007f90 !important;
+}
+
+#app .main-menu .info-icon i {
+  font-size: 16px !important;
+}
+
+#app .main-menu .info-copy {
+  min-width: 0;
+  width: 100%;
+  max-width: 174px;
+}
+
+#app .main-menu .info-copy small {
+  color: #5f7d88 !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+}
+
+#app .main-menu .info-copy > span {
+  color: #203f4b !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+#app .main-menu .fm-user-extra-fields {
+  width: calc(100% + 45px);
+  display: grid;
+  gap: 8px;
+  margin-top: 9px;
+  margin-left: -45px;
+  padding-top: 9px;
+  border-top: 1px solid #e4ecef;
+}
+
+#app .main-menu .fm-user-profile-field {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 34px 55px minmax(0, 1fr);
+  align-items: center;
+  gap: 11px;
+}
+
+#app .main-menu .fm-user-profile-field__icon {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: center;
+  border-radius: 6px;
+  background: #dff7fa;
+  color: #007f90;
+}
+
+#app .main-menu .fm-user-profile-field__icon i {
+  font-size: 16px !important;
+}
+
+#app .main-menu .fm-user-profile-field small {
+  color: #5f7d88 !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+}
+
+#app .main-menu .fm-user-profile-field__value {
+  min-width: 0;
+  min-height: 18px;
+  overflow: hidden;
+  color: #203f4b !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#app .main-menu .fm-user-profile-field__value.is-empty {
+  border-bottom: 1px dashed #cbd9de;
+  color: transparent !important;
+}
+
+/* Botón de salida compacto y proporcionado. */
+#app .main-menu .logout-area {
+  display: flex !important;
+  justify-content: center !important;
+  padding: 2px 8px 9px !important;
+}
+
+#app .main-menu .logout-btn.p-button {
+  width: auto !important;
+  min-width: 132px !important;
+  min-height: 28px !important;
+  height: 28px !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  padding: 0 12px !important;
+  border: 1px solid #00a9bd !important;
+  border-radius: 6px !important;
+  background: #f7fdfe !important;
+  color: #007f90 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  box-shadow: 0 1px 2px rgba(0, 127, 144, .08) !important;
+}
+
+#app .main-menu .logout-btn.p-button .p-button-icon {
+  width: 14px !important;
+  min-width: 14px !important;
+  height: 14px !important;
+  flex: 0 0 14px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  color: currentColor !important;
+  font-size: 14px !important;
+  line-height: 14px !important;
+  transform: none !important;
+}
+
+#app .main-menu .logout-btn.p-button .p-button-label {
+  display: inline-flex !important;
+  align-items: center !important;
+  font-size: 11px !important;
+  line-height: 1 !important;
+}
+
+#app .main-menu .logout-btn.p-button:hover {
+  border-color: #008b9d !important;
+  background: #e8fafd !important;
+  color: #006f7d !important;
+  box-shadow: 0 2px 5px rgba(0, 127, 144, .12) !important;
+  transform: none !important;
+}
+
+/* Franja de color animada debajo del menú. No utiliza negro. */
+#app .menu-container .menu-accent {
+  height: 4px !important;
+  background: linear-gradient(
+    90deg,
+    #ff1744,
+    #ff7a00,
+    #ffd600,
+    #32d74b,
+    #00c7be,
+    #00a9bd,
+    #1689ff,
+    #5e5ce6,
+    #af52de,
+    #ff2d95,
+    #ff1744
+  ) !important;
+  background-size: 320% 100% !important;
+  animation: fm-menu-spectrum 7s linear infinite;
+}
+
+@keyframes fm-menu-spectrum {
+  from {
+    background-position: 0% 50%;
+  }
+
+  to {
+    background-position: 320% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #app .menu-container .menu-accent {
+    animation: none;
+    background-size: 100% 100% !important;
+  }
+}
+/* ===== FIN: fm-menu-tuning.css ===== */
+
+/* ===== INICIO: fm-report-sas-auto-height.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [MÓDULO / PANTALLA]
+ * PANTALLA AFECTADA: Reporte SAS.
+ * CLASES PRINCIPALES: .report-sas-page, .report-sas-grid-shell y .report-sas-grid.
+ * RESPONSABILIDAD:
+ *   - altura automática de la grilla;
+ *   - uso del espacio disponible entre cabecera, tabla y paginador;
+ *   - prevención de scroll duplicado y cortes verticales.
+ * MODIFICACIÓN: puede ajustarse para Reporte SAS, manteniendo siempre sus clases raíz.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
+/* Reporte SAS: crece con la cantidad de filas hasta completar la pantalla.
+ * Al alcanzar la altura disponible, conserva el scroll interno de la grilla.
+ */
+#app .report-sas-page.report-sas-page--fullscreen {
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: min(
+    var(--fm-report-sas-desired-height, 520px),
+    calc(100dvh - 82px)
+  ) !important;
+  min-height: min(300px, calc(100dvh - 82px)) !important;
+  max-height: calc(100dvh - 82px) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+#app .report-sas-page.report-sas-page--fullscreen .report-sas-accordion,
+#app .report-sas-page.report-sas-page--fullscreen .report-sas-grid-shell,
+#app .report-sas-page.report-sas-page--fullscreen .report-sas-grid {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+#app .report-sas-page.report-sas-page--fullscreen .report-sas-grid :is(
+  .p-datatable-table-container,
+  .p-datatable-wrapper,
+  [data-pc-section='tablecontainer']
+) {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow: auto !important;
+}
+/* ===== FIN: fm-report-sas-auto-height.css ===== */
+
+/* ===== INICIO: fm-report-sas-fullscreen.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [ARCHIVADO - INACTIVO]
+ * PANTALLA HISTÓRICA: Reporte SAS.
+ * ESTADO: conservado dentro de @media not all; no participa de la cascada actual.
+ * RESPONSABILIDAD HISTÓRICA: forzar Reporte SAS a pantalla completa.
+ * ADVERTENCIA: no quitar @media not all ni reactivar estas reglas. Existe una
+ * implementación actual de tamaño completo y activarlo duplicaría especificidad.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
+/* Sección archivada: este archivo no estaba importado en la aplicación. */
+@media not all {
+  #app .report-sas-page.report-sas-page--fullscreen {
+    position: fixed !important;
+    inset: 82px 0 0 !important;
+    z-index: 0;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: calc(100dvh - 82px) !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: #fff;
+  }
+
+  #app .report-sas-page.report-sas-page--fullscreen .report-sas-accordion {
+    width: 100% !important;
+    height: 100% !important;
+    gap: 0 !important;
+  }
+
+  #app .report-sas-page.report-sas-page--fullscreen .report-sas-grid-shell,
+  #app .report-sas-page.report-sas-page--fullscreen .report-sas-grid {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+}
+/* ===== FIN: fm-report-sas-fullscreen.css ===== */
+
+/* ===== INICIO: fm-select.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [GLOBAL COMPARTIDO - MODIFICAR CON PRUEBA REGRESIVA]
+ * PANTALLAS AFECTADAS: todos los Select y MultiSelect compartidos de PrimeVue.
+ * RESPONSABILIDAD:
+ *   - altura, tipografía, padding, iconos y panel desplegable;
+ *   - estados focus, disabled, hover y selección;
+ *   - consistencia visual de combos entre módulos.
+ * ADVERTENCIA: para un combo particular usar una clase del módulo. No cambiar este
+ * bloque para resolver solamente un Select de Jobtype, Reporte SAS u OTs Fallidas.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
+@layer fieldmanager {
+  .p-select-overlay,
+  .fm-pt-select-panel {
+    overflow: hidden !important;
+    border: 1px solid #d4dde2 !important;
+    border-radius: 8px !important;
+    background: #fff !important;
+    box-shadow: 0 12px 30px rgba(20, 48, 59, .18) !important;
+  }
+
+  .p-select-list,
+  .fm-pt-select-list {
+    margin: 0 !important;
+    padding: 6px 0 !important;
+    background: #fff !important;
+  }
+
+  .p-select-option,
+  .fm-pt-select-option {
+    min-height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 8px 18px !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+    color: #263746 !important;
+    font-size: 16px !important;
+    font-weight: 400 !important;
+    cursor: pointer !important;
+    transition: background-color .12s ease, color .12s ease !important;
+  }
+
+  .p-select-option.p-select-option-selected,
+  .p-select-option[aria-selected="true"],
+  .p-select-option[data-p-selected="true"],
+  .fm-pt-select-option.p-select-option-selected,
+  .fm-pt-select-option[aria-selected="true"],
+  .fm-pt-select-option[data-p-selected="true"] {
+    background: #eef2f4 !important;
+    color: #263746 !important;
+    font-weight: 500 !important;
+  }
+
+  .p-select-option:hover,
+  .p-select-option.p-focus,
+  .p-select-option[data-p-focused="true"],
+  .fm-pt-select-option:hover,
+  .fm-pt-select-option.p-focus,
+  .fm-pt-select-option[data-p-focused="true"] {
+    background: #d9f8fa !important;
+    color: #006f7d !important;
+  }
+
+  .p-select-option.p-select-option-selected:hover,
+  .p-select-option.p-select-option-selected.p-focus,
+  .p-select-option.p-select-option-selected[data-p-focused="true"],
+  .p-select-option[aria-selected="true"]:hover,
+  .p-select-option[aria-selected="true"].p-focus,
+  .p-select-option[aria-selected="true"][data-p-focused="true"],
+  .fm-pt-select-option.p-select-option-selected:hover,
+  .fm-pt-select-option.p-select-option-selected.p-focus,
+  .fm-pt-select-option.p-select-option-selected[data-p-focused="true"] {
+    background: #d9f8fa !important;
+    color: #006f7d !important;
+  }
+
+  @media (max-width: 600px), (pointer: coarse) {
+    .p-select-option,
+    .fm-pt-select-option {
+      min-height: 44px !important;
+      padding: 10px 16px !important;
+    }
+  }
+}
+/* ===== FIN: fm-select.css ===== */
+
+/* ===== INICIO: jobtype-contrato.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [MÓDULO / FAMILIA DE PANTALLAS]
+ * PANTALLAS AFECTADAS: Configuración Jobtype–Contrato y CMO–Actividad cuando
+ * reutilizan clases .jobtype-* y sus componentes compartidos.
+ * RESPONSABILIDAD:
+ *   - distribución de filtros, resultados, grillas y botones;
+ *   - modales de alta, modificación y confirmación;
+ *   - dimensiones y comportamiento visual de la familia Jobtype.
+ * ADVERTENCIA: aunque el nombre diga contrato, varias reglas son compartidas con CMO.
+ * Revisar ambas pantallas antes de modificar un selector .jobtype-* genérico.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
+/*
+ * Jobtype-Contrato
+ * Única hoja de estilos de la pantalla.
+ * No crear hojas paralelas para esta vista.
+ */
+
+/* =========================
+   Pantalla principal
+   ========================= */
+.jobtype-screen {
+  width: 100%;
+  height: calc(100vh - 2px);
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  overflow: hidden;
+  background: #fff;
+  color: #111;
+  font-family: Arial, Helvetica, sans-serif;
+  box-sizing: border-box;
+}
+
+.jobtype-panel {
+  width: 100%;
+  border: 1px solid #d5d5d5;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.jobtype-panel--results.is-expanded {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.jobtype-panel__header {
+  width: 100%;
+  height: 27px;
+  min-height: 27px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px;
+  border: 0;
+  border-bottom: 1px solid #e5e5e5;
+  background: linear-gradient(#fafafa, #f2f2f2);
+  color: #202020;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 400;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.jobtype-panel__toggle {
+  color: #666;
+  font-size: 20px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.jobtype-search-body {
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+}
+
+.jobtype-search-button,
+.jobtype-search-button.p-button {
+  min-width: 66px !important;
+  height: 27px !important;
+  min-height: 27px !important;
+  padding: 0 12px !important;
+  border-radius: 15px !important;
+  font-size: 11px !important;
+  font-weight: 400 !important;
+  box-shadow: none !important;
+}
+
+.jobtype-results-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  overflow: hidden;
+  background: #fff;
+}
+
+.jobtype-main-grid,
+.jobtype-main-grid.p-datatable {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  border: 0 !important;
+  background: #fff !important;
+}
+
+.jobtype-main-grid .p-datatable-table-container,
+.jobtype-main-grid .p-datatable-wrapper,
+.jobtype-main-grid [data-pc-section="tablecontainer"] {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  overflow: auto !important;
+  background: #fff !important;
+}
+
+.jobtype-main-grid .p-datatable-table {
+  width: 100% !important;
+  min-width: 100% !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+}
+
+.jobtype-main-grid .p-datatable-thead > tr > th {
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 7px !important;
+  border: 1px solid #bcbcbc !important;
+  background: #f1f1f1 !important;
+  color: #242424 !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  line-height: 1.1 !important;
+  text-transform: uppercase !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.jobtype-main-grid .p-datatable-thead > tr.p-datatable-filter-row > th,
+.jobtype-main-grid .p-datatable-thead > tr.p-filter-row > th {
+  height: 35px !important;
+  min-height: 35px !important;
+  padding: 3px 5px !important;
+  background: #fff !important;
+  border-top: 0 !important;
+}
+
+.jobtype-main-grid .p-datatable-sort-icon,
+.jobtype-main-grid .p-sortable-column-icon {
+  width: 11px !important;
+  height: 11px !important;
+  margin-left: 5px !important;
+  color: #333 !important;
+}
+
+.jobtype-filter-cell {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr) 12px;
+  align-items: center;
+  gap: 2px;
+}
+
+.jobtype-filter-symbol,
+.jobtype-filter-clear {
+  color: #111;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.jobtype-filter-clear {
+  cursor: pointer;
+}
+
+.jobtype-filter-input,
+.jobtype-filter-input.p-inputtext {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 26px !important;
+  min-height: 26px !important;
+  padding: 1px 5px !important;
+  border: 1px solid #cdcdcd !important;
+  border-radius: 2px !important;
+  background: #fff !important;
+  color: #111 !important;
+  font-size: 11px !important;
+  box-shadow: none !important;
+  box-sizing: border-box !important;
+}
+
+.jobtype-main-grid .p-datatable-tbody > tr > td {
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 7px !important;
+  border-right: 1px solid #e1e1e1 !important;
+  border-bottom: 1px solid #e8e8e8 !important;
+  background: #fff !important;
+  color: #111 !important;
+  font-size: 11px !important;
+}
+
+.jobtype-main-grid .p-datatable-tbody > tr.p-highlight > td,
+.jobtype-main-grid .p-datatable-tbody > tr:hover > td {
+  background: #eefbfc !important;
+}
+
+.jobtype-cell-text {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jobtype-main-grid > .p-paginator,
+.jobtype-main-grid .p-datatable-paginator-bottom {
+  flex: 0 0 38px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 0 !important;
+  border-top: 1px solid #d7d7d7 !important;
+  background: #fff !important;
+  overflow: hidden !important;
+}
+
+/* =========================
+   Popup Alta Jobtype-Contrato
+   Base visual: bdf3d160...
+   ========================= */
+body .p-dialog.jobtype-alta-dialog {
+  width: min(1440px, calc(100vw - 24px)) !important;
+  height: min(680px, 56vw, calc(100dvh - 24px)) !important;
+  max-width: calc(100vw - 24px) !important;
+  max-height: calc(100dvh - 24px) !important;
+  display: grid !important;
+  grid-template-rows: 58px minmax(0, 1fr) 58px !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  border: 1px solid var(--fm-border) !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  box-shadow: var(--fm-shadow-popup) !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+body .jobtype-alta-dialog .p-dialog-header {
+  width: 100% !important;
+  height: 58px !important;
+  min-height: 58px !important;
+  padding: 0 !important;
+  border-bottom: 1px solid var(--fm-border) !important;
+  background: #fff !important;
+  box-sizing: border-box !important;
+}
+
+.jobtype-alta-header {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 52px;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+body .p-dialog.jobtype-alta-dialog .jobtype-alta-header__close {
+  width: 44px !important;
+  height: 40px !important;
+  min-width: 44px !important;
+  min-height: 40px !important;
+  justify-self: center;
+  margin-left: 0;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  border: 1px solid transparent !important;
+  border-radius: 7px;
+  outline: 0;
+  background: #fff !important;
+  color: #111 !important;
+  box-shadow: none;
+  cursor: pointer;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 24px !important;
+  font-weight: 700;
+  line-height: 1 !important;
+  transition: border-color .15s ease, color .15s ease;
+}
+
+body .p-dialog.jobtype-alta-dialog .jobtype-alta-header__close:hover,
+body .p-dialog.jobtype-alta-dialog .jobtype-alta-header__close:focus-visible {
+  border-color: var(--fm-cyan) !important;
+  color: var(--fm-cyan) !important;
+}
+
+.jobtype-alta-header__title {
+  margin: 0 0 0 20px;
+  color: var(--fm-text);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+body .jobtype-alta-dialog .p-dialog-content {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  display: flex !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: #fff !important;
+  box-sizing: border-box !important;
+}
+
+.jobtype-alta-content {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-rows: 58px minmax(0, 1fr);
+  gap: 14px;
+  padding: 8px 16px 10px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.jobtype-alta-form {
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns:
+    120px
+    minmax(260px, 1fr)
+    minmax(260px, 1fr)
+    120px
+    140px;
+  align-items: end;
+  gap: 14px;
+  box-sizing: border-box;
+}
+
+.jobtype-alta-field {
+  min-width: 0;
+}
+
+.jobtype-alta-form > .jobtype-alta-field:nth-child(1),
+.jobtype-alta-form > .jobtype-alta-field:nth-child(4) {
+  width: 120px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
+}
+
+.jobtype-alta-field .jobtype-alta-control,
+.jobtype-alta-field .jobtype-alta-control.p-inputtext,
+.jobtype-alta-field .jobtype-alta-control.p-select {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  background: #fff !important;
+  opacity: 1 !important;
+}
+
+body .p-dialog.jobtype-alta-dialog .jobtype-alta-control.p-select .p-select-label {
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 8px !important;
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+}
+
+.jobtype-alta-form .jobtype-alta-control.p-inputtext:invalid {
+  border-color: #d32f2f !important;
+  box-shadow: 0 0 0 1px #d32f2f inset !important;
+}
+
+.jobtype-alta-form .jobtype-alta-control.p-inputtext:invalid:focus {
+  border-color: #d32f2f !important;
+  box-shadow: 0 0 0 1px #d32f2f inset !important;
+}
+
+body .p-dialog.jobtype-alta-dialog .jobtype-add-button,
+body .p-dialog.jobtype-alta-dialog .jobtype-add-button.p-button {
+  width: 120px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  align-self: end;
+  justify-self: end !important;
+  border-radius: 2px !important;
+}
+
+body .jobtype-alta-select-overlay {
+  width: auto !important;
+  min-width: 120px !important;
+  max-width: 180px !important;
+}
+
+body .jobtype-alta-select-overlay .p-select-list {
+  padding: 2px 0 !important;
+}
+
+body .jobtype-alta-select-overlay .p-select-option {
+  min-height: 30px !important;
+  padding: 5px 10px !important;
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+}
+
+body .jobtype-alta-select-overlay .p-select-option-label {
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+}
+
+.jobtype-alta-grid-wrap {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  border: 1px solid var(--fm-border);
+  border-left: 3px solid var(--fm-cyan);
+  overflow: hidden;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.jobtype-alta-grid,
+.jobtype-alta-grid.p-datatable {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  background: #fff !important;
+}
+
+body .jobtype-alta-dialog .jobtype-alta-grid .p-datatable-table-container,
+body .jobtype-alta-dialog .jobtype-alta-grid .p-datatable-wrapper,
+body .jobtype-alta-dialog .jobtype-alta-grid [data-pc-section="tablecontainer"] {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  overflow: auto !important;
+  background: #fff !important;
+}
+
+body .jobtype-alta-dialog .jobtype-alta-grid .p-datatable-table {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  table-layout: fixed !important;
+}
+
+.jobtype-alta-empty {
+  min-height: 76px !important;
+  height: 76px !important;
+}
+
+body .jobtype-alta-dialog .jobtype-alta-grid > .p-paginator,
+body .jobtype-alta-dialog .jobtype-alta-grid .p-datatable-paginator-bottom {
+  flex: 0 0 42px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  padding: 0 !important;
+  border-top: 1px solid var(--fm-border) !important;
+  background: #fff !important;
+  overflow: hidden !important;
+}
+
+body .jobtype-alta-dialog .fm-custom-paginator {
+  min-height: 42px !important;
+  height: 42px !important;
+  padding: 2px 10px !important;
+}
+
+body .jobtype-alta-dialog .p-dialog-footer {
+  width: 100% !important;
+  height: 58px !important;
+  min-height: 58px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  padding: 0 16px !important;
+  border-top: 1px solid var(--fm-border) !important;
+  background: #fff !important;
+  box-sizing: border-box !important;
+}
+
+body .p-dialog.jobtype-alta-dialog .jobtype-relate-button,
+body .p-dialog.jobtype-alta-dialog .jobtype-relate-button.p-button {
+  width: 120px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  border-radius: 2px !important;
+}
+
+/* Adaptación del AutoComplete conectado al backend a la maqueta aprobada. */
+body .p-dialog.jobtype-alta-dialog .jobtype-alta-autocomplete,
+body .p-dialog.jobtype-alta-dialog .jobtype-alta-field .p-autocomplete {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  display: flex !important;
+  background: #fff !important;
+  opacity: 1 !important;
+}
+
+body .p-dialog.jobtype-alta-dialog .jobtype-alta-autocomplete .p-autocomplete-input,
+body .p-dialog.jobtype-alta-dialog .jobtype-alta-autocomplete input,
+body .p-dialog.jobtype-alta-dialog .jobtype-alta-field .p-autocomplete .p-autocomplete-input {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  flex: 1 1 auto !important;
+  padding: 0 8px !important;
+  border: 1px solid var(--fm-border-strong, #b8c9d3) !important;
+  border-radius: 2px !important;
+  background: #fff !important;
+  opacity: 1 !important;
+  box-sizing: border-box !important;
+}
+
+body .p-dialog.jobtype-alta-dialog .jobtype-alta-autocomplete--invalid .p-autocomplete-input,
+body .p-dialog.jobtype-alta-dialog .jobtype-alta-autocomplete--invalid input,
+body .p-dialog.jobtype-alta-dialog .jobtype-alta-autocomplete--invalid .p-autocomplete-input:focus,
+body .p-dialog.jobtype-alta-dialog .jobtype-alta-autocomplete--invalid input:focus {
+  border-color: #d32f2f !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 1px #d32f2f inset !important;
+}
+/* ===== FIN: jobtype-contrato.css ===== */
+
+/* ===== INICIO: parametrizaciones-panel-accent.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [MÓDULO / FAMILIA DE PANTALLAS]
+ * PANTALLAS AFECTADAS: Jobtype–Contrato y CMO–Actividad.
+ * RESPONSABILIDAD:
+ *   - ancho final de paneles de parametrizaciones;
+ *   - línea turquesa vertical continua debajo de la cabecera;
+ *   - superposición del acento sobre filtros, tabla y paginador.
+ * ADVERTENCIA: conservar el pseudo-elemento y verificar ambas parametrizaciones.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
+/*
+ * Ajuste compartido para Jobtype–Contrato y CMO–Actividad.
+ * La línea turquesa comienza inmediatamente debajo de la cabecera
+ * y continúa hasta el final del contenido expandido.
+ */
+html body #app .jobtype-screen > .jobtype-panel {
+  position: relative !important;
+  width: calc(100% - 8px) !important;
+  max-width: calc(100% - 8px) !important;
+  margin-right: 8px !important;
+}
+
+/* Evita duplicar el borde aplicado en intentos anteriores. */
+html body #app .jobtype-screen > .jobtype-panel > .jobtype-panel__body,
+html body #app .jobtype-screen > .jobtype-panel > .jobtype-results-body {
+  border-left: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/*
+ * La cabecera mide 27 px. La franja se superpone a filtros, tabla,
+ * espacio vacío y paginador para que no pueda quedar tapada.
+ */
+html body #app .jobtype-screen > .jobtype-panel::after {
+  content: '' !important;
+  position: absolute !important;
+  z-index: 9999 !important;
+  top: 27px !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 3px !important;
+  display: block !important;
+  background: #00a9bd !important;
+  pointer-events: none !important;
+}
+/* ===== FIN: parametrizaciones-panel-accent.css ===== */
+
+/* ===== INICIO: jobtype-required-validation.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [MÓDULO / FAMILIA DE PANTALLAS]
+ * PANTALLAS AFECTADAS: formularios y diálogos Jobtype–Contrato/CMO–Actividad.
+ * RESPONSABILIDAD:
+ *   - marca visual de campos obligatorios;
+ *   - estados inválidos y mensajes de validación;
+ *   - consistencia de borde/foco en formularios Jobtype.
+ * MODIFICACIÓN: limitar cualquier nueva regla a las clases del diálogo correspondiente.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
+/*
+ * Validación visible de los campos obligatorios de Alta Jobtype-Contrato.
+ * Se carga después de jobtype-contrato.css para prevalecer sobre PrimeVue.
+ */
+
+html body .p-dialog.jobtype-alta-dialog
+.jobtype-alta-autocomplete.jobtype-alta-autocomplete--invalid {
+  border-radius: 3px !important;
+  background: #fffafa !important;
+  outline: 2px solid #e7a1a1 !important;
+  outline-offset: -1px !important;
+  box-shadow: 0 0 0 2px rgba(231, 161, 161, 0.16) !important;
+}
+
+html body .p-dialog.jobtype-alta-dialog
+.jobtype-alta-autocomplete.jobtype-alta-autocomplete--invalid
+.p-autocomplete-input,
+html body .p-dialog.jobtype-alta-dialog
+.jobtype-alta-autocomplete.jobtype-alta-autocomplete--invalid
+input,
+html body .p-dialog.jobtype-alta-dialog
+#alta-jobtype[aria-invalid='true'] input,
+html body .p-dialog.jobtype-alta-dialog
+#alta-contrato[aria-invalid='true'] input {
+  border-color: #e7a1a1 !important;
+  background: #fffafa !important;
+  box-shadow: none !important;
+}
+
+html body .p-dialog.jobtype-alta-dialog
+.jobtype-alta-autocomplete.jobtype-alta-autocomplete--invalid:focus-within {
+  outline-color: #df8d8d !important;
+  box-shadow: 0 0 0 3px rgba(223, 141, 141, 0.18) !important;
+}
+/* ===== FIN: jobtype-required-validation.css ===== */
+
+/* ===== INICIO: parametrizaciones-grid-selection.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [MÓDULO / FAMILIA DE PANTALLAS]
+ * PANTALLAS AFECTADAS: grillas de Jobtype–Contrato y CMO–Actividad.
+ * RESPONSABILIDAD:
+ *   - color de fila seleccionada;
+ *   - hover, checkbox y estados de selección;
+ *   - prioridad visual sobre estilos generales de DataTable.
+ * ADVERTENCIA: no trasladar estas reglas a .fm-pass-grid global porque cambiaría
+ * todas las tablas migradas.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
+/*
+ * Tipografía y selección compartidas para las grillas de Parametrizaciones.
+ * Referencia visual: Registro OTs Fallidas.
+ */
+
+#tabla-jobtype-contrato,
+#tabla-cmo-actividad {
+  --p-datatable-row-selected-background: #eafcff;
+  --p-datatable-row-selected-color: #17252d;
+}
+
+/* Datos con la misma tipografía que Registro OTs Fallidas. */
+html body #app #tabla-jobtype-contrato .p-datatable-tbody > tr > td,
+html body #app #tabla-cmo-actividad .p-datatable-tbody > tr > td {
+  color: #263238 !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+}
+
+html body #app #tabla-jobtype-contrato .p-datatable-tbody > tr > td *,
+html body #app #tabla-cmo-actividad .p-datatable-tbody > tr > td * {
+  color: inherit !important;
+  font-size: inherit !important;
+}
+
+html body #app #tabla-jobtype-contrato .p-datatable-tbody > tr.p-datatable-row-selected,
+html body #app #tabla-jobtype-contrato .p-datatable-tbody > tr.p-highlight,
+html body #app #tabla-jobtype-contrato .p-datatable-tbody > tr[data-p-selected='true'],
+html body #app #tabla-jobtype-contrato .p-datatable-tbody > tr[aria-selected='true'],
+html body #app #tabla-cmo-actividad .p-datatable-tbody > tr.p-datatable-row-selected,
+html body #app #tabla-cmo-actividad .p-datatable-tbody > tr.p-highlight,
+html body #app #tabla-cmo-actividad .p-datatable-tbody > tr[data-p-selected='true'],
+html body #app #tabla-cmo-actividad .p-datatable-tbody > tr[aria-selected='true'] {
+  opacity: 1 !important;
+}
+
+/* Selección turquesa muy clara y texto más oscuro. */
+html body #app #tabla-jobtype-contrato .p-datatable-tbody > tr.p-datatable-row-selected > td,
+html body #app #tabla-jobtype-contrato .p-datatable-tbody > tr.p-datatable-row-selected:hover > td,
+html body #app #tabla-jobtype-contrato .p-datatable-tbody > tr.p-highlight > td,
+html body #app #tabla-jobtype-contrato .p-datatable-tbody > tr.p-highlight:hover > td,
+html body #app #tabla-jobtype-contrato .p-datatable-tbody > tr[data-p-selected='true'] > td,
+html body #app #tabla-jobtype-contrato .p-datatable-tbody > tr[data-p-selected='true']:hover > td,
+html body #app #tabla-jobtype-contrato .p-datatable-tbody > tr[aria-selected='true'] > td,
+html body #app #tabla-jobtype-contrato .p-datatable-tbody > tr[aria-selected='true']:hover > td,
+html body #app #tabla-cmo-actividad .p-datatable-tbody > tr.p-datatable-row-selected > td,
+html body #app #tabla-cmo-actividad .p-datatable-tbody > tr.p-datatable-row-selected:hover > td,
+html body #app #tabla-cmo-actividad .p-datatable-tbody > tr.p-highlight > td,
+html body #app #tabla-cmo-actividad .p-datatable-tbody > tr.p-highlight:hover > td,
+html body #app #tabla-cmo-actividad .p-datatable-tbody > tr[data-p-selected='true'] > td,
+html body #app #tabla-cmo-actividad .p-datatable-tbody > tr[data-p-selected='true']:hover > td,
+html body #app #tabla-cmo-actividad .p-datatable-tbody > tr[aria-selected='true'] > td,
+html body #app #tabla-cmo-actividad .p-datatable-tbody > tr[aria-selected='true']:hover > td {
+  background: #eafcff !important;
+  color: #17252d !important;
+  font-weight: 600 !important;
+}
+
+html body #app #tabla-jobtype-contrato .p-datatable-tbody > tr.p-datatable-row-selected > td *,
+html body #app #tabla-jobtype-contrato .p-datatable-tbody > tr.p-highlight > td *,
+html body #app #tabla-jobtype-contrato .p-datatable-tbody > tr[data-p-selected='true'] > td *,
+html body #app #tabla-jobtype-contrato .p-datatable-tbody > tr[aria-selected='true'] > td *,
+html body #app #tabla-cmo-actividad .p-datatable-tbody > tr.p-datatable-row-selected > td *,
+html body #app #tabla-cmo-actividad .p-datatable-tbody > tr.p-highlight > td *,
+html body #app #tabla-cmo-actividad .p-datatable-tbody > tr[data-p-selected='true'] > td *,
+html body #app #tabla-cmo-actividad .p-datatable-tbody > tr[aria-selected='true'] > td * {
+  color: #17252d !important;
+  font-weight: 600 !important;
+}
+/* ===== FIN: parametrizaciones-grid-selection.css ===== */
+
+/* ===== INICIO: fm-grid-empty-state.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [GLOBAL COMPARTIDO - MODIFICAR CON PRUEBA REGRESIVA]
+ * PANTALLAS AFECTADAS: todas las grillas que usan el estado vacío compartido.
+ * RESPONSABILIDAD:
+ *   - apariencia de “sin resultados”;
+ *   - altura mínima, fondo, alineación y mensaje vacío;
+ *   - compatibilidad con distintas clases de PrimeVue para empty message.
+ * ADVERTENCIA: un cambio se verá en Reporte SAS, Búsqueda de OTs, OTs Fallidas
+ * y otras tablas migradas.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
+/*
+ * Estado vacío compartido para todas las grillas del aplicativo.
+ * Referencia visual: franja celeste fina de 35 px con texto centrado.
+ */
+
+:root {
+  --fm-grid-empty-row-height: 35px;
+  --fm-grid-empty-row-background: #eafcff;
+  --fm-grid-empty-row-color: #075f6d;
+}
+
+html body #app .p-datatable.p-component .p-datatable-tbody > tr.p-datatable-emptymessage,
+html body #app .p-datatable.p-component .p-datatable-tbody > tr.p-datatable-empty-message {
+  height: var(--fm-grid-empty-row-height) !important;
+  min-height: var(--fm-grid-empty-row-height) !important;
+  max-height: var(--fm-grid-empty-row-height) !important;
+}
+
+html body #app .p-datatable.p-component .p-datatable-tbody > tr.p-datatable-emptymessage > td,
+html body #app .p-datatable.p-component .p-datatable-tbody > tr.p-datatable-empty-message > td {
+  height: var(--fm-grid-empty-row-height) !important;
+  min-height: var(--fm-grid-empty-row-height) !important;
+  max-height: var(--fm-grid-empty-row-height) !important;
+  padding: 0 !important;
+  vertical-align: middle !important;
+  text-align: center !important;
+  background: var(--fm-grid-empty-row-background) !important;
+  color: var(--fm-grid-empty-row-color) !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: var(--fm-grid-empty-row-height) !important;
+}
+
+html body #app .p-datatable.p-component .p-datatable-tbody > tr.p-datatable-emptymessage > td > *,
+html body #app .p-datatable.p-component .p-datatable-tbody > tr.p-datatable-empty-message > td > *,
+html body #app .p-datatable.p-component .fm-grid-empty {
+  width: 100% !important;
+  height: var(--fm-grid-empty-row-height) !important;
+  min-height: var(--fm-grid-empty-row-height) !important;
+  max-height: var(--fm-grid-empty-row-height) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: var(--fm-grid-empty-row-background) !important;
+  color: var(--fm-grid-empty-row-color) !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+  box-sizing: border-box !important;
+}
+/* ===== FIN: fm-grid-empty-state.css ===== */
+
+/* ===== INICIO: fm-desktop-notebook-responsive.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [GLOBAL CRÍTICO - NO TOCAR POR UNA SOLA PANTALLA]
+ * PANTALLAS AFECTADAS: layout general en 1920×1080, 1366×768, 1280×720 y 1024×768.
+ * RESPONSABILIDAD:
+ *   - altura disponible debajo del menú;
+ *   - contenedores principales, scroll y viewport;
+ *   - adaptación de tablas, filtros y diálogos a notebook/escritorio.
+ * ADVERTENCIA: modificar solo para una corrección transversal validada en todas
+ * las resoluciones objetivo.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
+@layer fieldmanager {
+  /*
+   * Primera etapa responsive del aplicativo.
+   * Alcance: monitores y notebooks desde 1024 px de ancho.
+   * El menú de escritorio ocupa 82 px: 42 px + 3 px + 37 px.
+   */
+  @media (min-width: 961px) {
+    :root {
+      --fm-desktop-header-height: 82px;
+      --fm-desktop-content-height: calc(100dvh - var(--fm-desktop-header-height));
+    }
+
+    html,
+    body,
+    #app {
+      width: 100%;
+      height: 100%;
+      min-height: 100%;
+    }
+
+    body {
+      min-width: 1024px;
+    }
+
+    .main-layout {
+      width: 100%;
+      height: 100dvh;
+      min-height: 0 !important;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .main-layout > .menu-container {
+      width: 100%;
+      min-height: var(--fm-desktop-header-height);
+      flex: 0 0 var(--fm-desktop-header-height);
+    }
+
+    .main-layout > :not(.menu-container):not(.main-home) {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      min-height: 0;
+      flex: 1 1 auto;
+    }
+
+    .main-layout > .fm-screen,
+    .main-layout > .fm-module-page,
+    .main-layout > .fm-responsive-page,
+    .main-layout > .jobtype-screen,
+    .main-layout > .cmo-actividad-screen,
+    .main-layout > .buscador-ots-screen,
+    .main-layout > .otf-page,
+    .main-layout > .report-sas-page {
+      height: var(--fm-desktop-content-height) !important;
+      min-height: 0 !important;
+      max-height: var(--fm-desktop-content-height) !important;
+      overflow: hidden;
+    }
+
+    .fm-screen,
+    .fm-module-page,
+    .fm-responsive-page,
+    .jobtype-screen,
+    .cmo-actividad-screen,
+    .buscador-ots-screen,
+    .otf-page,
+    .report-sas-page {
+      min-width: 0 !important;
+      min-height: 0 !important;
+    }
+
+    .fm-accordion,
+    .p-accordion,
+    .p-accordionpanel,
+    .p-accordioncontent,
+    .p-accordioncontent-content,
+    .fm-panel,
+    .fm-grid-shell,
+    .fm-responsive-grid-shell,
+    .jobtype-results-body {
+      min-width: 0;
+      min-height: 0;
+    }
+
+    .fm-pass-grid,
+    .fm-pass-grid.p-datatable,
+    .jobtype-main-grid,
+    .jobtype-main-grid.p-datatable {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      min-height: 0 !important;
+      flex: 1 1 auto !important;
+      overflow: hidden !important;
+    }
+
+    .fm-pass-grid .p-datatable-table-container,
+    .fm-pass-grid .p-datatable-wrapper,
+    .fm-pass-grid [data-pc-section='tablecontainer'],
+    .jobtype-main-grid .p-datatable-table-container,
+    .jobtype-main-grid .p-datatable-wrapper,
+    .jobtype-main-grid [data-pc-section='tablecontainer'] {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      min-height: 0 !important;
+      flex: 1 1 auto !important;
+      overflow: auto !important;
+      overscroll-behavior: contain;
+    }
+
+    .fm-pass-grid > .p-paginator,
+    .fm-pass-grid .p-datatable-paginator-bottom,
+    .jobtype-main-grid > .p-paginator,
+    .jobtype-main-grid .p-datatable-paginator-bottom {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      flex: 0 0 auto !important;
+    }
+
+    .legacy-iframe,
+    .detail-frame,
+    .fm-legacy-frame {
+      width: 100% !important;
+      height: var(--fm-desktop-content-height) !important;
+      min-height: 0 !important;
+      max-height: var(--fm-desktop-content-height) !important;
+      flex: 1 1 auto;
+      display: block;
+      border: 0;
+    }
+
+    body .p-dialog,
+    body .fm-dialog,
+    body .fm-responsive-dialog,
+    body .fm-alert-dialog {
+      max-width: calc(100dvw - 24px) !important;
+      max-height: calc(100dvh - 24px) !important;
+    }
+
+    body .p-dialog .p-dialog-content {
+      min-width: 0;
+      min-height: 0;
+    }
+  }
+
+  /* Notebook estándar: 1366 × 768 y resoluciones cercanas. */
+  @media (min-width: 961px) and (max-width: 1366px) {
+    :root {
+      --fm-page-padding: 5px;
+      --fm-section-gap: 7px;
+    }
+
+    .fm-screen--pad,
+    .fm-module-page,
+    .fm-responsive-page {
+      padding: 5px !important;
+    }
+
+    .fm-accordion,
+    .fm-pt-accordion {
+      gap: 6px !important;
+    }
+
+    .fm-accordion .p-accordionheader,
+    .fm-pt-accordion-header,
+    .fm-card__header,
+    .fm-panel-header,
+    .fm-ui-section-header {
+      min-height: 29px !important;
+      padding-top: 4px !important;
+      padding-bottom: 4px !important;
+    }
+
+    .fm-filters {
+      padding: 9px 12px 10px !important;
+    }
+
+    .fm-filter-grid {
+      gap: 8px 11px !important;
+    }
+
+    .fm-pass-grid .p-datatable-thead > tr > th {
+      height: 31px !important;
+      min-height: 31px !important;
+    }
+
+    .fm-pass-grid .p-datatable-tbody > tr > td {
+      height: 31px !important;
+      min-height: 31px !important;
+    }
+  }
+
+  /* 1280 × 720 y notebooks de poca altura. */
+  @media (min-width: 961px) and (max-width: 1280px),
+         (min-width: 961px) and (max-height: 760px) {
+    .fm-screen--pad,
+    .fm-module-page,
+    .fm-responsive-page {
+      padding: 4px !important;
+    }
+
+    .fm-card,
+    .fm-panel,
+    .fm-ui-section {
+      margin-bottom: 5px !important;
+    }
+
+    .fm-filters {
+      padding-top: 7px !important;
+      padding-bottom: 8px !important;
+    }
+
+    .fm-actions,
+    .fm-filter-actions {
+      margin-top: 8px !important;
+    }
+
+    .fm-action-button,
+    .fm-ui-button,
+    .fm-btn {
+      height: 34px !important;
+      min-height: 34px !important;
+    }
+
+    .fm-pass-grid .p-datatable-table-container,
+    .fm-pass-grid .p-datatable-wrapper,
+    .fm-pt-datatable-wrapper {
+      max-height: none !important;
+    }
+
+    body .p-dialog .p-dialog-header {
+      min-height: 48px;
+    }
+
+    body .p-dialog .p-dialog-content {
+      max-height: calc(100dvh - 126px) !important;
+      overflow: auto;
+    }
+
+    body .p-dialog .p-dialog-footer {
+      min-height: 48px;
+    }
+
+    body .p-dialog.jobtype-alta-dialog {
+      height: calc(100dvh - 20px) !important;
+      max-height: calc(100dvh - 20px) !important;
+    }
+
+    body .jobtype-alta-dialog .p-dialog-header,
+    body .jobtype-alta-dialog .p-dialog-footer {
+      height: 50px !important;
+      min-height: 50px !important;
+    }
+
+    body .jobtype-alta-dialog .jobtype-alta-content {
+      grid-template-rows: auto minmax(0, 1fr) !important;
+      gap: 9px !important;
+      padding-top: 6px !important;
+      padding-bottom: 7px !important;
+    }
+
+    body .jobtype-alta-dialog .jobtype-alta-grid-wrap {
+      min-height: 0 !important;
+      height: auto !important;
+      flex: 1 1 auto !important;
+    }
+  }
+
+  /* 1024 × 768: conserva escritorio, pero reacomoda formularios anchos. */
+  @media (min-width: 961px) and (max-width: 1100px) {
+    :root {
+      --fm-grid-min-width: 700px;
+    }
+
+    .fm-screen--pad,
+    .fm-module-page,
+    .fm-responsive-page {
+      padding: 4px !important;
+    }
+
+    .fm-filter-grid {
+      gap: 8px 9px !important;
+    }
+
+    .fm-custom-paginator,
+    .otf-custom-paginator {
+      width: 100% !important;
+      max-width: 100% !important;
+      grid-template-columns: minmax(76px, 1fr) auto minmax(115px, 1fr) !important;
+      padding-right: 6px !important;
+      padding-left: 6px !important;
+    }
+
+    body .p-dialog.jobtype-alta-dialog {
+      width: calc(100dvw - 20px) !important;
+      max-width: calc(100dvw - 20px) !important;
+    }
+
+    body .jobtype-alta-dialog .jobtype-alta-form {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      grid-auto-rows: auto !important;
+      gap: 9px 12px !important;
+    }
+
+    body .jobtype-alta-dialog .jobtype-alta-form > .jobtype-alta-field,
+    body .jobtype-alta-dialog .jobtype-alta-form > .jobtype-alta-field--button {
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+      grid-column: auto !important;
+      grid-row: auto !important;
+    }
+
+    body .jobtype-alta-dialog .jobtype-add-button,
+    body .jobtype-alta-dialog .jobtype-add-button.p-button {
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+    }
+
+    body .jobtype-alta-dialog .jobtype-alta-form > .jobtype-alta-field--button {
+      grid-column: 2 !important;
+    }
+  }
+}
+/* ===== FIN: fm-desktop-notebook-responsive.css ===== */
+
+/* ===== INICIO: fm-desktop-notebook-modules.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [MULTI-MÓDULO - MODIFICAR CON PRUEBA REGRESIVA]
+ * PANTALLAS AFECTADAS: Jobtype–Contrato, CMO–Actividad, Búsqueda de OTs,
+ * Registro OTs Fallidas y Reporte SAS.
+ * RESPONSABILIDAD:
+ *   - correcciones puntuales de altura y flex para módulos con medidas históricas;
+ *   - expansión de grillas y contenido de acordeones;
+ *   - adaptación de modales Jobtype en notebook y 1024 px.
+ * ADVERTENCIA: revisar el selector antes de tocarlo: algunos son multi-módulo y
+ * otros están dirigidos específicamente a .jobtype-, .busqueda-ots-, .otf- o .report-sas-.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
+@layer fieldmanager {
+  /* Ajustes puntuales de módulos que conservaban medidas históricas rígidas. */
+  @media (min-width: 961px) {
+    body {
+      min-width: 0;
+    }
+
+    #app .jobtype-screen,
+    #app .busqueda-ots-page,
+    #app .ot-fallidas-ct,
+    #app .report-sas-page {
+      height: var(--fm-desktop-content-height) !important;
+      min-height: 0 !important;
+      max-height: var(--fm-desktop-content-height) !important;
+      box-sizing: border-box;
+    }
+
+    #app .ot-fallidas-ct {
+      margin: 0 !important;
+      padding-top: 0 !important;
+    }
+
+    #app .ot-fallidas-ct--grid-expanded .otf-grid-shell {
+      height: 100% !important;
+      min-height: 0 !important;
+      max-height: 100% !important;
+      flex: 1 1 auto !important;
+    }
+
+    #app .busqueda-ots-page--grid-expanded .busqueda-ots-accordion,
+    #app .busqueda-ots-page--grid-expanded .busqueda-ots-results-panel,
+    #app .jobtype-panel--results.is-expanded,
+    #app .jobtype-results-body {
+      min-height: 0 !important;
+      flex: 1 1 auto !important;
+    }
+
+    #app .busqueda-ots-page--grid-expanded .busqueda-ots-results-panel,
+    #app .jobtype-panel--results.is-expanded {
+      overflow: hidden !important;
+    }
+
+    #app .busqueda-ots-page--grid-expanded .p-accordioncontent,
+    #app .busqueda-ots-page--grid-expanded .p-accordioncontent-content,
+    #app .jobtype-results-body > * {
+      min-height: 0 !important;
+      flex: 1 1 auto !important;
+    }
+  }
+
+  /* Popups y formularios para 1280 × 720 y alturas equivalentes. */
+  @media (min-width: 961px) and (max-width: 1280px),
+         (min-width: 961px) and (max-height: 760px) {
+    html body .p-dialog.jobtype-alta-dialog {
+      width: calc(100dvw - 20px) !important;
+      height: calc(100dvh - 20px) !important;
+      max-width: calc(100dvw - 20px) !important;
+      max-height: calc(100dvh - 20px) !important;
+      min-height: 0 !important;
+    }
+
+    html body .p-dialog.jobtype-alta-dialog .p-dialog-header,
+    html body .p-dialog.jobtype-alta-dialog .p-dialog-footer {
+      height: 50px !important;
+      min-height: 50px !important;
+      flex-basis: 50px !important;
+    }
+
+    html body .p-dialog.jobtype-alta-dialog .jobtype-alta-header__title {
+      font-size: 18px !important;
+    }
+
+    html body .p-dialog.jobtype-alta-dialog .jobtype-alta-content {
+      min-height: 0 !important;
+      grid-template-rows: auto minmax(0, 1fr) !important;
+      gap: 8px !important;
+      padding: 6px 12px 7px !important;
+    }
+
+    html body .p-dialog.jobtype-alta-dialog .jobtype-alta-form {
+      gap: 8px 10px !important;
+    }
+
+    html body .p-dialog.jobtype-alta-dialog .jobtype-alta-grid-wrap {
+      height: auto !important;
+      min-height: 0 !important;
+      flex: 1 1 auto !important;
+    }
+
+    html body .p-dialog.jobtype-alta-dialog .jobtype-alta-grid,
+    html body .p-dialog.jobtype-alta-dialog .jobtype-alta-grid.p-datatable {
+      min-height: 0 !important;
+      flex: 1 1 auto !important;
+    }
+
+    html body .p-dialog.jobtype-alta-dialog .jobtype-alta-grid .p-datatable-table-container,
+    html body .p-dialog.jobtype-alta-dialog .jobtype-alta-grid .p-datatable-wrapper,
+    html body .p-dialog.jobtype-alta-dialog .jobtype-alta-grid [data-pc-section='tablecontainer'] {
+      min-height: 0 !important;
+      flex: 1 1 auto !important;
+      overflow: auto !important;
+    }
+  }
+
+  /* En 1024 × 768 el formulario ancho se distribuye en dos filas. */
+  @media (min-width: 961px) and (max-width: 1100px) {
+    html body .p-dialog.jobtype-alta-dialog .jobtype-alta-form {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      grid-template-rows: auto auto auto !important;
+      grid-auto-flow: row !important;
+      row-gap: 9px !important;
+      column-gap: 12px !important;
+    }
+
+    html body .p-dialog.jobtype-alta-dialog .jobtype-alta-form > .jobtype-alta-field,
+    html body .p-dialog.jobtype-alta-dialog .jobtype-alta-form > .jobtype-alta-field--button {
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+      grid-column: auto !important;
+      grid-row: auto !important;
+    }
+
+    html body .p-dialog.jobtype-alta-dialog .jobtype-alta-form > .jobtype-alta-field--button {
+      grid-column: 2 !important;
+    }
+
+    html body .p-dialog.jobtype-alta-dialog .jobtype-add-button,
+    html body .p-dialog.jobtype-alta-dialog .jobtype-add-button.p-button {
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+    }
+
+    html body .p-dialog.jobtype-alta-dialog .jobtype-alta-field .jobtype-alta-control,
+    html body .p-dialog.jobtype-alta-dialog .jobtype-alta-field .p-inputtext,
+    html body .p-dialog.jobtype-alta-dialog .jobtype-alta-field .p-select,
+    html body .p-dialog.jobtype-alta-dialog .jobtype-alta-field .p-autocomplete {
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+    }
+  }
+}
+/* ===== FIN: fm-desktop-notebook-modules.css ===== */
+
+/* ===== INICIO: fm-menu-spacing.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [GLOBAL CRÍTICO - MENÚ Y LAYOUT]
+ * PANTALLAS AFECTADAS: todas las rutas mostradas dentro del layout principal.
+ * RESPONSABILIDAD:
+ *   - altura efectiva de cabecera;
+ *   - separación inferior del menú;
+ *   - posición de .main-home y cálculo del área de contenido.
+ * ADVERTENCIA: cambiar estos valores desplaza todas las pantallas verticalmente.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
+@layer fieldmanager {
+  /*
+   * Reduce el espacio visual entre la franja de color del menú
+   * y el comienzo de todas las pantallas.
+   */
+  #app .menu-container .spacer {
+    height: 8px !important;
+    min-height: 8px !important;
+  }
+
+  /* Escritorio: 42 px de menú + 4 px de franja + 8 px de separación. */
+  @media (min-width: 961px) {
+    :root {
+      --fm-desktop-header-height: 54px !important;
+      --fm-desktop-content-height: calc(100dvh - var(--fm-desktop-header-height));
+    }
+
+    #app .main-home {
+      inset: 54px 0 0 !important;
+    }
+  }
+
+  /* Menú compacto: 48 px + 4 px + 8 px. */
+  @media (max-width: 960px) {
+    #app .main-home {
+      inset: 60px 0 0 !important;
+    }
+  }
+}
+/* ===== FIN: fm-menu-spacing.css ===== */
+
+/* ===== INICIO: fm-menu-submenu-compact.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [GLOBAL CRÍTICO - SUBMENÚS]
+ * PANTALLAS AFECTADAS: todos los submenús del menú principal.
+ * RESPONSABILIDAD:
+ *   - fondo blanco de desplegables;
+ *   - altura compacta de filas, padding y tipografía;
+ *   - divisores, hover turquesa y eliminación de separaciones excesivas.
+ * ADVERTENCIA: mantener este bloque al final de los estilos de menú porque su orden
+ * asegura que PrimeVue no restablezca fondos grises o alturas mayores.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
+/*
+ * Ajuste final de los submenús desplegables.
+ * Se carga después de los demás estilos del menú para evitar que PrimeVue
+ * restablezca fondos grises o alturas mayores.
+ */
+#app .main-menu .p-menubar-submenu,
+#app .main-menu .p-submenu-list,
+body > .p-menubar-submenu,
+body > .p-submenu-list {
+  padding: 0 !important;
+  background: #fff !important;
+}
+
+#app .main-menu .p-menubar-submenu .p-menubar-item,
+#app .main-menu .p-menubar-submenu .p-menuitem,
+#app .main-menu .p-submenu-list .p-menubar-item,
+#app .main-menu .p-submenu-list .p-menuitem,
+body > .p-menubar-submenu .p-menubar-item,
+body > .p-menubar-submenu .p-menuitem,
+body > .p-submenu-list .p-menubar-item,
+body > .p-submenu-list .p-menuitem {
+  height: 28px !important;
+  min-height: 28px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: #fff !important;
+}
+
+#app .main-menu .p-menubar-submenu .p-menubar-item-content,
+#app .main-menu .p-menubar-submenu .p-menuitem-content,
+#app .main-menu .p-submenu-list .p-menubar-item-content,
+#app .main-menu .p-submenu-list .p-menuitem-content,
+body > .p-menubar-submenu .p-menubar-item-content,
+body > .p-menubar-submenu .p-menuitem-content,
+body > .p-submenu-list .p-menubar-item-content,
+body > .p-submenu-list .p-menuitem-content {
+  height: 28px !important;
+  min-height: 28px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid #edf1f3 !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  box-sizing: border-box !important;
+}
+
+#app .main-menu .p-menubar-submenu .p-menubar-item:last-child > .p-menubar-item-content,
+#app .main-menu .p-menubar-submenu .p-menuitem:last-child > .p-menuitem-content,
+#app .main-menu .p-submenu-list .p-menubar-item:last-child > .p-menubar-item-content,
+#app .main-menu .p-submenu-list .p-menuitem:last-child > .p-menuitem-content,
+body > .p-menubar-submenu .p-menubar-item:last-child > .p-menubar-item-content,
+body > .p-menubar-submenu .p-menuitem:last-child > .p-menuitem-content,
+body > .p-submenu-list .p-menubar-item:last-child > .p-menubar-item-content,
+body > .p-submenu-list .p-menuitem:last-child > .p-menuitem-content {
+  border-bottom: 0 !important;
+}
+
+#app .main-menu .p-menubar-submenu .fm-menu-link--submenu,
+#app .main-menu .p-submenu-list .fm-menu-link--submenu,
+body > .p-menubar-submenu .fm-menu-link--submenu,
+body > .p-submenu-list .fm-menu-link--submenu {
+  width: 100% !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  padding: 0 12px !important;
+  gap: 8px !important;
+  background: #fff !important;
+  box-sizing: border-box !important;
+}
+
+#app .main-menu .p-menubar-submenu .fm-menu-label,
+#app .main-menu .p-submenu-list .fm-menu-label,
+body > .p-menubar-submenu .fm-menu-label,
+body > .p-submenu-list .fm-menu-label {
+  font-size: 11px !important;
+  line-height: 1 !important;
+}
+
+#app .main-menu .p-menubar-submenu .p-menubar-item-content:hover,
+#app .main-menu .p-menubar-submenu .p-menuitem-content:hover,
+#app .main-menu .p-submenu-list .p-menubar-item-content:hover,
+#app .main-menu .p-submenu-list .p-menuitem-content:hover,
+#app .main-menu .p-menubar-submenu .p-menubar-item.p-focus > .p-menubar-item-content,
+#app .main-menu .p-submenu-list .p-menubar-item.p-focus > .p-menubar-item-content,
+body > .p-menubar-submenu .p-menubar-item-content:hover,
+body > .p-menubar-submenu .p-menuitem-content:hover,
+body > .p-submenu-list .p-menubar-item-content:hover,
+body > .p-submenu-list .p-menuitem-content:hover {
+  background: #e9fafd !important;
+  box-shadow: inset 3px 0 0 #00a9bd !important;
+  transform: none !important;
+}
+
+#app .main-menu .p-menubar-submenu .p-menubar-item-content:hover .fm-menu-link--submenu,
+#app .main-menu .p-menubar-submenu .p-menuitem-content:hover .fm-menu-link--submenu,
+#app .main-menu .p-submenu-list .p-menubar-item-content:hover .fm-menu-link--submenu,
+#app .main-menu .p-submenu-list .p-menuitem-content:hover .fm-menu-link--submenu,
+body > .p-menubar-submenu .p-menubar-item-content:hover .fm-menu-link--submenu,
+body > .p-menubar-submenu .p-menuitem-content:hover .fm-menu-link--submenu,
+body > .p-submenu-list .p-menubar-item-content:hover .fm-menu-link--submenu,
+body > .p-submenu-list .p-menuitem-content:hover .fm-menu-link--submenu {
+  background: transparent !important;
+}
+/* ===== FIN: fm-menu-submenu-compact.css ===== */
+
+/* ===== INICIO: nuestros.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [ARCHIVADO - INACTIVO]
+ * ALCANCE HISTÓRICO: reglas antiguas globales de PrimeVue, botones y menubar.
+ * ESTADO: conservado dentro de @media not all; no participa de la cascada actual.
+ * ADVERTENCIA: no activar. Sus selectores globales entrarían en conflicto con
+ * fm-global.css, fm-menu-tuning.css y fm-menu-submenu-compact.css.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
+/* Sección archivada: este archivo no estaba importado en la aplicación. */
+@media not all {
+  :root {
+    font-size: 13px;
+    --p-primary-color: #00b4b5;
+    --button-info-background: #00b4b5;
+  }
+
+  html,body {
+    height: 100vh;
+    margin: 0;
+  }
+
+  .p-disabled{
+    background-color:var(--gray-100) !important;
+    color: var(--gray-500) !important;
+  }
+
+  .p-inputtext:disabled {
+    background-color:var(--gray-200) !important;
+  }
+
+  .p-button:disabled{
+    background-color:var(--gray-100) !important;
+    color:var(--gray-500) !important;
+  }
+
+  .p-button {
+    font-size: 1rem;
+  }
+
+  .p-autocomplete > .p-inputtext{
+    width: 100% !important;
+  }
+
+  .p-menubar{
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    padding-right: 1.5rem !important;
+    background-color: #00b4c5 !important;
+    border-radius: 0;
+    height: auto;
+  }
+
+  .p-menubar .p-menubar-root-list > .p-menubar-item {
+    padding: 0;
+  }
+
+  .p-menubar .p-menubar-root-list > .p-menubar-item > .p-menubar-item-content {
+    background-color: #00b4c5;
+  }
+
+  .p-menubar .p-menubar-root-list > .p-menubar-item > .p-menubar-item-content > .p-menubar-item-link {
+    padding: 0.5rem;
+    margin: 0;
+  }
+
+  .p-menubar .p-menubar-root-list > .p-menubar-item > .p-menubar-item-content > .p-menubar-item-link > .p-menubar-item-label {
+    padding: 0 !important;
+    color: white !important;
+    font-weight: 500 !important;
+  }
+
+  .p-menubar .p-menubar-root-list > .p-menubar-item > .p-menubar-item-content > .p-menubar-item-link > .p-icon.p-menubar-submenu-icon {
+    display: none !important;
+  }
+
+  .p-menubar .p-menubar-root-list > .p-menubar-item .p-menubar-item-active > .p-menubar-item-content{
+    background-color: #0096a4;
+    border-radius: 0 !important;
+  }
+
+  .p-menubar .p-menubar-root-list > .p-menubar-item > .p-menubar-item-content:hover{
+    background-color: #0096a4;
+    border-radius: 0 !important;
+  }
+
+  .p-menubar .p-menubar-root-list > .p-menubar-item .p-menubar-item-active > .p-menubar-item-content{
+    background-color: #0096a4 !important;
+    border-radius: 0 !important;
+  }
+
+  .p-menubar .p-submenu-list {
+    border-radius: 0px;
+    /* box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px; */
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+    margin-left: 1px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .p-menubar  .p-menubar-root-list > .p-menubar-item > .p-submenu-list > .p-menuitem > .p-menuitem-content > .p-menuitem-link > .p-submenu-icon.p-icon, .p-menuitem-text  {
+    color: black !important;
+  }
+}
+/* ===== FIN: nuestros.css ===== */
+
+/* ===== INICIO: abm-materiales.css ===== */
+/* --- INICIO DOCUMENTACION DE SECCION --- */
+/*
+ * CLASIFICACIÓN: [MÓDULO / PANTALLA]
+ * PANTALLA AFECTADA: Gestión de Materiales > ABM MATERIALES.
+ * CLASES RAÍZ: .abm-materiales-page, .abm-materiales-dialog y
+ * .abm-materiales-edit-dialog.
+ * RESPONSABILIDAD:
+ *   - paneles de búsqueda y resultados;
+ *   - grilla, filtros, filas activas/inactivas y acciones;
+ *   - diálogos de alta/edición, icono de cierre y validaciones;
+ *   - distribución de los tres umbrales y compactación del diálogo de edición;
+ *   - adaptación de la pantalla a escritorio, notebook y móvil.
+ * ADVERTENCIA: estas reglas son específicas de ABM Materiales. No trasladarlas
+ * a bloques globales compartidos de botones, grillas, acordeones o diálogos.
+ */
+/* --- FIN DOCUMENTACION DE SECCION --- */
+
+.abm-materiales-page {
+  width: 100%;
+  height: calc(100vh - 64px);
+  min-height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: -12px 0 0 !important;
+  padding: 0 6px 5px !important;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.abm-materiales-panel {
+  width: 100%;
+  flex: 0 0 auto;
+  border: 1px solid #d6dde2;
+  border-left: 3px solid #00a9bd;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(22, 54, 67, .06);
+  overflow: hidden;
+}
+
+.abm-materiales-panel--results.is-expanded {
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.abm-materiales-panel__header {
+  width: 100%;
+  min-height: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 10px;
+  border: 0;
+  border-bottom: 1px solid #dfe4e8;
+  background: #f7f7f7;
+  color: #101820;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+.abm-materiales-panel__header:hover,
+.abm-materiales-panel__header:focus-visible {
+  background: #eef9fa;
+  color: #007e8e;
+  outline: none;
+}
+
+.abm-materiales-panel__toggle {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #007f90;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.abm-materiales-panel__body {
+  padding: 10px 12px;
+  background: #fff;
+}
+
+.abm-materiales-search-body {
+  min-height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.abm-materiales-results-body {
+  width: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  background: #fff;
+}
+
+.abm-materiales-grid,
+#tabla-abm-materiales.p-datatable {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #fff;
+}
+
+#tabla-abm-materiales .p-datatable-table-container,
+#tabla-abm-materiales .p-datatable-wrapper,
+#tabla-abm-materiales [data-pc-section="tablecontainer"] {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: auto !important;
+}
+
+#tabla-abm-materiales .p-datatable-table {
+  width: 100%;
+  min-width: 1120px;
+  border-collapse: collapse;
+}
+
+#tabla-abm-materiales .p-datatable-thead > tr > th {
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 4px 7px !important;
+  border: 1px solid #cfd8dd !important;
+  background: #eef2f4 !important;
+  color: #263640 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+  text-align: left !important;
+  white-space: normal !important;
+  vertical-align: middle !important;
+}
+
+#tabla-abm-materiales .p-datatable-thead > tr.p-datatable-filter-row > th,
+#tabla-abm-materiales .p-datatable-thead > tr.p-filter-row > th {
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 3px 4px !important;
+  background: #fff !important;
+}
+
+#tabla-abm-materiales .p-datatable-tbody > tr > td {
+  height: 31px !important;
+  min-height: 31px !important;
+  padding: 3px 7px !important;
+  border: 1px solid #d5dde1 !important;
+  background: #fff !important;
+  color: #263238 !important;
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+  vertical-align: middle !important;
+}
+
+#tabla-abm-materiales .p-datatable-tbody > tr:not(.abm-materiales-row--inactive) {
+  cursor: pointer;
+}
+
+#tabla-abm-materiales .p-datatable-tbody > tr:not(.abm-materiales-row--inactive):hover > td {
+  background: #eaf9fb !important;
+}
+
+#tabla-abm-materiales .p-datatable-tbody > tr.p-highlight > td,
+#tabla-abm-materiales .p-datatable-tbody > tr.p-datatable-row-selected > td {
+  background: #cef0f4 !important;
+  color: #183943 !important;
+}
+
+#tabla-abm-materiales .p-datatable-tbody > tr.abm-materiales-row--inactive,
+#tabla-abm-materiales .p-datatable-tbody > tr.abm-materiales-row--inactive > td,
+#tabla-abm-materiales .p-datatable-tbody > tr.abm-materiales-row--inactive:hover > td {
+  background: #eceff1 !important;
+  color: #8a979e !important;
+  cursor: not-allowed !important;
+  user-select: none;
+}
+
+#tabla-abm-materiales .p-datatable-tbody > tr.abm-materiales-row--inactive .abm-materiales-cell-text {
+  color: #8a979e !important;
+}
+
+.abm-materiales-filter-cell {
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) 17px;
+  align-items: center;
+  gap: 2px;
+}
+
+.abm-materiales-filter-symbol {
+  color: #687b84;
+  font-size: 12px;
+  line-height: 1;
+  text-align: center;
+}
+
+.abm-materiales-filter-input,
+.abm-materiales-filter-input.p-inputtext {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 25px !important;
+  min-height: 25px !important;
+  padding: 2px 5px !important;
+  border: 1px solid #cbd5da !important;
+  border-radius: 3px !important;
+  background: #fff !important;
+  color: #263640 !important;
+  font-size: 11px !important;
+  box-shadow: none !important;
+}
+
+.abm-materiales-filter-input:focus,
+.abm-materiales-filter-input.p-inputtext:focus {
+  border-color: #00a9bd !important;
+  box-shadow: 0 0 0 1px rgba(0, 169, 189, .15) !important;
+}
+
+.abm-materiales-filter-clear {
+  width: 17px;
+  min-width: 17px;
+  height: 23px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #263640;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.abm-materiales-filter-clear:hover {
+  color: #00a9bd;
+}
+
+.abm-materiales-cell-text {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.abm-materiales-empty-state {
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7d86;
+  font-size: 13px;
+}
+
+#tabla-abm-materiales .p-datatable-paginator-bottom,
+#tabla-abm-materiales > .p-paginator {
+  width: 100%;
+  min-height: 40px;
+  flex: 0 0 40px;
+  padding: 0 !important;
+  border-top: 1px solid #d5dde1 !important;
+  border-radius: 0 !important;
+  overflow: hidden;
+}
+
+.abm-materiales-dialog.p-dialog {
+  overflow: hidden !important;
+  border: 1px solid #aebac0 !important;
+  border-top: 4px solid #5d666b !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+  box-shadow: 0 18px 46px rgba(22, 47, 59, .25) !important;
+}
+
+.abm-materiales-dialog .p-dialog-header {
+  min-height: 66px !important;
+  padding: 0 28px !important;
+  border-bottom: 1px solid #d9e0e4 !important;
+  background: #fff !important;
+}
+
+.abm-materiales-dialog .p-dialog-title,
+.abm-materiales-dialog__header {
+  color: #1f2e36 !important;
+  font-size: 20px !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+}
+
+.abm-materiales-dialog .p-dialog-header-actions,
+.abm-materiales-dialog .p-dialog-close-button {
+  color: #9aa7ad !important;
+}
+
+.abm-materiales-dialog .p-dialog-content {
+  padding: 0 !important;
+  background: #fff !important;
+}
+
+.abm-materiales-dialog__form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 18px;
+  padding: 28px 28px 30px;
+}
+
+.abm-materiales-dialog__field {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.abm-materiales-dialog__field--full {
+  grid-column: 1 / -1;
+}
+
+.abm-materiales-dialog__field label {
+  color: #3d5059;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.abm-materiales-dialog__field > .p-inputtext,
+.abm-materiales-dialog__field > .p-inputnumber,
+.abm-materiales-dialog__field > .p-inputnumber .p-inputnumber-input {
+  width: 100% !important;
+}
+
+.abm-materiales-dialog__field > .p-inputtext,
+.abm-materiales-dialog__field .p-inputnumber-input {
+  height: 48px !important;
+  min-height: 48px !important;
+  padding: 0 14px !important;
+  border: 1px solid #c9d3d8 !important;
+  border-radius: 7px !important;
+  background: #fff !important;
+  color: #334750 !important;
+  font-size: 14px !important;
+  box-shadow: none !important;
+}
+
+.abm-materiales-dialog__field > .p-inputtext:focus,
+.abm-materiales-dialog__field .p-inputnumber-input:focus {
+  border-color: #00a9bd !important;
+  box-shadow: 0 0 0 2px rgba(0, 169, 189, .13) !important;
+}
+
+.abm-materiales-dialog__field > .p-inputtext:disabled,
+.abm-materiales-dialog__field .p-inputnumber-input:disabled {
+  border-color: #d6dde1 !important;
+  background: #eef1f3 !important;
+  color: #697981 !important;
+  opacity: 1 !important;
+}
+
+.abm-materiales-dialog__field > .p-invalid,
+.abm-materiales-dialog__field .p-inputnumber.p-invalid .p-inputnumber-input,
+.abm-materiales-dialog__field .p-inputnumber-input.p-invalid {
+  border-color: #dc3545 !important;
+}
+
+.abm-materiales-field-error {
+  display: block;
+  color: #c92d3a;
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.abm-materiales-dialog .p-dialog-footer {
+  min-height: 84px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  padding: 14px 28px !important;
+  border-top: 1px solid #d9e0e4 !important;
+  background: #fff !important;
+}
+
+.abm-materiales-dialog__footer {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.abm-materiales-dialog__footer .fm-action-button,
+.abm-materiales-dialog__footer .fm-ui-button {
+  min-width: 160px !important;
+  border-radius: 22px !important;
+}
+
+/* --- AJUSTES VISUALES ESPECÍFICOS DE ABM MATERIALES --- */
+/*
+ * Este bloque consolida los estilos que antes estaban dentro de los componentes
+ * AbmMateriales.vue y EditarMaterialDialog.vue. Se mantiene al final de la sección
+ * para conservar la cascada aprobada sin afectar otras pantallas del sistema.
+ */
+
+.abm-materiales-page {
+  margin-top: 4px !important;
+}
+
+#tabla-abm-materiales .p-datatable-tbody > tr.p-highlight > td,
+#tabla-abm-materiales .p-datatable-tbody > tr.p-datatable-row-selected > td {
+  border-color: #78c5cf !important;
+  background: #a9e0e7 !important;
+  color: #143d45 !important;
+  font-weight: 700 !important;
+}
+
+#tabla-abm-materiales .p-datatable-tbody > tr.p-highlight .abm-materiales-cell-text,
+#tabla-abm-materiales .p-datatable-tbody > tr.p-datatable-row-selected .abm-materiales-cell-text {
+  color: #143d45 !important;
+  font-weight: 700 !important;
+}
+
+.abm-materiales-dialog.p-dialog {
+  border: 1px solid #b7c4ca !important;
+  border-top: 3px solid #00a9bd !important;
+  border-radius: 9px !important;
+  box-shadow: 0 18px 42px rgba(22, 47, 59, .22) !important;
+}
+
+.abm-materiales-dialog .p-dialog-header {
+  min-height: 56px !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 20px !important;
+}
+
+.abm-materiales-dialog .p-dialog-title,
+.abm-materiales-dialog__header {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+}
+
+.abm-materiales-dialog .p-dialog-header-actions {
+  width: auto !important;
+  min-width: 0 !important;
+  height: auto !important;
+  margin-left: auto !important;
+  padding: 0 !important;
+}
+
+.abm-materiales-dialog .p-dialog-close-button,
+.abm-materiales-dialog .p-dialog-header-close-button {
+  position: relative !important;
+  width: 32px !important;
+  min-width: 32px !important;
+  max-width: 32px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 1px solid #d7e0e4 !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  color: #111820 !important;
+  box-shadow: 0 4px 12px rgba(18, 48, 60, .08) !important;
+  transform: none !important;
+  transition:
+    border-color .15s ease,
+    color .15s ease,
+    background-color .15s ease,
+    box-shadow .15s ease !important;
+}
+
+.abm-materiales-dialog .p-dialog-close-button:hover,
+.abm-materiales-dialog .p-dialog-header-close-button:hover {
+  border-color: #00a9bd !important;
+  background: #fff !important;
+  color: #00a9bd !important;
+  box-shadow: 0 0 0 1px rgba(0, 169, 189, .12) !important;
+  outline: none !important;
+}
+
+.abm-materiales-dialog .p-dialog-close-button:focus-visible,
+.abm-materiales-dialog .p-dialog-header-close-button:focus-visible {
+  border-color: #d7e0e4 !important;
+  background: #fff !important;
+  color: #111820 !important;
+  box-shadow: 0 4px 12px rgba(18, 48, 60, .08) !important;
+  outline: none !important;
+}
+
+.abm-materiales-dialog-close-icon {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  width: 14px !important;
+  height: 14px !important;
+  display: block !important;
+  overflow: visible !important;
+  color: #111820 !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: none !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+.abm-materiales-dialog-close-icon::before,
+.abm-materiales-dialog-close-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+  transform-origin: center;
+}
+
+.abm-materiales-dialog-close-icon::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.abm-materiales-dialog-close-icon::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.abm-materiales-dialog .p-dialog-close-button:hover .abm-materiales-dialog-close-icon,
+.abm-materiales-dialog .p-dialog-header-close-button:hover .abm-materiales-dialog-close-icon {
+  color: #00a9bd !important;
+}
+
+.abm-materiales-dialog .p-dialog-close-button:focus-visible .abm-materiales-dialog-close-icon,
+.abm-materiales-dialog .p-dialog-header-close-button:focus-visible .abm-materiales-dialog-close-icon {
+  color: #111820 !important;
+}
+
+.abm-materiales-dialog__form {
+  gap: 15px !important;
+  padding: 22px 22px 24px !important;
+}
+
+.abm-materiales-dialog__form--edit {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+.abm-materiales-dialog__form--add {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 16px 14px !important;
+}
+
+.abm-materiales-dialog__field--code,
+.abm-materiales-dialog__field--full {
+  grid-column: 1 / -1 !important;
+}
+
+.abm-materiales-dialog__field {
+  gap: 6px !important;
+}
+
+.abm-materiales-dialog__field label {
+  font-size: 11px !important;
+}
+
+.abm-materiales-dialog__field > .p-inputtext,
+.abm-materiales-dialog__field .p-inputnumber-input {
+  height: 40px !important;
+  min-height: 40px !important;
+  padding: 0 12px !important;
+  border-radius: 6px !important;
+  font-size: 13px !important;
+}
+
+.abm-materiales-dialog .p-dialog-footer {
+  min-height: 68px !important;
+  padding: 12px 20px !important;
+  background: #f9fbfc !important;
+}
+
+.abm-materiales-dialog__footer .fm-action-button,
+.abm-materiales-dialog__footer .fm-ui-button {
+  min-width: 120px !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0 18px !important;
+  border-radius: 7px !important;
+}
+
+/* --- EDICIÓN DE UMBRALES: TRES CAMPOS EN UNA FILA Y DIÁLOGO COMPACTO --- */
+.abm-materiales-edit-dialog .p-dialog-content {
+  flex: 0 0 auto !important;
+}
+
+.abm-materiales-edit-dialog .abm-materiales-dialog__form--edit {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  column-gap: 14px !important;
+  row-gap: 24px !important;
+  padding: 22px 22px 16px !important;
+}
+
+.abm-materiales-edit-dialog .abm-materiales-dialog__form--edit > .abm-materiales-dialog__field:nth-child(1) {
+  grid-column: 1 / -1 !important;
+}
+
+.abm-materiales-edit-dialog .abm-materiales-dialog__form--edit > .abm-materiales-dialog__field:nth-child(2),
+.abm-materiales-edit-dialog .abm-materiales-dialog__form--edit > .abm-materiales-dialog__field:nth-child(3),
+.abm-materiales-edit-dialog .abm-materiales-dialog__form--edit > .abm-materiales-dialog__field:nth-child(4) {
+  grid-column: auto !important;
+}
+
+.abm-materiales-edit-dialog .p-dialog-footer {
+  min-height: 58px !important;
+  padding: 10px 20px 12px !important;
+}
+
+@media (max-width: 1024px) {
+  .abm-materiales-page {
+    height: calc(100vh - 60px);
+    min-height: calc(100vh - 60px);
+    margin-top: -8px !important;
+  }
+
+  .abm-materiales-dialog__form {
+    gap: 16px;
+    padding: 22px;
+  }
+}
+
+@media (max-width: 700px) {
+  .abm-materiales-page {
+    height: auto;
+    min-height: calc(100dvh - 58px);
+    overflow: visible;
+  }
+
+  .abm-materiales-panel--results.is-expanded,
+  .abm-materiales-results-body,
+  .abm-materiales-grid,
+  #tabla-abm-materiales.p-datatable {
+    min-height: 520px;
+  }
+
+  .abm-materiales-dialog__form,
+  .abm-materiales-dialog__form--add,
+  .abm-materiales-dialog__form--edit {
+    grid-template-columns: 1fr !important;
+  }
+
+  .abm-materiales-dialog__field--code,
+  .abm-materiales-dialog__field--full,
+  .abm-materiales-edit-dialog .abm-materiales-dialog__form--edit > .abm-materiales-dialog__field {
+    grid-column: auto !important;
+  }
+
+  .abm-materiales-dialog .p-dialog-header,
+  .abm-materiales-dialog .p-dialog-footer {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  .abm-materiales-dialog__form {
+    padding: 20px 18px 24px;
+  }
+
+  .abm-materiales-edit-dialog .abm-materiales-dialog__form--edit {
+    row-gap: 16px !important;
+    padding: 20px 18px 18px !important;
+  }
+}
+/* ===== FIN: abm-materiales.css ===== */
+
+/* ===== INICIO: jobtype-contrato-main-funcionalidad.css ===== */
+
+/*
+     * CLASIFICACIÓN: [MÓDULO / PANTALLA]
+     * PANTALLA: Parametrizaciones > Jobtype-Contrato.
+     * BASE VISUAL: rama main, sin reemplazar templates ni medidas.
+     * FUNCIONALIDAD: origen, duplicados, filas inactivas, loaders y Excel.
+     * ÚNICA UBICACIÓN DE ESTILOS DEL MÓDULO: fm-global.css.
+     */
+
+/* --- Pantalla principal de main --- */
+.jobtype-contrato-screen--grid-expanded {
+  height: calc(100vh - 64px) !important;
+  min-height: 0 !important;
+  padding-bottom: 4px !important;
+  overflow: hidden !important;
+}
+
+.jobtype-contrato-screen--grid-expanded .jobtype-panel--filters {
+  flex: 0 0 auto !important;
+}
+
+.jobtype-contrato-screen--grid-expanded .jobtype-panel--results {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.jobtype-contrato-screen--grid-expanded .jobtype-results-body {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  overflow: hidden !important;
+}
+
+.jobtype-contrato-screen--grid-expanded .jobtype-contrato-main-grid,
+.jobtype-contrato-screen--grid-expanded .jobtype-contrato-main-grid.p-datatable {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.jobtype-contrato-screen--grid-expanded .jobtype-contrato-main-grid .p-datatable-table-container,
+.jobtype-contrato-screen--grid-expanded .jobtype-contrato-main-grid .p-datatable-wrapper,
+.jobtype-contrato-screen--grid-expanded .jobtype-contrato-main-grid [data-pc-section='tablecontainer'] {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 1 1 auto !important;
+  overflow: auto !important;
+}
+
+body [data-jobtype-popup-button='true'],
+body [data-jobtype-popup-button='true'] .p-button-label {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+}
+
+body [data-jobtype-popup-button='true'][data-jobtype-popup-button-variant='primary'] {
+  border: 1px solid #00a9bd !important;
+  background: #00a9bd !important;
+  color: #fff !important;
+}
+
+:global(body [data-jobtype-popup-button='true'][data-jobtype-popup-button-variant='primary']:hover:not(:disabled)) {
+  border-color: #008fa1 !important;
+  background: #008fa1 !important;
+  color: #fff !important;
+}
+
+body [data-jobtype-popup-button='true'][data-jobtype-popup-button-variant='outline'] {
+  border: 1px solid #00a9bd !important;
+  background: #fff !important;
+  color: #008fa1 !important;
+  box-shadow: none !important;
+}
+
+:global(body [data-jobtype-popup-button='true'][data-jobtype-popup-button-variant='outline']:hover:not(:disabled)) {
+  border-color: #008fa1 !important;
+  background: #e4f9fc !important;
+  color: #006f7d !important;
+}
+
+body [data-jobtype-popup-button='true']:disabled {
+  border-color: #c9d2d7 !important;
+  background: #dbe1e4 !important;
+  color: #7c8a92 !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+}
+
+/* --- Popup de Alta de main --- */
+.jobtype-alta-unsaved__header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.jobtype-alta-unsaved__header-main {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.jobtype-alta-unsaved__icon-circle {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #e9f8fa;
+}
+
+.jobtype-alta-unsaved__header-icon {
+  color: #11aabd;
+  font-size: 23px;
+}
+
+.jobtype-alta-unsaved__title {
+  color: #252b33;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.jobtype-alta-unsaved__close {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #c7c7c7;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.jobtype-alta-unsaved__close:hover {
+  color: #00a9bd;
+}
+
+.jobtype-alta-unsaved__content {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  padding: 18px 4px;
+}
+
+.jobtype-alta-unsaved__message {
+  color: #4b5563;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.jobtype-alta-unsaved__actions {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.jobtype-alta-unsaved__button {
+  appearance: none;
+  width: 100px;
+  min-width: 100px;
+  height: 30px;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border: 1px solid #00acc1;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.jobtype-alta-unsaved__button--cancel {
+  background: #fff;
+  color: #0097a7;
+}
+
+.jobtype-alta-unsaved__button--accept {
+  background: #00acc1;
+  color: #fff;
+}
+
+.p-dialog.jobtype-alta-unsaved-dialog {
+  overflow: hidden;
+  border: 1px solid #bdbdbd;
+  border-radius: 0;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .28);
+}
+
+.jobtype-alta-unsaved-dialog .p-dialog-header {
+  min-height: 68px;
+  padding: 12px 18px;
+  border-bottom: 1px solid #dedede;
+  background: #fff;
+}
+
+.jobtype-alta-unsaved-dialog .p-dialog-content {
+  padding: 0 18px;
+  background: #fff;
+}
+
+.jobtype-alta-unsaved-dialog .p-dialog-footer {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 10px 18px;
+  border-top: 1px solid #dedede;
+  background: #fff;
+}
+
+.p-dialog.jobtype-alta-dialog input.jobtype-alta-control--invalid,
+.p-dialog.jobtype-alta-dialog input.jobtype-alta-control--invalid:hover,
+.p-dialog.jobtype-alta-dialog input.jobtype-alta-control--invalid:focus {
+  border: 1px solid #e57373 !important;
+  background-color: #fffafa !important;
+  box-shadow: 0 0 0 1px rgba(229, 115, 115, .28) inset !important;
+  outline: none !important;
+}
+
+/* --- Popup de Edición de main --- */
+.jobtype-contrato-edit-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.jobtype-contrato-edit-header h2 {
+  margin: 0;
+  color: #263746;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.jobtype-contrato-edit-close,
+.jobtype-contrato-unsaved__close {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #c7c7c7;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.jobtype-contrato-edit-close:hover,
+.jobtype-contrato-unsaved__close:hover {
+  color: #00a9bd;
+}
+
+.jobtype-contrato-edit-content {
+  min-height: 170px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-areas:
+    'jobtype contrato pais'
+    '. nuevo origen';
+  align-items: start;
+  column-gap: 20px;
+  row-gap: 14px;
+  padding: 16px 0 28px;
+}
+
+.jobtype-contrato-edit-field--jobtype { grid-area: jobtype; }
+.jobtype-contrato-edit-field--contrato { grid-area: contrato; }
+.jobtype-contrato-edit-field--pais { grid-area: pais; }
+.jobtype-contrato-edit-field--nuevo { grid-area: nuevo; }
+.jobtype-contrato-edit-field--origen { grid-area: origen; }
+
+.jobtype-contrato-edit-field {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.jobtype-contrato-edit-field > label {
+  color: #202020;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.jobtype-contrato-edit-control {
+  width: 100%;
+  height: 32px;
+  min-height: 32px;
+  box-sizing: border-box;
+}
+
+.jobtype-contrato-edit-autocomplete {
+  width: 100% !important;
+  min-width: 0 !important;
+  display: flex !important;
+}
+
+.jobtype-contrato-edit-autocomplete .p-autocomplete-input {
+  width: 100% !important;
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+}
+
+.jobtype-contrato-edit-control--select.p-select {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.jobtype-contrato-edit-control--select .p-select-label {
+  display: flex;
+  align-items: center;
+  padding: 0 9px;
+  font-size: 13px;
+}
+
+.jobtype-contrato-edit-control--readonly:disabled {
+  border-color: #d1d1d1;
+  background: #eeeeee;
+  color: #444;
+  opacity: 1;
+}
+
+.p-dialog.jobtype-contrato-edit-dialog {
+  overflow: hidden;
+  border: 1px solid #bdbdbd;
+  border-radius: 0;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .28);
+}
+
+.jobtype-contrato-edit-dialog .p-dialog-header {
+  min-height: 56px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #dedede;
+  background: #fff;
+}
+
+.jobtype-contrato-edit-dialog .p-dialog-content {
+  padding: 0 16px;
+  background: #fff;
+}
+
+.jobtype-contrato-edit-dialog .p-dialog-footer {
+  min-height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 10px 16px;
+  border-top: 1px solid #dedede;
+  background: #fff;
+}
+
+.jobtype-contrato-edit-dialog .jobtype-contrato-edit-update {
+  width: 108px !important;
+  min-width: 108px !important;
+  max-width: 108px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  border-radius: 16px !important;
+  font-size: 12px !important;
+}
+
+.jobtype-contrato-unsaved__header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.jobtype-contrato-unsaved__header-main {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.jobtype-contrato-unsaved__icon-circle {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #e9f8fa;
+}
+
+.jobtype-contrato-unsaved__header-icon {
+  color: #11aabd;
+  font-size: 23px;
+}
+
+.jobtype-contrato-unsaved__title {
+  color: #252b33;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.jobtype-contrato-unsaved__content {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  padding: 18px 4px;
+}
+
+.jobtype-contrato-unsaved__message {
+  color: #4b5563;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.jobtype-contrato-unsaved__actions {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.jobtype-contrato-unsaved__button {
+  appearance: none;
+  width: 100px;
+  min-width: 100px;
+  height: 30px;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border: 1px solid #00acc1;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.jobtype-contrato-unsaved__button--cancel {
+  background: #fff;
+  color: #0097a7;
+}
+
+.jobtype-contrato-unsaved__button--accept {
+  background: #00acc1;
+  color: #fff;
+}
+
+.p-dialog.jobtype-contrato-unsaved-dialog {
+  overflow: hidden;
+  border: 1px solid #bdbdbd;
+  border-radius: 0;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .28);
+}
+
+.jobtype-contrato-unsaved-dialog .p-dialog-header {
+  min-height: 68px;
+  padding: 12px 18px;
+  border-bottom: 1px solid #dedede;
+  background: #fff;
+}
+
+.jobtype-contrato-unsaved-dialog .p-dialog-content {
+  padding: 0 18px;
+  background: #fff;
+}
+
+.jobtype-contrato-unsaved-dialog .p-dialog-footer {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 10px 18px;
+  border-top: 1px solid #dedede;
+  background: #fff;
+}
+
+@media (max-width: 760px) {
+  .jobtype-contrato-edit-content {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'jobtype'
+      'contrato'
+      'pais'
+      'nuevo'
+      'origen';
+    row-gap: 14px;
+    padding: 16px 0 22px;
+  }
+}
+
+/* --- Confirmación de desactivación de main --- */
+.jobtype-contrato-delete-confirm__header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.jobtype-contrato-delete-confirm__header-main {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.jobtype-contrato-delete-confirm__icon-circle {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #e9f8fa;
+}
+
+.jobtype-contrato-delete-confirm__header-icon {
+  color: #11aabd;
+  font-size: 23px;
+}
+
+.jobtype-contrato-delete-confirm__title {
+  color: #252b33;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.jobtype-contrato-delete-confirm__close {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #c7c7c7;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.jobtype-contrato-delete-confirm__close:hover {
+  color: #00a9bd;
+}
+
+.jobtype-contrato-delete-confirm__content {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  padding: 18px 4px;
+}
+
+.jobtype-contrato-delete-confirm__message {
+  color: #4b5563;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.jobtype-contrato-delete-confirm__actions {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.jobtype-contrato-delete-confirm__button {
+  appearance: none;
+  width: 100px;
+  min-width: 100px;
+  height: 30px;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border: 1px solid #00acc1;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.jobtype-contrato-delete-confirm__button--cancel {
+  background: #fff;
+  color: #0097a7;
+}
+
+.jobtype-contrato-delete-confirm__button--accept {
+  background: #00acc1;
+  color: #fff;
+}
+
+.p-dialog.jobtype-contrato-delete-confirm-dialog {
+  overflow: hidden;
+  border: 1px solid #bdbdbd;
+  border-radius: 0;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .28);
+}
+
+.jobtype-contrato-delete-confirm-dialog .p-dialog-header {
+  min-height: 68px;
+  padding: 12px 18px;
+  border-bottom: 1px solid #dedede;
+  background: #fff;
+}
+
+.jobtype-contrato-delete-confirm-dialog .p-dialog-content {
+  padding: 0 18px;
+  background: #fff;
+}
+
+.jobtype-contrato-delete-confirm-dialog .p-dialog-footer {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 10px 18px;
+  border-top: 1px solid #dedede;
+  background: #fff;
+}
+
+/* Funcionalidad nueva. No modifica las medidas ni la distribución de main. */
+body .p-dialog.jobtype-alta-dialog,
+body .p-dialog.jobtype-contrato-edit-dialog {
+  position: relative;
+}
+
+#tabla-jobtype-contrato .p-datatable-tbody > tr.jobtype-row-inactive > td,
+#tabla-jobtype-contrato .p-datatable-tbody > tr.jobtype-row-inactive:hover > td,
+#tabla-jobtype-contrato .p-datatable-tbody > tr.jobtype-row-inactive.p-highlight > td {
+  background: #edf0f2 !important;
+  color: #75838b !important;
+  font-weight: 400 !important;
+  cursor: not-allowed !important;
+}
+
+#tabla-jobtype-contrato .p-datatable-tbody > tr.jobtype-row-inactive > td * {
+  color: #75838b !important;
+  font-weight: 400 !important;
+}
+
+/* ===== FIN: jobtype-contrato-main-funcionalidad.css ===== */
+
+/* ===== INICIO: cmo-actividad.css ===== */
+/*
+ * CLASIFICACIÓN: [MÓDULO / PANTALLA]
+ * PANTALLA: Parametrizaciones > CMO-Actividad.
+ * BASE VISUAL: componentes actuales de main.
+ */
+
+body .p-dialog.jobtype-alta-dialog.cmo-alta-dialog {
+  width: min(1440px, calc(100vw - 24px)) !important;
+  height: min(680px, 56vw, calc(100dvh - 24px)) !important;
+  max-width: calc(100vw - 24px) !important;
+  max-height: calc(100dvh - 24px) !important;
+  margin: 0 !important;
+}
+
+html body .p-dialog.cmo-alta-dialog .cmo-alta-form {
+  width: min(860px, 100%) !important;
+  max-width: 860px !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 120px !important;
+  grid-template-rows: auto !important;
+  grid-auto-flow: row !important;
+  align-items: end !important;
+  gap: 10px 14px !important;
+}
+
+html body .p-dialog.cmo-alta-dialog .cmo-alta-form > .jobtype-alta-field,
+html body .p-dialog.cmo-alta-dialog .cmo-alta-form > .jobtype-alta-field:nth-child(1),
+html body .p-dialog.cmo-alta-dialog .cmo-alta-form > .jobtype-alta-field:nth-child(2) {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  grid-column: auto !important;
+  grid-row: auto !important;
+}
+
+html body .p-dialog.cmo-alta-dialog .cmo-alta-form .p-autocomplete,
+html body .p-dialog.cmo-alta-dialog .cmo-alta-form .p-autocomplete-input,
+html body .p-dialog.cmo-alta-dialog .cmo-alta-form .jobtype-alta-control {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+
+html body .p-dialog.cmo-alta-dialog .cmo-alta-form > .jobtype-add-button,
+html body .p-dialog.cmo-alta-dialog .cmo-alta-form > .jobtype-add-button.p-button {
+  width: 120px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
+  grid-column: 3 !important;
+  grid-row: 1 !important;
+  align-self: end !important;
+  border-radius: 0 !important;
+}
+
+body .p-dialog.cmo-alta-dialog .jobtype-alta-grid-wrap {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+body .p-dialog.jobtype-alta-dialog.cmo-modificar-dialog {
+  width: min(900px, calc(100vw - 32px)) !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-width: 900px !important;
+  max-height: calc(100dvh - 32px) !important;
+  margin: 0 !important;
+}
+
+html body .p-dialog.cmo-modificar-dialog .cmo-modificar-form {
+  width: 100% !important;
+  max-width: 960px !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-template-rows: auto !important;
+  grid-auto-flow: row !important;
+  align-items: end !important;
+  gap: 10px 14px !important;
+}
+
+html body .p-dialog.cmo-modificar-dialog .cmo-modificar-form > .jobtype-alta-field,
+html body .p-dialog.cmo-modificar-dialog .cmo-modificar-form > .jobtype-alta-field:nth-child(1),
+html body .p-dialog.cmo-modificar-dialog .cmo-modificar-form > .jobtype-alta-field:nth-child(2),
+html body .p-dialog.cmo-modificar-dialog .cmo-modificar-form > .jobtype-alta-field:nth-child(3) {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  grid-column: auto !important;
+  grid-row: auto !important;
+}
+
+html body .p-dialog.cmo-modificar-dialog .cmo-modificar-form .p-autocomplete,
+html body .p-dialog.cmo-modificar-dialog .cmo-modificar-form .p-autocomplete-input,
+html body .p-dialog.cmo-modificar-dialog .cmo-modificar-form .jobtype-alta-control {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+
+.cmo-alta-errors,
+.cmo-modificar-error {
+  padding: 8px 16px 0;
+  margin: 0;
+}
+
+.cmo-alta-errors__item,
+.cmo-modificar-error__item {
+  margin: 2px 0;
+  padding: 4px 8px;
+  border-left: 3px solid #d32f2f;
+  background: #fff5f5;
+  color: #d32f2f;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.cmo-grid-shell,
+#tabla-cmo-actividad,
+#tabla-cmo-actividad.p-datatable {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+#tabla-cmo-actividad .p-datatable-table-container,
+#tabla-cmo-actividad .p-datatable-wrapper,
+#tabla-cmo-actividad [data-pc-section="tablecontainer"] {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 1 1 auto !important;
+  overflow: auto !important;
+}
+
+#tabla-cmo-actividad .p-datatable-table {
+  width: 100% !important;
+  min-width: 100% !important;
+  table-layout: fixed !important;
+}
+
+#tabla-cmo-actividad .p-datatable-tbody > tr.p-highlight > td,
+#tabla-cmo-actividad .p-datatable-tbody > tr.p-datatable-row-selected > td,
+#tabla-cmo-actividad .p-datatable-tbody > tr[data-p-selected='true'] > td,
+#tabla-cmo-actividad .p-datatable-tbody > tr[aria-selected='true'] > td {
+  background: #9ee7ee !important;
+  border-color: #78c5cf !important;
+  color: #143d45 !important;
+  font-weight: 700 !important;
+}
+
+#tabla-cmo-actividad .p-datatable-tbody > tr.p-highlight > td *,
+#tabla-cmo-actividad .p-datatable-tbody > tr.p-datatable-row-selected > td *,
+#tabla-cmo-actividad .p-datatable-tbody > tr[data-p-selected='true'] > td *,
+#tabla-cmo-actividad .p-datatable-tbody > tr[aria-selected='true'] > td * {
+  color: #143d45 !important;
+  font-weight: 700 !important;
+}
+
+#tabla-cmo-actividad .p-datatable-tbody > tr.cmo-row-inactive > td,
+#tabla-cmo-actividad .p-datatable-tbody > tr.cmo-row-inactive:hover > td,
+#tabla-cmo-actividad .p-datatable-tbody > tr.cmo-row-inactive.p-highlight > td,
+#tabla-cmo-actividad .p-datatable-tbody > tr.cmo-row-inactive.p-datatable-row-selected > td,
+#tabla-cmo-actividad .p-datatable-tbody > tr.cmo-row-inactive[data-p-selected='true'] > td,
+#tabla-cmo-actividad .p-datatable-tbody > tr.cmo-row-inactive[aria-selected='true'] > td {
+  background: #edf0f2 !important;
+  border-color: #d5dde1 !important;
+  color: #75838b !important;
+  font-weight: 400 !important;
+  cursor: not-allowed !important;
+}
+
+#tabla-cmo-actividad .p-datatable-tbody > tr.cmo-row-inactive > td * {
+  color: #75838b !important;
+  font-weight: 400 !important;
+}
+
+@media (max-width: 768px) {
+  html body .p-dialog.cmo-alta-dialog .cmo-alta-form,
+  html body .p-dialog.cmo-modificar-dialog .cmo-modificar-form {
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  html body .p-dialog.cmo-alta-dialog .cmo-alta-form > .jobtype-add-button,
+  html body .p-dialog.cmo-alta-dialog .cmo-alta-form > .jobtype-add-button.p-button {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    grid-column: 1 !important;
+    grid-row: auto !important;
+  }
+}
+/* --- Botones CMO iguales a Jobtype-Contrato --- */
+html body .p-dialog.cmo-alta-dialog .cmo-alta-form > .jobtype-add-button,
+html body .p-dialog.cmo-alta-dialog .cmo-alta-form > .jobtype-add-button.p-button,
+html body .p-dialog.cmo-alta-dialog .p-dialog-footer .jobtype-relate-button,
+html body .p-dialog.cmo-alta-dialog .p-dialog-footer .jobtype-relate-button.p-button,
+html body .p-dialog.cmo-modificar-dialog .p-dialog-footer .jobtype-relate-button,
+html body .p-dialog.cmo-modificar-dialog .p-dialog-footer .jobtype-relate-button.p-button {
+  width: auto !important;
+  min-width: 110px !important;
+  max-width: none !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
+  padding: 0 16px !important;
+  border-radius: 8px !important;
+  gap: 7px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  box-shadow: 0 4px 12px rgba(0, 73, 84, 0.13) !important;
+  transform: none !important;
+}
+
+html body .p-dialog.cmo-alta-dialog .cmo-alta-form > .jobtype-add-button,
+html body .p-dialog.cmo-alta-dialog .cmo-alta-form > .jobtype-add-button.p-button {
+  grid-column: 3 !important;
+  grid-row: 1 !important;
+  align-self: end !important;
+  justify-self: start !important;
+}
+
+html body .p-dialog.cmo-alta-dialog .jobtype-add-button:disabled,
+html body .p-dialog.cmo-alta-dialog .jobtype-add-button.p-disabled,
+html body .p-dialog.cmo-alta-dialog .jobtype-relate-button:disabled,
+html body .p-dialog.cmo-alta-dialog .jobtype-relate-button.p-disabled,
+html body .p-dialog.cmo-modificar-dialog .jobtype-relate-button:disabled,
+html body .p-dialog.cmo-modificar-dialog .jobtype-relate-button.p-disabled {
+  border-color: #c9d2d7 !important;
+  background: #dbe1e4 !important;
+  color: #7c8a92 !important;
+  opacity: 1 !important;
+  box-shadow: 0 4px 12px rgba(0, 73, 84, 0.13) !important;
+  cursor: not-allowed !important;
+}
+
+@media (max-width: 768px) {
+  html body .p-dialog.cmo-alta-dialog .cmo-alta-form > .jobtype-add-button,
+  html body .p-dialog.cmo-alta-dialog .cmo-alta-form > .jobtype-add-button.p-button {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    grid-column: 1 !important;
+    grid-row: auto !important;
+  }
+}
+/* --- Fin botones CMO --- */
+/* ===== FIN: cmo-actividad.css ===== */
