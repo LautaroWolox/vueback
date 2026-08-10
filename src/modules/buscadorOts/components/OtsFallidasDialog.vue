@@ -8,7 +8,7 @@
     :resizable="false"
     class="fm-dialog buscador-ots-fallidas-dialog"
     :pt="{ root: { class: 'fm-dialog buscador-ots-fallidas-dialog' } }"
-    :style="{ width: 'min(980px, calc(100vw - 24px))' }"
+    :style="{ '--fm-dialog-width': '1200px' }"
     @update:visible="emit('update:visible', $event)"
   >
     <FmGridShell class="buscador-ots-fallidas-grid-shell">
@@ -19,11 +19,11 @@
         v-model:rows="pageRows"
         :value="rows"
         data-key="id"
-        class="fm-pass-grid jobtype-main-grid buscador-ots-fallidas-grid"
-        table-style="table-layout: fixed; min-width: 940px; width: 100%"
+        class="fm-pass-grid buscador-ots-fallidas-grid"
+        table-style="table-layout: fixed; width: 100%; min-width: 100%"
         paginator
         scrollable
-        scroll-height="300px"
+        scroll-height="380px"
         show-gridlines
         removable-sort
         sort-mode="multiple"
@@ -96,17 +96,17 @@
           sortable
         >
           <template #filter="{ filterModel, filterCallback }">
-            <div class="jobtype-filter-cell fm-filter-cell">
-              <span class="jobtype-filter-symbol">~</span>
+            <div class="fm-filter-cell">
+              <span class="fm-filter-prefix">~</span>
               <InputText
                 v-model="filterModel.value"
-                class="jobtype-filter-input"
+                class="fm-column-filter"
                 type="text"
                 @input="filterCallback()"
               />
               <button
                 type="button"
-                class="jobtype-filter-clear busqueda-ots-column-filter__clear"
+                class="fm-filter-more"
                 aria-label="Limpiar filtro"
                 title="Limpiar filtro"
                 @click="clearFilter(filterModel, filterCallback)"
@@ -115,7 +115,7 @@
           </template>
 
           <template #body="{ data }">
-            <span class="jobtype-cell-text fm-cell-text" :title="String(data[column.field] ?? '')">
+            <span class="fm-cell-text" :title="String(data[column.field] ?? '')">
               {{ data[column.field] ?? '' }}
             </span>
           </template>
@@ -157,12 +157,12 @@ const emit = defineEmits<{
 }>()
 
 const columns = [
-  { field: 'nroOt', header: 'Nro. OT', width: '135px' },
-  { field: 'codigoTarea', header: 'Cod. tarea', width: '145px' },
-  { field: 'fechaUltimaModificacion', header: 'Fecha últ. mod. OT', width: '190px' },
-  { field: 'tecnicoNoLdap', header: 'Técnico no LDAP', width: '175px' },
-  { field: 'sistemaOrigen', header: 'Sistema origen', width: '145px' },
-  { field: 'descripcionError', header: 'Descripción error', width: '250px' }
+  { field: 'nroOt', header: 'Nro. OT', width: '11%' },
+  { field: 'codigoTarea', header: 'Cod. tarea', width: '12%' },
+  { field: 'fechaUltimaModificacion', header: 'Fecha últ. mod. OT', width: '18%' },
+  { field: 'tecnicoNoLdap', header: 'Técnico no LDAP', width: '17%' },
+  { field: 'sistemaOrigen', header: 'Sistema origen', width: '14%' },
+  { field: 'descripcionError', header: 'Descripción error', width: '28%' }
 ]
 
 const rowsOptions = [100, 250, 500]
