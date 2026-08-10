@@ -1,10 +1,7 @@
 <template>
   <div
     class="fm-screen fm-screen--pad busqueda-ots-page"
-    :class="{
-      'busqueda-ots-page--grid-expanded': gridExpanded,
-      'busqueda-ots-page--failed-filter': store.failedOnly
-    }"
+    :class="{ 'busqueda-ots-page--grid-expanded': gridExpanded }"
   >
     <Accordion v-model:value="activePanels" multiple class="fm-accordion busqueda-ots-accordion">
       <AccordionPanel value="0" class="busqueda-ots-filter-panel">
@@ -90,14 +87,18 @@ const normalizeFailedRow = (value, parent, index) => {
   }
 }
 
-const openFailedOrders = (row) => {
-  const rawRows = Array.isArray(row?.ordenesFallidas)
+const getFailedRows = (row) => {
+  const nestedRows = Array.isArray(row?.ordenesFallidas)
     ? row.ordenesFallidas
     : Array.isArray(row?.fallidas)
       ? row.fallidas
       : []
 
-  failedRows.value = rawRows.map((item, index) => normalizeFailedRow(item, row, index))
+  return nestedRows.map((item, index) => normalizeFailedRow(item, row, index))
+}
+
+const openFailedOrders = () => {
+  failedRows.value = store.rows.flatMap((row) => getFailedRows(row))
   failedDialogVisible.value = true
 }
 
