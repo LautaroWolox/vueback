@@ -52,46 +52,48 @@
             aria-label="Opciones de usuario"
           >
             <div class="user-info">
-              <div class="info-item">
-                <span class="info-icon" aria-hidden="true">
-                  <i class="pi pi-id-card"></i>
-                </span>
-                <div class="info-copy">
-                  <small>Legajo</small>
-                  <span>{{ legajo || 'No disponible' }}</span>
-                </div>
-              </div>
-
-              <div v-if="hasPersonalIdentity" class="info-item">
-                <span class="info-icon" aria-hidden="true">
-                  <i class="pi pi-user"></i>
-                </span>
-                <div class="info-copy">
-                  <small>Nombre y apellido</small>
-                  <span :title="fullName">{{ fullName }}</span>
-                </div>
-              </div>
-
-              <template v-else>
-                <div class="info-item">
+              <div class="user-info-card">
+                <div class="info-row">
                   <span class="info-icon" aria-hidden="true">
-                    <i class="pi pi-user"></i>
+                    <i class="pi pi-id-card"></i>
                   </span>
                   <div class="info-copy">
-                    <small>Nombre</small>
-                    <span>{{ fallbackName }}</span>
+                    <small>Legajo</small>
+                    <span>{{ legajo || 'No disponible' }}</span>
                   </div>
                 </div>
-                <div class="info-item">
+
+                <div v-if="hasPersonalIdentity" class="info-row">
                   <span class="info-icon" aria-hidden="true">
-                    <i class="pi pi-users"></i>
+                    <span class="info-row-initials">{{ userInitials }}</span>
                   </span>
                   <div class="info-copy">
-                    <small>Apellido</small>
-                    <span>{{ apellido }}</span>
+                    <small>Nombre y apellido</small>
+                    <span :title="fullName">{{ fullName }}</span>
                   </div>
                 </div>
-              </template>
+
+                <template v-else>
+                  <div class="info-row">
+                    <span class="info-icon" aria-hidden="true">
+                      <i class="pi pi-user"></i>
+                    </span>
+                    <div class="info-copy">
+                      <small>Nombre</small>
+                      <span>{{ fallbackName }}</span>
+                    </div>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-icon" aria-hidden="true">
+                      <i class="pi pi-users"></i>
+                    </span>
+                    <div class="info-copy">
+                      <small>Apellido</small>
+                      <span>{{ apellido }}</span>
+                    </div>
+                  </div>
+                </template>
+              </div>
             </div>
 
             <div class="logout-area">
@@ -161,9 +163,15 @@ const hasPersonalIdentity = computed(() => {
 
 const userInitials = computed(() => {
   if (!hasPersonalIdentity.value) return ''
-  const parts = fullName.value.split(/\s+/).filter(Boolean)
-  if (!parts.length) return ''
 
+  const nameInitial = fallbackName.value.charAt(0)
+  const surnameInitial = apellido.value.charAt(0)
+
+  if (nameInitial && surnameInitial) {
+    return `${nameInitial}${surnameInitial}`.toLocaleUpperCase()
+  }
+
+  const parts = fullName.value.split(/\s+/).filter(Boolean)
   const first = parts[0]?.charAt(0) ?? ''
   const last = parts.length > 1 ? parts[parts.length - 1]?.charAt(0) ?? '' : ''
   return `${first}${last}`.toLocaleUpperCase()
@@ -488,20 +496,24 @@ onUnmounted(() => {
   background: #fff;
 }
 
-.info-item {
+.user-info-card {
+  overflow: hidden;
+  border: 1px solid #d9e3e7;
+  border-radius: 6px;
+  background: #f8fbfc;
+}
+
+.info-row {
   min-height: 46px;
   display: flex;
   align-items: center;
   gap: 9px;
   padding: 7px 9px;
-  border: 1px solid #e4ecef;
-  border-radius: 6px;
-  background: #f8fbfc;
   color: #344f5b;
 }
 
-.user-info .info-item + .info-item {
-  margin-top: 7px;
+.info-row + .info-row {
+  border-top: 1px solid #e4ecef;
 }
 
 .info-icon {
@@ -520,8 +532,15 @@ onUnmounted(() => {
   font-size: 13px;
 }
 
+.info-row-initials {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .02em;
+}
+
 .info-copy {
   min-width: 0;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -537,6 +556,7 @@ onUnmounted(() => {
 
 .info-copy span {
   max-width: 165px;
+  min-height: 13px;
   overflow: hidden;
   color: #304d59;
   font-size: 11px;
