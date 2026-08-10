@@ -116,6 +116,10 @@ const useEmulacionStore = defineStore('emulacionStore', {
             this.error_message = ''
 
             const legajo = String(this.legajoSelected ?? '').trim()
+            const selectedOperator = this.selectedOperator
+                ? { ...this.selectedOperator }
+                : null
+
             if (!legajo) {
                 this.error_code = 400
                 this.error_message = 'No hay un operador seleccionado'
@@ -143,9 +147,22 @@ const useEmulacionStore = defineStore('emulacionStore', {
                 this.authStore.setPerfil({
                     autenticado: true,
                     rutas: parsed.rutas,
-                    nombre: parsed.nombre,
-                    email: parsed.email,
-                    legajo: parsed.legajo
+                    nombre:
+                        parsed.nombre ??
+                        parsed.name ??
+                        selectedOperator?.nombre ??
+                        selectedOperator?.name ??
+                        '',
+                    apellido:
+                        parsed.apellido ??
+                        parsed.apellidos ??
+                        parsed.surname ??
+                        selectedOperator?.apellido ??
+                        selectedOperator?.apellidos ??
+                        selectedOperator?.surname ??
+                        '',
+                    email: parsed.email ?? selectedOperator?.email ?? '',
+                    legajo: parsed.legajo ?? legajo
                 })
             } catch (error) {
                 this.error_code = 500
