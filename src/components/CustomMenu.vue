@@ -19,111 +19,81 @@
       </template>
 
       <template #end>
-        <div ref="userSectionRef" class="fm-user-v2-section">
+        <div ref="userSectionRef" class="fm-user-v3-section">
           <Button
-            class="fm-user-v2-trigger"
-            :class="{ 'fm-user-v2-trigger--named': hasPersonalIdentity }"
+            class="fm-user-v3-trigger"
+            :class="{ 'fm-user-v3-trigger--named': hasPersonalIdentity }"
             text
             type="button"
             aria-haspopup="menu"
             :aria-expanded="showDropdown"
-            aria-controls="fm-user-menu-v2"
+            aria-controls="fm-user-menu-v3"
             @click="toggleDropdown"
           >
             <span
               v-if="hasPersonalIdentity"
-              class="fm-user-v2-avatar fm-user-v2-avatar--initials"
+              class="fm-user-v3-avatar fm-user-v3-avatar--initials"
               aria-hidden="true"
             >{{ userInitials }}</span>
-            <span v-else class="fm-user-v2-avatar" aria-hidden="true">
+            <span v-else class="fm-user-v3-avatar" aria-hidden="true">
               <i class="pi pi-user"></i>
             </span>
 
-            <span class="fm-user-v2-label" :title="userLabel">{{ userLabel }}</span>
+            <span class="fm-user-v3-label" :title="userLabel">{{ userLabel }}</span>
 
             <i
-              class="pi pi-chevron-down fm-user-v2-chevron"
-              :class="{ 'fm-user-v2-chevron--open': showDropdown }"
+              class="pi pi-chevron-down fm-user-v3-chevron"
+              :class="{ 'fm-user-v3-chevron--open': showDropdown }"
               aria-hidden="true"
             ></i>
           </Button>
 
           <div
             v-if="showDropdown"
-            id="fm-user-menu-v2"
-            class="fm-user-v2-dropdown"
+            id="fm-user-menu-v3"
+            class="fm-user-v3-dropdown"
             role="menu"
             aria-label="Opciones de usuario"
           >
-            <div class="fm-user-v2-body">
-              <div
-                v-if="hasPersonalIdentity"
-                key="named-profile-v2"
-                class="fm-user-v2-card"
-                data-profile-layout="named-single-card-v2"
-              >
-                <div class="fm-user-v2-row">
-                  <span class="fm-user-v2-row-icon" aria-hidden="true">
+            <div class="fm-user-v3-body">
+              <div class="fm-user-v3-card">
+                <div class="fm-user-v3-legajo-row">
+                  <span class="fm-user-v3-legajo-icon" aria-hidden="true">
                     <i class="pi pi-id-card"></i>
                   </span>
-                  <div class="fm-user-v2-copy">
+                  <div class="fm-user-v3-legajo-copy">
                     <small>Legajo</small>
                     <strong>{{ legajo || 'No disponible' }}</strong>
                   </div>
                 </div>
 
-                <div class="fm-user-v2-row">
-                  <span class="fm-user-v2-row-icon fm-user-v2-row-icon--initials" aria-hidden="true">
-                    {{ userInitials }}
-                  </span>
-                  <div class="fm-user-v2-copy">
-                    <small>Nombre y apellido</small>
-                    <strong :title="fullName">{{ fullName }}</strong>
+                <div class="fm-user-v3-person-row">
+                  <div class="fm-user-v3-person-cell">
+                    <span class="fm-user-v3-person-icon" aria-hidden="true">
+                      <i class="pi pi-user"></i>
+                    </span>
+                    <div class="fm-user-v3-person-copy">
+                      <small>Nombre</small>
+                      <strong :title="displayGivenName">{{ displayGivenName }}</strong>
+                    </div>
                   </div>
-                </div>
-              </div>
 
-              <div
-                v-else
-                key="technical-profile-v2"
-                class="fm-user-v2-card"
-                data-profile-layout="technical-single-card-v2"
-              >
-                <div class="fm-user-v2-row">
-                  <span class="fm-user-v2-row-icon" aria-hidden="true">
-                    <i class="pi pi-id-card"></i>
-                  </span>
-                  <div class="fm-user-v2-copy">
-                    <small>Legajo</small>
-                    <strong>{{ legajo || 'No disponible' }}</strong>
-                  </div>
-                </div>
-
-                <div class="fm-user-v2-row">
-                  <span class="fm-user-v2-row-icon" aria-hidden="true">
-                    <i class="pi pi-user"></i>
-                  </span>
-                  <div class="fm-user-v2-copy">
-                    <small>Nombre</small>
-                    <strong>{{ fallbackName }}</strong>
-                  </div>
-                </div>
-
-                <div class="fm-user-v2-row">
-                  <span class="fm-user-v2-row-icon" aria-hidden="true">
-                    <i class="pi pi-users"></i>
-                  </span>
-                  <div class="fm-user-v2-copy">
-                    <small>Apellido</small>
-                    <strong>{{ apellido }}</strong>
+                  <div class="fm-user-v3-person-cell">
+                    <span class="fm-user-v3-person-icon" aria-hidden="true">
+                      <i class="pi pi-users"></i>
+                    </span>
+                    <div class="fm-user-v3-person-copy">
+                      <small>Apellido</small>
+                      <strong :title="displaySurname">{{ displaySurname }}</strong>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div class="fm-user-v2-footer">
+            <div class="fm-user-v3-footer">
               <Button
-                class="fm-user-v2-logout"
+                class="fm-user-v3-logout"
                 outlined
                 type="button"
                 icon="pi pi-sign-out"
@@ -156,52 +126,70 @@ const showDropdown = ref(false)
 const userSectionRef = ref<HTMLElement | null>(null)
 const items = ref(getRutas(rutas))
 
-const nombre = computed(() => String(authStore.usuario?.nombre ?? authStore.nombre ?? '').trim())
-const apellido = computed(() => String(authStore.usuario?.apellido ?? authStore.apellido ?? '').trim())
+const rawNombre = computed(() => String(authStore.usuario?.nombre ?? authStore.nombre ?? '').trim())
+const rawApellido = computed(() => String(authStore.usuario?.apellido ?? authStore.apellido ?? '').trim())
 const legajo = computed(() => String(authStore.usuario?.legajo ?? authStore.legajo ?? '').trim())
 
-const fallbackName = computed(() => {
-  if (!nombre.value) return ''
-  return nombre.value.toLocaleLowerCase() === legajo.value.toLocaleLowerCase() ? '' : nombre.value
+const cleanName = computed(() => {
+  if (!rawNombre.value) return ''
+  return rawNombre.value.toLocaleLowerCase() === legajo.value.toLocaleLowerCase()
+    ? ''
+    : rawNombre.value
 })
 
-const fullName = computed(() => {
-  const name = fallbackName.value
-  const surname = apellido.value
+const derivedNameParts = computed(() => {
+  const name = cleanName.value
+  const explicitSurname = rawApellido.value
 
-  if (!name) return ''
-  if (!surname) return name
+  if (!name) return { givenName: '', surname: explicitSurname }
 
-  const normalizedName = name.toLocaleLowerCase()
-  const normalizedSurname = surname.toLocaleLowerCase()
+  if (explicitSurname) {
+    const normalizedName = name.toLocaleLowerCase()
+    const normalizedSurname = explicitSurname.toLocaleLowerCase()
 
-  return normalizedName.endsWith(normalizedSurname)
-    ? name
-    : `${name} ${surname}`.trim()
+    if (normalizedName === normalizedSurname) {
+      return { givenName: '', surname: explicitSurname }
+    }
+
+    if (normalizedName.endsWith(` ${normalizedSurname}`)) {
+      return {
+        givenName: name.slice(0, -(explicitSurname.length + 1)).trim(),
+        surname: explicitSurname
+      }
+    }
+
+    return { givenName: name, surname: explicitSurname }
+  }
+
+  const parts = name.split(/\s+/).filter(Boolean)
+  if (parts.length >= 2) {
+    return {
+      givenName: parts.slice(0, -1).join(' '),
+      surname: parts.at(-1) ?? ''
+    }
+  }
+
+  return { givenName: name, surname: '' }
 })
 
-const hasPersonalIdentity = computed(() => {
-  if (!fullName.value) return false
-  if (fullName.value.toLocaleLowerCase() === legajo.value.toLocaleLowerCase()) return false
+const displayGivenName = computed(() => derivedNameParts.value.givenName)
+const displaySurname = computed(() => derivedNameParts.value.surname)
 
-  return Boolean(apellido.value || fullName.value.split(/\s+/).filter(Boolean).length >= 2)
-})
+const fullName = computed(() =>
+  [displayGivenName.value, displaySurname.value].filter(Boolean).join(' ').trim()
+)
+
+const hasPersonalIdentity = computed(() => Boolean(
+  displayGivenName.value && displaySurname.value &&
+  fullName.value.toLocaleLowerCase() !== legajo.value.toLocaleLowerCase()
+))
 
 const userInitials = computed(() => {
   if (!hasPersonalIdentity.value) return ''
 
-  const firstNameInitial = fallbackName.value.charAt(0)
-  const surnameInitial = apellido.value.charAt(0)
-
-  if (firstNameInitial && surnameInitial) {
-    return `${firstNameInitial}${surnameInitial}`.toLocaleUpperCase()
-  }
-
-  const parts = fullName.value.split(/\s+/).filter(Boolean)
-  const first = parts[0]?.charAt(0) ?? ''
-  const last = parts.length > 1 ? parts[parts.length - 1]?.charAt(0) ?? '' : ''
-
-  return `${first}${last}`.toLocaleUpperCase()
+  const first = displayGivenName.value.charAt(0)
+  const second = displaySurname.value.charAt(0)
+  return `${first}${second}`.toLocaleUpperCase()
 })
 
 const userLabel = computed(() => hasPersonalIdentity.value
@@ -412,7 +400,7 @@ onUnmounted(() => {
   color: #087f90 !important;
 }
 
-.fm-user-v2-section {
+.fm-user-v3-section {
   position: relative;
   height: 42px;
   display: flex;
@@ -420,8 +408,8 @@ onUnmounted(() => {
   margin-left: auto;
 }
 
-.fm-user-v2-trigger,
-:deep(.fm-user-v2-trigger.p-button) {
+.fm-user-v3-trigger,
+:deep(.fm-user-v3-trigger.p-button) {
   min-width: 160px !important;
   min-height: 34px !important;
   height: 34px !important;
@@ -436,23 +424,23 @@ onUnmounted(() => {
   box-shadow: none !important;
 }
 
-.fm-user-v2-trigger--named,
-:deep(.fm-user-v2-trigger--named.p-button) {
+.fm-user-v3-trigger--named,
+:deep(.fm-user-v3-trigger--named.p-button) {
   min-width: 210px !important;
-  max-width: 270px !important;
+  max-width: 300px !important;
 }
 
-.fm-user-v2-trigger:hover,
-:deep(.fm-user-v2-trigger.p-button:hover),
-.fm-user-v2-trigger[aria-expanded="true"],
-:deep(.fm-user-v2-trigger.p-button[aria-expanded="true"]) {
+.fm-user-v3-trigger:hover,
+:deep(.fm-user-v3-trigger.p-button:hover),
+.fm-user-v3-trigger[aria-expanded="true"],
+:deep(.fm-user-v3-trigger.p-button[aria-expanded="true"]) {
   border-color: rgba(255, 255, 255, .44) !important;
   background: rgba(0, 105, 120, .31) !important;
   box-shadow: none !important;
   transform: none !important;
 }
 
-.fm-user-v2-avatar {
+.fm-user-v3-avatar {
   width: 22px;
   height: 22px;
   flex: 0 0 22px;
@@ -465,13 +453,13 @@ onUnmounted(() => {
   font-size: 12px;
 }
 
-.fm-user-v2-avatar--initials {
+.fm-user-v3-avatar--initials {
   font-size: 10px;
   font-weight: 800;
   letter-spacing: .02em;
 }
 
-.fm-user-v2-label {
+.fm-user-v3-label {
   min-width: 0;
   max-width: 125px;
   flex: 1 1 auto;
@@ -484,69 +472,62 @@ onUnmounted(() => {
   white-space: nowrap;
 }
 
-.fm-user-v2-trigger--named .fm-user-v2-label {
-  max-width: 185px;
+.fm-user-v3-trigger--named .fm-user-v3-label {
+  max-width: 210px;
 }
 
-.fm-user-v2-chevron {
+.fm-user-v3-chevron {
   color: #fff;
   font-size: 8px;
   transition: transform .18s ease;
 }
 
-.fm-user-v2-chevron--open {
+.fm-user-v3-chevron--open {
   transform: rotate(180deg);
 }
 
-.fm-user-v2-dropdown {
+.fm-user-v3-dropdown {
   position: absolute;
   z-index: 3100;
   top: calc(100% + 6px);
   right: 0;
-  width: 260px;
+  width: 292px;
   overflow: hidden;
   border: 1px solid #d9e3e7;
   border-top: 3px solid #00a9bd;
   border-radius: 7px;
   background: #fff;
   box-shadow: 0 12px 26px rgba(17, 48, 61, .20);
-  animation: fm-user-v2-dropdown-in .16s ease-out;
+  animation: fm-user-v3-dropdown-in .16s ease-out;
 }
 
-@keyframes fm-user-v2-dropdown-in {
+@keyframes fm-user-v3-dropdown-in {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-.fm-user-v2-body {
+.fm-user-v3-body {
   padding: 10px;
   background: #fff;
 }
 
-.fm-user-v2-card {
+.fm-user-v3-card {
   overflow: hidden;
   border: 1px solid #d9e3e7;
-  border-radius: 6px;
+  border-radius: 7px;
   background: #f8fbfc;
 }
 
-.fm-user-v2-row {
-  min-height: 54px;
+.fm-user-v3-legajo-row {
+  min-height: 58px;
   display: flex;
   align-items: center;
   gap: 11px;
   padding: 8px 10px;
-  color: #344f5b;
 }
 
-.fm-user-v2-row + .fm-user-v2-row {
-  border-top: 1px solid #e4ecef;
-}
-
-.fm-user-v2-row-icon {
-  width: 38px;
-  height: 38px;
-  flex: 0 0 38px;
+.fm-user-v3-legajo-icon,
+.fm-user-v3-person-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -555,50 +536,82 @@ onUnmounted(() => {
   color: #008b9d;
 }
 
-.fm-user-v2-row-icon i {
+.fm-user-v3-legajo-icon {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+}
+
+.fm-user-v3-legajo-icon i,
+.fm-user-v3-person-icon i {
   font-size: 18px;
 }
 
-.fm-user-v2-row-icon--initials {
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: .02em;
-}
-
-.fm-user-v2-copy {
+.fm-user-v3-legajo-copy,
+.fm-user-v3-person-copy {
   min-width: 0;
-  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   gap: 3px;
 }
 
-.fm-user-v2-copy small {
+.fm-user-v3-legajo-copy small,
+.fm-user-v3-person-copy small {
   color: #6f8792;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: .03em;
   text-transform: uppercase;
 }
 
-.fm-user-v2-copy strong {
-  min-height: 18px;
+.fm-user-v3-legajo-copy strong,
+.fm-user-v3-person-copy strong {
+  min-height: 17px;
   overflow: hidden;
   color: #29424e;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   line-height: 1.25;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.fm-user-v2-footer {
+.fm-user-v3-person-row {
+  min-height: 68px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid #e4ecef;
+}
+
+.fm-user-v3-person-cell {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 8px;
+}
+
+.fm-user-v3-person-cell + .fm-user-v3-person-cell {
+  border-left: 1px solid #e4ecef;
+}
+
+.fm-user-v3-person-icon {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+}
+
+.fm-user-v3-person-copy {
+  flex: 1 1 auto;
+}
+
+.fm-user-v3-footer {
   padding: 0 10px 10px;
   background: #fff;
 }
 
-.fm-user-v2-logout,
-:deep(.fm-user-v2-logout.p-button) {
+.fm-user-v3-logout,
+:deep(.fm-user-v3-logout.p-button) {
   width: 100% !important;
   min-height: 36px !important;
   height: 36px !important;
@@ -614,8 +627,8 @@ onUnmounted(() => {
   box-shadow: none !important;
 }
 
-.fm-user-v2-logout:hover,
-:deep(.fm-user-v2-logout.p-button:hover) {
+.fm-user-v3-logout:hover,
+:deep(.fm-user-v3-logout.p-button:hover) {
   border-color: #008fa1 !important;
   background: #e8fafd !important;
   color: #006f7d !important;
@@ -635,16 +648,16 @@ onUnmounted(() => {
 }
 
 @media (max-width: 900px) {
-  .fm-user-v2-trigger,
-  :deep(.fm-user-v2-trigger.p-button),
-  .fm-user-v2-trigger--named,
-  :deep(.fm-user-v2-trigger--named.p-button) {
+  .fm-user-v3-trigger,
+  :deep(.fm-user-v3-trigger.p-button),
+  .fm-user-v3-trigger--named,
+  :deep(.fm-user-v3-trigger--named.p-button) {
     min-width: 42px !important;
     width: 42px !important;
     padding: 0 9px !important;
   }
 
-  .fm-user-v2-label {
+  .fm-user-v3-label {
     display: none;
   }
 
