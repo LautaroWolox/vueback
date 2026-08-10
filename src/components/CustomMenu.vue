@@ -52,7 +52,12 @@
             aria-label="Opciones de usuario"
           >
             <div class="user-info">
-              <div class="user-info-card">
+              <div
+                v-if="hasPersonalIdentity"
+                key="named-profile"
+                class="user-info-card"
+                data-profile-layout="named-single-card"
+              >
                 <div class="info-row">
                   <span class="info-icon" aria-hidden="true">
                     <i class="pi pi-id-card"></i>
@@ -63,7 +68,7 @@
                   </div>
                 </div>
 
-                <div v-if="hasPersonalIdentity" class="info-row">
+                <div class="info-row">
                   <span class="info-icon" aria-hidden="true">
                     <span class="info-row-initials">{{ userInitials }}</span>
                   </span>
@@ -72,27 +77,43 @@
                     <span :title="fullName">{{ fullName }}</span>
                   </div>
                 </div>
+              </div>
 
-                <template v-else>
-                  <div class="info-row">
-                    <span class="info-icon" aria-hidden="true">
-                      <i class="pi pi-user"></i>
-                    </span>
-                    <div class="info-copy">
-                      <small>Nombre</small>
-                      <span>{{ fallbackName }}</span>
-                    </div>
+              <div
+                v-else
+                key="technical-profile"
+                class="user-info-card"
+                data-profile-layout="technical-single-card"
+              >
+                <div class="info-row">
+                  <span class="info-icon" aria-hidden="true">
+                    <i class="pi pi-id-card"></i>
+                  </span>
+                  <div class="info-copy">
+                    <small>Legajo</small>
+                    <span>{{ legajo || 'No disponible' }}</span>
                   </div>
-                  <div class="info-row">
-                    <span class="info-icon" aria-hidden="true">
-                      <i class="pi pi-users"></i>
-                    </span>
-                    <div class="info-copy">
-                      <small>Apellido</small>
-                      <span>{{ apellido }}</span>
-                    </div>
+                </div>
+
+                <div class="info-row">
+                  <span class="info-icon" aria-hidden="true">
+                    <i class="pi pi-user"></i>
+                  </span>
+                  <div class="info-copy">
+                    <small>Nombre</small>
+                    <span>{{ fallbackName }}</span>
                   </div>
-                </template>
+                </div>
+
+                <div class="info-row">
+                  <span class="info-icon" aria-hidden="true">
+                    <i class="pi pi-users"></i>
+                  </span>
+                  <div class="info-copy">
+                    <small>Apellido</small>
+                    <span>{{ apellido }}</span>
+                  </div>
+                </div>
               </div>
             </div>
 
