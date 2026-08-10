@@ -1,0 +1,138 @@
+name: Ajustar popup OTs fallidas
+
+on:
+  push:
+    branches:
+      - buscador-de-ots
+    paths:
+      - '.github/workflows/fix-buscador-ots-fallidas-popup-height.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch-popup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: buscador-de-ots
+          fetch-depth: 0
+
+      - name: Ajustar componente y estilos globales
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          component = Path('src/modules/buscadorOts/components/OtsFallidasDialog.vue')
+          text = component.read_text(encoding='utf-8')
+          text = text.replace("    :style=\"{ '--fm-dialog-width': '1360px' }\"\n", "")
+          text = text.replace('        scroll-height="420px"', '        scroll-height="flex"')
+          component.write_text(text, encoding='utf-8')
+
+          css_path = Path('src/assets/css/fm-global.css')
+          css = css_path.read_text(encoding='utf-8')
+          marker = '/* ===== INICIO: buscador-ots-fallidas-popup.css ===== */'
+          block = r'''
+
+/* ===== INICIO: buscador-ots-fallidas-popup.css ===== */
+/*
+ * CLASIFICACIÓN: [MÓDULO / PANTALLA]
+ * PANTALLA: Búsqueda de OTs > popup Órdenes de Trabajo Fallidas.
+ * RESPONSABILIDAD: tamaño flotante del diálogo y expansión vertical de la grilla.
+ */
+body .p-dialog.buscador-ots-fallidas-dialog {
+  width: min(1360px, calc(100dvw - 72px)) !important;
+  height: min(610px, calc(100dvh - 72px)) !important;
+  min-height: min(480px, calc(100dvh - 72px)) !important;
+  max-width: calc(100dvw - 72px) !important;
+  max-height: calc(100dvh - 72px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  margin: 0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 24px 64px rgba(20, 48, 59, .30) !important;
+  overflow: hidden !important;
+}
+
+body .p-dialog.buscador-ots-fallidas-dialog .p-dialog-header {
+  flex: 0 0 56px !important;
+  min-height: 56px !important;
+}
+
+body .p-dialog.buscador-ots-fallidas-dialog .p-dialog-content {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  padding: 14px 16px 16px !important;
+  overflow: hidden !important;
+}
+
+body .p-dialog.buscador-ots-fallidas-dialog .buscador-ots-fallidas-grid-shell {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  overflow: hidden !important;
+}
+
+body .p-dialog.buscador-ots-fallidas-dialog .buscador-ots-fallidas-grid,
+body .p-dialog.buscador-ots-fallidas-dialog .buscador-ots-fallidas-grid.p-datatable {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+body .p-dialog.buscador-ots-fallidas-dialog .buscador-ots-fallidas-grid .p-datatable-table-container,
+body .p-dialog.buscador-ots-fallidas-dialog .buscador-ots-fallidas-grid .p-datatable-wrapper,
+body .p-dialog.buscador-ots-fallidas-dialog .buscador-ots-fallidas-grid [data-pc-section='tablecontainer'] {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 1 1 auto !important;
+  overflow: auto !important;
+}
+
+body .p-dialog.buscador-ots-fallidas-dialog .buscador-ots-fallidas-grid > .p-paginator,
+body .p-dialog.buscador-ots-fallidas-dialog .buscador-ots-fallidas-grid .p-datatable-paginator-bottom {
+  flex: 0 0 auto !important;
+}
+
+@media (max-width: 900px) {
+  body .p-dialog.buscador-ots-fallidas-dialog {
+    width: calc(100dvw - 28px) !important;
+    height: calc(100dvh - 40px) !important;
+    min-height: 0 !important;
+    max-width: calc(100dvw - 28px) !important;
+    max-height: calc(100dvh - 40px) !important;
+  }
+}
+/* ===== FIN: buscador-ots-fallidas-popup.css ===== */
+'''
+          if marker not in css:
+              css = css.rstrip() + block + '\n'
+          css_path.write_text(css, encoding='utf-8')
+          PY
+
+      - name: Commit del ajuste
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/modules/buscadorOts/components/OtsFallidasDialog.vue src/assets/css/fm-global.css
+          if git diff --cached --quiet; then
+            echo "Sin cambios"
+            exit 0
+          fi
+          git commit -m "fix: alargar popup flotante de OTs fallidas [skip ci]"
+          git push origin HEAD:buscador-de-ots
