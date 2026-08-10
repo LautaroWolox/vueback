@@ -19,107 +19,111 @@
       </template>
 
       <template #end>
-        <div ref="userSectionRef" class="user-section">
+        <div ref="userSectionRef" class="fm-user-v2-section">
           <Button
-            class="user-profile"
-            :class="{ 'user-profile--named': hasPersonalIdentity }"
+            class="fm-user-v2-trigger"
+            :class="{ 'fm-user-v2-trigger--named': hasPersonalIdentity }"
             text
             type="button"
             aria-haspopup="menu"
             :aria-expanded="showDropdown"
-            aria-controls="fm-user-menu"
+            aria-controls="fm-user-menu-v2"
             @click="toggleDropdown"
           >
             <span
               v-if="hasPersonalIdentity"
-              class="user-profile-icon user-profile-initials"
+              class="fm-user-v2-avatar fm-user-v2-avatar--initials"
               aria-hidden="true"
             >{{ userInitials }}</span>
-            <i v-else class="pi pi-user user-profile-icon" aria-hidden="true"></i>
-            <span class="username" :title="userLabel">{{ userLabel }}</span>
+            <span v-else class="fm-user-v2-avatar" aria-hidden="true">
+              <i class="pi pi-user"></i>
+            </span>
+
+            <span class="fm-user-v2-label" :title="userLabel">{{ userLabel }}</span>
+
             <i
-              class="pi pi-chevron-down dropdown-icon"
-              :class="{ rotated: showDropdown }"
+              class="pi pi-chevron-down fm-user-v2-chevron"
+              :class="{ 'fm-user-v2-chevron--open': showDropdown }"
               aria-hidden="true"
             ></i>
           </Button>
 
           <div
             v-if="showDropdown"
-            id="fm-user-menu"
-            class="dropdown-content"
+            id="fm-user-menu-v2"
+            class="fm-user-v2-dropdown"
             role="menu"
             aria-label="Opciones de usuario"
           >
-            <div class="user-info">
+            <div class="fm-user-v2-body">
               <div
                 v-if="hasPersonalIdentity"
-                key="named-profile"
-                class="user-info-card"
-                data-profile-layout="named-single-card"
+                key="named-profile-v2"
+                class="fm-user-v2-card"
+                data-profile-layout="named-single-card-v2"
               >
-                <div class="info-row">
-                  <span class="info-icon" aria-hidden="true">
+                <div class="fm-user-v2-row">
+                  <span class="fm-user-v2-row-icon" aria-hidden="true">
                     <i class="pi pi-id-card"></i>
                   </span>
-                  <div class="info-copy">
+                  <div class="fm-user-v2-copy">
                     <small>Legajo</small>
-                    <span>{{ legajo || 'No disponible' }}</span>
+                    <strong>{{ legajo || 'No disponible' }}</strong>
                   </div>
                 </div>
 
-                <div class="info-row">
-                  <span class="info-icon" aria-hidden="true">
-                    <span class="info-row-initials">{{ userInitials }}</span>
+                <div class="fm-user-v2-row">
+                  <span class="fm-user-v2-row-icon fm-user-v2-row-icon--initials" aria-hidden="true">
+                    {{ userInitials }}
                   </span>
-                  <div class="info-copy">
+                  <div class="fm-user-v2-copy">
                     <small>Nombre y apellido</small>
-                    <span :title="fullName">{{ fullName }}</span>
+                    <strong :title="fullName">{{ fullName }}</strong>
                   </div>
                 </div>
               </div>
 
               <div
                 v-else
-                key="technical-profile"
-                class="user-info-card"
-                data-profile-layout="technical-single-card"
+                key="technical-profile-v2"
+                class="fm-user-v2-card"
+                data-profile-layout="technical-single-card-v2"
               >
-                <div class="info-row">
-                  <span class="info-icon" aria-hidden="true">
+                <div class="fm-user-v2-row">
+                  <span class="fm-user-v2-row-icon" aria-hidden="true">
                     <i class="pi pi-id-card"></i>
                   </span>
-                  <div class="info-copy">
+                  <div class="fm-user-v2-copy">
                     <small>Legajo</small>
-                    <span>{{ legajo || 'No disponible' }}</span>
+                    <strong>{{ legajo || 'No disponible' }}</strong>
                   </div>
                 </div>
 
-                <div class="info-row">
-                  <span class="info-icon" aria-hidden="true">
+                <div class="fm-user-v2-row">
+                  <span class="fm-user-v2-row-icon" aria-hidden="true">
                     <i class="pi pi-user"></i>
                   </span>
-                  <div class="info-copy">
+                  <div class="fm-user-v2-copy">
                     <small>Nombre</small>
-                    <span>{{ fallbackName }}</span>
+                    <strong>{{ fallbackName }}</strong>
                   </div>
                 </div>
 
-                <div class="info-row">
-                  <span class="info-icon" aria-hidden="true">
+                <div class="fm-user-v2-row">
+                  <span class="fm-user-v2-row-icon" aria-hidden="true">
                     <i class="pi pi-users"></i>
                   </span>
-                  <div class="info-copy">
+                  <div class="fm-user-v2-copy">
                     <small>Apellido</small>
-                    <span>{{ apellido }}</span>
+                    <strong>{{ apellido }}</strong>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div class="logout-area">
+            <div class="fm-user-v2-footer">
               <Button
-                class="logout-btn"
+                class="fm-user-v2-logout"
                 outlined
                 type="button"
                 icon="pi pi-sign-out"
@@ -170,6 +174,7 @@ const fullName = computed(() => {
 
   const normalizedName = name.toLocaleLowerCase()
   const normalizedSurname = surname.toLocaleLowerCase()
+
   return normalizedName.endsWith(normalizedSurname)
     ? name
     : `${name} ${surname}`.trim()
@@ -185,16 +190,17 @@ const hasPersonalIdentity = computed(() => {
 const userInitials = computed(() => {
   if (!hasPersonalIdentity.value) return ''
 
-  const nameInitial = fallbackName.value.charAt(0)
+  const firstNameInitial = fallbackName.value.charAt(0)
   const surnameInitial = apellido.value.charAt(0)
 
-  if (nameInitial && surnameInitial) {
-    return `${nameInitial}${surnameInitial}`.toLocaleUpperCase()
+  if (firstNameInitial && surnameInitial) {
+    return `${firstNameInitial}${surnameInitial}`.toLocaleUpperCase()
   }
 
   const parts = fullName.value.split(/\s+/).filter(Boolean)
   const first = parts[0]?.charAt(0) ?? ''
   const last = parts.length > 1 ? parts[parts.length - 1]?.charAt(0) ?? '' : ''
+
   return `${first}${last}`.toLocaleUpperCase()
 })
 
@@ -406,7 +412,7 @@ onUnmounted(() => {
   color: #087f90 !important;
 }
 
-.user-section {
+.fm-user-v2-section {
   position: relative;
   height: 42px;
   display: flex;
@@ -414,8 +420,8 @@ onUnmounted(() => {
   margin-left: auto;
 }
 
-.user-profile,
-:deep(.user-profile.p-button) {
+.fm-user-v2-trigger,
+:deep(.fm-user-v2-trigger.p-button) {
   min-width: 160px !important;
   min-height: 34px !important;
   height: 34px !important;
@@ -430,23 +436,23 @@ onUnmounted(() => {
   box-shadow: none !important;
 }
 
-.user-profile--named,
-:deep(.user-profile--named.p-button) {
+.fm-user-v2-trigger--named,
+:deep(.fm-user-v2-trigger--named.p-button) {
   min-width: 210px !important;
   max-width: 270px !important;
 }
 
-.user-profile:hover,
-:deep(.user-profile.p-button:hover),
-.user-profile[aria-expanded="true"],
-:deep(.user-profile.p-button[aria-expanded="true"]) {
+.fm-user-v2-trigger:hover,
+:deep(.fm-user-v2-trigger.p-button:hover),
+.fm-user-v2-trigger[aria-expanded="true"],
+:deep(.fm-user-v2-trigger.p-button[aria-expanded="true"]) {
   border-color: rgba(255, 255, 255, .44) !important;
   background: rgba(0, 105, 120, .31) !important;
   box-shadow: none !important;
   transform: none !important;
 }
 
-.user-profile-icon {
+.fm-user-v2-avatar {
   width: 22px;
   height: 22px;
   flex: 0 0 22px;
@@ -459,13 +465,13 @@ onUnmounted(() => {
   font-size: 12px;
 }
 
-.user-profile-initials {
+.fm-user-v2-avatar--initials {
   font-size: 10px;
   font-weight: 800;
   letter-spacing: .02em;
 }
 
-.username {
+.fm-user-v2-label {
   min-width: 0;
   max-width: 125px;
   flex: 1 1 auto;
@@ -478,138 +484,138 @@ onUnmounted(() => {
   white-space: nowrap;
 }
 
-.user-profile--named .username {
+.fm-user-v2-trigger--named .fm-user-v2-label {
   max-width: 185px;
 }
 
-.dropdown-icon {
+.fm-user-v2-chevron {
   color: #fff;
   font-size: 8px;
   transition: transform .18s ease;
 }
 
-.dropdown-icon.rotated {
+.fm-user-v2-chevron--open {
   transform: rotate(180deg);
 }
 
-.dropdown-content {
+.fm-user-v2-dropdown {
   position: absolute;
   z-index: 3100;
   top: calc(100% + 6px);
   right: 0;
-  width: 232px;
+  width: 260px;
   overflow: hidden;
   border: 1px solid #d9e3e7;
   border-top: 3px solid #00a9bd;
   border-radius: 7px;
   background: #fff;
   box-shadow: 0 12px 26px rgba(17, 48, 61, .20);
-  animation: dropdown-in .16s ease-out;
+  animation: fm-user-v2-dropdown-in .16s ease-out;
 }
 
-@keyframes dropdown-in {
+@keyframes fm-user-v2-dropdown-in {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-.user-info {
+.fm-user-v2-body {
   padding: 10px;
   background: #fff;
 }
 
-.user-info-card {
+.fm-user-v2-card {
   overflow: hidden;
   border: 1px solid #d9e3e7;
   border-radius: 6px;
   background: #f8fbfc;
 }
 
-.info-row {
-  min-height: 46px;
+.fm-user-v2-row {
+  min-height: 54px;
   display: flex;
   align-items: center;
-  gap: 9px;
-  padding: 7px 9px;
+  gap: 11px;
+  padding: 8px 10px;
   color: #344f5b;
 }
 
-.info-row + .info-row {
+.fm-user-v2-row + .fm-user-v2-row {
   border-top: 1px solid #e4ecef;
 }
 
-.info-icon {
-  width: 28px;
-  height: 28px;
-  flex: 0 0 28px;
+.fm-user-v2-row-icon {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
+  border-radius: 8px;
   background: #dff7fa;
   color: #008b9d;
 }
 
-.info-icon i {
-  font-size: 13px;
+.fm-user-v2-row-icon i {
+  font-size: 18px;
 }
 
-.info-row-initials {
-  font-size: 10px;
+.fm-user-v2-row-icon--initials {
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: .02em;
 }
 
-.info-copy {
+.fm-user-v2-copy {
   min-width: 0;
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 
-.info-copy small {
-  color: #7b919a;
-  font-size: 8px;
+.fm-user-v2-copy small {
+  color: #6f8792;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: .04em;
+  letter-spacing: .03em;
   text-transform: uppercase;
 }
 
-.info-copy span {
-  max-width: 165px;
-  min-height: 13px;
+.fm-user-v2-copy strong {
+  min-height: 18px;
   overflow: hidden;
-  color: #304d59;
-  font-size: 11px;
-  font-weight: 500;
+  color: #29424e;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.25;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.logout-area {
+.fm-user-v2-footer {
   padding: 0 10px 10px;
   background: #fff;
 }
 
-.logout-btn,
-:deep(.logout-btn.p-button) {
+.fm-user-v2-logout,
+:deep(.fm-user-v2-logout.p-button) {
   width: 100% !important;
-  min-height: 34px !important;
-  height: 34px !important;
+  min-height: 36px !important;
+  height: 36px !important;
   justify-content: center !important;
   gap: 8px !important;
   padding: 0 10px !important;
   border: 1px solid #00a9bd !important;
-  border-radius: 6px !important;
+  border-radius: 7px !important;
   background: #fff !important;
   color: #008b9d !important;
-  font-size: 11px !important;
+  font-size: 12px !important;
   font-weight: 700 !important;
   box-shadow: none !important;
 }
 
-.logout-btn:hover,
-:deep(.logout-btn.p-button:hover) {
+.fm-user-v2-logout:hover,
+:deep(.fm-user-v2-logout.p-button:hover) {
   border-color: #008fa1 !important;
   background: #e8fafd !important;
   color: #006f7d !important;
@@ -629,16 +635,16 @@ onUnmounted(() => {
 }
 
 @media (max-width: 900px) {
-  .user-profile,
-  :deep(.user-profile.p-button),
-  .user-profile--named,
-  :deep(.user-profile--named.p-button) {
+  .fm-user-v2-trigger,
+  :deep(.fm-user-v2-trigger.p-button),
+  .fm-user-v2-trigger--named,
+  :deep(.fm-user-v2-trigger--named.p-button) {
     min-width: 42px !important;
     width: 42px !important;
     padding: 0 9px !important;
   }
 
-  .username {
+  .fm-user-v2-label {
     display: none;
   }
 
