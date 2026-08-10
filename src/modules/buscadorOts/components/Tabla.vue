@@ -84,14 +84,14 @@
 
               <button
                 type="button"
-                class="busqueda-ots-grid-action busqueda-ots-grid-action--failed"
+                class="busqueda-ots-grid-action"
                 :class="{ 'busqueda-ots-grid-action--active': store.failedOnly }"
                 title="Filtrar fallidas"
                 aria-label="Filtrar fallidas"
                 :aria-pressed="store.failedOnly"
                 @click="store.toggleFailedFilter"
               >
-                <FilterFailedIcon />
+                <i class="pi pi-times" aria-hidden="true"></i>
               </button>
 
               <button
@@ -181,7 +181,6 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import InputText from 'primevue/inputtext'
 import FmGridPaginator from '@/components/shared/FmGridPaginator.vue'
-import FilterFailedIcon from './FilterFailedIcon.vue'
 import { columns, createColumnFilters, rowsOptions } from './columns'
 import { useBuscadorOtsStore } from '../store/buscadorOtsStore'
 
