@@ -4,6 +4,7 @@
     append-to="body"
     modal
     header="Órdenes de Trabajo Fallidas"
+    :closable="true"
     :draggable="false"
     :resizable="false"
     class="fm-dialog buscador-ots-fallidas-dialog"
@@ -195,3 +196,98 @@ const download = () => {
   tableRef.value?.exportCSV?.()
 }
 </script>
+
+<style>
+body .p-dialog.buscador-ots-fallidas-dialog {
+  width: min(1360px, calc(100vw - 48px)) !important;
+  max-width: calc(100vw - 48px) !important;
+  height: min(610px, calc(100dvh - 72px)) !important;
+  max-height: calc(100dvh - 72px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+body .p-dialog.buscador-ots-fallidas-dialog .p-dialog-header {
+  flex: 0 0 auto !important;
+  width: 100% !important;
+}
+
+body .p-dialog.buscador-ots-fallidas-dialog .p-dialog-header-actions {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  margin-left: auto !important;
+  align-items: center !important;
+}
+
+body .p-dialog.buscador-ots-fallidas-dialog .p-dialog-close-button {
+  display: inline-flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+body .p-dialog.buscador-ots-fallidas-dialog .p-dialog-content {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+body .p-dialog.buscador-ots-fallidas-dialog .buscador-ots-fallidas-grid-shell {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+body .p-dialog.buscador-ots-fallidas-dialog .buscador-ots-fallidas-grid {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+body .p-dialog.buscador-ots-fallidas-dialog .buscador-ots-fallidas-grid .p-datatable-table-container,
+body .p-dialog.buscador-ots-fallidas-dialog .buscador-ots-fallidas-grid .p-datatable-wrapper {
+  flex: 1 1 auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: auto !important;
+}
+
+body .p-dialog.buscador-ots-fallidas-dialog .buscador-ots-fallidas-grid .p-paginator {
+  flex: 0 0 auto !important;
+}
+
+body .p-dialog.buscador-ots-fallidas-dialog .buscador-ots-fallidas-grid .p-datatable-empty-message > td {
+  height: 100% !important;
+  vertical-align: middle !important;
+}
+
+body .p-dialog.buscador-ots-fallidas-dialog .buscador-ots-fallidas-grid .fm-grid-empty {
+  min-height: 100% !important;
+}
+
+@media (max-width: 760px) {
+  body .p-dialog.buscador-ots-fallidas-dialog {
+    width: calc(100vw - 20px) !important;
+    max-width: calc(100vw - 20px) !important;
+    height: calc(100dvh - 74px) !important;
+    max-height: calc(100dvh - 74px) !important;
+  }
+}
+</style>
