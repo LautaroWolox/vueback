@@ -8,6 +8,7 @@
     :resizable="false"
     class="fm-dialog buscador-ots-fallidas-dialog"
     :pt="{ root: { class: 'fm-dialog buscador-ots-fallidas-dialog' } }"
+    :style="{ width: 'min(980px, calc(100vw - 24px))' }"
     @update:visible="emit('update:visible', $event)"
   >
     <FmGridShell class="buscador-ots-fallidas-grid-shell">
@@ -18,12 +19,14 @@
         v-model:rows="pageRows"
         :value="rows"
         data-key="id"
-        class="fm-pass-grid buscador-ots-fallidas-grid"
+        class="fm-pass-grid jobtype-main-grid buscador-ots-fallidas-grid"
+        table-style="table-layout: fixed; min-width: 940px; width: 100%"
         paginator
         scrollable
-        scroll-height="240px"
+        scroll-height="300px"
         show-gridlines
         removable-sort
+        sort-mode="multiple"
         filter-display="row"
         resizable-columns
         column-resize-mode="fit"
@@ -87,20 +90,23 @@
           :field="column.field"
           :header="column.header"
           :show-filter-menu="false"
+          :style="{ width: column.width }"
+          :header-style="{ width: column.width }"
+          :body-style="{ width: column.width }"
           sortable
         >
           <template #filter="{ filterModel, filterCallback }">
-            <div class="fm-filter-cell">
-              <span class="fm-filter-prefix">~</span>
+            <div class="jobtype-filter-cell fm-filter-cell">
+              <span class="jobtype-filter-symbol">~</span>
               <InputText
                 v-model="filterModel.value"
-                class="fm-column-filter"
+                class="jobtype-filter-input"
                 type="text"
                 @input="filterCallback()"
               />
               <button
                 type="button"
-                class="fm-filter-more"
+                class="jobtype-filter-clear busqueda-ots-column-filter__clear"
                 aria-label="Limpiar filtro"
                 title="Limpiar filtro"
                 @click="clearFilter(filterModel, filterCallback)"
@@ -109,7 +115,7 @@
           </template>
 
           <template #body="{ data }">
-            <span class="fm-cell-text" :title="String(data[column.field] ?? '')">
+            <span class="jobtype-cell-text fm-cell-text" :title="String(data[column.field] ?? '')">
               {{ data[column.field] ?? '' }}
             </span>
           </template>
@@ -151,12 +157,12 @@ const emit = defineEmits<{
 }>()
 
 const columns = [
-  { field: 'nroOt', header: 'Nro. OT' },
-  { field: 'codigoTarea', header: 'Cod. tarea' },
-  { field: 'fechaUltimaModificacion', header: 'Fecha últ. mod. OT' },
-  { field: 'tecnicoNoLdap', header: 'Técnico no LDAP' },
-  { field: 'sistemaOrigen', header: 'Sistema origen' },
-  { field: 'descripcionError', header: 'Descripción error' }
+  { field: 'nroOt', header: 'Nro. OT', width: '135px' },
+  { field: 'codigoTarea', header: 'Cod. tarea', width: '145px' },
+  { field: 'fechaUltimaModificacion', header: 'Fecha últ. mod. OT', width: '190px' },
+  { field: 'tecnicoNoLdap', header: 'Técnico no LDAP', width: '175px' },
+  { field: 'sistemaOrigen', header: 'Sistema origen', width: '145px' },
+  { field: 'descripcionError', header: 'Descripción error', width: '250px' }
 ]
 
 const rowsOptions = [100, 250, 500]
