@@ -22,6 +22,7 @@
         <div ref="userSectionRef" class="user-section">
           <Button
             class="user-profile"
+            :class="{ 'user-profile--named': hasPersonalIdentity }"
             text
             type="button"
             aria-haspopup="menu"
@@ -29,7 +30,12 @@
             aria-controls="fm-user-menu"
             @click="toggleDropdown"
           >
-            <i class="pi pi-user user-profile-icon" aria-hidden="true"></i>
+            <span
+              v-if="hasPersonalIdentity"
+              class="user-profile-icon user-profile-initials"
+              aria-hidden="true"
+            >{{ userInitials }}</span>
+            <i v-else class="pi pi-user user-profile-icon" aria-hidden="true"></i>
             <span class="username" :title="userLabel">{{ userLabel }}</span>
             <i
               class="pi pi-chevron-down dropdown-icon"
@@ -55,6 +61,37 @@
                   <span>{{ legajo || 'No disponible' }}</span>
                 </div>
               </div>
+
+              <div v-if="hasPersonalIdentity" class="info-item">
+                <span class="info-icon" aria-hidden="true">
+                  <i class="pi pi-user"></i>
+                </span>
+                <div class="info-copy">
+                  <small>Nombre y apellido</small>
+                  <span :title="fullName">{{ fullName }}</span>
+                </div>
+              </div>
+
+              <template v-else>
+                <div class="info-item">
+                  <span class="info-icon" aria-hidden="true">
+                    <i class="pi pi-user"></i>
+                  </span>
+                  <div class="info-copy">
+                    <small>Nombre</small>
+                    <span>{{ fallbackName }}</span>
+                  </div>
+                </div>
+                <div class="info-item">
+                  <span class="info-icon" aria-hidden="true">
+                    <i class="pi pi-users"></i>
+                  </span>
+                  <div class="info-copy">
+                    <small>Apellido</small>
+                    <span>{{ apellido }}</span>
+                  </div>
+                </div>
+              </template>
             </div>
 
             <div class="logout-area">
@@ -87,14 +124,54 @@ import { useAuthStore } from '@/store/auth'
 import { getRutas } from './rutas'
 
 const authStore = useAuthStore()
-const nombre = authStore.usuario?.nombre ?? ''
-const legajo = authStore.usuario?.legajo ?? ''
 const rutas = authStore.rutas
 const showDropdown = ref(false)
 const userSectionRef = ref<HTMLElement | null>(null)
 const items = ref(getRutas(rutas))
 
-const userLabel = computed(() => nombre || legajo || 'Usuario')
+const nombre = computed(() => String(authStore.usuario?.nombre ?? authStore.nombre ?? '').trim())
+const apellido = computed(() => String(authStore.usuario?.apellido ?? authStore.apellido ?? '').trim())
+const legajo = computed(() => String(authStore.usuario?.legajo ?? authStore.legajo ?? '').trim())
+
+const fallbackName = computed(() => {
+  if (!nombre.value) return ''
+  return nombre.value.toLocaleLowerCase() === legajo.value.toLocaleLowerCase() ? '' : nombre.value
+})
+
+const fullName = computed(() => {
+  const name = fallbackName.value
+  const surname = apellido.value
+
+  if (!name) return ''
+  if (!surname) return name
+
+  const normalizedName = name.toLocaleLowerCase()
+  const normalizedSurname = surname.toLocaleLowerCase()
+  return normalizedName.endsWith(normalizedSurname)
+    ? name
+    : `${name} ${surname}`.trim()
+})
+
+const hasPersonalIdentity = computed(() => {
+  if (!fullName.value) return false
+  if (fullName.value.toLocaleLowerCase() === legajo.value.toLocaleLowerCase()) return false
+
+  return Boolean(apellido.value || fullName.value.split(/\s+/).filter(Boolean).length >= 2)
+})
+
+const userInitials = computed(() => {
+  if (!hasPersonalIdentity.value) return ''
+  const parts = fullName.value.split(/\s+/).filter(Boolean)
+  if (!parts.length) return ''
+
+  const first = parts[0]?.charAt(0) ?? ''
+  const last = parts.length > 1 ? parts[parts.length - 1]?.charAt(0) ?? '' : ''
+  return `${first}${last}`.toLocaleUpperCase()
+})
+
+const userLabel = computed(() => hasPersonalIdentity.value
+  ? fullName.value
+  : legajo.value || 'Usuario')
 
 const closeDropdown = () => {
   showDropdown.value = false
@@ -324,6 +401,12 @@ onUnmounted(() => {
   box-shadow: none !important;
 }
 
+.user-profile--named,
+:deep(.user-profile--named.p-button) {
+  min-width: 210px !important;
+  max-width: 270px !important;
+}
+
 .user-profile:hover,
 :deep(.user-profile.p-button:hover),
 .user-profile[aria-expanded="true"],
@@ -347,6 +430,12 @@ onUnmounted(() => {
   font-size: 12px;
 }
 
+.user-profile-initials {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .02em;
+}
+
 .username {
   min-width: 0;
   max-width: 125px;
@@ -358,6 +447,10 @@ onUnmounted(() => {
   text-align: left;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.user-profile--named .username {
+  max-width: 185px;
 }
 
 .dropdown-icon {
@@ -407,6 +500,10 @@ onUnmounted(() => {
   color: #344f5b;
 }
 
+.user-info .info-item + .info-item {
+  margin-top: 7px;
+}
+
 .info-icon {
   width: 28px;
   height: 28px;
@@ -439,9 +536,13 @@ onUnmounted(() => {
 }
 
 .info-copy span {
+  max-width: 165px;
+  overflow: hidden;
   color: #304d59;
   font-size: 11px;
   font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .logout-area {
@@ -488,7 +589,9 @@ onUnmounted(() => {
 
 @media (max-width: 900px) {
   .user-profile,
-  :deep(.user-profile.p-button) {
+  :deep(.user-profile.p-button),
+  .user-profile--named,
+  :deep(.user-profile--named.p-button) {
     min-width: 42px !important;
     width: 42px !important;
     padding: 0 9px !important;
