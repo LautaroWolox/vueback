@@ -19,47 +19,69 @@
       </template>
 
       <template #end>
-        <div ref="userSectionRef" class="user-section">
+        <div ref="userSectionRef" class="fm-user-v3-section">
           <Button
-            class="user-profile"
+            class="fm-user-v3-trigger"
+            :class="{ 'fm-user-v3-trigger--named': hasPersonalIdentity }"
             text
             type="button"
             aria-haspopup="menu"
             :aria-expanded="showDropdown"
-            aria-controls="fm-user-menu"
+            aria-controls="fm-user-menu-v3"
             @click="toggleDropdown"
           >
-            <i class="pi pi-user user-profile-icon" aria-hidden="true"></i>
-            <span class="username" :title="userLabel">{{ userLabel }}</span>
+            <span
+              v-if="hasPersonalIdentity"
+              class="fm-user-v3-avatar fm-user-v3-avatar--initials"
+              aria-hidden="true"
+            >{{ userInitials }}</span>
+            <span v-else class="fm-user-v3-avatar" aria-hidden="true">
+              <i class="pi pi-user"></i>
+            </span>
+
+            <span class="fm-user-v3-label" :title="userLabel">{{ userLabel }}</span>
+
             <i
-              class="pi pi-chevron-down dropdown-icon"
-              :class="{ rotated: showDropdown }"
+              class="pi pi-chevron-down fm-user-v3-chevron"
+              :class="{ 'fm-user-v3-chevron--open': showDropdown }"
               aria-hidden="true"
             ></i>
           </Button>
 
           <div
             v-if="showDropdown"
-            id="fm-user-menu"
-            class="dropdown-content"
+            id="fm-user-menu-v3"
+            class="fm-user-v3-dropdown"
             role="menu"
             aria-label="Opciones de usuario"
           >
-            <div class="user-info">
-              <div class="info-item">
-                <span class="info-icon" aria-hidden="true">
-                  <i class="pi pi-id-card"></i>
-                </span>
-                <div class="info-copy">
-                  <small>Legajo</small>
-                  <span>{{ legajo || 'No disponible' }}</span>
+            <div class="fm-user-v3-body">
+              <div class="fm-user-v3-card">
+                <div class="fm-user-v3-legajo-row">
+                  <span class="fm-user-v3-legajo-icon" aria-hidden="true">
+                    <i class="pi pi-id-card"></i>
+                  </span>
+                  <div class="fm-user-v3-legajo-copy">
+                    <small>Legajo</small>
+                    <strong>{{ legajo || 'No disponible' }}</strong>
+                  </div>
+                </div>
+
+                <div class="fm-user-v3-person-row">
+                  <span class="fm-user-v3-person-icon" aria-hidden="true">
+                    <i class="pi pi-users"></i>
+                  </span>
+                  <div class="fm-user-v3-person-copy">
+                    <small>Nombre y Apellido</small>
+                    <strong :title="fullName">{{ fullName }}</strong>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div class="logout-area">
+            <div class="fm-user-v3-footer">
               <Button
-                class="logout-btn"
+                class="fm-user-v3-logout"
                 outlined
                 type="button"
                 icon="pi pi-sign-out"
@@ -87,14 +109,80 @@ import { useAuthStore } from '@/store/auth'
 import { getRutas } from './rutas'
 
 const authStore = useAuthStore()
-const nombre = authStore.usuario?.nombre ?? ''
-const legajo = authStore.usuario?.legajo ?? ''
 const rutas = authStore.rutas
 const showDropdown = ref(false)
 const userSectionRef = ref<HTMLElement | null>(null)
 const items = ref(getRutas(rutas))
 
-const userLabel = computed(() => nombre || legajo || 'Usuario')
+const rawNombre = computed(() => String(authStore.usuario?.nombre ?? authStore.nombre ?? '').trim())
+const rawApellido = computed(() => String(authStore.usuario?.apellido ?? authStore.apellido ?? '').trim())
+const legajo = computed(() => String(authStore.usuario?.legajo ?? authStore.legajo ?? '').trim())
+
+const cleanName = computed(() => {
+  if (!rawNombre.value) return ''
+  return rawNombre.value.toLocaleLowerCase() === legajo.value.toLocaleLowerCase()
+    ? ''
+    : rawNombre.value
+})
+
+const derivedNameParts = computed(() => {
+  const name = cleanName.value
+  const explicitSurname = rawApellido.value
+
+  if (!name) return { givenName: '', surname: explicitSurname }
+
+  if (explicitSurname) {
+    const normalizedName = name.toLocaleLowerCase()
+    const normalizedSurname = explicitSurname.toLocaleLowerCase()
+
+    if (normalizedName === normalizedSurname) {
+      return { givenName: '', surname: explicitSurname }
+    }
+
+    if (normalizedName.endsWith(` ${normalizedSurname}`)) {
+      return {
+        givenName: name.slice(0, -(explicitSurname.length + 1)).trim(),
+        surname: explicitSurname
+      }
+    }
+
+    return { givenName: name, surname: explicitSurname }
+  }
+
+  const parts = name.split(/\s+/).filter(Boolean)
+  if (parts.length >= 2) {
+    return {
+      givenName: parts.slice(0, -1).join(' '),
+      surname: parts.at(-1) ?? ''
+    }
+  }
+
+  return { givenName: name, surname: '' }
+})
+
+const displayGivenName = computed(() => derivedNameParts.value.givenName)
+const displaySurname = computed(() => derivedNameParts.value.surname)
+
+const fullName = computed(() =>
+  [displayGivenName.value, displaySurname.value].filter(Boolean).join(' ').trim()
+)
+
+const hasPersonalIdentity = computed(() => Boolean(
+  displayGivenName.value && displaySurname.value &&
+  fullName.value.toLocaleLowerCase() !== legajo.value.toLocaleLowerCase()
+))
+
+const userInitials = computed(() => {
+  if (!hasPersonalIdentity.value) return ''
+
+  const first = displayGivenName.value.charAt(0)
+  const second = displaySurname.value.charAt(0)
+  return `${first}${second}`.toLocaleUpperCase()
+})
+
+const userLabel = computed(() => hasPersonalIdentity.value
+  ? fullName.value
+  : legajo.value || 'Usuario')
 
 const closeDropdown = () => {
   showDropdown.value = false
@@ -129,7 +217,6 @@ onUnmounted(() => {
   document.removeEventListener('keydown', handleEscape)
 })
 </script>
-
 <style scoped>
 .menu-container {
   position: relative;
@@ -300,7 +387,7 @@ onUnmounted(() => {
   color: #087f90 !important;
 }
 
-.user-section {
+.fm-user-v3-section {
   position: relative;
   height: 42px;
   display: flex;
@@ -308,8 +395,8 @@ onUnmounted(() => {
   margin-left: auto;
 }
 
-.user-profile,
-:deep(.user-profile.p-button) {
+.fm-user-v3-trigger,
+:deep(.fm-user-v3-trigger.p-button) {
   min-width: 160px !important;
   min-height: 34px !important;
   height: 34px !important;
@@ -324,17 +411,23 @@ onUnmounted(() => {
   box-shadow: none !important;
 }
 
-.user-profile:hover,
-:deep(.user-profile.p-button:hover),
-.user-profile[aria-expanded="true"],
-:deep(.user-profile.p-button[aria-expanded="true"]) {
+.fm-user-v3-trigger--named,
+:deep(.fm-user-v3-trigger--named.p-button) {
+  min-width: 210px !important;
+  max-width: 300px !important;
+}
+
+.fm-user-v3-trigger:hover,
+:deep(.fm-user-v3-trigger.p-button:hover),
+.fm-user-v3-trigger[aria-expanded="true"],
+:deep(.fm-user-v3-trigger.p-button[aria-expanded="true"]) {
   border-color: rgba(255, 255, 255, .44) !important;
   background: rgba(0, 105, 120, .31) !important;
   box-shadow: none !important;
   transform: none !important;
 }
 
-.user-profile-icon {
+.fm-user-v3-avatar {
   width: 22px;
   height: 22px;
   flex: 0 0 22px;
@@ -347,7 +440,13 @@ onUnmounted(() => {
   font-size: 12px;
 }
 
-.username {
+.fm-user-v3-avatar--initials {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .02em;
+}
+
+.fm-user-v3-label {
   min-width: 0;
   max-width: 125px;
   flex: 1 1 auto;
@@ -360,105 +459,131 @@ onUnmounted(() => {
   white-space: nowrap;
 }
 
-.dropdown-icon {
+.fm-user-v3-trigger--named .fm-user-v3-label {
+  max-width: 210px;
+}
+
+.fm-user-v3-chevron {
   color: #fff;
   font-size: 8px;
   transition: transform .18s ease;
 }
 
-.dropdown-icon.rotated {
+.fm-user-v3-chevron--open {
   transform: rotate(180deg);
 }
 
-.dropdown-content {
+.fm-user-v3-dropdown {
   position: absolute;
   z-index: 3100;
   top: calc(100% + 6px);
   right: 0;
-  width: 232px;
+  width: 292px;
   overflow: hidden;
   border: 1px solid #d9e3e7;
   border-top: 3px solid #00a9bd;
   border-radius: 7px;
   background: #fff;
   box-shadow: 0 12px 26px rgba(17, 48, 61, .20);
-  animation: dropdown-in .16s ease-out;
+  animation: fm-user-v3-dropdown-in .16s ease-out;
 }
 
-@keyframes dropdown-in {
+@keyframes fm-user-v3-dropdown-in {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-.user-info {
+.fm-user-v3-body {
   padding: 10px;
   background: #fff;
 }
-
-.info-item {
-  min-height: 46px;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 7px 9px;
-  border: 1px solid #e4ecef;
-  border-radius: 6px;
+.fm-user-v3-card {
+  overflow: hidden;
+  border: 1px solid #d9e3e7;
+  border-radius: 7px;
   background: #f8fbfc;
-  color: #344f5b;
 }
 
-.info-icon {
-  width: 28px;
-  height: 28px;
-  flex: 0 0 28px;
+.fm-user-v3-legajo-row,
+.fm-user-v3-person-row {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 8px 10px;
+}
+
+.fm-user-v3-person-row {
+  border-top: 1px solid #e4ecef;
+}
+
+.fm-user-v3-legajo-icon,
+.fm-user-v3-person-icon {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
+  border-radius: 8px;
   background: #dff7fa;
   color: #008b9d;
 }
 
-.info-icon i {
-  font-size: 13px;
+.fm-user-v3-legajo-icon i,
+.fm-user-v3-person-icon i {
+  font-size: 18px;
 }
 
-.info-copy {
+.fm-user-v3-legajo-copy,
+.fm-user-v3-person-copy {
   min-width: 0;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 
-.info-copy small {
-  color: #7b919a;
-  font-size: 8px;
+.fm-user-v3-legajo-copy small,
+.fm-user-v3-person-copy small {
+  color: #6f8792;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: .04em;
+  letter-spacing: .03em;
   text-transform: uppercase;
 }
 
-.info-copy span {
-  color: #304d59;
-  font-size: 11px;
-  font-weight: 500;
+.fm-user-v3-legajo-copy strong,
+.fm-user-v3-person-copy strong {
+  min-height: 17px;
+  overflow: hidden;
+  color: #29424e;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.logout-area {
+.fm-user-v3-footer {
+  display: flex;
+  justify-content: center;
   padding: 0 10px 10px;
   background: #fff;
 }
 
-.logout-btn,
-:deep(.logout-btn.p-button) {
-  width: 100% !important;
-  min-height: 34px !important;
-  height: 34px !important;
+.fm-user-v3-logout,
+:deep(.fm-user-v3-logout.p-button) {
+  width: 160px !important;
+  min-width: 160px !important;
+  max-width: 160px !important;
+  min-height: 32px !important;
+  height: 32px !important;
   justify-content: center !important;
-  gap: 8px !important;
+  gap: 7px !important;
   padding: 0 10px !important;
   border: 1px solid #00a9bd !important;
-  border-radius: 6px !important;
+  border-radius: 7px !important;
   background: #fff !important;
   color: #008b9d !important;
   font-size: 11px !important;
@@ -466,8 +591,8 @@ onUnmounted(() => {
   box-shadow: none !important;
 }
 
-.logout-btn:hover,
-:deep(.logout-btn.p-button:hover) {
+.fm-user-v3-logout:hover,
+:deep(.fm-user-v3-logout.p-button:hover) {
   border-color: #008fa1 !important;
   background: #e8fafd !important;
   color: #006f7d !important;
@@ -487,14 +612,16 @@ onUnmounted(() => {
 }
 
 @media (max-width: 900px) {
-  .user-profile,
-  :deep(.user-profile.p-button) {
+  .fm-user-v3-trigger,
+  :deep(.fm-user-v3-trigger.p-button),
+  .fm-user-v3-trigger--named,
+  :deep(.fm-user-v3-trigger--named.p-button) {
     min-width: 42px !important;
     width: 42px !important;
     padding: 0 9px !important;
   }
 
-  .username {
+  .fm-user-v3-label {
     display: none;
   }
 
