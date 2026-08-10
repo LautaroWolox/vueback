@@ -8,7 +8,10 @@
     :resizable="false"
     class="fm-dialog buscador-ots-fallidas-dialog"
     :pt="{ root: { class: 'fm-dialog buscador-ots-fallidas-dialog' } }"
-    :style="{ '--fm-dialog-width': '1360px' }"
+    :style="{
+      '--fm-dialog-width': '1360px',
+      height: 'min(610px, calc(100dvh - 72px))'
+    }"
     @update:visible="emit('update:visible', $event)"
   >
     <FmGridShell class="buscador-ots-fallidas-grid-shell">
@@ -23,7 +26,7 @@
         table-style="table-layout: fixed; width: 100%; min-width: 100%"
         paginator
         scrollable
-        scroll-height="420px"
+        scroll-height="flex"
         show-gridlines
         removable-sort
         sort-mode="multiple"
