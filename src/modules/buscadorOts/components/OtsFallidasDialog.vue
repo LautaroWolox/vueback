@@ -30,6 +30,8 @@
         <DataTable
           ref="tableRef"
           v-model:filters="filters"
+          v-model:first="first"
+          v-model:rows="pageRows"
           :value="rows"
           data-key="id"
           class="fm-pass-grid"
@@ -39,10 +41,57 @@
           show-gridlines
           removable-sort
           filter-display="row"
-          :rows="100"
-          :rows-per-page-options="[100, 250, 500]"
+          :rows-per-page-options="rowsOptions"
           :global-filter-fields="columnFields"
         >
+          <template
+            #paginatorcontainer="{
+              first: paginatorFirst,
+              last,
+              page,
+              pageCount,
+              rows: paginatorRows,
+              totalRecords,
+              firstPageCallback,
+              lastPageCallback,
+              prevPageCallback,
+              nextPageCallback,
+              rowChangeCallback,
+              changePageCallback
+            }"
+          >
+            <FmGridPaginator
+              :first="paginatorFirst"
+              :last="last"
+              :page="page"
+              :page-count="Math.max(pageCount, 1)"
+              :rows="paginatorRows"
+              :total-records="totalRecords"
+              :rows-options="rowsOptions"
+              :show-rows-select="true"
+              :show-counter="true"
+              :auto-max-rows="false"
+              :counter-text="totalRecords === 0 ? 'No hay resultados' : ''"
+              @first-page="firstPageCallback"
+              @prev-page="prevPageCallback"
+              @next-page="nextPageCallback"
+              @last-page="lastPageCallback"
+              @page-change="changePageCallback"
+              @rows-change="rowChangeCallback"
+            >
+              <template #actions>
+                <FmGridActions
+                  size="large"
+                  :show-delete="false"
+                  :show-refresh="false"
+                  :export-disabled="rows.length === 0"
+                  export-title="Descargar órdenes fallidas"
+                  @export="download"
+                />
+              </template>
+            </FmGridPaginator>
+          </template>
+
           <template #empty>
             <div class="fm-grid-empty">No hay órdenes de trabajo fallidas</div>
           </template>
@@ -56,11 +105,11 @@
             sortable
           >
             <template #filter="{ filterModel, filterCallback }">
-              <div class="fm-column-filter">
+              <div class="fm-filter-cell">
                 <span class="fm-filter-prefix">~</span>
                 <InputText
                   v-model="filterModel.value"
-                  class="fm-column-filter__input"
+                  class="fm-column-filter"
                   type="text"
                   @input="filterCallback()"
                 />
@@ -80,19 +129,6 @@
               </span>
             </template>
           </Column>
-
-          <template #paginatorstart>
-            <button
-              type="button"
-              class="busqueda-ots-grid-action"
-              :disabled="rows.length === 0"
-              aria-label="Descargar"
-              title="Descargar"
-              @click="download"
-            >
-              <i class="pi pi-download" aria-hidden="true"></i>
-            </button>
-          </template>
         </DataTable>
       </FmGridShell>
     </div>
@@ -107,6 +143,8 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import InputText from 'primevue/inputtext'
 import FmGridShell from '@/components/shared/FmGridShell.vue'
+import FmGridPaginator from '@/components/shared/FmGridPaginator.vue'
+import FmGridActions from '@/components/shared/FmGridActions.vue'
 
 interface OtFallidaRow {
   id?: string | number
@@ -137,8 +175,11 @@ const columns = [
   { field: 'descripcionError', header: 'Descripción error' }
 ]
 
+const rowsOptions = [100, 250, 500]
 const columnFields = columns.map(({ field }) => field)
 const tableRef = ref<InstanceType<typeof DataTable> | null>(null)
+const first = ref(0)
+const pageRows = ref(100)
 const filters = ref(Object.fromEntries(
   columns.map(({ field }) => [field, { value: null, matchMode: FilterMatchMode.CONTAINS }])
 ))
@@ -147,6 +188,7 @@ const rows = computed(() => props.rows ?? [])
 
 const clearFilter = (filterModel: { value: unknown }, filterCallback: () => void) => {
   filterModel.value = null
+  first.value = 0
   filterCallback()
 }
 
