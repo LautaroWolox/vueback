@@ -50,7 +50,7 @@
                 :key="profile"
                 class="emulation-profile-item"
               >
-                <i class="pi pi-key"></i>
+                <i class="pi pi-shield" aria-hidden="true"></i>
                 <span>{{ profile }}</span>
               </span>
               <span v-if="!selectedProfiles.length" class="emulation-profile-empty">
@@ -82,7 +82,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import Dialog from 'primevue/dialog'
 import { useToast } from 'primevue/usetoast'
 import router from '@/router'
@@ -131,9 +131,19 @@ const selectedProfiles = computed(() => {
     .filter(Boolean)
 })
 
-const cancelarConfirmacion = () => {
+const volverAlAcordeon = async () => {
+  store.$setActiveTab(['0'])
+  await nextTick()
+  document.querySelector('.emulation-accordion')?.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start'
+  })
+}
+
+const cancelarConfirmacion = async () => {
   showPopup.value = false
   store.$clearConfirmation()
+  await volverAlAcordeon()
 }
 
 const emular = async () => {
@@ -287,7 +297,7 @@ watch(() => store.confirmationVersion, () => {
 
 .emulation-profile-item i {
   color: #00a9bd;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .emulation-profile-empty {
