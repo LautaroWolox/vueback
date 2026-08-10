@@ -1,7 +1,10 @@
 <template>
   <div
     class="fm-screen fm-screen--pad busqueda-ots-page"
-    :class="{ 'busqueda-ots-page--grid-expanded': gridExpanded }"
+    :class="{
+      'busqueda-ots-page--grid-expanded': gridExpanded,
+      'busqueda-ots-page--both-open': bothPanelsOpen
+    }"
   >
     <Accordion v-model:value="activePanels" multiple class="fm-accordion busqueda-ots-accordion">
       <AccordionPanel value="0" class="busqueda-ots-filter-panel">
@@ -53,10 +56,17 @@ const externalDialogVisible = ref(false)
 const failedDialogVisible = ref(false)
 const failedRows = ref([])
 
-const gridExpanded = computed(() => {
-  const active = (Array.isArray(activePanels.value) ? activePanels.value : [activePanels.value]).map(String)
-  return !active.includes('0') && active.includes('1')
-})
+const activePanelValues = computed(() => (
+  Array.isArray(activePanels.value) ? activePanels.value : [activePanels.value]
+).map(String))
+
+const gridExpanded = computed(() => (
+  !activePanelValues.value.includes('0') && activePanelValues.value.includes('1')
+))
+
+const bothPanelsOpen = computed(() => (
+  activePanelValues.value.includes('0') && activePanelValues.value.includes('1')
+))
 
 const normalizeFailedRow = (value, parent, index) => {
   const source = value && typeof value === 'object' ? value : {}
@@ -125,6 +135,10 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.busqueda-ots-page--both-open .busqueda-ots-filter-panel {
+  margin-bottom: 14px;
 }
 
 .busqueda-ots-page--grid-expanded .busqueda-ots-accordion,
