@@ -8,6 +8,8 @@ export interface MockTechnician {
   provincia: string
 }
 
+const MOCK_GRID_SIZE = 625
+
 const knownRows: Record<string, BuscadorOtRow> = {
   AA00070643: {
     id: 'AA00070643',
@@ -106,12 +108,12 @@ const createGeneratedRow = (ot: string, index: number): BuscadorOtRow => {
     nroOtSfs: `SFS-${ot}`,
     statusOt: mode === 1 ? 'OT En Ejecución' : 'OT Cerrada',
     statusOtWfx: '',
-    fechaUltimaModificacion: '2026-08-10 17:30:00.0',
-    nroTech: valid ? '11CP0217' : '',
-    nombreTech: valid ? 'SANCHEZ CRISTIAN' : '',
+    fechaUltimaModificacion: `2026-08-${String((index % 28) + 1).padStart(2, '0')} ${String((index % 12) + 8).padStart(2, '0')}:${String(index % 60).padStart(2, '0')}:00.0`,
+    nroTech: valid ? '11CP0217' : `TECH${String(index % 90).padStart(2, '0')}`,
+    nombreTech: valid ? 'SANCHEZ CRISTIAN' : `TECNICO MOCK ${index + 1}`,
     codigoSolucion: valid ? '461YA - OT se...' : '',
-    empresaContratista: valid ? 'CONTRERAS' : '',
-    baseTecnica: valid ? 'SANTA ROSA' : '',
+    empresaContratista: valid ? 'CONTRERAS' : 'CONTRATISTA MOCK',
+    baseTecnica: valid ? 'SANTA ROSA' : `BASE ${String((index % 20) + 1).padStart(2, '0')}`,
     pais: 'ARG',
     actividades: mode === 3 ? 'NO' : 'SI',
     ubicacionOt: mode === 2 ? 'GM-Fallida' : 'GM-OK',
@@ -119,12 +121,27 @@ const createGeneratedRow = (ot: string, index: number): BuscadorOtRow => {
   }
 }
 
-export const buildMockSearchRows = (otNumbers: string[]): BuscadorOtRow[] => (
-  otNumbers.map((rawOt, index) => {
+export const buildMockSearchRows = (otNumbers: string[]): BuscadorOtRow[] => {
+  const requestedRows = otNumbers.map((rawOt, index) => {
     const ot = rawOt.trim().toUpperCase()
     return { ...(knownRows[ot] ?? createGeneratedRow(ot, index)) }
   })
-)
+
+  if (requestedRows.length >= MOCK_GRID_SIZE) {
+    return requestedRows
+  }
+
+  const generatedRows = Array.from(
+    { length: MOCK_GRID_SIZE - requestedRows.length },
+    (_, offset) => {
+      const index = requestedRows.length + offset
+      const ot = `MOCK${String(index + 1).padStart(6, '0')}`
+      return createGeneratedRow(ot, index)
+    }
+  )
+
+  return [...requestedRows, ...generatedRows]
+}
 
 export const findMockTechnician = (techId: string): MockTechnician | null => {
   const normalized = techId.trim().toUpperCase()
