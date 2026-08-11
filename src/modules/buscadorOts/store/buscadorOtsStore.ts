@@ -13,8 +13,9 @@ export const useBuscadorOtsStore = defineStore('buscadorOts', () => {
   const searching = ref(false)
   const failedOnly = ref(false)
   const showColumnFilters = ref(false)
+  const selectedRow = ref<BuscadorOtRow | null>(null)
   const first = ref(0)
-  const pageRows = ref(100)
+  const pageRows = ref(500)
   const resetToken = ref(0)
 
   const parsedOtNumbers = computed(() => (
@@ -65,6 +66,7 @@ export const useBuscadorOtsStore = defineStore('buscadorOts', () => {
 
     searching.value = true
     first.value = 0
+    selectedRow.value = null
 
     try {
       if (import.meta.env.DEV) {
@@ -100,6 +102,13 @@ export const useBuscadorOtsStore = defineStore('buscadorOts', () => {
         provincia: technician.provincia
       }
     })
+
+    if (selectedRow.value) {
+      const selectedId = String(selectedRow.value.id ?? selectedRow.value.nroOt ?? '')
+      selectedRow.value = rows.value.find((row) => (
+        String(row.id ?? row.nroOt ?? '') === selectedId
+      )) ?? null
+    }
   }
 
   const clearSearch = () => {
@@ -108,6 +117,7 @@ export const useBuscadorOtsStore = defineStore('buscadorOts', () => {
     externalRows.value = []
     failedOnly.value = false
     showColumnFilters.value = false
+    selectedRow.value = null
     first.value = 0
     resetToken.value += 1
   }
@@ -122,12 +132,13 @@ export const useBuscadorOtsStore = defineStore('buscadorOts', () => {
 
   const toggleFailedFilter = () => {
     failedOnly.value = !failedOnly.value
+    selectedRow.value = null
     first.value = 0
   }
 
   const resetStore = () => {
     clearSearch()
-    pageRows.value = 100
+    pageRows.value = 500
   }
 
   return {
@@ -137,6 +148,7 @@ export const useBuscadorOtsStore = defineStore('buscadorOts', () => {
     searching,
     failedOnly,
     showColumnFilters,
+    selectedRow,
     first,
     pageRows,
     resetToken,
