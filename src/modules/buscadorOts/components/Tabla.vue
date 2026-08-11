@@ -6,10 +6,14 @@
     <DataTable
       ref="gridRef"
       v-model:filters="columnFilters"
+      v-model:selection="store.selectedRow"
       v-model:first="store.first"
       v-model:rows="store.pageRows"
       :value="store.visibleRows"
       data-key="id"
+      selection-mode="single"
+      :meta-key-selection="false"
+      :row-class="rowClass"
       class="fm-pass-grid busqueda-ots-grid"
       table-style="table-layout: fixed; min-width: 1880px; width: 100%"
       paginator
@@ -171,6 +175,14 @@ const columnFilters = ref(createColumnFilters())
 watch(() => store.resetToken, () => {
   columnFilters.value = createColumnFilters()
 })
+
+const rowIdentity = (row) => String(row?.id ?? row?.nroOt ?? '')
+
+const rowClass = (row) => (
+  store.selectedRow && rowIdentity(store.selectedRow) === rowIdentity(row)
+    ? 'fm-selected-row'
+    : ''
+)
 
 const clearColumnFilter = (filterModel, filterCallback) => {
   filterModel.value = null
