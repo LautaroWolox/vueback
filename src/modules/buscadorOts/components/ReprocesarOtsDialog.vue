@@ -6,7 +6,7 @@
     :closable="false"
     :draggable="false"
     :resizable="false"
-    class="fm-dialog fm-responsive-dialog abm-materiales-dialog"
+    class="fm-dialog fm-responsive-dialog"
     :style="{ '--fm-dialog-width': '78rem' }"
     @update:visible="emit('update:visible', $event)"
   >
@@ -15,23 +15,35 @@
         <span class="p-dialog-title">Ordenes de Trabajo a Reprocesar</span>
         <button
           type="button"
-          class="p-dialog-header-close-button"
+          class="fm-icon-button"
           title="Cerrar"
           aria-label="Cerrar Ordenes de Trabajo a Reprocesar"
           @click="closeDialog"
         >
-          <span class="abm-materiales-dialog-close-icon" aria-hidden="true"></span>
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.4"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <path d="M6 6L18 18" />
+            <path d="M18 6L6 18" />
+          </svg>
         </button>
       </div>
     </template>
 
     <FmGridShell>
       <DataTable
+        v-model:selection="selectedRows"
         v-model:first="first"
         v-model:rows="pageRows"
         :value="rows"
         data-key="id"
-        :row-class="rowClass"
         class="fm-pass-grid"
         table-style="table-layout: fixed; min-width: 1180px; width: 100%"
         paginator
@@ -99,28 +111,10 @@
         </template>
 
         <Column
-          header-style="width: 46px; min-width: 46px; max-width: 46px; text-align: center; padding-left: 0; padding-right: 0"
-          body-style="width: 46px; min-width: 46px; max-width: 46px; text-align: center; padding-left: 0; padding-right: 0"
-        >
-          <template #header>
-            <Checkbox
-              binary
-              :model-value="allSelected"
-              aria-label="Seleccionar todas las ordenes"
-              style="margin: 0 auto"
-              @update:model-value="toggleAll"
-            />
-          </template>
-          <template #body="{ data }">
-            <Checkbox
-              binary
-              :model-value="isSelected(data)"
-              :aria-label="`Seleccionar OT ${data.nroOt}`"
-              style="margin: 0 auto"
-              @update:model-value="(checked) => toggleRow(data, checked)"
-            />
-          </template>
-        </Column>
+          selection-mode="multiple"
+          header-style="width: 46px; min-width: 46px; max-width: 46px"
+          body-style="width: 46px; min-width: 46px; max-width: 46px"
+        />
         <Column field="nroOt" header="Nro de OT" sortable style="width: 130px" />
         <Column field="nroOtSfs" header="Nro OT SFS" sortable style="width: 130px" />
         <Column field="statusOt" header="Status de la OT" sortable style="width: 135px" />
@@ -137,11 +131,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, shallowRef, watch } from 'vue'
+import { ref, watch } from 'vue'
 import Dialog from 'primevue/dialog'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import Checkbox from 'primevue/checkbox'
 import FmGridShell from '@/components/shared/FmGridShell.vue'
 import FmGridPaginator from '@/components/shared/FmGridPaginator.vue'
 import FmGridActions from '@/components/shared/FmGridActions.vue'
@@ -158,55 +151,23 @@ const emit = defineEmits<{
   (event: 'proceed', rows: BuscadorOtRow[]): void
 }>()
 
-const selectedIds = shallowRef<Set<string>>(new Set())
+const selectedRows = ref<BuscadorOtRow[]>([])
 const first = ref(0)
 const pageRows = ref(500)
 const rowsOptions = [100, 250, 500]
 
-const rowId = (row: BuscadorOtRow) => String(row.id ?? row.nroOt ?? '')
-
-const selectedRows = computed(() => (
-  props.rows.filter((row) => selectedIds.value.has(rowId(row)))
-))
-
-const allSelected = computed(() => (
-  props.rows.length > 0 && selectedIds.value.size === props.rows.length
-))
-
-const isSelected = (row: BuscadorOtRow) => selectedIds.value.has(rowId(row))
-
-const toggleRow = (row: BuscadorOtRow, checked: boolean) => {
-  const next = new Set(selectedIds.value)
-  const id = rowId(row)
-
-  if (checked) next.add(id)
-  else next.delete(id)
-
-  selectedIds.value = next
-}
-
-const toggleAll = (checked: boolean) => {
-  selectedIds.value = checked
-    ? new Set(props.rows.map(rowId))
-    : new Set()
-}
-
-const rowClass = (row: BuscadorOtRow) => (
-  isSelected(row) ? 'fm-selected-row' : ''
-)
-
 watch(() => props.visible, (visible) => {
   if (!visible) return
-  selectedIds.value = new Set()
+  selectedRows.value = []
   first.value = 0
   pageRows.value = 500
 })
 
 watch(() => props.rows, (rows) => {
-  const availableIds = new Set(rows.map(rowId))
-  selectedIds.value = new Set(
-    [...selectedIds.value].filter((id) => availableIds.has(id))
-  )
+  const availableIds = new Set(rows.map((row) => String(row.id ?? row.nroOt ?? '')))
+  selectedRows.value = selectedRows.value.filter((row) => (
+    availableIds.has(String(row.id ?? row.nroOt ?? ''))
+  ))
 })
 
 const closeDialog = () => {
