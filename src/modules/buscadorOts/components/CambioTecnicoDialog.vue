@@ -3,13 +3,40 @@
     :visible="visible"
     append-to="body"
     modal
-    header="Cambio de Técnico"
+    :closable="false"
     :draggable="false"
     :resizable="false"
     class="fm-dialog fm-responsive-dialog"
     :style="{ '--fm-dialog-width': '70rem' }"
     @update:visible="emit('update:visible', $event)"
   >
+    <template #header>
+      <div class="jobtype-contrato-unsaved__header">
+        <span class="p-dialog-title">Cambio de Técnico</span>
+        <button
+          type="button"
+          class="fm-icon-button"
+          title="Cerrar"
+          aria-label="Cerrar Cambio de Técnico"
+          @click="closeDialog"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <path d="M6 6L18 18" />
+            <path d="M18 6L6 18" />
+          </svg>
+        </button>
+      </div>
+    </template>
+
     <FmGridShell>
       <DataTable
         :value="rows"
@@ -145,6 +172,10 @@ watch(techId, (value) => {
     clearTechnicianData()
   }
 })
+
+const closeDialog = () => {
+  emit('update:visible', false)
+}
 
 const searchTechnician = () => {
   const technician = findMockTechnician(techId.value)
