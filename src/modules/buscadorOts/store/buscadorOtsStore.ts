@@ -70,14 +70,21 @@ export const useBuscadorOtsStore = defineStore('buscadorOts', () => {
     selectedRow.value = null
 
     try {
+      /**
+       * ======================== MOCK TEMPORAL ========================
+       * SOLO LOCAL / DEV.
+       * Al conectar el backend real, eliminar este bloque y reemplazarlo
+       * por la llamada HTTP real. Los datos están centralizados en:
+       * src/modules/buscadorOts/mocks/reprocesoMocks.ts
+       * ===============================================================
+       */
       if (import.meta.env.DEV) {
         rows.value = buildMockSearchRows(parsedOtNumbers.value)
         externalRows.value = []
         return
       }
 
-      // El endpoint real se conecta cuando se confirme su contrato.
-      // Los mocks quedan limitados al entorno local de desarrollo.
+      // TODO BACKEND: reemplazar por el endpoint real del Buscador de OTs.
       rows.value = []
       externalRows.value = []
     } finally {
