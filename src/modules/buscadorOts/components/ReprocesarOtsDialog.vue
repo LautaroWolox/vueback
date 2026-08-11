@@ -3,28 +3,26 @@
     :visible="visible"
     append-to="body"
     modal
-    header="Ordenes de Trabajo a Reprocesar"
-    :closable="true"
+    :closable="false"
     :draggable="false"
     :resizable="false"
-    class="fm-dialog fm-responsive-dialog"
+    class="fm-dialog fm-responsive-dialog abm-materiales-dialog"
     :style="{ '--fm-dialog-width': '78rem' }"
     @update:visible="emit('update:visible', $event)"
   >
-    <template #closeicon>
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.2"
-        stroke-linecap="round"
-        aria-hidden="true"
-      >
-        <path d="M6 6L18 18" />
-        <path d="M18 6L6 18" />
-      </svg>
+    <template #header>
+      <div class="jobtype-contrato-unsaved__header">
+        <span class="p-dialog-title">Ordenes de Trabajo a Reprocesar</span>
+        <button
+          type="button"
+          class="p-dialog-header-close-button"
+          title="Cerrar"
+          aria-label="Cerrar Ordenes de Trabajo a Reprocesar"
+          @click="closeDialog"
+        >
+          <span class="abm-materiales-dialog-close-icon" aria-hidden="true"></span>
+        </button>
+      </div>
     </template>
 
     <FmGridShell>
@@ -109,6 +107,7 @@
               binary
               :model-value="allSelected"
               aria-label="Seleccionar todas las ordenes"
+              style="margin: 0 auto"
               @update:model-value="toggleAll"
             />
           </template>
@@ -117,6 +116,7 @@
               binary
               :model-value="isSelected(data)"
               :aria-label="`Seleccionar OT ${data.nroOt}`"
+              style="margin: 0 auto"
               @update:model-value="(checked) => toggleRow(data, checked)"
             />
           </template>
