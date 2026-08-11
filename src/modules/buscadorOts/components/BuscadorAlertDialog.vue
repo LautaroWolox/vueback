@@ -3,7 +3,7 @@
     :visible="visible"
     append-to="body"
     modal
-    header="Alerta"
+    :closable="false"
     :draggable="false"
     :resizable="false"
     :base-z-index="4000"
@@ -11,45 +11,37 @@
     :style="{ '--fm-dialog-width': '34rem' }"
     @update:visible="emit('update:visible', $event)"
   >
-    <template #closeicon>
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.2"
-        stroke-linecap="round"
-        aria-hidden="true"
-      >
-        <path d="M6 6L18 18" />
-        <path d="M18 6L6 18" />
-      </svg>
+    <template #header>
+      <div class="jobtype-contrato-unsaved__header">
+        <span class="p-dialog-title">Alerta</span>
+        <button
+          type="button"
+          class="fm-icon-button"
+          title="Cerrar"
+          aria-label="Cerrar alerta"
+          @click="close"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <path d="M6 6L18 18" />
+            <path d="M18 6L6 18" />
+          </svg>
+        </button>
+      </div>
     </template>
 
     <div class="fm-alert-body">
-      <svg
-        width="42"
-        height="42"
-        viewBox="0 0 48 48"
-        fill="none"
-        aria-hidden="true"
-      >
-        <path
-          d="M24 5.5L44 40H4L24 5.5Z"
-          fill="#fff5f5"
-          stroke="#d9363e"
-          stroke-width="2.4"
-          stroke-linejoin="round"
-        />
-        <path
-          d="M24 17V28"
-          stroke="#d9363e"
-          stroke-width="3"
-          stroke-linecap="round"
-        />
-        <circle cx="24" cy="34.5" r="1.8" fill="#d9363e" />
-      </svg>
+      <div class="jobtype-contrato-unsaved__icon-circle" aria-hidden="true">
+        <i class="pi pi-bell jobtype-contrato-unsaved__header-icon"></i>
+      </div>
       <span>{{ message }}</span>
     </div>
 
