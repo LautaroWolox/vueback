@@ -17,7 +17,7 @@ export const columns: BuscadorOtColumn[] = [
   { field: 'ubicacionOt', header: 'Ubicación de la OT', width: '170px' }
 ]
 
-export const rowsOptions = [10, 50, 100]
+export const rowsOptions = [100, 250, 500]
 
 export const createColumnFilters = () => Object.fromEntries(
   columns.map(({ field }) => [field, { value: null, matchMode: FilterMatchMode.CONTAINS }])
