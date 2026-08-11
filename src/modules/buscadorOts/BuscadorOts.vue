@@ -10,7 +10,10 @@
       <AccordionPanel value="0" class="busqueda-ots-filter-panel">
         <AccordionHeader>LISTA DE ORDENES DE TRABAJO A BUSCAR</AccordionHeader>
         <AccordionContent>
-          <FiltrosBusqueda />
+          <FiltrosBusqueda
+            @search-start="prepareSearchLayout"
+            @searched="finishSearchLayout"
+          />
         </AccordionContent>
       </AccordionPanel>
 
@@ -74,7 +77,7 @@ import BuscadorAlertDialog from './components/BuscadorAlertDialog.vue'
 import { useBuscadorOtsStore } from './store/buscadorOtsStore'
 
 const store = useBuscadorOtsStore()
-const activePanels = ref([])
+const activePanels = ref(['0', '1'])
 const externalDialogVisible = ref(false)
 const failedDialogVisible = ref(false)
 const failedRows = ref([])
@@ -95,6 +98,16 @@ const gridExpanded = computed(() => (
 const bothPanelsOpen = computed(() => (
   activePanelValues.value.includes('0') && activePanelValues.value.includes('1')
 ))
+
+const prepareSearchLayout = () => {
+  activePanels.value = ['1']
+}
+
+const finishSearchLayout = () => {
+  if (store.rows.length) {
+    activePanels.value = ['1']
+  }
+}
 
 const showAlert = (message) => {
   alertMessage.value = message
