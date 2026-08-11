@@ -11,7 +11,14 @@
     :style="{ '--fm-dialog-width': '34rem' }"
     @update:visible="emit('update:visible', $event)"
   >
+    <template #closeicon>
+      <span aria-hidden="true">×</span>
+    </template>
+
     <div class="fm-alert-body">
+      <div class="fm-alert-triangle" aria-hidden="true">
+        <span>!</span>
+      </div>
       <span>{{ message }}</span>
     </div>
 
