@@ -11,8 +11,8 @@
     @update:visible="emit('update:visible', $event)"
   >
     <template #header>
-      <div class="fm-responsive-toolbar">
-        <span class="p-dialog-title">Ordenes de Trabajo a Reprocesar</span>
+      <span class="p-dialog-title">Ordenes de Trabajo a Reprocesar</span>
+      <div class="p-dialog-header-actions">
         <button
           type="button"
           class="fm-icon-button"
@@ -37,6 +37,7 @@
         paginator
         scrollable
         scroll-height="flex"
+        :virtual-scroller-options="virtualScrollerOptions"
         show-gridlines
         removable-sort
         sort-mode="multiple"
@@ -82,9 +83,12 @@
                 :show-export="false"
                 :show-delete="false"
                 :show-edit="false"
+                :show-back="true"
                 :show-refresh="true"
                 :show-add="false"
+                back-title="Volver a la grilla principal"
                 refresh-title="Reprocesar / cambiar técnico"
+                @back="closeDialog"
                 @refresh="requestReprocess"
               />
             </template>
@@ -116,7 +120,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, shallowRef, watch } from 'vue'
 import Dialog from 'primevue/dialog'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
@@ -136,10 +140,16 @@ const emit = defineEmits<{
   (event: 'proceed', rows: BuscadorOtRow[]): void
 }>()
 
-const selectedRows = ref<BuscadorOtRow[]>([])
+const selectedRows = shallowRef<BuscadorOtRow[]>([])
 const first = ref(0)
 const pageRows = ref(500)
 const rowsOptions = [100, 250, 500]
+const virtualScrollerOptions = {
+  itemSize: 38,
+  numToleratedItems: 12,
+  delay: 0,
+  showLoader: false
+}
 
 watch(() => props.visible, (visible) => {
   if (!visible) return
@@ -160,8 +170,8 @@ const closeDialog = () => {
 }
 
 const requestReprocess = () => {
-  if (!selectedRows.value.length) {
-    emit('alert', 'Debe seleccionar al menos una fila')
+  if (selectedRows.value.length === 0) {
+    emit('alert', 'Debes seleccionar al menos una fila')
     return
   }
 
