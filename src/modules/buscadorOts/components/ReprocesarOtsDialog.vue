@@ -11,6 +11,10 @@
     :style="{ '--fm-dialog-width': '78rem' }"
     @update:visible="emit('update:visible', $event)"
   >
+    <template #closeicon>
+      <span aria-hidden="true">×</span>
+    </template>
+
     <FmGridShell>
       <DataTable
         v-model:selection="selectedRows"
