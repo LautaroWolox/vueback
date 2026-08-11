@@ -73,11 +73,9 @@
               <button
                 type="button"
                 class="busqueda-ots-grid-action"
-                :class="{ 'busqueda-ots-grid-action--active': store.showColumnFilters }"
-                title="Mostrar filtros de columnas"
-                aria-label="Mostrar filtros de columnas"
-                :aria-pressed="store.showColumnFilters"
-                @click="store.toggleColumnFilters"
+                title="Reprocesar / cambiar técnico"
+                aria-label="Reprocesar / cambiar técnico"
+                @click="emit('open-reprocess')"
               >
                 <i class="pi pi-filter" aria-hidden="true"></i>
               </button>
@@ -165,7 +163,7 @@ defineProps({
   expanded: { type: Boolean, default: false }
 })
 
-const emit = defineEmits(['open-external', 'open-failed'])
+const emit = defineEmits(['open-external', 'open-failed', 'open-reprocess'])
 const store = useBuscadorOtsStore()
 const gridRef = ref(null)
 const columnFilters = ref(createColumnFilters())
