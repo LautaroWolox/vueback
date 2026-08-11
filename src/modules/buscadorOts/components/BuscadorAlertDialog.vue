@@ -6,6 +6,7 @@
     header="Alerta"
     :draggable="false"
     :resizable="false"
+    :base-z-index="4000"
     class="fm-alert-dialog fm-responsive-dialog"
     :style="{ '--fm-dialog-width': '34rem' }"
     @update:visible="emit('update:visible', $event)"
