@@ -12,13 +12,44 @@
     @update:visible="emit('update:visible', $event)"
   >
     <template #closeicon>
-      <span aria-hidden="true">×</span>
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.2"
+        stroke-linecap="round"
+        aria-hidden="true"
+      >
+        <path d="M6 6L18 18" />
+        <path d="M18 6L6 18" />
+      </svg>
     </template>
 
     <div class="fm-alert-body">
-      <div class="fm-alert-triangle" aria-hidden="true">
-        <span>!</span>
-      </div>
+      <svg
+        width="42"
+        height="42"
+        viewBox="0 0 48 48"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          d="M24 5.5L44 40H4L24 5.5Z"
+          fill="#fff5f5"
+          stroke="#d9363e"
+          stroke-width="2.4"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M24 17V28"
+          stroke="#d9363e"
+          stroke-width="3"
+          stroke-linecap="round"
+        />
+        <circle cx="24" cy="34.5" r="1.8" fill="#d9363e" />
+      </svg>
       <span>{{ message }}</span>
     </div>
 
