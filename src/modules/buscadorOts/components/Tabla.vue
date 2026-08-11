@@ -15,10 +15,7 @@
       selection-mode="single"
       :meta-key-selection="false"
       :row-class="rowClass"
-      :class="[
-        'busqueda-ots-grid',
-        expanded ? 'fm-pt-datatable' : 'fm-pass-grid'
-      ]"
+      class="fm-pass-grid busqueda-ots-grid"
       table-style="table-layout: fixed; min-width: 1880px; width: 100%"
       paginator
       scrollable
@@ -220,25 +217,46 @@ const downloadResults = () => {
 .busqueda-ots-grid-shell--expanded {
   height: 100%;
   min-height: 0;
-  flex: 1 1 auto;
+  flex: 1 1 0;
 }
 
 .busqueda-ots-grid,
 .busqueda-ots-grid.p-datatable {
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 1 1 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
   border: 0;
 }
 
 .busqueda-ots-grid :deep(.p-datatable-table-container),
-.busqueda-ots-grid :deep(.p-datatable-wrapper) {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: auto;
+.busqueda-ots-grid :deep(.p-datatable-wrapper),
+.busqueda-ots-grid :deep([data-pc-section='tablecontainer']) {
+  width: 100% !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 1 1 0 !important;
+  overflow: auto !important;
   background: #fff;
+}
+
+.busqueda-ots-grid :deep(.p-virtualscroller),
+.busqueda-ots-grid :deep(.p-virtualscroller-content) {
+  min-height: 0 !important;
+  max-height: none !important;
+}
+
+.busqueda-ots-grid :deep(.p-datatable-paginator-bottom),
+.busqueda-ots-grid :deep(> .p-paginator) {
+  flex: 0 0 39px !important;
+  width: 100% !important;
+  min-height: 39px !important;
+  margin-top: 0 !important;
 }
 
 .busqueda-ots-grid :deep(.p-datatable-thead > tr > th) {
