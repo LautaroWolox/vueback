@@ -21,6 +21,7 @@
             :expanded="gridExpanded"
             @open-external="externalDialogVisible = true"
             @open-failed="openFailedOrders"
+            @open-reprocess="openReprocessFlow"
           />
         </AccordionContent>
       </AccordionPanel>
@@ -35,6 +36,25 @@
       v-model:visible="failedDialogVisible"
       :rows="failedRows"
     />
+
+    <ReprocesarOtsDialog
+      v-model:visible="reprocessDialogVisible"
+      :rows="store.eligibleRows"
+      @alert="showAlert"
+      @proceed="openChangeTechnician"
+    />
+
+    <CambioTecnicoDialog
+      v-model:visible="changeTechnicianDialogVisible"
+      :rows="selectedForChange"
+      @alert="showAlert"
+      @execute="executeMockReprocess"
+    />
+
+    <BuscadorAlertDialog
+      v-model:visible="alertVisible"
+      :message="alertMessage"
+    />
   </div>
 </template>
 
@@ -48,6 +68,9 @@ import FiltrosBusqueda from './components/FiltrosBusqueda.vue'
 import Tabla from './components/Tabla.vue'
 import OtsExternasDialog from './components/OtsExternasDialog.vue'
 import OtsFallidasDialog from './components/OtsFallidasDialog.vue'
+import ReprocesarOtsDialog from './components/ReprocesarOtsDialog.vue'
+import CambioTecnicoDialog from './components/CambioTecnicoDialog.vue'
+import BuscadorAlertDialog from './components/BuscadorAlertDialog.vue'
 import { useBuscadorOtsStore } from './store/buscadorOtsStore'
 
 const store = useBuscadorOtsStore()
@@ -55,6 +78,11 @@ const activePanels = ref([])
 const externalDialogVisible = ref(false)
 const failedDialogVisible = ref(false)
 const failedRows = ref([])
+const reprocessDialogVisible = ref(false)
+const changeTechnicianDialogVisible = ref(false)
+const selectedForChange = ref([])
+const alertVisible = ref(false)
+const alertMessage = ref('')
 
 const activePanelValues = computed(() => (
   Array.isArray(activePanels.value) ? activePanels.value : [activePanels.value]
@@ -67,6 +95,31 @@ const gridExpanded = computed(() => (
 const bothPanelsOpen = computed(() => (
   activePanelValues.value.includes('0') && activePanelValues.value.includes('1')
 ))
+
+const showAlert = (message) => {
+  alertMessage.value = message
+  alertVisible.value = true
+}
+
+const openReprocessFlow = () => {
+  if (!store.eligibleRows.length) {
+    showAlert('No hay OTs en condiciones de continuar con el procesamiento.')
+    return
+  }
+
+  reprocessDialogVisible.value = true
+}
+
+const openChangeTechnician = (rows) => {
+  selectedForChange.value = [...rows]
+  changeTechnicianDialogVisible.value = true
+}
+
+const executeMockReprocess = ({ rows, technician }) => {
+  store.applyMockReprocess(rows, technician)
+  changeTechnicianDialogVisible.value = false
+  showAlert('Se enviaron a procesar las órdenes seleccionadas.')
+}
 
 const normalizeFailedRow = (value, parent, index) => {
   const source = value && typeof value === 'object' ? value : {}
