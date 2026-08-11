@@ -4,6 +4,7 @@
     :class="{ 'busqueda-ots-grid-shell--expanded': expanded }"
   >
     <DataTable
+      :key="expanded ? 'expanded-grid' : 'standard-grid'"
       ref="gridRef"
       v-model:filters="columnFilters"
       v-model:selection="store.selectedRow"
@@ -22,6 +23,7 @@
       paginator
       scrollable
       scroll-height="flex"
+      :virtual-scroller-options="virtualScrollerOptions"
       removable-sort
       sort-mode="multiple"
       resizable-columns
@@ -174,6 +176,12 @@ const emit = defineEmits(['open-external', 'open-failed', 'open-reprocess'])
 const store = useBuscadorOtsStore()
 const gridRef = ref(null)
 const columnFilters = ref(createColumnFilters())
+const virtualScrollerOptions = {
+  itemSize: 32,
+  numToleratedItems: 16,
+  delay: 0,
+  showLoader: false
+}
 
 watch(() => store.resetToken, () => {
   columnFilters.value = createColumnFilters()
