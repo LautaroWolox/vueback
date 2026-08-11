@@ -14,7 +14,10 @@
       selection-mode="single"
       :meta-key-selection="false"
       :row-class="rowClass"
-      class="fm-pass-grid busqueda-ots-grid"
+      :class="[
+        'busqueda-ots-grid',
+        expanded ? 'fm-pt-datatable' : 'fm-pass-grid'
+      ]"
       table-style="table-layout: fixed; min-width: 1880px; width: 100%"
       paginator
       scrollable
