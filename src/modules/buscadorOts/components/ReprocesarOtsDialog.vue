@@ -3,13 +3,28 @@
     :visible="visible"
     append-to="body"
     modal
-    header="Órdenes de Trabajo a Reprocesar"
+    :closable="false"
     :draggable="false"
     :resizable="false"
     class="fm-dialog fm-responsive-dialog"
     :style="{ '--fm-dialog-width': '78rem' }"
     @update:visible="emit('update:visible', $event)"
   >
+    <template #header>
+      <div class="fm-responsive-toolbar">
+        <span class="p-dialog-title">Ordenes de Trabajo a Reprocesar</span>
+        <button
+          type="button"
+          class="fm-icon-button"
+          title="Cerrar"
+          aria-label="Cerrar Ordenes de Trabajo a Reprocesar"
+          @click="closeDialog"
+        >
+          <i class="pi pi-times" aria-hidden="true"></i>
+        </button>
+      </div>
+    </template>
+
     <FmGridShell>
       <DataTable
         v-model:selection="selectedRows"
@@ -80,7 +95,16 @@
           <div class="fm-grid-empty">No hay resultados</div>
         </template>
 
-        <Column selection-mode="multiple" header-style="width: 42px" body-style="width: 42px" />
+        <Column selection-mode="multiple" header-style="width: 42px" body-style="width: 42px">
+          <template #header>
+            <Checkbox
+              v-model="allRowsSelected"
+              binary
+              :disabled="rows.length === 0"
+              aria-label="Seleccionar todas las órdenes"
+            />
+          </template>
+        </Column>
         <Column field="nroOt" header="Nro de OT" sortable style="width: 130px" />
         <Column field="nroOtSfs" header="Nro OT SFS" sortable style="width: 130px" />
         <Column field="statusOt" header="Status de la OT" sortable style="width: 135px" />
@@ -97,10 +121,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import Dialog from 'primevue/dialog'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
+import Checkbox from 'primevue/checkbox'
 import FmGridShell from '@/components/shared/FmGridShell.vue'
 import FmGridPaginator from '@/components/shared/FmGridPaginator.vue'
 import FmGridActions from '@/components/shared/FmGridActions.vue'
@@ -122,11 +147,29 @@ const first = ref(0)
 const pageRows = ref(100)
 const rowsOptions = [10, 50, 100]
 
+const allRowsSelected = computed({
+  get: () => props.rows.length > 0 && selectedRows.value.length === props.rows.length,
+  set: (checked: boolean) => {
+    selectedRows.value = checked ? [...props.rows] : []
+  }
+})
+
 watch(() => props.visible, (visible) => {
   if (!visible) return
   selectedRows.value = []
   first.value = 0
 })
+
+watch(() => props.rows, (rows) => {
+  const availableIds = new Set(rows.map((row) => String(row.id ?? row.nroOt ?? '')))
+  selectedRows.value = selectedRows.value.filter((row) => (
+    availableIds.has(String(row.id ?? row.nroOt ?? ''))
+  ))
+})
+
+const closeDialog = () => {
+  emit('update:visible', false)
+}
 
 const requestReprocess = () => {
   if (!selectedRows.value.length) {
