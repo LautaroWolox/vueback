@@ -3,28 +3,14 @@
     :visible="visible"
     append-to="body"
     modal
-    :closable="false"
+    header="Ordenes de Trabajo a Reprocesar"
+    :closable="true"
     :draggable="false"
     :resizable="false"
     class="fm-dialog fm-responsive-dialog"
     :style="{ '--fm-dialog-width': '78rem' }"
     @update:visible="emit('update:visible', $event)"
   >
-    <template #header>
-      <span class="p-dialog-title">Ordenes de Trabajo a Reprocesar</span>
-      <div class="p-dialog-header-actions">
-        <button
-          type="button"
-          class="fm-icon-button"
-          title="Cerrar"
-          aria-label="Cerrar Ordenes de Trabajo a Reprocesar"
-          @click="closeDialog"
-        >
-          <i class="pi pi-times" aria-hidden="true"></i>
-        </button>
-      </div>
-    </template>
-
     <FmGridShell>
       <DataTable
         v-model:selection="selectedRows"
@@ -36,8 +22,7 @@
         table-style="table-layout: fixed; min-width: 1180px; width: 100%"
         paginator
         scrollable
-        scroll-height="flex"
-        :virtual-scroller-options="virtualScrollerOptions"
+        scroll-height="min(60dvh, 540px)"
         show-gridlines
         removable-sort
         sort-mode="multiple"
@@ -120,7 +105,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, watch } from 'vue'
+import { ref, watch } from 'vue'
 import Dialog from 'primevue/dialog'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
@@ -140,16 +125,10 @@ const emit = defineEmits<{
   (event: 'proceed', rows: BuscadorOtRow[]): void
 }>()
 
-const selectedRows = shallowRef<BuscadorOtRow[]>([])
+const selectedRows = ref<BuscadorOtRow[]>([])
 const first = ref(0)
 const pageRows = ref(500)
 const rowsOptions = [100, 250, 500]
-const virtualScrollerOptions = {
-  itemSize: 38,
-  numToleratedItems: 12,
-  delay: 0,
-  showLoader: false
-}
 
 watch(() => props.visible, (visible) => {
   if (!visible) return
