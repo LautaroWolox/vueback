@@ -39,6 +39,17 @@
       @click="$emit('edit')"
     />
     <Button
+      v-if="showBack"
+      icon="pi pi-arrow-left"
+      text
+      rounded
+      class="fm-grid-action-final"
+      :disabled="backDisabled"
+      :title="backDisabled ? backDisabledTitle : backTitle"
+      :aria-label="backDisabled ? backDisabledTitle : backTitle"
+      @click="$emit('back')"
+    />
+    <Button
       v-if="showRefresh"
       icon="pi pi-refresh"
       text
@@ -70,27 +81,31 @@ defineProps({
   showExport: { type: Boolean, default: true },
   showDelete: { type: Boolean, default: true },
   showEdit: { type: Boolean, default: false },
+  showBack: { type: Boolean, default: false },
   showRefresh: { type: Boolean, default: true },
   showAdd: { type: Boolean, default: false },
   exportDisabled: { type: Boolean, default: false },
   deleteDisabled: { type: Boolean, default: false },
   editDisabled: { type: Boolean, default: false },
+  backDisabled: { type: Boolean, default: false },
   refreshDisabled: { type: Boolean, default: false },
   addDisabled: { type: Boolean, default: false },
   exportTitle: { type: String, default: 'Exportar' },
   deleteTitle: { type: String, default: 'Eliminar' },
   editTitle: { type: String, default: 'Editar' },
+  backTitle: { type: String, default: 'Volver' },
   refreshTitle: { type: String, default: 'Reprocesar' },
   addTitle: { type: String, default: 'Agregar' },
   exportDisabledTitle: { type: String, default: 'Exportación no disponible' },
   deleteDisabledTitle: { type: String, default: 'Seleccione un registro' },
   editDisabledTitle: { type: String, default: 'Seleccione un registro' },
+  backDisabledTitle: { type: String, default: 'Acción no disponible' },
   refreshDisabledTitle: { type: String, default: 'Seleccione un registro' },
   addDisabledTitle: { type: String, default: 'Acción no disponible' },
   size: { type: String, default: 'compact' }
 })
 
-defineEmits(['export', 'delete', 'edit', 'refresh', 'add'])
+defineEmits(['export', 'delete', 'edit', 'back', 'refresh', 'add'])
 </script>
 
 <style scoped>
