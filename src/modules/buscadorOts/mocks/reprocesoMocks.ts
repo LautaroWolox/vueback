@@ -1,5 +1,21 @@
 import type { BuscadorOtRow } from '../store/types'
 
+/**
+ * ============================================================================
+ * MOCK TEMPORAL - BUSCADOR DE OTs / REPROCESO
+ * ============================================================================
+ * ESTE ARCHIVO CONTIENE DATOS SIMULADOS SOLO PARA PRUEBAS LOCALES.
+ *
+ * Cuando el backend real quede conectado:
+ * 1. eliminar el uso de buildMockSearchRows() desde buscadorOtsStore.ts;
+ * 2. reemplazar findMockTechnician() por la llamada real de búsqueda de técnico;
+ * 3. eliminar este archivo completo si ya no queda ninguna dependencia.
+ *
+ * Los mocks se usan únicamente cuando import.meta.env.DEV === true.
+ * NO deben considerarse datos productivos ni contrato definitivo de backend.
+ * ============================================================================
+ */
+
 export interface MockTechnician {
   techId: string
   nombre: string
