@@ -95,16 +95,11 @@
           <div class="fm-grid-empty">No hay resultados</div>
         </template>
 
-        <Column selection-mode="multiple" header-style="width: 42px" body-style="width: 42px">
-          <template #header>
-            <Checkbox
-              v-model="allRowsSelected"
-              binary
-              :disabled="rows.length === 0"
-              aria-label="Seleccionar todas las órdenes"
-            />
-          </template>
-        </Column>
+        <Column
+          selection-mode="multiple"
+          header-style="width: 42px; text-align: center"
+          body-style="width: 42px; text-align: center"
+        />
         <Column field="nroOt" header="Nro de OT" sortable style="width: 130px" />
         <Column field="nroOtSfs" header="Nro OT SFS" sortable style="width: 130px" />
         <Column field="statusOt" header="Status de la OT" sortable style="width: 135px" />
@@ -121,11 +116,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import Dialog from 'primevue/dialog'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import Checkbox from 'primevue/checkbox'
 import FmGridShell from '@/components/shared/FmGridShell.vue'
 import FmGridPaginator from '@/components/shared/FmGridPaginator.vue'
 import FmGridActions from '@/components/shared/FmGridActions.vue'
@@ -144,20 +138,14 @@ const emit = defineEmits<{
 
 const selectedRows = ref<BuscadorOtRow[]>([])
 const first = ref(0)
-const pageRows = ref(100)
-const rowsOptions = [10, 50, 100]
-
-const allRowsSelected = computed({
-  get: () => props.rows.length > 0 && selectedRows.value.length === props.rows.length,
-  set: (checked: boolean) => {
-    selectedRows.value = checked ? [...props.rows] : []
-  }
-})
+const pageRows = ref(500)
+const rowsOptions = [100, 250, 500]
 
 watch(() => props.visible, (visible) => {
   if (!visible) return
   selectedRows.value = []
   first.value = 0
+  pageRows.value = 500
 })
 
 watch(() => props.rows, (rows) => {
