@@ -66,6 +66,7 @@ export const useBuscadorOtsStore = defineStore('buscadorOts', () => {
 
     searching.value = true
     first.value = 0
+    pageRows.value = 500
     selectedRow.value = null
 
     try {
@@ -119,6 +120,7 @@ export const useBuscadorOtsStore = defineStore('buscadorOts', () => {
     showColumnFilters.value = false
     selectedRow.value = null
     first.value = 0
+    pageRows.value = 500
     resetToken.value += 1
   }
 
