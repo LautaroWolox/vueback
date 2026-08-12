@@ -151,7 +151,7 @@
         :style="columnStyle(col)"
       >
         <template #filter="{ filterModel, filterCallback }">
-          <div v-if="col.filter !== false" class="fm-filter-cell">
+          <div v-if="col.filter !== false" class="fm-filter-cell otf-column-filter-cell">
             <span class="fm-filter-prefix">~</span>
             <InputText
               v-model="filterModel.value"
@@ -160,16 +160,14 @@
               @input="filterCallback()"
             />
             <button
-              v-if="hasColumnFilterValue(filterModel.value)"
               type="button"
-              class="fm-icon-button"
+              class="otf-filter-clear-button"
               title="Limpiar filtro"
               aria-label="Limpiar filtro"
               @click.stop="clearColumnFilter(filterModel, filterCallback)"
             >
-              <i class="pi pi-times" aria-hidden="true" />
+              <span aria-hidden="true">×</span>
             </button>
-            <span v-else class="fm-filter-more">...</span>
           </div>
         </template>
 
@@ -355,10 +353,6 @@ const columnStyle = (column) => ({
   width: column.width || '120px',
   minWidth: '48px'
 })
-
-const hasColumnFilterValue = (value) => (
-  value !== null && value !== undefined && String(value).length > 0
-)
 
 const clearColumnFilter = (filterModel, filterCallback) => {
   filterModel.value = null
