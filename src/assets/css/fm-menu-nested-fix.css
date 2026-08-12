@@ -1,0 +1,54 @@
+/*
+ * Ajuste global y aislado para submenus anidados del menu principal.
+ * Se carga despues de fm-global.css para evitar que PrimeVue o estilos historicos
+ * vuelvan a limitar/recortar el segundo nivel.
+ */
+
+@media (min-width: 961px) {
+  html body #app .menu-container,
+  html body #app .main-menu.p-menubar,
+  html body #app .main-menu .p-menubar-root-list,
+  html body #app .main-menu .p-menubar-submenu,
+  html body #app .main-menu .p-submenu-list {
+    overflow: visible !important;
+    clip-path: none !important;
+    contain: none !important;
+  }
+
+  html body #app .main-menu .p-menubar-root-list > .p-menubar-item > .p-menubar-submenu,
+  html body #app .main-menu .p-menubar-root-list > .p-menuitem > .p-submenu-list {
+    height: max-content !important;
+    max-height: none !important;
+    overflow: visible !important;
+    z-index: 4000 !important;
+  }
+
+  /*
+   * El item con hijos deja de ser el bloque de posicionamiento del segundo nivel.
+   * De esta forma el submenu anidado toma como referencia el panel completo del
+   * primer nivel y no queda pegado al borde inferior cuando el item esta abajo.
+   */
+  html body #app .main-menu .p-menubar-root-list > .p-menubar-item > .p-menubar-submenu > .p-menubar-item:has(> .p-menubar-submenu),
+  html body #app .main-menu .p-menubar-root-list > .p-menubar-item > .p-menubar-submenu > .p-menuitem:has(> .p-submenu-list),
+  html body #app .main-menu .p-menubar-root-list > .p-menuitem > .p-submenu-list > .p-menubar-item:has(> .p-menubar-submenu),
+  html body #app .main-menu .p-menubar-root-list > .p-menuitem > .p-submenu-list > .p-menuitem:has(> .p-submenu-list) {
+    position: static !important;
+  }
+
+  html body #app .main-menu .p-menubar-root-list > .p-menubar-item > .p-menubar-submenu > .p-menubar-item > .p-menubar-submenu,
+  html body #app .main-menu .p-menubar-root-list > .p-menubar-item > .p-menubar-submenu > .p-menuitem > .p-submenu-list,
+  html body #app .main-menu .p-menubar-root-list > .p-menuitem > .p-submenu-list > .p-menubar-item > .p-menubar-submenu,
+  html body #app .main-menu .p-menubar-root-list > .p-menuitem > .p-submenu-list > .p-menuitem > .p-submenu-list {
+    position: absolute !important;
+    top: -3px !important;
+    left: calc(100% - 1px) !important;
+    right: auto !important;
+    bottom: auto !important;
+    margin: 0 !important;
+    height: max-content !important;
+    max-height: calc(100dvh - 48px) !important;
+    overflow-x: visible !important;
+    overflow-y: auto !important;
+    z-index: 5000 !important;
+  }
+}
