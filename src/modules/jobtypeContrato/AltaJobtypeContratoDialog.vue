@@ -1,0 +1,807 @@
+<template>
+  <Dialog
+    :visible="visible"
+    appendTo="body"
+    modal
+    :closable="false"
+    :close-on-escape="false"
+    :draggable="false"
+    :resizable="false"
+    class="jobtype-alta-dialog"
+    @update:visible="onVisibleChange"
+  >
+    <template #header>
+      <div class="jobtype-alta-header">
+        <h2 class="jobtype-alta-header__title">Alta Jobtype - Contrato</h2>
+        <button
+          type="button"
+          class="jobtype-alta-header__close"
+          title="Cerrar"
+          aria-label="Cerrar"
+          :disabled="relating"
+          @click="solicitarCierre"
+        >×</button>
+      </div>
+    </template>
+
+    <div class="jobtype-alta-content">
+      <div class="jobtype-alta-form">
+        <div class="jobtype-alta-field">
+          <label for="alta-pais">Pais</label>
+          <Select
+            id="alta-pais"
+            v-model="form.pais"
+            :options="paisOptions"
+            optionLabel="label"
+            optionValue="value"
+            overlayClass="jobtype-alta-select-overlay"
+            class="jobtype-alta-control"
+          />
+        </div>
+
+        <div class="jobtype-alta-field">
+          <label for="alta-jobtype">Jobtype</label>
+          <AutoComplete
+            id="alta-jobtype"
+            v-model="form.jobtype"
+            :suggestions="jobtypeSuggestions"
+            optionLabel="valor"
+            :minLength="4"
+            :disabled="!form.pais"
+            class="jobtype-alta-control"
+            inputClass="jobtype-alta-control"
+            @complete="buscarJobtypes"
+            @item-select="onJobtypeSelect"
+            @clear="jobtypeSelected = null"
+          />
+        </div>
+
+        <div class="jobtype-alta-field">
+          <label for="alta-contrato">Contrato</label>
+          <AutoComplete
+            id="alta-contrato"
+            v-model="form.contrato"
+            :suggestions="contratoSuggestions"
+            optionLabel="valor"
+            :minLength="4"
+            :disabled="!form.pais"
+            class="jobtype-alta-control"
+            inputClass="jobtype-alta-control"
+            @complete="buscarContratos"
+            @item-select="onContratoSelect"
+            @clear="contratoSelected = null"
+          />
+        </div>
+
+        <div class="jobtype-alta-field">
+          <label for="alta-origen">Origen</label>
+          <Select
+            id="alta-origen"
+            v-model="form.origen"
+            :options="origenOptions"
+            optionLabel="label"
+            optionValue="value"
+            :disabled="!form.pais || isPY"
+            overlayClass="jobtype-alta-select-overlay"
+            class="jobtype-alta-control"
+          />
+        </div>
+
+        <FmButton
+          label="AGREGAR"
+          class="jobtype-add-button"
+          :disabled="!canAgregar"
+          @click="agregar"
+        />
+      </div>
+
+      <div class="jobtype-alta-grid-wrap">
+        <DataTable
+          v-model:selection="altaSelectedRow"
+          v-model:first="altaFirst"
+          v-model:rows="altaPageRows"
+          class="jobtype-alta-grid"
+          :value="altaRows"
+          dataKey="id"
+          tableStyle="table-layout: fixed; width: 100%; min-width: 100%"
+          scrollable
+          scrollHeight="flex"
+          selectionMode="single"
+          paginator
+          :rowsPerPageOptions="[10]"
+          showGridlines
+          @row-click="onAltaRowClick"
+        >
+          <template #empty>
+            <div class="jobtype-alta-empty">No hay relaciones agregadas</div>
+          </template>
+
+          <template
+            #paginatorcontainer="{
+              first,
+              last,
+              page,
+              pageCount,
+              rows,
+              totalRecords,
+              firstPageCallback,
+              lastPageCallback,
+              prevPageCallback,
+              nextPageCallback,
+              rowChangeCallback,
+              changePageCallback
+            }"
+          >
+            <FmGridPaginator
+              :first="first"
+              :last="last"
+              :page="page"
+              :page-count="pageCount"
+              :rows="rows"
+              :total-records="totalRecords"
+              :rows-options="[10]"
+              :show-rows-select="false"
+              :show-counter="false"
+              page-label="Página"
+              @first-page="firstPageCallback"
+              @prev-page="prevPageCallback"
+              @next-page="nextPageCallback"
+              @last-page="lastPageCallback"
+              @page-change="changePageCallback"
+              @rows-change="rowChangeCallback"
+            >
+              <template #actions>
+                <FmGridActions
+                  size="large"
+                  :show-export="false"
+                  :show-delete="true"
+                  :show-refresh="false"
+                  :delete-disabled="!altaSelectedRow"
+                  delete-title="Eliminar"
+                  @delete="eliminarPreview"
+                />
+              </template>
+            </FmGridPaginator>
+          </template>
+
+          <Column field="relCodigoTarea" header="CODIGO_TAREA" :style="{ width: '15%' }">
+            <template #body="{ data }">
+              <span class="jobtype-cell-text" :title="data.relCodigoTarea">{{ data.relCodigoTarea }}</span>
+            </template>
+          </Column>
+          <Column field="relTarea" header="TAREA" :style="{ width: '25%' }">
+            <template #body="{ data }">
+              <span class="jobtype-cell-text" :title="data.relTarea">{{ data.relTarea }}</span>
+            </template>
+          </Column>
+          <Column field="origen" header="ORIGEN" :style="{ width: '12%' }">
+            <template #body="{ data }">
+              <span class="jobtype-cell-text" :title="data.origen">{{ data.origen }}</span>
+            </template>
+          </Column>
+          <Column field="relContrato" header="NOMBRE_CONTRATO" :style="{ width: '28%' }">
+            <template #body="{ data }">
+              <span class="jobtype-cell-text" :title="data.relContrato">{{ data.relContrato }}</span>
+            </template>
+          </Column>
+          <Column field="paisLabel" header="PAIS" :style="{ width: '20%' }">
+            <template #body="{ data }">
+              <span class="jobtype-cell-text" :title="data.paisLabel">{{ data.paisLabel }}</span>
+            </template>
+          </Column>
+        </DataTable>
+      </div>
+
+      <div v-if="duplicateMessage" class="jobtype-alta-duplicate-notice">
+        {{ duplicateMessage }}
+      </div>
+    </div>
+
+    <template #footer>
+      <FmButton
+        label="RELACIONAR"
+        class="jobtype-relate-button"
+        :disabled="altaRows.length === 0 || relating"
+        @click="relacionar"
+      />
+    </template>
+
+    <div v-if="relating" class="jobtype-alta-loading-overlay">
+      <ProgressSpinner />
+    </div>
+  </Dialog>
+
+  <Dialog
+    v-model:visible="showAlertDialog"
+    appendTo="body"
+    modal
+    :closable="false"
+    :close-on-escape="false"
+    :draggable="true"
+    :resizable="false"
+    class="jobtype-alta-alert-dialog"
+    :style="alertDialogStyle"
+  >
+    <template #header>
+      <div class="jobtype-alta-alert__header">
+        <span class="jobtype-alta-alert__title">Alerta</span>
+        <button
+          type="button"
+          class="jobtype-alta-alert__close"
+          title="Cerrar"
+          aria-label="Cerrar"
+          @click="showAlertDialog = false"
+        >×</button>
+      </div>
+    </template>
+
+    <div class="jobtype-alta-alert__content">
+      <span class="jobtype-alta-alert__message">{{ alertMessage }}</span>
+    </div>
+
+    <template #footer>
+      <div class="jobtype-alta-alert__actions">
+        <button
+          type="button"
+          class="jobtype-alta-alert__button"
+          @click="showAlertDialog = false"
+        >ACEPTAR</button>
+      </div>
+    </template>
+  </Dialog>
+
+  <Dialog
+    v-model:visible="showConfirmCierre"
+    appendTo="body"
+    modal
+    :closable="false"
+    :close-on-escape="false"
+    :draggable="true"
+    :resizable="false"
+    class="jobtype-alta-unsaved-dialog"
+    :style="confirmDialogStyle"
+  >
+    <template #header>
+      <div class="jobtype-alta-unsaved__header">
+        <div class="jobtype-alta-unsaved__header-main">
+          <span class="jobtype-alta-unsaved__icon-circle">
+            <i class="pi pi-bell jobtype-alta-unsaved__header-icon" aria-hidden="true" />
+          </span>
+          <span class="jobtype-alta-unsaved__title">Confirmar Accion</span>
+        </div>
+        <button
+          type="button"
+          class="jobtype-alta-unsaved__close"
+          title="Cerrar"
+          aria-label="Cerrar"
+          @click="cancelarCierre"
+        >×</button>
+      </div>
+    </template>
+
+    <div class="jobtype-alta-unsaved__content">
+      <span class="jobtype-alta-unsaved__message">
+        Hay datos ingresados, confirma que desea cancelar?
+      </span>
+    </div>
+
+    <template #footer>
+      <div class="jobtype-alta-unsaved__actions">
+        <button
+          type="button"
+          class="jobtype-alta-unsaved__button jobtype-alta-unsaved__button--cancel"
+          @click="cancelarCierre"
+        >CANCELAR</button>
+        <button
+          type="button"
+          class="jobtype-alta-unsaved__button jobtype-alta-unsaved__button--accept"
+          @click="confirmarCierre"
+        >ACEPTAR</button>
+      </div>
+    </template>
+  </Dialog>
+</template>
+
+<script setup>
+import { ref, reactive, computed, watch } from 'vue'
+import Dialog from 'primevue/dialog'
+import Select from 'primevue/select'
+import AutoComplete from 'primevue/autocomplete'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import ProgressSpinner from 'primevue/progressspinner'
+import FmButton from '@/components/shared/FmButton.vue'
+import FmGridPaginator from '@/components/shared/FmGridPaginator.vue'
+import FmGridActions from '@/components/shared/FmGridActions.vue'
+import { useJobtypeContratoStore } from './jobtypeContratoStore'
+
+const props = defineProps({
+  visible: { type: Boolean, default: false }
+})
+
+const emit = defineEmits(['update:visible', 'relacionado'])
+
+const store = useJobtypeContratoStore()
+
+const confirmDialogStyle = 'width: min(540px, calc(100vw - 32px)); max-width: 540px;'
+
+const paisOptions = [
+  { label: '', value: '' },
+  { label: 'ARG/UY', value: '1' },
+  { label: 'PY', value: '2' }
+]
+
+const form = reactive({
+  pais: '',
+  jobtype: '',
+  contrato: '',
+  origen: ''
+})
+
+const origenOptions = [
+  { label: '', value: '' },
+  { label: 'FAN', value: 'FAN' },
+  { label: 'MXM', value: 'MXM' }
+]
+
+const isPY = computed(() => form.pais === '2')
+
+const jobtypeSuggestions = ref([])
+const contratoSuggestions = ref([])
+const jobtypeSelected = ref(null)
+const contratoSelected = ref(null)
+const altaRows = ref([])
+const altaSelectedRow = ref(null)
+const altaFirst = ref(0)
+const altaPageRows = ref(10)
+const showConfirmCierre = ref(false)
+const duplicateMessage = ref('')
+const relating = ref(false)
+const showAlertDialog = ref(false)
+const alertMessage = ref('')
+
+const alertDialogStyle = 'width: min(540px, calc(100vw - 32px)); max-width: 540px;'
+
+const canAgregar = computed(() => Boolean(jobtypeSelected.value && contratoSelected.value && form.origen))
+
+const hayDatosCargados = computed(() => {
+  return Boolean(
+    form.jobtype ||
+    form.contrato ||
+    form.origen ||
+    jobtypeSelected.value ||
+    contratoSelected.value ||
+    altaRows.value.length
+  )
+})
+
+watch(() => form.pais, () => {
+  form.jobtype = ''
+  form.contrato = ''
+  jobtypeSelected.value = null
+  contratoSelected.value = null
+  if (form.pais === '2') {
+    form.origen = 'FAN'
+  } else {
+    form.origen = ''
+  }
+})
+
+watch(() => props.visible, (val) => {
+  if (val) resetForm()
+})
+
+const resetForm = () => {
+  form.pais = ''
+  form.jobtype = ''
+  form.contrato = ''
+  form.origen = ''
+  jobtypeSelected.value = null
+  contratoSelected.value = null
+  altaRows.value = []
+  altaSelectedRow.value = null
+  altaFirst.value = 0
+  showConfirmCierre.value = false
+  duplicateMessage.value = ''
+}
+
+const buscarJobtypes = async (event) => {
+  jobtypeSuggestions.value = await store.buscarJobtypes(event.query, form.pais)
+}
+
+const buscarContratos = async (event) => {
+  contratoSuggestions.value = await store.buscarContratos(event.query)
+}
+
+const onJobtypeSelect = (event) => {
+  jobtypeSelected.value = event.value
+}
+
+const onContratoSelect = (event) => {
+  contratoSelected.value = event.value
+}
+
+const agregar = () => {
+  if (!jobtypeSelected.value || !contratoSelected.value || !form.origen) return
+
+  const codigo = jobtypeSelected.value.codigo
+  const contratoId = contratoSelected.value.contratoId
+  const origen = form.origen
+
+  const duplicado = altaRows.value.some(
+    (row) => row.relCodigoTarea === codigo && row.relContratoId === contratoId && row.origen === origen
+  )
+  if (duplicado) {
+    duplicateMessage.value = `Ya se descargó una relación para el Jobtype ${codigo} con origen ${origen}`
+    return
+  }
+
+  duplicateMessage.value = ''
+  const paisLabel = form.pais === '1' ? 'ARG/UY' : form.pais === '2' ? 'PY' : ''
+
+  altaRows.value = [...altaRows.value, {
+    id: `${Date.now()}-${codigo}`,
+    relCodigoTarea: codigo,
+    relTarea: jobtypeSelected.value.nombre,
+    relContratoId: contratoSelected.value.contratoId,
+    relContrato: contratoSelected.value.nombre,
+    origen,
+    pais: paisLabel,
+    paisLabel
+  }]
+
+  form.pais = ''
+  form.jobtype = ''
+  form.contrato = ''
+  form.origen = ''
+  jobtypeSelected.value = null
+  contratoSelected.value = null
+}
+
+const eliminarPreview = () => {
+  if (!altaSelectedRow.value) return
+  altaRows.value = altaRows.value.filter((row) => row.id !== altaSelectedRow.value.id)
+  altaSelectedRow.value = null
+}
+
+const onAltaRowClick = ({ data }) => {
+  altaSelectedRow.value = data
+}
+
+const relacionar = async () => {
+  if (!altaRows.value.length) return
+
+  // Check for duplicates against the main grid (only active rows count)
+  const duplicados = altaRows.value.filter((row) =>
+    store.relaciones.some(
+      (rel) =>
+        rel.activo === 'S' &&
+        rel.tareaCodigo === row.relCodigoTarea &&
+        rel.contratoNombre === row.relContrato &&
+        rel.origen === row.origen &&
+        rel.pais === row.paisLabel
+    )
+  )
+
+  if (duplicados.length > 0) {
+    const codigos = duplicados.map((d) => d.relCodigoTarea).join(', ')
+    alertMessage.value = `Ya existe una relación Jobtype-Contrato para el jobtype ${codigos}`
+    showAlertDialog.value = true
+    return
+  }
+
+  const payload = altaRows.value.map((row) => ({
+    relCodigoTarea: row.relCodigoTarea,
+    relTarea: row.relTarea,
+    relContratoId: row.relContratoId,
+    relContrato: row.relContrato,
+    origen: row.origen,
+    pais: row.pais
+  }))
+
+  relating.value = true
+
+  try {
+    const errores = await store.crearRelaciones(payload)
+
+    if (errores.length > 0) {
+      const msgs = errores.map((e) => e.mensaje).filter(Boolean).join('\n')
+      alertMessage.value = msgs || `Ya existe una relación para los jobtypes: ${errores.map((e) => e.tareaCodigo).join(', ')}`
+      showAlertDialog.value = true
+    }
+
+    emit('update:visible', false)
+    emit('relacionado')
+  } catch {
+    emit('update:visible', false)
+    emit('relacionado')
+  } finally {
+    relating.value = false
+  }
+}
+
+const solicitarCierre = () => {
+  if (hayDatosCargados.value) {
+    showConfirmCierre.value = true
+    return
+  }
+  cerrar()
+}
+
+const onVisibleChange = (val) => {
+  if (!val) solicitarCierre()
+}
+
+const cancelarCierre = () => {
+  showConfirmCierre.value = false
+}
+
+const confirmarCierre = () => {
+  showConfirmCierre.value = false
+  cerrar()
+}
+
+const cerrar = () => {
+  resetForm()
+  emit('update:visible', false)
+}
+</script>
+
+<style scoped>
+.jobtype-alta-unsaved__header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.jobtype-alta-unsaved__header-main {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.jobtype-alta-unsaved__icon-circle {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #e9f8fa;
+}
+
+.jobtype-alta-unsaved__header-icon {
+  color: #11aabd;
+  font-size: 23px;
+}
+
+.jobtype-alta-unsaved__title {
+  color: #252b33;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.jobtype-alta-unsaved__close {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #c7c7c7;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.jobtype-alta-unsaved__close:hover {
+  color: #00a9bd;
+}
+
+.jobtype-alta-unsaved__content {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  padding: 18px 4px;
+}
+
+.jobtype-alta-unsaved__message {
+  color: #4b5563;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.jobtype-alta-unsaved__actions {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.jobtype-alta-unsaved__button {
+  appearance: none;
+  width: 100px;
+  min-width: 100px;
+  height: 30px;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border: 1px solid #00acc1;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.jobtype-alta-unsaved__button--cancel {
+  background: #fff;
+  color: #0097a7;
+}
+
+.jobtype-alta-unsaved__button--accept {
+  background: #00acc1;
+  color: #fff;
+}
+
+:global(.p-dialog.jobtype-alta-unsaved-dialog) {
+  overflow: hidden;
+  border: 1px solid #bdbdbd;
+  border-radius: 0;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .28);
+}
+
+:global(.jobtype-alta-unsaved-dialog .p-dialog-header) {
+  min-height: 68px;
+  padding: 12px 18px;
+  border-bottom: 1px solid #dedede;
+  background: #fff;
+}
+
+:global(.jobtype-alta-unsaved-dialog .p-dialog-content) {
+  padding: 0 18px;
+  background: #fff;
+}
+
+:global(.jobtype-alta-unsaved-dialog .p-dialog-footer) {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 10px 18px;
+  border-top: 1px solid #dedede;
+  background: #fff;
+}
+
+/* Loading overlay */
+.jobtype-alta-loading-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.7);
+  z-index: 9999;
+}
+
+/* Alert dialog */
+.jobtype-alta-alert__header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.jobtype-alta-alert__title {
+  color: #252b33;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.jobtype-alta-alert__close {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #c7c7c7;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.jobtype-alta-alert__close:hover {
+  color: #00a9bd;
+}
+
+.jobtype-alta-alert__content {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 18px 4px;
+}
+
+.jobtype-alta-alert__message {
+  color: #4b5563;
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: pre-line;
+}
+
+.jobtype-alta-alert__actions {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.jobtype-alta-alert__button {
+  appearance: none;
+  width: 100px;
+  min-width: 100px;
+  height: 30px;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border: 1px solid #00acc1;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: none;
+  outline: none;
+  cursor: pointer;
+  background: #fff;
+  color: #0097a7;
+}
+
+:global(.p-dialog.jobtype-alta-alert-dialog) {
+  overflow: hidden;
+  border: 1px solid #bdbdbd;
+  border-radius: 0;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .28);
+}
+
+:global(.jobtype-alta-alert-dialog .p-dialog-header) {
+  min-height: 56px;
+  padding: 12px 18px;
+  border-bottom: 1px solid #dedede;
+  background: #fff;
+}
+
+:global(.jobtype-alta-alert-dialog .p-dialog-content) {
+  padding: 0 18px;
+  background: #fff;
+}
+
+:global(.jobtype-alta-alert-dialog .p-dialog-footer) {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 10px 18px;
+  border-top: 1px solid #dedede;
+  background: #fff;
+}
+</style>
