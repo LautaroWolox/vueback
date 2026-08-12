@@ -63,6 +63,7 @@ export const useFallidasCtStore = defineStore('fallidasCT', {
             this.filters[key] = value
         },        
         async setData() {
+            this.selectedRows = []
             this.loading = true;
             const { data } = await useFetch('/pc/registroOTFallidasReproceso/searchFallidas.html')
                 .post(this.filters)
@@ -144,6 +145,7 @@ export const useFallidasCtStore = defineStore('fallidasCT', {
         },
         clearFilters() {
             this.filters = emptyFilters()
+            this.selectedRows = []
         },
         clearStore(): void {
             this.$reset()

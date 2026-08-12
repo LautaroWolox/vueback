@@ -159,7 +159,15 @@
               class="fm-column-filter"
               @input="filterCallback()"
             />
-            <span class="fm-filter-more">...</span>
+            <button
+              type="button"
+              class="fm-icon-button"
+              title="Limpiar filtro"
+              aria-label="Limpiar filtro"
+              @click.stop="clearColumnFilter(filterModel, filterCallback)"
+            >
+              <span aria-hidden="true">×</span>
+            </button>
           </div>
         </template>
 
@@ -345,6 +353,11 @@ const columnStyle = (column) => ({
   width: column.width || '120px',
   minWidth: '48px'
 })
+
+const clearColumnFilter = (filterModel, filterCallback) => {
+  filterModel.value = null
+  filterCallback()
+}
 
 const changePageFromInput = (event, pageCount, changePageCallback) => {
   if (!pageCount) return
