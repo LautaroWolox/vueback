@@ -1,0 +1,129 @@
+diff --git a/src/composables/useLegacyIframeLayout.js b/src/composables/useLegacyIframeLayout.js
+index 0c6b9fd..bbcc12d 100644
+--- a/src/composables/useLegacyIframeLayout.js
++++ b/src/composables/useLegacyIframeLayout.js
+@@ -112,11 +112,16 @@ const LAYOUT_CSS = `
+     box-sizing: border-box !important;
+   }
+ 
++  body.fm-legacy-layout.fm-legacy-grid-fill .fm-legacy-grid-shell {
++    height: var(--fm-legacy-grid-shell-height, 100%) !important;
++    max-height: var(--fm-legacy-grid-shell-height, none) !important;
++  }
++
+   body.fm-legacy-layout.fm-legacy-grid-fill .fm-legacy-grid-scroll {
+-    height: auto !important;
++    height: var(--fm-legacy-grid-scroll-height, auto) !important;
+     min-height: 0 !important;
+-    max-height: none !important;
+-    flex: 1 1 auto !important;
++    max-height: var(--fm-legacy-grid-scroll-height, none) !important;
++    flex: 0 0 var(--fm-legacy-grid-scroll-height, auto) !important;
+     overflow: auto !important;
+   }
+ `
+@@ -151,6 +156,7 @@ const GRID_SHELL_SELECTORS = [
+   '.dataTables_wrapper',
+   '.p-datatable',
+   '.ag-root-wrapper',
++  '.ui-jqgrid',
+   '.jqx-grid',
+   '.handsontable',
+   '.table-responsive'
+@@ -163,6 +169,7 @@ const GRID_SCROLL_SELECTORS = [
+   '.p-datatable-table-container',
+   '.p-datatable-wrapper',
+   '.ag-body-viewport',
++  '.ui-jqgrid-bdiv',
+   '.jqx-grid-content',
+   '.ht_master .wtHolder'
+ ].join(',')
+@@ -204,6 +211,8 @@ const clearMarkers = (doc) => {
+     '.fm-legacy-grid-scroll'
+   ].join(',')).forEach((element) => {
+     element.style.removeProperty('--fm-legacy-fill-height')
++    element.style.removeProperty('--fm-legacy-grid-shell-height')
++    element.style.removeProperty('--fm-legacy-grid-scroll-height')
+     element.classList.remove(
+       'fm-legacy-accordion-root',
+       'fm-legacy-accordion-first',
+@@ -220,6 +229,57 @@ const findAccordionRoot = (headers) => {
+   return firstHeader?.closest('.ui-accordion, .accordion') || firstHeader?.parentElement || null
+ }
+ 
++const findGridParts = (content, view) => {
++  if (!content || !view) return { gridShell: null, gridScroll: null }
++
++  let gridShell = content.querySelector(GRID_SHELL_SELECTORS)
++  let gridScroll = content.querySelector(GRID_SCROLL_SELECTORS)
++
++  // Fallback para grillas legacy que no exponen una de las clases conocidas.
++  if (!gridScroll) {
++    const candidates = [...content.querySelectorAll('div')].filter((element) => {
++      const style = view.getComputedStyle(element)
++      const overflowY = style.overflowY
++      return (overflowY === 'auto' || overflowY === 'scroll') && element.querySelector('table')
++    })
++
++    gridScroll = candidates.sort((a, b) => b.clientHeight - a.clientHeight)[0] || null
++  }
++
++  if (!gridShell && gridScroll) {
++    gridShell = gridScroll.closest(GRID_SHELL_SELECTORS) || gridScroll.parentElement
++  }
++
++  if (!gridShell) {
++    const table = content.querySelector('table')
++    gridShell = table?.closest('div') || table?.parentElement || null
++  }
++
++  return { gridShell, gridScroll }
++}
++
++const sizeLegacyGridToViewport = (doc, view, gridShell, gridScroll) => {
++  if (!doc?.body || !view || !gridShell) return
++
++  const viewportHeight = view.innerHeight || doc.documentElement.clientHeight || 0
++  if (!viewportHeight) return
++
++  const shellRect = gridShell.getBoundingClientRect()
++  if (!shellRect.height || shellRect.top >= viewportHeight) return
++
++  // La grilla debe terminar al ras del viewport del iframe.
++  const targetShellHeight = Math.max(Math.floor(viewportHeight - Math.max(shellRect.top, 0) - 4), 180)
++  gridShell.style.setProperty('--fm-legacy-grid-shell-height', `${targetShellHeight}px`)
++
++  if (!gridScroll) return
++
++  const scrollRect = gridScroll.getBoundingClientRect()
++  const nonScrollableHeight = Math.max(shellRect.height - scrollRect.height, 0)
++  const targetScrollHeight = Math.max(Math.floor(targetShellHeight - nonScrollableHeight), 120)
++
++  gridScroll.style.setProperty('--fm-legacy-grid-scroll-height', `${targetScrollHeight}px`)
++}
++
+ export function useLegacyIframeLayout(iframeRef) {
+   let observer = null
+   let currentDocument = null
+@@ -285,8 +345,7 @@ export function useLegacyIframeLayout(iframeRef) {
+     secondLayoutItem?.classList.add('fm-legacy-accordion-grid')
+     secondContent?.classList.add('fm-legacy-grid-content')
+ 
+-    const gridShell = secondContent?.querySelector(GRID_SHELL_SELECTORS)
+-    const gridScroll = secondContent?.querySelector(GRID_SCROLL_SELECTORS)
++    const { gridShell, gridScroll } = findGridParts(secondContent, view)
+ 
+     gridShell?.classList.add('fm-legacy-grid-shell')
+     gridScroll?.classList.add('fm-legacy-grid-scroll')
+@@ -302,8 +361,11 @@ export function useLegacyIframeLayout(iframeRef) {
+       const rootTop = Math.max(0, accordionRoot.getBoundingClientRect().top)
+       const availableHeight = Math.max(Math.floor(viewportHeight - rootTop), 180)
+       accordionRoot.style.setProperty('--fm-legacy-fill-height', `${availableHeight}px`)
++      sizeLegacyGridToViewport(doc, view, gridShell, gridScroll)
+     } else {
+       accordionRoot?.style.removeProperty('--fm-legacy-fill-height')
++      gridShell?.style.removeProperty('--fm-legacy-grid-shell-height')
++      gridScroll?.style.removeProperty('--fm-legacy-grid-scroll-height')
+     }
+   }
+ 
