@@ -311,8 +311,6 @@ export function useLegacyIframeLayout(iframeRef) {
     const view = doc?.defaultView
     if (!doc?.body || !view) return
 
-    clearMarkers(doc)
-
     const headers = [...doc.querySelectorAll(HEADER_SELECTORS)]
       .filter((header) => header.closest('.ui-accordion, .accordion, .accordion-group, .accordion-item, .panel'))
 
