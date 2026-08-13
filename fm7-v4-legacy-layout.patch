@@ -1,0 +1,486 @@
+diff --git a/src/composables/useLegacyIframeLayout.js b/src/composables/useLegacyIframeLayout.js
+--- a/src/composables/useLegacyIframeLayout.js
++++ b/src/composables/useLegacyIframeLayout.js
+@@ -1,302 +1,239 @@
+ import { onBeforeUnmount } from 'vue'
+ import { installAccordionSearchBehavior } from '@/utils/accordionSearchBehavior'
+ 
+-const STYLE_ID = 'fm-legacy-layout-only'
+-
+-const LAYOUT_CSS = `
+-  html.fm-legacy-layout-root,
+-  body.fm-legacy-layout {
+-    min-height: 100% !important;
+-  }
+-
+-  body.fm-legacy-layout {
+-    margin-top: 0 !important;
+-    padding-top: 0 !important;
+-  }
+-
+-  body.fm-legacy-layout .fm-legacy-accordion-root {
+-    width: 100% !important;
+-    margin-top: 0 !important;
+-    padding-top: 0 !important;
+-  }
+-
+-  body.fm-legacy-layout.fm-legacy-grid-expanded {
+-    height: 100vh !important;
+-    min-height: 100vh !important;
+-    overflow: hidden !important;
+-  }
+-
+-  body.fm-legacy-layout.fm-legacy-grid-expanded .fm-legacy-accordion-root {
+-    height: 100% !important;
+-    min-height: 0 !important;
+-    display: flex !important;
+-    flex-direction: column !important;
+-    gap: 4px !important;
+-    overflow: hidden !important;
+-  }
+-
+-  body.fm-legacy-layout.fm-legacy-grid-expanded .fm-legacy-accordion-first {
+-    flex: 0 0 auto !important;
+-  }
+-
+-  body.fm-legacy-layout.fm-legacy-grid-expanded .fm-legacy-accordion-grid {
+-    flex: 1 1 auto !important;
+-    min-height: 0 !important;
+-    display: flex !important;
+-    flex-direction: column !important;
+-    overflow: hidden !important;
+-  }
+-
+-  body.fm-legacy-layout.fm-legacy-grid-expanded .fm-legacy-grid-content {
+-    flex: 1 1 auto !important;
+-    min-height: 0 !important;
+-    max-height: none !important;
+-    display: flex !important;
+-    flex-direction: column !important;
+-    overflow: hidden !important;
+-  }
+-
+-  body.fm-legacy-layout.fm-legacy-grid-expanded .fm-legacy-grid-shell {
+-    width: 100% !important;
+-    height: 100% !important;
+-    min-height: 0 !important;
+-    max-height: none !important;
+-    flex: 1 1 auto !important;
+-    display: flex !important;
+-    flex-direction: column !important;
+-    overflow: hidden !important;
+-  }
+-
+-  body.fm-legacy-layout.fm-legacy-grid-expanded .fm-legacy-grid-scroll {
+-    height: auto !important;
+-    min-height: 0 !important;
+-    max-height: none !important;
+-    flex: 1 1 auto !important;
+-    overflow: auto !important;
+-  }
+-`
+-
+-const HEADER_SELECTORS = [
++const ACCORDION_SELECTOR = '.ui-accordion, .accordion, .p-accordion, [data-pc-name="accordion"]'
++const HEADER_SELECTOR = [
+   '.ui-accordion-header',
+   '.accordion-heading',
+   '.accordion-header',
+   '.panel-heading',
++  '.p-accordionheader',
++  '[data-pc-name="accordionheader"]',
+   '[data-toggle="collapse"]',
+   '[data-bs-toggle="collapse"]'
+ ].join(',')
+-
+-const CONTENT_SELECTORS = [
++const CONTENT_SELECTOR = [
+   '.ui-accordion-content',
+   '.accordion-inner',
+   '.accordion-content',
+   '.accordion-collapse',
+   '.panel-collapse',
++  '.p-accordioncontent',
++  '[data-pc-name="accordioncontent"]',
+   '.collapse'
+ ].join(',')
+-
+-const ITEM_SELECTORS = [
+-  '.accordion-group',
+-  '.accordion-item',
+-  '.ui-accordion-panel',
+-  '.panel'
+-].join(',')
+-
+-const GRID_SHELL_SELECTORS = [
++const ITEM_SELECTOR = '.ui-accordion-panel, .accordion-group, .accordion-item, .panel, .p-accordionpanel, [data-pc-name="accordionpanel"]'
++const GRID_SELECTOR = [
+   '.ui-datatable',
+   '.dataTables_wrapper',
+   '.p-datatable',
++  '.ui-jqgrid',
+   '.ag-root-wrapper',
+   '.jqx-grid',
+   '.handsontable',
+   '.table-responsive'
+ ].join(',')
+-
+-const GRID_SCROLL_SELECTORS = [
++const SCROLL_SELECTOR = [
+   '.ui-datatable-scrollable-body',
+-  '.ui-datatable-tablewrapper',
+   '.dataTables_scrollBody',
+   '.p-datatable-table-container',
+   '.p-datatable-wrapper',
++  '.ui-jqgrid-bdiv',
+   '.ag-body-viewport',
+   '.jqx-grid-content',
+-  '.ht_master .wtHolder'
+-].join(',')
+-
+-const getItem = (header) => header.closest(ITEM_SELECTORS) || header
+-
+-const getContent = (header, item) => {
+-  const next = header.nextElementSibling
+-  if (next?.matches?.(CONTENT_SELECTORS)) return next
+-  return item?.querySelector?.(CONTENT_SELECTORS) || null
+-}
++  '.ht_master .wtHolder',
++  '.ui-datatable-tablewrapper'
++].join(',')
++const PAGINATOR_SELECTOR = '.ui-paginator, .p-paginator, .dataTables_paginate, .pagination, .pager, .ui-jqgrid-pager'
+ 
+ const isVisible = (element, view) => {
+-  if (!element) return false
++  if (!element || !view) return false
+   const style = view.getComputedStyle(element)
+-  return !element.hidden && style.display !== 'none' && style.visibility !== 'hidden'
+-}
+-
+-const isOpen = (header, content, view) => {
+-  const expanded = header?.getAttribute?.('aria-expanded')
+-  if (expanded === 'true') return true
+-  if (expanded === 'false') return false
+-
+-  if (header?.classList?.contains('ui-state-active') || header?.classList?.contains('active')) {
+-    return true
+-  }
+-
+-  if (content?.classList?.contains('show') || content?.classList?.contains('in')) return true
+-  return isVisible(content, view)
+-}
+-
+-const clearMarkers = (doc) => {
+-  doc.querySelectorAll([
+-    '.fm-legacy-accordion-root',
+-    '.fm-legacy-accordion-first',
+-    '.fm-legacy-accordion-grid',
+-    '.fm-legacy-grid-content',
+-    '.fm-legacy-grid-shell',
+-    '.fm-legacy-grid-scroll'
+-  ].join(',')).forEach((element) => {
+-    element.classList.remove(
+-      'fm-legacy-accordion-root',
+-      'fm-legacy-accordion-first',
+-      'fm-legacy-accordion-grid',
+-      'fm-legacy-grid-content',
+-      'fm-legacy-grid-shell',
+-      'fm-legacy-grid-scroll'
+-    )
+-  })
+-}
+-
+-const findAccordionRoot = (headers) => {
+-  const firstHeader = headers[0]
+-  return firstHeader?.closest('.ui-accordion, .accordion') || firstHeader?.parentElement || null
++  const rect = element.getBoundingClientRect()
++  return !element.hidden && style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0
++}
++
++const getTopLevelHeaders = (root) => [...root.querySelectorAll(HEADER_SELECTOR)]
++  .filter((header) => header.closest(ACCORDION_SELECTOR) === root)
++
++const getPanelContent = (header, root) => {
++  const next = header?.nextElementSibling
++  if (next?.matches?.(CONTENT_SELECTOR)) return next
++
++  const item = header?.closest?.(ITEM_SELECTOR)
++  if (!item || !root.contains(item)) return null
++
++  return [...item.querySelectorAll(CONTENT_SELECTOR)]
++    .find((content) => content.closest(ACCORDION_SELECTOR) === root) || null
++}
++
++const largestVisible = (elements, view) => elements
++  .filter((element) => isVisible(element, view))
++  .sort((a, b) => {
++    const ar = a.getBoundingClientRect()
++    const br = b.getBoundingClientRect()
++    return (br.width * br.height) - (ar.width * ar.height)
++  })[0] || null
++
++const findSecondAccordionGrid = (doc, view) => {
++  const roots = [...doc.querySelectorAll(ACCORDION_SELECTOR)]
++    .filter((root) => isVisible(root, view))
++    .sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top)
++
++  for (const root of roots) {
++    const headers = getTopLevelHeaders(root)
++    if (headers.length < 2) continue
++
++    const secondContent = getPanelContent(headers[1], root)
++    if (!isVisible(secondContent, view)) continue
++
++    const grid = largestVisible([...secondContent.querySelectorAll(GRID_SELECTOR)], view)
++    if (!grid) continue
++
++    const scroll = largestVisible([...grid.querySelectorAll(SCROLL_SELECTOR)], view)
++    if (!scroll) continue
++
++    let paginator = largestVisible([...grid.querySelectorAll(PAGINATOR_SELECTOR)], view)
++    if (!paginator) {
++      paginator = largestVisible([...secondContent.querySelectorAll(PAGINATOR_SELECTOR)], view)
++    }
++
++    return { grid, scroll, paginator }
++  }
++
++  return null
+ }
+ 
+ export function useLegacyIframeLayout(iframeRef) {
++  let currentDocument = null
+   let observer = null
+-  let currentDocument = null
+-  let clickHandler = null
++  let removeSearchBehavior = null
+   let resizeHandler = null
+-  let updateTimer = null
+-  let removeSearchBehavior = null
+-
+-  const cleanupDocument = () => {
+-    if (updateTimer) window.clearTimeout(updateTimer)
+-    updateTimer = null
+-
+-    observer?.disconnect()
+-    observer = null
+-
+-    removeSearchBehavior?.()
+-    removeSearchBehavior = null
+-
+-    if (currentDocument && clickHandler) {
+-      currentDocument.removeEventListener('click', clickHandler, true)
+-    }
+-
+-    if (currentDocument?.defaultView && resizeHandler) {
+-      currentDocument.defaultView.removeEventListener('resize', resizeHandler)
+-    }
+-
+-    currentDocument?.body?.classList.remove('fm-legacy-layout', 'fm-legacy-grid-expanded')
+-    currentDocument?.documentElement?.classList.remove('fm-legacy-layout-root')
+-    if (currentDocument) clearMarkers(currentDocument)
+-
+-    currentDocument = null
+-    clickHandler = null
+-    resizeHandler = null
++  let interactionHandler = null
++  let submitHandler = null
++  let timer = null
++  let settleTimers = []
++
++  const clearTimers = () => {
++    if (timer !== null) window.clearTimeout(timer)
++    settleTimers.forEach((id) => window.clearTimeout(id))
++    timer = null
++    settleTimers = []
++  }
++
++  const resetSizing = () => {
++    if (!currentDocument) return
++
++    currentDocument.querySelectorAll('.fm-legacy-main-grid').forEach((grid) => {
++      grid.classList.remove('fm-legacy-main-grid')
++      grid.style.removeProperty('height')
++      grid.style.removeProperty('min-height')
++      grid.style.removeProperty('max-height')
++    })
++
++    currentDocument.querySelectorAll('.fm-legacy-main-grid-scroll').forEach((scroll) => {
++      scroll.classList.remove('fm-legacy-main-grid-scroll')
++      scroll.style.removeProperty('height')
++      scroll.style.removeProperty('min-height')
++      scroll.style.removeProperty('max-height')
++      scroll.style.removeProperty('overflow-y')
++    })
+   }
+ 
+   const applyLayout = () => {
+     const doc = currentDocument
+     const view = doc?.defaultView
+     if (!doc?.body || !view) return
+ 
+-    const headers = [...doc.querySelectorAll(HEADER_SELECTORS)]
+-      .filter((header) => header.closest('.ui-accordion, .accordion, .accordion-group, .accordion-item, .panel'))
+-
+-    if (headers.length < 2) {
+-      doc.body.classList.remove('fm-legacy-grid-expanded')
++    const target = findSecondAccordionGrid(doc, view)
++    if (!target) return
++
++    const { grid, scroll, paginator } = target
++    const viewportHeight = view.innerHeight || doc.documentElement.clientHeight || 0
++    const gridRect = grid.getBoundingClientRect()
++    const scrollRect = scroll.getBoundingClientRect()
++
++    const internalBottom = Math.max(0, gridRect.bottom - scrollRect.bottom)
++    const externalPaginatorHeight = paginator && !grid.contains(paginator)
++      ? paginator.getBoundingClientRect().height
++      : 0
++    const reservedBottom = internalBottom + externalPaginatorHeight + 8
++    const availableScrollHeight = Math.floor(viewportHeight - scrollRect.top - reservedBottom)
++
++    if (availableScrollHeight < 160) return
++
++    const targetGridHeight = availableScrollHeight + internalBottom
++
++    grid.classList.add('fm-legacy-main-grid')
++    scroll.classList.add('fm-legacy-main-grid-scroll')
++
++    grid.style.setProperty('height', `${targetGridHeight}px`, 'important')
++    grid.style.setProperty('min-height', `${targetGridHeight}px`, 'important')
++    grid.style.setProperty('max-height', 'none', 'important')
++
++    scroll.style.setProperty('height', `${availableScrollHeight}px`, 'important')
++    scroll.style.setProperty('min-height', `${availableScrollHeight}px`, 'important')
++    scroll.style.setProperty('max-height', `${availableScrollHeight}px`, 'important')
++    scroll.style.setProperty('overflow-y', 'auto', 'important')
++  }
++
++  const scheduleLayout = () => {
++    clearTimers()
++    timer = window.setTimeout(applyLayout, 30)
++    settleTimers = [120, 280, 550, 900].map((delay) => window.setTimeout(applyLayout, delay))
++  }
++
++  const cleanup = () => {
++    clearTimers()
++    observer?.disconnect()
++    observer = null
++    removeSearchBehavior?.()
++    removeSearchBehavior = null
++
++    if (currentDocument) {
++      if (interactionHandler) currentDocument.removeEventListener('click', interactionHandler, true)
++      if (submitHandler) currentDocument.removeEventListener('submit', submitHandler, true)
++      if (resizeHandler) currentDocument.defaultView?.removeEventListener('resize', resizeHandler)
++    }
++
++    resetSizing()
++    currentDocument = null
++    resizeHandler = null
++    interactionHandler = null
++    submitHandler = null
++  }
++
++  const onIframeLoad = () => {
++    cleanup()
++
++    try {
++      currentDocument = iframeRef.value?.contentDocument || iframeRef.value?.contentWindow?.document
++    } catch {
++      currentDocument = null
+       return
+     }
+ 
+-    const firstHeader = headers[0]
+-    const secondHeader = headers[1]
+-    const firstItem = getItem(firstHeader)
+-    const secondItem = getItem(secondHeader)
+-    const firstContent = getContent(firstHeader, firstItem)
+-    const secondContent = getContent(secondHeader, secondItem)
+-    const accordionRoot = findAccordionRoot(headers)
+-    const firstLayoutItem = firstItem === firstHeader ? firstHeader : firstItem
+-    const secondLayoutItem = secondItem === secondHeader ? (secondContent || secondHeader) : secondItem
+-
+-    accordionRoot?.classList.add('fm-legacy-accordion-root')
+-    firstLayoutItem?.classList.add('fm-legacy-accordion-first')
+-    secondLayoutItem?.classList.add('fm-legacy-accordion-grid')
+-    secondContent?.classList.add('fm-legacy-grid-content')
+-
+-    const gridShell = secondContent?.querySelector(GRID_SHELL_SELECTORS)
+-    const gridScroll = secondContent?.querySelector(GRID_SCROLL_SELECTORS)
+-
+-    gridShell?.classList.add('fm-legacy-grid-shell')
+-    gridScroll?.classList.add('fm-legacy-grid-scroll')
+-
+-    const shouldExpand = !isOpen(firstHeader, firstContent, view) && isOpen(secondHeader, secondContent, view)
+-    doc.body.classList.toggle('fm-legacy-grid-expanded', shouldExpand)
+-  }
+-
+-  const scheduleLayout = () => {
+-    if (updateTimer) window.clearTimeout(updateTimer)
+-    updateTimer = window.setTimeout(applyLayout, 40)
+-  }
+-
+-  const onIframeLoad = () => {
+-    cleanupDocument()
+-
+-    const iframe = iframeRef.value
+-    let doc
+-
+-    try {
+-      doc = iframe?.contentDocument || iframe?.contentWindow?.document
+-    } catch {
+-      return
+-    }
+-
+-    if (!doc?.head || !doc?.body) return
+-    currentDocument = doc
+-
+-    let style = doc.getElementById(STYLE_ID)
+-    if (!style) {
+-      style = doc.createElement('style')
+-      style.id = STYLE_ID
+-      style.textContent = LAYOUT_CSS
+-      doc.head.appendChild(style)
+-    }
+-
+-    doc.documentElement.classList.add('fm-legacy-layout-root')
+-    doc.body.classList.add('fm-legacy-layout')
+-
+-    removeSearchBehavior = installAccordionSearchBehavior(doc)
+-    clickHandler = scheduleLayout
++    if (!currentDocument?.body) return
++
++    removeSearchBehavior = installAccordionSearchBehavior(currentDocument)
++    interactionHandler = scheduleLayout
++    submitHandler = scheduleLayout
+     resizeHandler = scheduleLayout
+ 
+-    doc.addEventListener('click', clickHandler, true)
+-    doc.defaultView?.addEventListener('resize', resizeHandler)
++    currentDocument.addEventListener('click', interactionHandler, true)
++    currentDocument.addEventListener('submit', submitHandler, true)
++    currentDocument.defaultView?.addEventListener('resize', resizeHandler)
+ 
+     observer = new MutationObserver(scheduleLayout)
+-    observer.observe(doc.body, {
++    observer.observe(currentDocument.body, {
+       childList: true,
+-      subtree: true,
+-      attributes: true,
+-      attributeFilter: ['class', 'style', 'hidden', 'aria-expanded']
++      subtree: true
+     })
+ 
+-    applyLayout()
+-  }
+-
+-  onBeforeUnmount(cleanupDocument)
++    scheduleLayout()
++  }
++
++  onBeforeUnmount(cleanup)
+ 
+   return { onIframeLoad }
+ }
