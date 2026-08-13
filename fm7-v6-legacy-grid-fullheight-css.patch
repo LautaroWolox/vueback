@@ -1,0 +1,44 @@
+diff --git a/src/assets/css/fm-global.css b/src/assets/css/fm-global.css
+index 19bb957..a76bd87 100644
+--- a/src/assets/css/fm-global.css
++++ b/src/assets/css/fm-global.css
+@@ -2257,6 +2257,39 @@ body.fm-responsive-legacy [class*=button-bar] {
+     transition-duration: .01ms !important;
+   }
+ }
++
++
++/* --- Grilla principal full-height dentro del iframe legacy --- */
++/*
++ * useLegacyIframeLayout.js marca únicamente la grilla principal visible del
++ * segundo acordeón. No cambia display, height ni overflow del acordeón legacy.
++ */
++@media (min-width: 769px) {
++  body.fm-responsive-legacy .fm-legacy-main-grid {
++    width: 100% !important;
++    max-width: 100% !important;
++    min-width: 0 !important;
++    min-height: 0 !important;
++    max-height: none !important;
++  }
++
++  body.fm-responsive-legacy .fm-legacy-main-grid-scroll {
++    width: 100% !important;
++    height: var(--fm-legacy-main-grid-body-height, auto) !important;
++    min-height: var(--fm-legacy-main-grid-body-height, 160px) !important;
++    max-height: var(--fm-legacy-main-grid-body-height, none) !important;
++    overflow-x: auto !important;
++    overflow-y: auto !important;
++    overscroll-behavior: contain !important;
++    -webkit-overflow-scrolling: touch !important;
++  }
++
++  body.fm-responsive-legacy .fm-legacy-main-grid-paginator {
++    width: 100% !important;
++    max-width: 100% !important;
++  }
++}
++
+ /* ===== FIN: fm-legacy-responsive.css ===== */
+ 
+ /* ===== INICIO: fm-menu-responsive.css ===== */
