@@ -1,0 +1,263 @@
+diff --git a/src/assets/css/fm-global.css b/src/assets/css/fm-global.css
+index df8c1e0..6d81499 100644
+--- a/src/assets/css/fm-global.css
++++ b/src/assets/css/fm-global.css
+@@ -2257,6 +2257,79 @@ body.fm-responsive-legacy [class*=button-bar] {
+     transition-duration: .01ms !important;
+   }
+ }
++/* --- Full-height de grillas legacy dentro de iframe --- */
++html.fm-legacy-layout-root,
++html.fm-legacy-layout-root body.fm-responsive-legacy.fm-legacy-layout {
++  height: 100% !important;
++  min-height: 0 !important;
++  max-height: 100% !important;
++  overflow: hidden !important;
++}
++
++html.fm-legacy-layout-root body.fm-responsive-legacy.fm-legacy-layout.fm-legacy-grid-fill .fm-legacy-accordion-root {
++  height: var(--fm-legacy-fill-height, 100dvh) !important;
++  min-height: 0 !important;
++  max-height: var(--fm-legacy-fill-height, 100dvh) !important;
++  display: flex !important;
++  flex-direction: column !important;
++  overflow: hidden !important;
++}
++
++html.fm-legacy-layout-root body.fm-responsive-legacy.fm-legacy-layout.fm-legacy-grid-fill .fm-legacy-accordion-first {
++  flex: 0 0 auto !important;
++}
++
++html.fm-legacy-layout-root body.fm-responsive-legacy.fm-legacy-layout.fm-legacy-grid-fill .fm-legacy-accordion-grid,
++html.fm-legacy-layout-root body.fm-responsive-legacy.fm-legacy-layout.fm-legacy-grid-fill .fm-legacy-grid-content,
++html.fm-legacy-layout-root body.fm-responsive-legacy.fm-legacy-layout.fm-legacy-grid-fill .fm-legacy-grid-grow,
++html.fm-legacy-layout-root body.fm-responsive-legacy.fm-legacy-layout.fm-legacy-grid-fill .fm-legacy-grid-shell {
++  min-height: 0 !important;
++  max-height: none !important;
++  flex: 1 1 auto !important;
++  display: flex !important;
++  flex-direction: column !important;
++  overflow: hidden !important;
++}
++
++/* PrimeFaces legacy: el cuerpo scrolleable crece y el paginador queda fijo al pie. */
++html.fm-legacy-layout-root body.fm-responsive-legacy.fm-legacy-layout.fm-legacy-grid-fill .fm-legacy-grid-shell.ui-datatable,
++html.fm-legacy-layout-root body.fm-responsive-legacy.fm-legacy-layout.fm-legacy-grid-fill .fm-legacy-grid-shell .ui-datatable-scrollable,
++html.fm-legacy-layout-root body.fm-responsive-legacy.fm-legacy-layout.fm-legacy-grid-fill .fm-legacy-grid-shell .ui-datatable-scrollable-wrapper,
++html.fm-legacy-layout-root body.fm-responsive-legacy.fm-legacy-layout.fm-legacy-grid-fill .fm-legacy-grid-shell.dataTables_wrapper,
++html.fm-legacy-layout-root body.fm-responsive-legacy.fm-legacy-layout.fm-legacy-grid-fill .fm-legacy-grid-shell .dataTables_scroll {
++  height: 100% !important;
++  min-height: 0 !important;
++  max-height: none !important;
++  flex: 1 1 auto !important;
++  display: flex !important;
++  flex-direction: column !important;
++  overflow: hidden !important;
++}
++
++html.fm-legacy-layout-root body.fm-responsive-legacy.fm-legacy-layout.fm-legacy-grid-fill .fm-legacy-grid-shell {
++  height: var(--fm-legacy-grid-shell-height, 100%) !important;
++  min-height: 0 !important;
++  max-height: var(--fm-legacy-grid-shell-height, none) !important;
++}
++
++html.fm-legacy-layout-root body.fm-responsive-legacy.fm-legacy-layout.fm-legacy-grid-fill .fm-legacy-grid-scroll,
++html.fm-legacy-layout-root body.fm-responsive-legacy.fm-legacy-layout.fm-legacy-grid-fill .ui-datatable-scrollable-body,
++html.fm-legacy-layout-root body.fm-responsive-legacy.fm-legacy-layout.fm-legacy-grid-fill .dataTables_scrollBody,
++html.fm-legacy-layout-root body.fm-responsive-legacy.fm-legacy-layout.fm-legacy-grid-fill .ui-jqgrid-bdiv {
++  height: var(--fm-legacy-grid-scroll-height, auto) !important;
++  min-height: 0 !important;
++  max-height: var(--fm-legacy-grid-scroll-height, none) !important;
++  flex: 1 1 auto !important;
++  overflow-y: auto !important;
++}
++
++html.fm-legacy-layout-root body.fm-responsive-legacy.fm-legacy-layout.fm-legacy-grid-fill .ui-paginator,
++html.fm-legacy-layout-root body.fm-responsive-legacy.fm-legacy-layout.fm-legacy-grid-fill .p-paginator,
++html.fm-legacy-layout-root body.fm-responsive-legacy.fm-legacy-layout.fm-legacy-grid-fill .dataTables_paginate,
++html.fm-legacy-layout-root body.fm-responsive-legacy.fm-legacy-layout.fm-legacy-grid-fill .pagination,
++html.fm-legacy-layout-root body.fm-responsive-legacy.fm-legacy-layout.fm-legacy-grid-fill .pager {
++  flex: 0 0 auto !important;
++}
+ /* ===== FIN: fm-legacy-responsive.css ===== */
+ 
+ /* ===== INICIO: fm-menu-responsive.css ===== */
+@@ -6421,3 +6494,76 @@ html body .p-dialog.cmo-modificar-dialog .jobtype-relate-button.p-disabled {
+   }
+ }
+ /* ===== FIN: fm-full-height-content.css ===== */
++/* ===== INICIO: fm-iframe-full-height-final.css ===== */
++/* El host Vue del iframe se controla globalmente; IframeView y DetalleView no usan style scoped. */
++@media (min-width: 961px) {
++  html body #app .main-layout {
++    height: 100dvh !important;
++    min-height: 0 !important;
++    max-height: 100dvh !important;
++    overflow: hidden !important;
++  }
++
++  html body #app .main-layout > .iframe-page {
++    position: relative !important;
++    width: 100% !important;
++    height: var(--fm-desktop-content-height) !important;
++    min-width: 0 !important;
++    min-height: 0 !important;
++    max-height: var(--fm-desktop-content-height) !important;
++    flex: 1 1 0 !important;
++    display: flex !important;
++    margin: 0 !important;
++    padding: 0 !important;
++    overflow: hidden !important;
++    background: #fff !important;
++  }
++
++  html body #app .iframe-page > iframe.legacy-iframe {
++    position: static !important;
++    inset: auto !important;
++    width: 100% !important;
++    height: 100% !important;
++    min-width: 0 !important;
++    min-height: 0 !important;
++    max-width: 100% !important;
++    max-height: 100% !important;
++    flex: 1 1 0 !important;
++    display: block !important;
++    margin: 0 !important;
++    padding: 0 !important;
++    border: 0 !important;
++    background: #fff !important;
++  }
++
++  html body #app .iframe-page--detail {
++    height: 100dvh !important;
++    max-height: 100dvh !important;
++  }
++}
++
++@media (max-width: 960px) {
++  html body #app .iframe-page {
++    position: relative !important;
++    width: 100% !important;
++    height: calc(100dvh - 60px) !important;
++    min-height: 0 !important;
++    display: flex !important;
++    overflow: hidden !important;
++    margin: 0 !important;
++    padding: 0 !important;
++  }
++
++  html body #app .iframe-page > iframe.legacy-iframe {
++    position: static !important;
++    width: 100% !important;
++    height: 100% !important;
++    min-height: 0 !important;
++    max-height: 100% !important;
++    flex: 1 1 0 !important;
++    display: block !important;
++    margin: 0 !important;
++    border: 0 !important;
++  }
++}
++/* ===== FIN: fm-iframe-full-height-final.css ===== */
+ diff --git a/src/composables/useLegacyIframeLayout.js b/src/composables/useLegacyIframeLayout.js
+index bbcc12d..24b05f3 100644
+--- a/src/composables/useLegacyIframeLayout.js
++++ b/src/composables/useLegacyIframeLayout.js
+@@ -208,7 +208,8 @@ const clearMarkers = (doc) => {
+     '.fm-legacy-accordion-grid',
+     '.fm-legacy-grid-content',
+     '.fm-legacy-grid-shell',
+-    '.fm-legacy-grid-scroll'
++    '.fm-legacy-grid-scroll',
++    '.fm-legacy-grid-grow'
+   ].join(',')).forEach((element) => {
+     element.style.removeProperty('--fm-legacy-fill-height')
+     element.style.removeProperty('--fm-legacy-grid-shell-height')
+@@ -219,7 +220,8 @@ const clearMarkers = (doc) => {
+       'fm-legacy-accordion-grid',
+       'fm-legacy-grid-content',
+       'fm-legacy-grid-shell',
+-      'fm-legacy-grid-scroll'
++      'fm-legacy-grid-scroll',
++      'fm-legacy-grid-grow'
+     )
+   })
+ }
+@@ -258,6 +260,15 @@ const findGridParts = (content, view) => {
+   return { gridShell, gridScroll }
+ }
+ 
++const markGridGrowChain = (gridShell, boundary) => {
++  let element = gridShell?.parentElement || null
++
++  while (element && element !== boundary) {
++    element.classList.add('fm-legacy-grid-grow')
++    element = element.parentElement
++  }
++}
++
+ const sizeLegacyGridToViewport = (doc, view, gridShell, gridScroll) => {
+   if (!doc?.body || !view || !gridShell) return
+ 
+@@ -349,6 +360,7 @@ export function useLegacyIframeLayout(iframeRef) {
+ 
+     gridShell?.classList.add('fm-legacy-grid-shell')
+     gridScroll?.classList.add('fm-legacy-grid-scroll')
++    markGridGrowChain(gridShell, secondContent)
+ 
+     const shouldExpand = !isOpen(firstHeader, firstContent, view) && isOpen(secondHeader, secondContent, view)
+     doc.body.classList.toggle('fm-legacy-grid-expanded', shouldExpand)
+diff --git a/src/views/DetalleView.vue b/src/views/DetalleView.vue
+index d6888fc..a82d3c1 100644
+--- a/src/views/DetalleView.vue
++++ b/src/views/DetalleView.vue
+@@ -43,24 +43,3 @@ const iframeSrc = computed(() =>
+ const titulo = `Detalle Acta - ${sessionStorage.getItem('nroActa') || ''}`
+ </script>
+ 
+-<style scoped>
+-.legacy-iframe {
+-  width: 100%;
+-  height: calc(100vh - 64px);
+-  height: calc(100dvh - 64px);
+-  min-width: 0;
+-  min-height: 420px;
+-  display: block;
+-  margin: 0;
+-  border: 0;
+-  background: #fff;
+-}
+-
+-@media (min-width: 961px) {
+-  .legacy-iframe {
+-    height: 100%;
+-    min-height: 0;
+-    flex: 1 1 auto;
+-  }
+-}
+-</style>
+diff --git a/src/views/IframeView.vue b/src/views/IframeView.vue
+index c1c82d0..cb17a8f 100644
+--- a/src/views/IframeView.vue
++++ b/src/views/IframeView.vue
+@@ -80,20 +80,3 @@ onUnmounted(() => {
+ })
+ </script>
+ 
+-<style scoped>
+-.legacy-iframe {
+-  position: fixed;
+-  width: 100%;
+-  height: 100%;
+-  min-height: 420px;
+-  background: #fff;
+-}
+-
+-@media (min-width: 961px) {
+-  .legacy-iframe {
+-    height: 100%;
+-    min-height: 0;
+-    flex: 1 1 auto;
+-  }
+-}
+-</style>
