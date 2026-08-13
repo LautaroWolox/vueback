@@ -1,0 +1,13 @@
+diff --git a/src/modules/otFallidasCT/OtFallidasCT.vue b/src/modules/otFallidasCT/OtFallidasCT.vue
+index 3b2f4ba..39f7b3a 100644
+--- a/src/modules/otFallidasCT/OtFallidasCT.vue
++++ b/src/modules/otFallidasCT/OtFallidasCT.vue
+@@ -30,7 +30,7 @@ import {useFallidasCtStore} from './store/CtFallidaStore'
+ const active = ref(['0', '1'])
+ const gridExpanded = computed(() => {
+   const values = (Array.isArray(active.value) ? active.value : [active.value]).map(String)
+-  return !values.includes('0') && values.includes('1')
++  return values.includes('1')
+ })
+ let exclusionLabelsObserver
+ const store = useFallidasCtStore()
