@@ -30,7 +30,7 @@ import {useFallidasCtStore} from './store/CtFallidaStore'
 const active = ref(['0', '1'])
 const gridExpanded = computed(() => {
   const values = (Array.isArray(active.value) ? active.value : [active.value]).map(String)
-  return !values.includes('0') && values.includes('1')
+  return values.includes('1')
 })
 let exclusionLabelsObserver
 const store = useFallidasCtStore()
@@ -155,8 +155,8 @@ onBeforeUnmount(() => {
 <style scoped>
 .ot-fallidas-ct {
   width: 100%;
-  height: calc(100vh - 64px);
-  min-height: calc(100vh - 64px);
+  height: 100%;
+  min-height: 0;
   margin: -12px 0 0 !important;
   padding: 0 6px 4px !important;
   overflow: hidden;
@@ -228,14 +228,14 @@ onBeforeUnmount(() => {
   padding: 0 !important;
   border: 0 !important;
   background: #fff !important;
-  overflow: visible !important;
+  overfow: visible !important;
 }
 
 :global(.ot-fallidas-ct--grid-expanded .otf-grid-shell) {
   width: 100% !important;
-  height: calc(100vh - 135px) !important;
+  height: auto !important;
   min-height: 0 !important;
-  max-height: calc(100vh - 135px) !important;
+  max-height: none !important;
   flex: 1 1 auto !important;
   display: flex !important;
   flex-direction: column !important;

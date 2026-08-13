@@ -17,7 +17,7 @@
       class="fm-pass-grid otf-grid"
       tableStyle="table-layout: fixed; min-width: 100%; width: max-content"
       scrollable
-      scrollHeight="430px"
+      scrollHeight="flex"
       :rowClass="rowClass"
       :isDataSelectable="isRowSelectable"
       :selectAll="allSelectablePageSelected"
