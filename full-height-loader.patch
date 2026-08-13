@@ -1,0 +1,427 @@
+diff --git a/src/assets/css/fm-global.css b/src/assets/css/fm-global.css
+index 4f7cd7d..df8c1e0 100644
+--- a/src/assets/css/fm-global.css
++++ b/src/assets/css/fm-global.css
+@@ -6212,3 +6212,212 @@ html body .p-dialog.cmo-modificar-dialog .jobtype-relate-button.p-disabled {
+ }
+ /* --- Fin botones CMO --- */
+ /* ===== FIN: cmo-actividad.css ===== */
++/* ===== INICIO: fm-full-height-content.css ===== */
++/*
++ * Ajuste transversal agregado para que las pantallas migradas y los iframes
++ * aprovechen todo el alto restante del viewport sin modificar la logica existente.
++ */
++@layer fieldmanager {
++  html,
++  body,
++  #app {
++    height: 100%;
++    min-height: 0;
++  }
++
++  #app .main-layout {
++    width: 100%;
++    height: 100dvh !important;
++    min-height: 0 !important;
++    display: flex !important;
++    flex-direction: column !important;
++    overflow: hidden !important;
++  }
++
++  #app .main-layout > .menu-container {
++    flex: 0 0 auto !important;
++  }
++
++  #app .main-layout > :not(.menu-container):not(.main-home) {
++    width: 100%;
++    max-width: 100%;
++    min-width: 0;
++    min-height: 0 !important;
++    flex: 1 1 auto !important;
++  }
++
++  /* Contenedor de iframe: ocupa exactamente el area libre debajo del menu. */
++  #app .iframe-page {
++    position: relative;
++    width: 100%;
++    max-width: 100%;
++    height: 100%;
++    min-width: 0;
++    min-height: 0;
++    flex: 1 1 auto;
++    display: flex;
++    overflow: hidden;
++    margin: 0;
++    padding: 0;
++    background: #fff;
++    box-sizing: border-box;
++  }
++
++  #app .main-layout > .iframe-page {
++    height: auto !important;
++    max-height: none !important;
++  }
++
++  #app .iframe-page--detail {
++    height: 100dvh !important;
++    max-height: 100dvh !important;
++  }
++
++  #app .iframe-page .legacy-iframe {
++    position: static !important;
++    inset: auto !important;
++    width: 100% !important;
++    max-width: 100% !important;
++    height: 100% !important;
++    min-width: 0 !important;
++    min-height: 0 !important;
++    max-height: none !important;
++    flex: 1 1 auto !important;
++    display: block !important;
++    margin: 0 !important;
++    padding: 0 !important;
++    border: 0 !important;
++    background: #fff !important;
++    box-sizing: border-box !important;
++  }
++
++  #app .iframe-page > .fm-typing-loader--overlay {
++    z-index: 1700;
++  }
++
++  /* La vista Vue toma el espacio restante; la grilla decide el scroll internamente. */
++  #app .main-layout > .fm-screen,
++  #app .main-layout > .fm-module-page,
++  #app .main-layout > .fm-responsive-page,
++  #app .main-layout > .ot-fallidas-ct,
++  #app .main-layout > .report-sas-page,
++  #app .main-layout > .emulation-page {
++    height: auto !important;
++    min-height: 0 !important;
++    max-height: none !important;
++    flex: 1 1 auto !important;
++    overflow: hidden !important;
++    box-sizing: border-box;
++  }
++
++  #app .fm-grid-shell,
++  #app .fm-responsive-grid-shell,
++  #app .emulation-grid-shell,
++  #app .otf-grid-shell,
++  #app .report-sas-grid-shell,
++  #app .reporte-sas-table-shell {
++    min-width: 0 !important;
++    min-height: 0 !important;
++    max-height: none !important;
++  }
++
++  #app .fm-grid-shell,
++  #app .emulation-grid-shell,
++  #app .otf-grid-shell,
++  #app .report-sas-grid-shell {
++    display: flex !important;
++    flex-direction: column !important;
++  }
++
++  #app .emulation-grid-shell,
++  #app .otf-grid-shell,
++  #app .report-sas-grid-shell,
++  #app .reporte-sas-table-shell {
++    height: auto !important;
++    flex: 1 1 auto !important;
++    overflow: hidden !important;
++  }
++
++  #app .fm-pass-grid,
++  #app .fm-pass-grid.p-datatable,
++  #app .emulation-grid,
++  #app #tabla.otf-grid,
++  #app .reporte-sas-main-grid {
++    width: 100% !important;
++    height: 100% !important;
++    min-width: 0 !important;
++    min-height: 0 !important;
++    max-height: none !important;
++    flex: 1 1 auto !important;
++    display: flex !important;
++    flex-direction: column !important;
++    overflow: hidden !important;
++  }
++
++  #app .fm-pass-grid .p-datatable-table-container,
++  #app .fm-pass-grid .p-datatable-wrapper,
++  #app .fm-pass-grid [data-pc-section='tablecontainer'],
++  #app #tabla.otf-grid .p-datatable-table-container,
++  #app #tabla.otf-grid .p-datatable-wrapper,
++  #app .reporte-sas-main-grid .p-datatable-table-container,
++  #app .reporte-sas-main-grid .p-datatable-wrapper {
++    height: auto !important;
++    min-height: 0 !important;
++    max-height: none !important;
++    flex: 1 1 auto !important;
++    overflow: auto !important;
++  }
++
++  /* Registro OTs Fallidas: el panel de resultados usa lo que queda aun con filtros abiertos. */
++  #app .ot-fallidas-ct > .fm-accordion {
++    min-height: 0 !important;
++    flex: 1 1 auto !important;
++  }
++
++  #app .ot-fallidas-ct .p-accordionpanel:last-child {
++    min-height: 0 !important;
++    flex: 1 1 auto !important;
++    display: flex !important;
++    flex-direction: column !important;
++    overflow: hidden !important;
++  }
++
++  #app .ot-fallidas-ct .p-accordionpanel:last-child .p-accordioncontent,
++  #app .ot-fallidas-ct .p-accordionpanel:last-child .p-accordioncontent-content {
++    min-height: 0 !important;
++    flex: 1 1 auto !important;
++    display: flex !important;
++    flex-direction: column !important;
++    overflow: hidden !important;
++  }
++
++  #app .ot-fallidas-ct .otf-grid-shell {
++    height: 100% !important;
++  }
++
++  /* Reporte SAS: elimina el alto calculado por cantidad de filas y llena el resto. */
++  #app .report-sas-page,
++  #app .report-sas-page.report-sas-page--fullscreen {
++    position: relative !important;
++    inset: auto !important;
++    width: 100% !important;
++    max-width: 100% !important;
++    height: auto !important;
++    min-height: 0 !important;
++    max-height: none !important;
++    flex: 1 1 auto !important;
++    margin: 0 !important;
++    overflow: hidden !important;
++  }
++
++  #app .report-sas-page .report-sas-accordion,
++  #app .report-sas-page .report-sas-results-panel,
++  #app .report-sas-page .p-accordioncontent,
++  #app .report-sas-page .p-accordioncontent-content,
++  #app .report-sas-page .report-sas-grid-shell,
++  #app .report-sas-page .reporte-sas-table-shell {
++    min-height: 0 !important;
++    flex: 1 1 auto !important;
++  }
++}
++/* ===== FIN: fm-full-height-content.css ===== */
+diff --git a/src/composables/useLegacyIframeLayout.js b/src/composables/useLegacyIframeLayout.js
+index 5e535f3..d6a3d57 100644
+--- a/src/composables/useLegacyIframeLayout.js
++++ b/src/composables/useLegacyIframeLayout.js
+@@ -74,6 +74,51 @@ const LAYOUT_CSS = `
+     flex: 1 1 auto !important;
+     overflow: auto !important;
+   }
++
++  /*
++   * Extiende la grilla legacy al alto restante aunque el panel de filtros siga abierto.
++   * Se activa solo cuando el segundo panel contiene una grilla y esta visible.
++   */
++  body.fm-legacy-layout.fm-legacy-grid-fill {
++    height: 100% !important;
++    min-height: 0 !important;
++    overflow: hidden !important;
++  }
++
++  body.fm-legacy-layout.fm-legacy-grid-fill .fm-legacy-accordion-root {
++    height: var(--fm-legacy-fill-height, 100vh) !important;
++    min-height: 0 !important;
++    max-height: var(--fm-legacy-fill-height, 100vh) !important;
++    display: flex !important;
++    flex-direction: column !important;
++    gap: 4px !important;
++    overflow: hidden !important;
++    box-sizing: border-box !important;
++  }
++
++  body.fm-legacy-layout.fm-legacy-grid-fill .fm-legacy-accordion-first {
++    flex: 0 0 auto !important;
++  }
++
++  body.fm-legacy-layout.fm-legacy-grid-fill .fm-legacy-accordion-grid,
++  body.fm-legacy-layout.fm-legacy-grid-fill .fm-legacy-grid-content,
++  body.fm-legacy-layout.fm-legacy-grid-fill .fm-legacy-grid-shell {
++    min-height: 0 !important;
++    max-height: none !important;
++    flex: 1 1 auto !important;
++    display: flex !important;
++    flex-direction: column !important;
++    overflow: hidden !important;
++    box-sizing: border-box !important;
++  }
++
++  body.fm-legacy-layout.fm-legacy-grid-fill .fm-legacy-grid-scroll {
++    height: auto !important;
++    min-height: 0 !important;
++    max-height: none !important;
++    flex: 1 1 auto !important;
++    overflow: auto !important;
++  }
+ `
+ 
+ const HEADER_SELECTORS = [
+@@ -158,6 +203,7 @@ const clearMarkers = (doc) => {
+     '.fm-legacy-grid-shell',
+     '.fm-legacy-grid-scroll'
+   ].join(',')).forEach((element) => {
++    element.style.removeProperty('--fm-legacy-fill-height')
+     element.classList.remove(
+       'fm-legacy-accordion-root',
+       'fm-legacy-accordion-first',
+@@ -201,6 +247,7 @@ export function useLegacyIframeLayout(iframeRef) {
+     }
+ 
+     currentDocument?.body?.classList.remove('fm-legacy-layout', 'fm-legacy-grid-expanded')
++    currentDocument?.body?.classList.remove('fm-legacy-grid-fill')
+     currentDocument?.documentElement?.classList.remove('fm-legacy-layout-root')
+     if (currentDocument) clearMarkers(currentDocument)
+ 
+@@ -219,6 +266,7 @@ export function useLegacyIframeLayout(iframeRef) {
+ 
+     if (headers.length < 2) {
+       doc.body.classList.remove('fm-legacy-grid-expanded')
++      doc.body.classList.remove('fm-legacy-grid-fill')
+       return
+     }
+ 
+@@ -245,6 +293,18 @@ export function useLegacyIframeLayout(iframeRef) {
+ 
+     const shouldExpand = !isOpen(firstHeader, firstContent, view) && isOpen(secondHeader, secondContent, view)
+     doc.body.classList.toggle('fm-legacy-grid-expanded', shouldExpand)
++
++    const shouldFill = Boolean(gridShell) && isOpen(secondHeader, secondContent, view)
++    doc.body.classList.toggle('fm-legacy-grid-fill', shouldFill)
++
++    if (shouldFill && accordionRoot) {
++      const viewportHeight = view.innerHeight || doc.documentElement.clientHeight || 0
++      const rootTop = Math.max(0, accordionRoot.getBoundingClientRect().top)
++      const availableHeight = Math.max(Math.floor(viewportHeight - rootTop), 180)
++      accordionRoot.style.setProperty('--fm-legacy-fill-height', `${availableHeight}px`)
++    } else {
++      accordionRoot?.style.removeProperty('--fm-legacy-fill-height')
++    }
+   }
+ 
+   const scheduleLayout = () => {
+diff --git a/src/views/DetalleView.vue b/src/views/DetalleView.vue
+index ad06c3c..d6888fc 100644
+--- a/src/views/DetalleView.vue
++++ b/src/views/DetalleView.vue
+@@ -1,14 +1,24 @@
+ <template>
+-  <iframe
+-    ref="iframeRef"
+-    :src="iframeSrc"
+-    :title="titulo"
+-    width="100%"
+-    frameborder="0"
+-    allowfullscreen
+-    class="legacy-iframe"
+-    @load="onIframeLoad"
+-  />
++  <div class="iframe-page iframe-page--detail">
++    <iframe
++      ref="iframeRef"
++      :src="iframeSrc"
++      :title="titulo"
++      width="100%"
++      frameborder="0"
++      allowfullscreen
++      class="legacy-iframe"
++      @load="onIframeLoad"
++    />
++
++    <FmTypingLoader
++      v-if="isIframeLoading"
++      overlay
++      variant="grid"
++      title="Cargando pantalla"
++      message="Preparando contenido"
++    />
++  </div>
+ </template>
+ 
+ <script setup>
+@@ -17,11 +27,13 @@ import { useLegacyIframeLayout } from '@/composables/useLegacyIframeLayout'
+ import { useLegacyIframeViewport } from '@/composables/useLegacyIframeViewport'
+ 
+ const iframeRef = ref(null)
++const isIframeLoading = ref(true)
+ const { onIframeLoad: applyLegacyLayout } = useLegacyIframeLayout(iframeRef)
+ const { onIframeLoad: applyLegacyViewport } = useLegacyIframeViewport(iframeRef)
+ const onIframeLoad = () => {
+   applyLegacyLayout()
+   applyLegacyViewport()
++  isIframeLoading.value = false
+ }
+ 
+ const iframeSrc = computed(() =>
+diff --git a/src/views/IframeView.vue b/src/views/IframeView.vue
+index 83f092b..c1c82d0 100644
+--- a/src/views/IframeView.vue
++++ b/src/views/IframeView.vue
+@@ -1,14 +1,24 @@
+ <template>
+-  <iframe
+-    ref="iframeRef"
+-    :src="iframeSrc"
+-    :title="titulo"
+-    width="100%"
+-    frameborder="0"
+-    allowfullscreen
+-    class="legacy-iframe"
+-    @load="onIframeLoad"
+-  />
++  <div class="iframe-page">
++    <iframe
++      ref="iframeRef"
++      :src="iframeSrc"
++      :title="titulo"
++      width="100%"
++      frameborder="0"
++      allowfullscreen
++      class="legacy-iframe"
++      @load="onIframeLoad"
++    />
++
++    <FmTypingLoader
++      v-if="isIframeLoading"
++      overlay
++      variant="grid"
++      title="Cargando pantalla"
++      message="Preparando contenido"
++    />
++  </div>
+ </template>
+ 
+ <script setup>
+@@ -23,15 +33,18 @@ const props = defineProps({
+ })
+ 
+ const iframeRef = ref(null)
++const isIframeLoading = ref(true)
+ const { onIframeLoad: applyLegacyLayout } = useLegacyIframeLayout(iframeRef)
+ const { onIframeLoad: applyLegacyViewport } = useLegacyIframeViewport(iframeRef)
+ const onIframeLoad = () => {
+   applyLegacyLayout()
+   applyLegacyViewport()
++  isIframeLoading.value = false
+ }
+ const titulo = computed(() => props.titleParam || sessionStorage.getItem('titleParam') || '')
+ 
+ watchEffect(() => {
++  isIframeLoading.value = true
+   sessionStorage.setItem('urlParam', props.urlParam)
+   sessionStorage.setItem('titleParam', props.titleParam)
+ })
