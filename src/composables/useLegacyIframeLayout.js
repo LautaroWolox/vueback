@@ -1,82 +1,19 @@
 import { onBeforeUnmount } from 'vue'
 import { installAccordionSearchBehavior } from '@/utils/accordionSearchBehavior'
 
-const STYLE_ID = 'fm-legacy-layout-only'
+const LEGACY_LAYOUT_STYLE_ID = 'fm-legacy-layout-only'
+const GRID_HEIGHT_PROPERTY = '--fm-legacy-main-grid-body-height'
 
-const LAYOUT_CSS = `
-  html.fm-legacy-layout-root,
-  body.fm-legacy-layout {
-    min-height: 100% !important;
-  }
+const ACCORDION_ROOT_SELECTOR = [
+  '.p-accordion',
+  '[data-pc-name="accordion"]',
+  '.ui-accordion',
+  '.accordion'
+].join(',')
 
-  body.fm-legacy-layout {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-  }
-
-  body.fm-legacy-layout .fm-legacy-accordion-root {
-    width: 100% !important;
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-  }
-
-  body.fm-legacy-layout.fm-legacy-grid-expanded {
-    height: 100vh !important;
-    min-height: 100vh !important;
-    overflow: hidden !important;
-  }
-
-  body.fm-legacy-layout.fm-legacy-grid-expanded .fm-legacy-accordion-root {
-    height: 100% !important;
-    min-height: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 4px !important;
-    overflow: hidden !important;
-  }
-
-  body.fm-legacy-layout.fm-legacy-grid-expanded .fm-legacy-accordion-first {
-    flex: 0 0 auto !important;
-  }
-
-  body.fm-legacy-layout.fm-legacy-grid-expanded .fm-legacy-accordion-grid {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
-  }
-
-  body.fm-legacy-layout.fm-legacy-grid-expanded .fm-legacy-grid-content {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
-  }
-
-  body.fm-legacy-layout.fm-legacy-grid-expanded .fm-legacy-grid-shell {
-    width: 100% !important;
-    height: 100% !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    flex: 1 1 auto !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
-  }
-
-  body.fm-legacy-layout.fm-legacy-grid-expanded .fm-legacy-grid-scroll {
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    flex: 1 1 auto !important;
-    overflow: auto !important;
-  }
-`
-
-const HEADER_SELECTORS = [
+const HEADER_SELECTOR = [
+  '.p-accordionheader',
+  '[data-pc-name="accordionheader"]',
   '.ui-accordion-header',
   '.accordion-heading',
   '.accordion-header',
@@ -85,7 +22,18 @@ const HEADER_SELECTORS = [
   '[data-bs-toggle="collapse"]'
 ].join(',')
 
-const CONTENT_SELECTORS = [
+const PANEL_SELECTOR = [
+  '.p-accordionpanel',
+  '[data-pc-name="accordionpanel"]',
+  '.ui-accordion-panel',
+  '.accordion-group',
+  '.accordion-item',
+  '.panel'
+].join(',')
+
+const CONTENT_SELECTOR = [
+  '.p-accordioncontent',
+  '[data-pc-name="accordioncontent"]',
   '.ui-accordion-content',
   '.accordion-inner',
   '.accordion-content',
@@ -94,69 +42,119 @@ const CONTENT_SELECTORS = [
   '.collapse'
 ].join(',')
 
-const ITEM_SELECTORS = [
-  '.accordion-group',
-  '.accordion-item',
-  '.ui-accordion-panel',
-  '.panel'
-].join(',')
-
-const GRID_SHELL_SELECTORS = [
+const GRID_SHELL_SELECTOR = [
   '.ui-datatable',
   '.dataTables_wrapper',
   '.p-datatable',
-  '.ag-root-wrapper',
+  '.ui-jqgrid',
   '.jqx-grid',
   '.handsontable',
   '.table-responsive'
 ].join(',')
 
-const GRID_SCROLL_SELECTORS = [
+const GRID_SCROLL_SELECTOR = [
   '.ui-datatable-scrollable-body',
-  '.ui-datatable-tablewrapper',
   '.dataTables_scrollBody',
   '.p-datatable-table-container',
   '.p-datatable-wrapper',
-  '.ag-body-viewport',
+  '.ui-jqgrid-bdiv',
   '.jqx-grid-content',
-  '.ht_master .wtHolder'
+  '.ht_master .wtHolder',
+  '.ui-datatable-tablewrapper'
 ].join(',')
 
-const getItem = (header) => header.closest(ITEM_SELECTORS) || header
+const PAGINATOR_SELECTOR = [
+  '.ui-paginator',
+  '.p-paginator',
+  '.dataTables_paginate',
+  '.pagination',
+  '.pager',
+  '.ui-jqgrid-pager'
+].join(',')
 
-const getContent = (header, item) => {
-  const next = header.nextElementSibling
-  if (next?.matches?.(CONTENT_SELECTORS)) return next
-  return item?.querySelector?.(CONTENT_SELECTORS) || null
+const nearestAccordionRoot = (element) => element?.closest?.(ACCORDION_ROOT_SELECTOR) || null
+
+const getTopLevelHeaders = (root) => [...root.querySelectorAll(HEADER_SELECTOR)]
+  .filter((header) => nearestAccordionRoot(header) === root)
+
+const getSection = (header) => {
+  const panel = header?.closest?.(PANEL_SELECTOR)
+  const next = header?.nextElementSibling
+  const content = next?.matches?.(CONTENT_SELECTOR)
+    ? next
+    : panel?.querySelector?.(CONTENT_SELECTOR) || null
+
+  return { header, panel, content }
 }
 
 const isVisible = (element, view) => {
-  if (!element) return false
+  if (!element || !view) return false
   const style = view.getComputedStyle(element)
-  return !element.hidden && style.display !== 'none' && style.visibility !== 'hidden'
+  const rect = element.getBoundingClientRect()
+
+  return !element.hidden &&
+    style.display !== 'none' &&
+    style.visibility !== 'hidden' &&
+    rect.width > 0 &&
+    rect.height > 0
 }
 
-const isOpen = (header, content, view) => {
-  const expanded = header?.getAttribute?.('aria-expanded')
-  if (expanded === 'true') return true
-  if (expanded === 'false') return false
+const firstVisible = (root, selector, view) => {
+  if (!root) return null
+  return [...root.querySelectorAll(selector)].find((element) => isVisible(element, view)) || null
+}
 
-  if (header?.classList?.contains('ui-state-active') || header?.classList?.contains('active')) {
-    return true
+const findResultsGrid = (doc, view) => {
+  const roots = [...doc.querySelectorAll(ACCORDION_ROOT_SELECTOR)]
+
+  for (const root of roots) {
+    const headers = getTopLevelHeaders(root)
+    if (headers.length < 2) continue
+
+    const results = getSection(headers[1])
+    if (!results.content || !isVisible(results.content, view)) continue
+
+    const gridShell = firstVisible(results.content, GRID_SHELL_SELECTOR, view)
+    if (!gridShell) continue
+
+    const gridScroll = firstVisible(gridShell, GRID_SCROLL_SELECTOR, view)
+    if (!gridScroll) continue
+
+    const paginator = firstVisible(results.content, PAGINATOR_SELECTOR, view)
+
+    return {
+      resultsContent: results.content,
+      gridShell,
+      gridScroll,
+      paginator
+    }
   }
 
-  if (content?.classList?.contains('show') || content?.classList?.contains('in')) return true
-  return isVisible(content, view)
+  return null
 }
 
-const clearMarkers = (doc) => {
+const removeOldAccordionLayoutArtifacts = (doc) => {
+  doc.getElementById(LEGACY_LAYOUT_STYLE_ID)?.remove()
+
+  doc.body?.classList.remove(
+    'fm-legacy-layout',
+    'fm-legacy-grid-expanded',
+    'fm-legacy-grid-fill'
+  )
+
+  doc.documentElement?.classList.remove(
+    'fm-legacy-layout-root',
+    'fm-legacy-viewport-root'
+  )
+
   doc.querySelectorAll([
     '.fm-legacy-accordion-root',
     '.fm-legacy-accordion-first',
     '.fm-legacy-accordion-grid',
     '.fm-legacy-grid-content',
     '.fm-legacy-grid-shell',
-    '.fm-legacy-grid-scroll'
+    '.fm-legacy-grid-scroll',
+    '.fm-legacy-grid-grow'
   ].join(',')).forEach((element) => {
     element.classList.remove(
       'fm-legacy-accordion-root',
@@ -164,28 +162,44 @@ const clearMarkers = (doc) => {
       'fm-legacy-accordion-grid',
       'fm-legacy-grid-content',
       'fm-legacy-grid-shell',
-      'fm-legacy-grid-scroll'
+      'fm-legacy-grid-scroll',
+      'fm-legacy-grid-grow'
     )
   })
-}
-
-const findAccordionRoot = (headers) => {
-  const firstHeader = headers[0]
-  return firstHeader?.closest('.ui-accordion, .accordion') || firstHeader?.parentElement || null
 }
 
 export function useLegacyIframeLayout(iframeRef) {
   let observer = null
   let currentDocument = null
   let clickHandler = null
+  let submitHandler = null
   let resizeHandler = null
   let updateTimer = null
+  let settleTimer = null
   let removeSearchBehavior = null
+  let marked = null
+
+  const clearTimers = () => {
+    if (updateTimer) window.clearTimeout(updateTimer)
+    if (settleTimer) window.clearTimeout(settleTimer)
+    updateTimer = null
+    settleTimer = null
+  }
+
+  const clearMarkedGrid = () => {
+    if (!marked) return
+
+    marked.resultsContent?.classList.remove('fm-legacy-grid-results-content')
+    marked.gridShell?.classList.remove('fm-legacy-main-grid')
+    marked.gridScroll?.classList.remove('fm-legacy-main-grid-scroll')
+    marked.paginator?.classList.remove('fm-legacy-main-grid-paginator')
+    marked.gridShell?.style.removeProperty(GRID_HEIGHT_PROPERTY)
+
+    marked = null
+  }
 
   const cleanupDocument = () => {
-    if (updateTimer) window.clearTimeout(updateTimer)
-    updateTimer = null
-
+    clearTimers()
     observer?.disconnect()
     observer = null
 
@@ -196,60 +210,87 @@ export function useLegacyIframeLayout(iframeRef) {
       currentDocument.removeEventListener('click', clickHandler, true)
     }
 
+    if (currentDocument && submitHandler) {
+      currentDocument.removeEventListener('submit', submitHandler, true)
+    }
+
     if (currentDocument?.defaultView && resizeHandler) {
       currentDocument.defaultView.removeEventListener('resize', resizeHandler)
     }
 
-    currentDocument?.body?.classList.remove('fm-legacy-layout', 'fm-legacy-grid-expanded')
-    currentDocument?.documentElement?.classList.remove('fm-legacy-layout-root')
-    if (currentDocument) clearMarkers(currentDocument)
+    clearMarkedGrid()
+    if (currentDocument) removeOldAccordionLayoutArtifacts(currentDocument)
 
     currentDocument = null
     clickHandler = null
+    submitHandler = null
     resizeHandler = null
   }
 
   const applyLayout = () => {
     const doc = currentDocument
     const view = doc?.defaultView
-    if (!doc?.body || !view) return
+    if (!doc?.body || !doc?.documentElement || !view) return
 
-    const headers = [...doc.querySelectorAll(HEADER_SELECTORS)]
-      .filter((header) => header.closest('.ui-accordion, .accordion, .accordion-group, .accordion-item, .panel'))
-
-    if (headers.length < 2) {
-      doc.body.classList.remove('fm-legacy-grid-expanded')
+    const next = findResultsGrid(doc, view)
+    if (!next) {
+      clearMarkedGrid()
       return
     }
 
-    const firstHeader = headers[0]
-    const secondHeader = headers[1]
-    const firstItem = getItem(firstHeader)
-    const secondItem = getItem(secondHeader)
-    const firstContent = getContent(firstHeader, firstItem)
-    const secondContent = getContent(secondHeader, secondItem)
-    const accordionRoot = findAccordionRoot(headers)
-    const firstLayoutItem = firstItem === firstHeader ? firstHeader : firstItem
-    const secondLayoutItem = secondItem === secondHeader ? (secondContent || secondHeader) : secondItem
+    if (
+      marked?.gridShell !== next.gridShell ||
+      marked?.gridScroll !== next.gridScroll ||
+      marked?.resultsContent !== next.resultsContent
+    ) {
+      clearMarkedGrid()
+      marked = next
 
-    accordionRoot?.classList.add('fm-legacy-accordion-root')
-    firstLayoutItem?.classList.add('fm-legacy-accordion-first')
-    secondLayoutItem?.classList.add('fm-legacy-accordion-grid')
-    secondContent?.classList.add('fm-legacy-grid-content')
+      marked.resultsContent.classList.add('fm-legacy-grid-results-content')
+      marked.gridShell.classList.add('fm-legacy-main-grid')
+      marked.gridScroll.classList.add('fm-legacy-main-grid-scroll')
+      marked.paginator?.classList.add('fm-legacy-main-grid-paginator')
+    } else {
+      marked.paginator = next.paginator
+      marked.paginator?.classList.add('fm-legacy-main-grid-paginator')
+    }
 
-    const gridShell = secondContent?.querySelector(GRID_SHELL_SELECTORS)
-    const gridScroll = secondContent?.querySelector(GRID_SCROLL_SELECTORS)
+    const viewportHeight = view.innerHeight || doc.documentElement.clientHeight || 0
+    const scrollRect = marked.gridScroll.getBoundingClientRect()
+    const shellRect = marked.gridShell.getBoundingClientRect()
 
-    gridShell?.classList.add('fm-legacy-grid-shell')
-    gridScroll?.classList.add('fm-legacy-grid-scroll')
+    if (!viewportHeight || scrollRect.top <= 0) return
 
-    const shouldExpand = !isOpen(firstHeader, firstContent, view) && isOpen(secondHeader, secondContent, view)
-    doc.body.classList.toggle('fm-legacy-grid-expanded', shouldExpand)
+    const footerInsideGrid = Math.max(0, shellRect.bottom - scrollRect.bottom)
+    const paginatorOutsideGrid = marked.paginator && !marked.gridShell.contains(marked.paginator)
+      ? marked.paginator.getBoundingClientRect().height
+      : 0
+
+    const reservedBottom = footerInsideGrid + paginatorOutsideGrid + 8
+    const availableBodyHeight = Math.max(
+      Math.floor(viewportHeight - scrollRect.top - reservedBottom),
+      160
+    )
+
+    const nextHeight = `${availableBodyHeight}px`
+    if (marked.gridShell.style.getPropertyValue(GRID_HEIGHT_PROPERTY) !== nextHeight) {
+      marked.gridShell.style.setProperty(GRID_HEIGHT_PROPERTY, nextHeight)
+    }
   }
 
-  const scheduleLayout = () => {
+  const scheduleLayout = (delay = 45) => {
     if (updateTimer) window.clearTimeout(updateTimer)
-    updateTimer = window.setTimeout(applyLayout, 40)
+    updateTimer = window.setTimeout(() => {
+      updateTimer = null
+      applyLayout()
+    }, delay)
+
+    // PrimeFaces/DataTables pueden terminar de recalcular la tabla después del AJAX.
+    if (settleTimer) window.clearTimeout(settleTimer)
+    settleTimer = window.setTimeout(() => {
+      settleTimer = null
+      applyLayout()
+    }, 180)
   }
 
   const onIframeLoad = () => {
@@ -267,33 +308,28 @@ export function useLegacyIframeLayout(iframeRef) {
     if (!doc?.head || !doc?.body) return
     currentDocument = doc
 
-    let style = doc.getElementById(STYLE_ID)
-    if (!style) {
-      style = doc.createElement('style')
-      style.id = STYLE_ID
-      style.textContent = LAYOUT_CSS
-      doc.head.appendChild(style)
-    }
-
-    doc.documentElement.classList.add('fm-legacy-layout-root')
-    doc.body.classList.add('fm-legacy-layout')
+    // Quita únicamente los artefactos de los intentos anteriores que convertían
+    // el acordeón legacy en flex. El acordeón conserva su CSS y su JS originales.
+    removeOldAccordionLayoutArtifacts(doc)
 
     removeSearchBehavior = installAccordionSearchBehavior(doc)
-    clickHandler = scheduleLayout
-    resizeHandler = scheduleLayout
+    clickHandler = () => scheduleLayout(60)
+    submitHandler = () => scheduleLayout(80)
+    resizeHandler = () => scheduleLayout(30)
 
     doc.addEventListener('click', clickHandler, true)
+    doc.addEventListener('submit', submitHandler, true)
     doc.defaultView?.addEventListener('resize', resizeHandler)
 
-    observer = new MutationObserver(scheduleLayout)
+    // AJAX de PrimeFaces reemplaza nodos de la grilla. Observamos reemplazos,
+    // no cambios de style, para evitar ciclos cuando nosotros actualizamos la altura.
+    observer = new MutationObserver(() => scheduleLayout(40))
     observer.observe(doc.body, {
       childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['class', 'style', 'hidden', 'aria-expanded']
+      subtree: true
     })
 
-    applyLayout()
+    scheduleLayout(0)
   }
 
   onBeforeUnmount(cleanupDocument)
