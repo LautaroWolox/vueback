@@ -1,10 +1,8 @@
 <template>
-  <div class="legacy-iframe-stage">
-    <Teleport to="body">
-      <FmTypingLoader v-if="iframeLoading" fullscreen />
-    </Teleport>
-
+  <div class="legacy-iframe-stage legacy-iframe-stage--detail">
+    <FmTypingLoader v-if="iframeLoading" overlay title="Cargando Información" message="Preparando pantalla" />
     <iframe
+      :key="iframeSrc"
       ref="iframeRef"
       :src="iframeSrc"
       :title="titulo"
@@ -23,11 +21,10 @@ import { computed, onUnmounted, ref } from 'vue'
 import FmTypingLoader from '@/components/shared/FmTypingLoader.vue'
 import { useLegacyIframeLayout } from '@/composables/useLegacyIframeLayout'
 
-const MIN_LOADER_VISIBLE_MS = 550
+const MIN_LOADER_VISIBLE_MS = 450
 const iframeRef = ref(null)
 const iframeLoading = ref(true)
 const { onIframeLoad: applyLegacyLayout } = useLegacyIframeLayout(iframeRef)
-
 let loadingStartedAt = performance.now()
 let hideLoaderTimer = null
 
@@ -40,13 +37,9 @@ const clearHideLoaderTimer = () => {
 
 const onIframeLoad = () => {
   let loadedHref = ''
-
   try {
     loadedHref = iframeRef.value?.contentWindow?.location?.href || ''
-  } catch {
-    // Si el navegador no permite leer la URL, el evento load sigue siendo válido.
-  }
-
+  } catch {}
   if (loadedHref === 'about:blank') return
 
   try {
@@ -55,9 +48,7 @@ const onIframeLoad = () => {
     console.error('Error aplicando layout al detalle legacy:', error)
   }
 
-  const elapsed = performance.now() - loadingStartedAt
-  const remaining = Math.max(0, MIN_LOADER_VISIBLE_MS - elapsed)
-
+  const remaining = Math.max(0, MIN_LOADER_VISIBLE_MS - (performance.now() - loadingStartedAt))
   clearHideLoaderTimer()
   hideLoaderTimer = window.setTimeout(() => {
     iframeLoading.value = false
@@ -68,8 +59,9 @@ const onIframeLoad = () => {
 const iframeSrc = computed(() =>
   `${window.location.origin}/pc${sessionStorage.getItem('urlDetalle')}?nroActa=${sessionStorage.getItem('nroActa')}`
 )
-
 const titulo = `Detalle Acta - ${sessionStorage.getItem('nroActa') || ''}`
 
-onUnmounted(clearHideLoaderTimer)
+onUnmounted(() => {
+  clearHideLoaderTimer()
+})
 </script>
