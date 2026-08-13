@@ -64,43 +64,25 @@ const PAGINATOR_SELECTORS = [
   '.pager'
 ]
 
-const MARKER_SELECTOR = [
-  '.fm-legacy-main-grid',
-  '.fm-legacy-main-grid-scroll',
-  '.fm-legacy-main-grid-paginator'
-].join(',')
-
 const isVisible = (element, view) => {
   if (!element || !view) return false
-
   const rect = element.getBoundingClientRect()
   const style = view.getComputedStyle(element)
-
-  return (
-    !element.hidden &&
-    style.display !== 'none' &&
-    style.visibility !== 'hidden' &&
-    rect.width > 0 &&
-    rect.height > 0
-  )
+  return !element.hidden && style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0
 }
 
 const findVisibleByPriority = (container, selectors, view) => {
   if (!container) return null
-
   for (const selector of selectors) {
-    const matches = [...container.querySelectorAll(selector)]
-    const visible = matches.find((element) => isVisible(element, view))
+    const visible = [...container.querySelectorAll(selector)].find((element) => isVisible(element, view))
     if (visible) return visible
   }
-
   return null
 }
 
 const getPanelContent = (header) => {
   const next = header?.nextElementSibling
   if (next?.matches?.(CONTENT_SELECTOR)) return next
-
   const item = header?.closest?.(ITEM_SELECTOR)
   return item?.querySelector?.(CONTENT_SELECTOR) || null
 }
@@ -110,7 +92,6 @@ const getTopLevelHeaders = (root) => [...root.querySelectorAll(HEADER_SELECTOR)]
 
 const findGridIn = (container, view) => {
   if (!container) return null
-
   return [...container.querySelectorAll(GRID_SELECTOR)]
     .filter((grid) => isVisible(grid, view))
     .sort((a, b) => {
@@ -121,42 +102,25 @@ const findGridIn = (container, view) => {
 }
 
 const findMainGrid = (doc, view) => {
-  const roots = [...doc.querySelectorAll(ACCORDION_ROOT_SELECTOR)]
-    .filter((root) => isVisible(root, view))
-
+  const roots = [...doc.querySelectorAll(ACCORDION_ROOT_SELECTOR)].filter((root) => isVisible(root, view))
   for (const root of roots) {
     const headers = getTopLevelHeaders(root)
     if (headers.length < 2) continue
-
     const secondContent = getPanelContent(headers[1])
     if (!isVisible(secondContent, view)) continue
-
     const grid = findGridIn(secondContent, view)
     if (grid) return { grid, panel: secondContent }
   }
-
   const grid = findGridIn(doc, view)
   return grid ? { grid, panel: grid.parentElement } : null
-}
-
-const clearMarkers = (doc) => {
-  doc?.querySelectorAll?.(MARKER_SELECTOR).forEach((element) => {
-    element.classList.remove(
-      'fm-legacy-main-grid',
-      'fm-legacy-main-grid-scroll',
-      'fm-legacy-main-grid-paginator'
-    )
-
-    if (element.style) {
-      element.style.removeProperty('--fm-legacy-main-grid-body-height')
-    }
-  })
 }
 
 export function useLegacyIframeLayout(iframeRef) {
   let currentDocument = null
   let observer = null
-  let resizeObserver = null
+  let markedGrid = null
+  let markedScroll = null
+  let markedPaginator = null
   let removeSearchBehavior = null
   let updateTimer = null
   let retryTimers = []
@@ -181,28 +145,33 @@ export function useLegacyIframeLayout(iframeRef) {
     const scroll = findVisibleByPriority(grid, SCROLL_SELECTORS, view)
     if (!scroll) return
 
-    const paginator =
-      findVisibleByPriority(grid, PAGINATOR_SELECTORS, view) ||
-      findVisibleByPriority(panel, PAGINATOR_SELECTORS, view)
+    const paginator = findVisibleByPriority(grid, PAGINATOR_SELECTORS, view) || findVisibleByPriority(panel, PAGINATOR_SELECTORS, view)
 
-    clearMarkers(doc)
+    if (markedGrid !== grid) {
+      markedGrid?.classList.remove('fm-legacy-main-grid')
+      markedGrid?.style?.removeProperty('--fm-legacy-main-grid-body-height')
+      markedGrid = grid
+      markedGrid.classList.add('fm-legacy-main-grid')
+    }
 
-    grid.classList.add('fm-legacy-main-grid')
-    scroll.classList.add('fm-legacy-main-grid-scroll')
-    paginator?.classList.add('fm-legacy-main-grid-paginator')
+    if (markedScroll !== scroll) {
+      markedScroll?.classList.remove('fm-legacy-main-grid-scroll')
+      markedScroll = scroll
+      markedScroll.classList.add('fm-legacy-main-grid-scroll')
+    }
 
-    const viewportHeight = Math.max(
-      view.innerHeight || 0,
-      doc.documentElement?.clientHeight || 0
-    )
+    if (markedPaginator !== paginator) {
+      markedPaginator?.classList.remove('fm-legacy-main-grid-paginator')
+      markedPaginator = paginator || null
+      markedPaginator?.classList.add('fm-legacy-main-grid-paginator')
+    }
+
+    const viewportHeight = Math.max(view.innerHeight || 0, doc.documentElement?.clientHeight || 0)
     const scrollRect = scroll.getBoundingClientRect()
     const gridRect = grid.getBoundingClientRect()
-    const paginatorRect = isVisible(paginator, view)
-      ? paginator.getBoundingClientRect()
-      : null
+    const paginatorRect = isVisible(paginator, view) ? paginator.getBoundingClientRect() : null
 
     let reservedBelow = 0
-
     if (paginatorRect) {
       const gapBeforePaginator = Math.max(0, paginatorRect.top - scrollRect.bottom)
       const tailAfterPaginator = Math.max(0, gridRect.bottom - paginatorRect.bottom)
@@ -211,60 +180,48 @@ export function useLegacyIframeLayout(iframeRef) {
       reservedBelow = Math.min(Math.max(0, gridRect.bottom - scrollRect.bottom), 80)
     }
 
-    const availableHeight = Math.floor(
-      viewportHeight - Math.max(0, scrollRect.top) - reservedBelow - 6
-    )
-
+    const availableHeight = Math.floor(viewportHeight - Math.max(0, scrollRect.top) - reservedBelow - 6)
     if (availableHeight < 160) return
 
-    grid.style.setProperty(
-      '--fm-legacy-main-grid-body-height',
-      `${availableHeight}px`
-    )
+    grid.style.setProperty('--fm-legacy-main-grid-body-height', `${availableHeight}px`)
   }
 
   const scheduleLayout = () => {
     clearTimers()
     updateTimer = window.setTimeout(applyLayout, 25)
-    retryTimers = [120, 300, 700, 1200, 1800].map((delay) =>
-      window.setTimeout(applyLayout, delay)
-    )
+    retryTimers = [120, 300, 700, 1200, 1800].map((delay) => window.setTimeout(applyLayout, delay))
   }
 
   const cleanup = () => {
     clearTimers()
-
     observer?.disconnect()
     observer = null
-
-    resizeObserver?.disconnect()
-    resizeObserver = null
-
     removeSearchBehavior?.()
     removeSearchBehavior = null
-
     currentDocument?.removeEventListener('click', scheduleLayout, true)
     currentDocument?.removeEventListener('submit', scheduleLayout, true)
     currentDocument?.defaultView?.removeEventListener('resize', scheduleLayout)
-
-    clearMarkers(currentDocument)
+    markedGrid?.classList.remove('fm-legacy-main-grid')
+    markedGrid?.style?.removeProperty('--fm-legacy-main-grid-body-height')
+    markedScroll?.classList.remove('fm-legacy-main-grid-scroll')
+    markedPaginator?.classList.remove('fm-legacy-main-grid-paginator')
+    markedGrid = null
+    markedScroll = null
+    markedPaginator = null
     currentDocument = null
   }
 
   const onIframeLoad = () => {
     cleanup()
-
     try {
       currentDocument = iframeRef.value?.contentDocument || iframeRef.value?.contentWindow?.document
     } catch {
       currentDocument = null
       return
     }
-
     if (!currentDocument?.body) return
 
     removeSearchBehavior = installAccordionSearchBehavior(currentDocument)
-
     currentDocument.addEventListener('click', scheduleLayout, true)
     currentDocument.addEventListener('submit', scheduleLayout, true)
     currentDocument.defaultView?.addEventListener('resize', scheduleLayout)
@@ -277,16 +234,9 @@ export function useLegacyIframeLayout(iframeRef) {
       attributeFilter: ['class', 'hidden', 'aria-expanded']
     })
 
-    if (typeof ResizeObserver !== 'undefined') {
-      resizeObserver = new ResizeObserver(scheduleLayout)
-      resizeObserver.observe(currentDocument.documentElement)
-      resizeObserver.observe(currentDocument.body)
-    }
-
     scheduleLayout()
   }
 
   onBeforeUnmount(cleanup)
-
   return { onIframeLoad }
 }
