@@ -1,7 +1,5 @@
 <template>
-  <BuscadorOts v-if="isBuscadorOts" />
-
-  <template v-else>
+  <div class="legacy-iframe-stage">
     <Teleport to="body">
       <FmTypingLoader v-if="iframeLoading" fullscreen />
     </Teleport>
@@ -18,16 +16,14 @@
       :class="{ 'legacy-iframe--loading': iframeLoading }"
       @load="onIframeLoad"
     />
-  </template>
+  </div>
 </template>
 
 <script setup>
 import { computed, onUnmounted, ref, watch, watchEffect } from 'vue'
 import router from '@/router'
-import BuscadorOts from '@/modules/buscadorOts/BuscadorOts.vue'
 import FmTypingLoader from '@/components/shared/FmTypingLoader.vue'
 import { useLegacyIframeLayout } from '@/composables/useLegacyIframeLayout'
-import { useLegacyIframeViewport } from '@/composables/useLegacyIframeViewport'
 
 const MIN_LOADER_VISIBLE_MS = 550
 
@@ -36,11 +32,9 @@ const props = defineProps({
   titleParam: { type: String, required: true }
 })
 
-const isBuscadorOts = computed(() => props.urlParam === '/busquedaOtsGcc.html')
 const iframeRef = ref(null)
 const iframeLoading = ref(true)
 const { onIframeLoad: applyLegacyLayout } = useLegacyIframeLayout(iframeRef)
-const { onIframeLoad: applyLegacyViewport } = useLegacyIframeViewport(iframeRef)
 const titulo = computed(() => props.titleParam || sessionStorage.getItem('titleParam') || '')
 
 let loadingStartedAt = performance.now()
@@ -52,7 +46,13 @@ watchEffect(() => {
   sessionStorage.setItem('titleParam', props.titleParam)
 })
 
-const iframeSrc = computed(() => `/pc${props.urlParam || sessionStorage.getItem('urlParam') || ''}`)
+const iframeSrc = computed(() => {
+  const pantalla = props.urlParam !== undefined
+    ? `/pc${props.urlParam}`
+    : `/pc${sessionStorage.getItem('urlParam') || ''}`
+
+  return pantalla
+})
 
 const clearHideLoaderTimer = () => {
   if (hideLoaderTimer !== null) {
@@ -62,8 +62,6 @@ const clearHideLoaderTimer = () => {
 }
 
 watch(iframeSrc, () => {
-  if (isBuscadorOts.value) return
-
   loadGeneration += 1
   loadingStartedAt = performance.now()
   clearHideLoaderTimer()
@@ -71,9 +69,8 @@ watch(iframeSrc, () => {
 }, { immediate: true })
 
 const onIframeLoad = () => {
-  if (isBuscadorOts.value) return
-
   let loadedHref = ''
+
   try {
     loadedHref = iframeRef.value?.contentWindow?.location?.href || ''
   } catch {
@@ -86,7 +83,6 @@ const onIframeLoad = () => {
 
   try {
     applyLegacyLayout()
-    applyLegacyViewport()
   } catch (error) {
     console.error('Error aplicando layout al iframe legacy:', error)
   }
@@ -104,7 +100,7 @@ const onIframeLoad = () => {
 }
 
 function handleRedirect(event) {
-  const origins = new Set([import.meta.env.VITE_ORIGIN, window.location.origin])
+  const origins = new Set([window.location.origin])
   if (!origins.has(event.origin)) return
 
   const message = event.data
@@ -123,29 +119,3 @@ onUnmounted(() => {
   window.removeEventListener('message', handleRedirect)
 })
 </script>
-
-<style scoped>
-.legacy-iframe {
-  width: 100%;
-  height: calc(100vh - 64px);
-  height: calc(100dvh - 64px);
-  min-width: 0;
-  min-height: 420px;
-  display: block;
-  margin: 0;
-  border: 0;
-  background: #fff;
-}
-
-.legacy-iframe--loading {
-  visibility: hidden;
-}
-
-@media (min-width: 961px) {
-  .legacy-iframe {
-    height: 100%;
-    min-height: 0;
-    flex: 1 1 auto;
-  }
-}
-</style>
