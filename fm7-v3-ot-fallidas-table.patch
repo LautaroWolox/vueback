@@ -1,0 +1,13 @@
+diff --git a/src/modules/otFallidasCT/components/Table.vue b/src/modules/otFallidasCT/components/Table.vue
+index fb43963..f31c73a 100644
+--- a/src/modules/otFallidasCT/components/Table.vue
++++ b/src/modules/otFallidasCT/components/Table.vue
+@@ -17,7 +17,7 @@
+       class="fm-pass-grid otf-grid"
+       tableStyle="table-layout: fixed; min-width: 100%; width: max-content"
+       scrollable
+-      scrollHeight="430px"
++      scrollHeight="flex"
+       :rowClass="rowClass"
+       :isDataSelectable="isRowSelectable"
+       :selectAll="allSelectablePageSelected"
