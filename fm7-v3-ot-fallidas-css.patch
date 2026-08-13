@@ -1,0 +1,44 @@
+diff --git a/src/modules/otFallidasCT/components/otf-table.css b/src/modules/otFallidasCT/components/otf-table.css
+index 4eb1c96..d3a0ede 100644
+--- a/src/modules/otFallidasCT/components/otf-table.css
++++ b/src/modules/otFallidasCT/components/otf-table.css
+@@ -1,5 +1,12 @@
+ .otf-grid-shell {
++  width: 100%;
++  height: 100%;
+   min-height: 0;
++  max-height: none;
++  flex: 1 1 auto;
++  display: flex;
++  flex-direction: column;
++  overflow: hidden;
+   border-left-width: 3px !important;
+   background: #fff !important;
+ }
+@@ -8,6 +15,13 @@
+ :deep(#tabla.p-datatable) {
+   width: 100% !important;
+   max-width: 100% !important;
++  height: 100% !important;
++  min-height: 0 !important;
++  max-height: none !important;
++  flex: 1 1 auto !important;
++  display: flex !important;
++  flex-direction: column !important;
++  overflow: hidden !important;
+   border-left: 0 !important;
+   background: #fff !important;
+ }
+@@ -16,8 +30,10 @@
+ :deep(#tabla .p-datatable-wrapper) {
+   width: 100% !important;
+   max-width: 100% !important;
+-  min-height: 186px !important;
+-  max-height: 470px !important;
++  height: auto !important;
++  min-height: 0 !important;
++  max-height: none !important;
++  flex: 1 1 auto !important;
+   overflow: auto !important;
+   border: 1px solid #d1d1d1 !important;
+   background: #fff !important;
