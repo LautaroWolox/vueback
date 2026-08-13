@@ -1,0 +1,158 @@
+diff --git a/src/views/IframeView.vue b/src/views/IframeView.vue
+index 76797bd..a7d87f2 100644
+--- a/src/views/IframeView.vue
++++ b/src/views/IframeView.vue
+@@ -1,21 +1,34 @@
+ <template>
+-  <iframe
+-    ref="iframeRef"
+-    :src="iframeSrc"
+-    :title="titulo"
+-    width="100%"
+-    frameborder="0"
+-    allowfullscreen
+-    class="legacy-iframe"
+-    @load="onIframeLoad"
+-  />
++  <div class="legacy-iframe-shell">
++    <FmTypingLoader
++      v-if="iframeLoading"
++      overlay
++      title="Cargando Información"
++      message="Preparando pantalla"
++    />
++
++    <iframe
++      :key="iframeSrc"
++      ref="iframeRef"
++      :src="iframeSrc"
++      :title="titulo"
++      width="100%"
++      frameborder="0"
++      allowfullscreen
++      class="legacy-iframe"
++      :class="{ 'legacy-iframe--loading': iframeLoading }"
++      @load="onIframeLoad"
++    />
++  </div>
+ </template>
+ 
+ <script setup>
+-import { computed, onUnmounted, ref, watchEffect } from 'vue'
++import { computed, onUnmounted, ref, watch, watchEffect } from 'vue'
+ import router from '@/router'
++import FmTypingLoader from '@/components/shared/FmTypingLoader.vue'
+ import { useLegacyIframeLayout } from '@/composables/useLegacyIframeLayout'
+-import { useLegacyIframeViewport } from '@/composables/useLegacyIframeViewport'
++
++const MIN_LOADER_VISIBLE_MS = 550
+ 
+ const props = defineProps({
+   urlParam: { type: String, required: true },
+@@ -23,29 +36,67 @@ const props = defineProps({
+ })
+ 
+ const iframeRef = ref(null)
++const iframeLoading = ref(true)
+ const { onIframeLoad: applyLegacyLayout } = useLegacyIframeLayout(iframeRef)
+-const { onIframeLoad: applyLegacyViewport } = useLegacyIframeViewport(iframeRef)
+-const onIframeLoad = () => {
+-  applyLegacyLayout()
+-  applyLegacyViewport()
+-}
+ const titulo = computed(() => props.titleParam || sessionStorage.getItem('titleParam') || '')
+ 
++let loadingStartedAt = performance.now()
++let loadGeneration = 0
++let hideLoaderTimer = null
++
+ watchEffect(() => {
+   sessionStorage.setItem('urlParam', props.urlParam)
+   sessionStorage.setItem('titleParam', props.titleParam)
+ })
+ 
+ const iframeSrc = computed(() => {
+-    let pantalla = '';
+-    if (props.urlParam !== undefined) {
+-        pantalla = '/pc' + props.urlParam;
+-    } else {
+-        pantalla = '/pc'  + sessionStorage.getItem('urlParam');
+-    }
+-    return pantalla;
+-});
++  const url = props.urlParam || sessionStorage.getItem('urlParam') || ''
++  return `/pc${url}`
++})
++
++const clearHideLoaderTimer = () => {
++  if (hideLoaderTimer === null) return
++  window.clearTimeout(hideLoaderTimer)
++  hideLoaderTimer = null
++}
++
++watch(iframeSrc, () => {
++  loadGeneration += 1
++  loadingStartedAt = performance.now()
++  clearHideLoaderTimer()
++  iframeLoading.value = true
++}, { immediate: true })
++
++const onIframeLoad = () => {
++  let loadedHref = ''
++
++  try {
++    loadedHref = iframeRef.value?.contentWindow?.location?.href || ''
++  } catch {
++    // Si el navegador no permite leer la URL, el evento load sigue siendo válido.
++  }
++
++  if (loadedHref === 'about:blank') return
+ 
++  const completedGeneration = loadGeneration
++
++  try {
++    applyLegacyLayout()
++  } catch (error) {
++    console.error('Error aplicando layout al iframe legacy:', error)
++  }
++
++  const elapsed = performance.now() - loadingStartedAt
++  const remaining = Math.max(0, MIN_LOADER_VISIBLE_MS - elapsed)
++
++  clearHideLoaderTimer()
++  hideLoaderTimer = window.setTimeout(() => {
++    if (completedGeneration === loadGeneration) {
++      iframeLoading.value = false
++    }
++    hideLoaderTimer = null
++  }, remaining)
++}
+ 
+ function handleRedirect(event) {
+   const origins = new Set([window.location.origin])
+@@ -63,24 +114,7 @@ function handleRedirect(event) {
+ window.addEventListener('message', handleRedirect)
+ 
+ onUnmounted(() => {
++  clearHideLoaderTimer()
+   window.removeEventListener('message', handleRedirect)
+ })
+ </script>
+-
+-<style scoped>
+-.legacy-iframe {
+-  position: fixed;
+-  width: 100%;
+-  height: 100%;
+-  min-height: 420px;
+-  background: #fff;
+-}
+-
+-@media (min-width: 961px) {
+-  .legacy-iframe {
+-    height: 100%;
+-    min-height: 0;
+-    flex: 1 1 auto;
+-  }
+-}
+-</style>
