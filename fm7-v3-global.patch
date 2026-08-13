@@ -1,0 +1,159 @@
+diff --git a/src/assets/css/fm-global.css b/src/assets/css/fm-global.css
+index 4f7cd7d..19a2490 100644
+--- a/src/assets/css/fm-global.css
++++ b/src/assets/css/fm-global.css
+@@ -6212,3 +6212,154 @@ html body .p-dialog.cmo-modificar-dialog .jobtype-relate-button.p-disabled {
+ }
+ /* --- Fin botones CMO --- */
+ /* ===== FIN: cmo-actividad.css ===== */
++
++/* ===== INICIO: fm-principal-grids-full-height.css ===== */
++/*
++ * Alcance: únicamente Registro OTs Fallidas, Reporte SAS e iframes legacy.
++ * Mantiene la grilla principal ocupando todo el alto disponible debajo del menú.
++ */
++@layer fieldmanager {
++  .legacy-iframe-shell {
++    position: relative;
++    width: 100%;
++    min-width: 0;
++    min-height: 0;
++    flex: 1 1 auto;
++    overflow: hidden;
++    background: #fff;
++  }
++
++  .legacy-iframe-shell > .legacy-iframe {
++    width: 100% !important;
++    height: 100% !important;
++    min-width: 0 !important;
++    min-height: 0 !important;
++    max-width: 100% !important;
++    max-height: none !important;
++    display: block !important;
++    margin: 0 !important;
++    border: 0 !important;
++    background: #fff !important;
++  }
++
++  .legacy-iframe-shell > .legacy-iframe--loading {
++    visibility: hidden !important;
++  }
++
++  @media (min-width: 961px) {
++    #app .legacy-iframe-shell,
++    #app .ot-fallidas-ct,
++    #app .report-sas-page {
++      height: var(--fm-desktop-content-height) !important;
++      min-height: 0 !important;
++      max-height: var(--fm-desktop-content-height) !important;
++      box-sizing: border-box !important;
++      overflow: hidden !important;
++    }
++
++    #app .ot-fallidas-ct .fm-accordion,
++    #app .report-sas-page .report-sas-accordion {
++      width: 100% !important;
++      height: 100% !important;
++      min-height: 0 !important;
++      flex: 1 1 auto !important;
++      display: flex !important;
++      flex-direction: column !important;
++      overflow: hidden !important;
++    }
++
++    #app .ot-fallidas-ct--grid-expanded .p-accordionpanel:last-child,
++    #app .report-sas-page .report-sas-results-panel {
++      min-height: 0 !important;
++      flex: 1 1 auto !important;
++      display: flex !important;
++      flex-direction: column !important;
++      overflow: hidden !important;
++    }
++
++    #app .ot-fallidas-ct--grid-expanded .p-accordionpanel:last-child .p-accordioncontent,
++    #app .ot-fallidas-ct--grid-expanded .p-accordionpanel:last-child .p-accordioncontent-content,
++    #app .report-sas-page .report-sas-results-panel .p-accordioncontent,
++    #app .report-sas-page .report-sas-results-panel .p-accordioncontent-content {
++      height: auto !important;
++      min-height: 0 !important;
++      max-height: none !important;
++      flex: 1 1 auto !important;
++      display: flex !important;
++      flex-direction: column !important;
++      overflow: hidden !important;
++    }
++
++    #app .ot-fallidas-ct--grid-expanded .otf-grid-shell,
++    #app .report-sas-page .report-sas-grid-shell,
++    #app .report-sas-page .reporte-sas-table-shell {
++      width: 100% !important;
++      height: auto !important;
++      min-height: 0 !important;
++      max-height: none !important;
++      flex: 1 1 auto !important;
++      display: flex !important;
++      flex-direction: column !important;
++      overflow: hidden !important;
++    }
++
++    #app .ot-fallidas-ct--grid-expanded #tabla,
++    #app .ot-fallidas-ct--grid-expanded #tabla.p-datatable,
++    #app .report-sas-page .reporte-sas-main-grid,
++    #app .report-sas-page .reporte-sas-main-grid.p-datatable {
++      width: 100% !important;
++      height: 100% !important;
++      min-height: 0 !important;
++      max-height: none !important;
++      flex: 1 1 auto !important;
++      display: flex !important;
++      flex-direction: column !important;
++      overflow: hidden !important;
++    }
++
++    #app .ot-fallidas-ct--grid-expanded #tabla :is(
++      .p-datatable-table-container,
++      .p-datatable-wrapper,
++      [data-pc-section='tablecontainer']
++    ),
++    #app .report-sas-page .reporte-sas-main-grid :is(
++      .p-datatable-table-container,
++      .p-datatable-wrapper,
++      [data-pc-section='tablecontainer']
++    ) {
++      height: auto !important;
++      min-height: 0 !important;
++      max-height: none !important;
++      flex: 1 1 auto !important;
++      overflow: auto !important;
++    }
++
++    #app .ot-fallidas-ct--grid-expanded #tabla > .p-paginator,
++    #app .ot-fallidas-ct--grid-expanded #tabla .p-datatable-paginator-bottom,
++    #app .report-sas-page .reporte-sas-main-grid > .p-paginator,
++    #app .report-sas-page .reporte-sas-main-grid .p-datatable-paginator-bottom {
++      flex: 0 0 auto !important;
++    }
++
++    #app .report-sas-page.report-sas-page--fullscreen {
++      position: relative !important;
++      inset: auto !important;
++      width: 100% !important;
++      max-width: 100% !important;
++      height: var(--fm-desktop-content-height) !important;
++      min-height: 0 !important;
++      max-height: var(--fm-desktop-content-height) !important;
++      margin: 0 !important;
++      padding: 0 !important;
++      overflow: hidden !important;
++    }
++  }
++
++  @media (max-width: 960px) {
++    #app .legacy-iframe-shell {
++      height: calc(100dvh - 60px) !important;
++      min-height: 420px !important;
++    }
++  }
++}
++/* ===== FIN: fm-principal-grids-full-height.css ===== */
