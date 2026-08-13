@@ -1,4 +1,5 @@
 <template>
+  <FmTypingLoader v-if="iframeLoading" fullscreen />
   <iframe
     ref="iframeRef"
     :src="iframeSrc"
@@ -13,15 +14,16 @@
 
 <script setup>
 import { computed, ref } from 'vue'
+import FmTypingLoader from '@/components/shared/FmTypingLoader.vue'
 import { useLegacyIframeLayout } from '@/composables/useLegacyIframeLayout'
-import { useLegacyIframeViewport } from '@/composables/useLegacyIframeViewport'
 
 const iframeRef = ref(null)
+const iframeLoading = ref(true)
 const { onIframeLoad: applyLegacyLayout } = useLegacyIframeLayout(iframeRef)
-const { onIframeLoad: applyLegacyViewport } = useLegacyIframeViewport(iframeRef)
+
 const onIframeLoad = () => {
   applyLegacyLayout()
-  applyLegacyViewport()
+  iframeLoading.value = false
 }
 
 const iframeSrc = computed(() =>
@@ -30,25 +32,3 @@ const iframeSrc = computed(() =>
 
 const titulo = `Detalle Acta - ${sessionStorage.getItem('nroActa') || ''}`
 </script>
-
-<style scoped>
-.legacy-iframe {
-  width: 100%;
-  height: calc(100vh - 64px);
-  height: calc(100dvh - 64px);
-  min-width: 0;
-  min-height: 420px;
-  display: block;
-  margin: 0;
-  border: 0;
-  background: #fff;
-}
-
-@media (min-width: 961px) {
-  .legacy-iframe {
-    height: 100%;
-    min-height: 0;
-    flex: 1 1 auto;
-  }
-}
-</style>
