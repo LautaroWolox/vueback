@@ -1,16 +1,12 @@
 diff --git a/src/assets/css/fm-global.css b/src/assets/css/fm-global.css
+index 4f7cd7d..3012b10 100644
 --- a/src/assets/css/fm-global.css
 +++ b/src/assets/css/fm-global.css
-@@
- @media (prefers-reduced-motion: reduce) {
-   body.fm-responsive-legacy *,
-   body.fm-responsive-legacy *::before,
-   body.fm-responsive-legacy *::after {
-     animation-duration: .01ms !important;
-     animation-iteration-count: 1 !important;
+@@ -2257,6 +2257,38 @@ body.fm-responsive-legacy [class*=button-bar] {
      transition-duration: .01ms !important;
    }
  }
++
 +
 +/* --- Grilla principal full-height dentro de iframe legacy --- */
 +/*
@@ -41,4 +37,7 @@ diff --git a/src/assets/css/fm-global.css b/src/assets/css/fm-global.css
 +    max-width: 100% !important;
 +  }
 +}
++
  /* ===== FIN: fm-legacy-responsive.css ===== */
+ 
+ /* ===== INICIO: fm-menu-responsive.css ===== */
