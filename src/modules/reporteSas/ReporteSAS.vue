@@ -1,5 +1,5 @@
 <template>
-  <div class="fm-screen fm-screen--pad report-sas-page report-sas-page--fullscreen">
+  <div class="fm-screen fm-screen--pad report-sas-page">
     <Accordion
       v-model:value="activePanels"
       multiple
@@ -53,10 +53,8 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.report-sas-page,
-.report-sas-page--fullscreen {
+.report-sas-page {
   position: relative;
-  inset: auto;
   width: 100%;
   max-width: 100%;
   height: 100%;
@@ -160,8 +158,7 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 900px) {
-  .report-sas-page,
-  .report-sas-page--fullscreen {
+  .report-sas-page {
     width: 100%;
     height: calc(100dvh - 64px);
     min-height: 420px;
