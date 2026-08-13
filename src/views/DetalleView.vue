@@ -1,33 +1,32 @@
 <template>
-  <Teleport to="body">
-    <FmTypingLoader v-if="iframeLoading" fullscreen />
-  </Teleport>
+  <div class="legacy-iframe-stage">
+    <Teleport to="body">
+      <FmTypingLoader v-if="iframeLoading" fullscreen />
+    </Teleport>
 
-  <iframe
-    :key="iframeSrc"
-    ref="iframeRef"
-    :src="iframeSrc"
-    :title="titulo"
-    width="100%"
-    frameborder="0"
-    allowfullscreen
-    class="legacy-iframe"
-    :class="{ 'legacy-iframe--loading': iframeLoading }"
-    @load="onIframeLoad"
-  />
+    <iframe
+      ref="iframeRef"
+      :src="iframeSrc"
+      :title="titulo"
+      width="100%"
+      frameborder="0"
+      allowfullscreen
+      class="legacy-iframe"
+      :class="{ 'legacy-iframe--loading': iframeLoading }"
+      @load="onIframeLoad"
+    />
+  </div>
 </template>
 
 <script setup>
 import { computed, onUnmounted, ref } from 'vue'
 import FmTypingLoader from '@/components/shared/FmTypingLoader.vue'
 import { useLegacyIframeLayout } from '@/composables/useLegacyIframeLayout'
-import { useLegacyIframeViewport } from '@/composables/useLegacyIframeViewport'
 
 const MIN_LOADER_VISIBLE_MS = 550
 const iframeRef = ref(null)
 const iframeLoading = ref(true)
 const { onIframeLoad: applyLegacyLayout } = useLegacyIframeLayout(iframeRef)
-const { onIframeLoad: applyLegacyViewport } = useLegacyIframeViewport(iframeRef)
 
 let loadingStartedAt = performance.now()
 let hideLoaderTimer = null
@@ -41,6 +40,7 @@ const clearHideLoaderTimer = () => {
 
 const onIframeLoad = () => {
   let loadedHref = ''
+
   try {
     loadedHref = iframeRef.value?.contentWindow?.location?.href || ''
   } catch {
@@ -51,7 +51,6 @@ const onIframeLoad = () => {
 
   try {
     applyLegacyLayout()
-    applyLegacyViewport()
   } catch (error) {
     console.error('Error aplicando layout al detalle legacy:', error)
   }
@@ -72,33 +71,5 @@ const iframeSrc = computed(() =>
 
 const titulo = `Detalle Acta - ${sessionStorage.getItem('nroActa') || ''}`
 
-onUnmounted(() => {
-  clearHideLoaderTimer()
-})
+onUnmounted(clearHideLoaderTimer)
 </script>
-
-<style scoped>
-.legacy-iframe {
-  width: 100%;
-  height: calc(100vh - 64px);
-  height: calc(100dvh - 64px);
-  min-width: 0;
-  min-height: 420px;
-  display: block;
-  margin: 0;
-  border: 0;
-  background: #fff;
-}
-
-.legacy-iframe--loading {
-  visibility: hidden;
-}
-
-@media (min-width: 961px) {
-  .legacy-iframe {
-    height: 100%;
-    min-height: 0;
-    flex: 1 1 auto;
-  }
-}
-</style>
