@@ -1,0 +1,52 @@
+diff --git a/src/modules/reporteSas/components/Tabla.vue b/src/modules/reporteSas/components/Tabla.vue
+--- a/src/modules/reporteSas/components/Tabla.vue
++++ b/src/modules/reporteSas/components/Tabla.vue
+@@ -221,16 +221,24 @@ const exportarExcel = () => {
+ </script>
+ 
+ <style scoped>
+ .reporte-sas-table-shell {
++  position: absolute;
++  inset: 0;
+   width: 100%;
+-  height: 100%;
++  height: auto;
+   min-width: 0;
+   min-height: 0;
+-  flex: 1 1 auto;
+   display: flex;
++  flex-direction: column;
+   overflow: hidden;
+   background: #fff;
+ }
+ 
+ .reporte-sas-main-grid,
+ .reporte-sas-main-grid.p-datatable {
++  position: absolute !important;
++  inset: 0 !important;
+   width: 100% !important;
+-  height: 100% !important;
++  height: auto !important;
+   min-width: 0 !important;
+   min-height: 0 !important;
++  max-height: none !important;
+   flex: 1 1 auto !important;
+   display: flex !important;
+   flex-direction: column !important;
+@@ -242,9 +250,11 @@ const exportarExcel = () => {
+ .reporte-sas-main-grid :deep([data-pc-section='tablecontainer']) {
+   width: 100% !important;
+   min-width: 0 !important;
++  height: auto !important;
+   min-height: 0 !important;
++  max-height: none !important;
+   flex: 1 1 auto !important;
+   overflow: auto !important;
+   background: #fff !important;
+@@ -295,6 +305,7 @@ const exportarExcel = () => {
+   min-height: 40px !important;
+   flex: 0 0 40px !important;
++  margin-top: auto !important;
+   padding: 0 !important;
+   overflow: hidden !important;
+ }
