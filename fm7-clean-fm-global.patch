@@ -1,0 +1,135 @@
+diff --git a/src/assets/css/fm-global.css b/src/assets/css/fm-global.css
+index 4f7cd7d..017d4ac 100644
+--- a/src/assets/css/fm-global.css
++++ b/src/assets/css/fm-global.css
+@@ -2814,37 +2814,44 @@ body > .p-submenu-list .p-menuitem-content:hover {
+ /* Reporte SAS: crece con la cantidad de filas hasta completar la pantalla.
+  * Al alcanzar la altura disponible, conserva el scroll interno de la grilla.
+  */
++#app .report-sas-page,
+ #app .report-sas-page.report-sas-page--fullscreen {
+   position: relative !important;
+   inset: auto !important;
+   width: 100% !important;
+   max-width: 100% !important;
+-  height: min(
+-    var(--fm-report-sas-desired-height, 520px),
+-    calc(100dvh - 82px)
+-  ) !important;
+-  min-height: min(300px, calc(100dvh - 82px)) !important;
++  height: calc(100dvh - 82px) !important;
++  min-height: 0 !important;
+   max-height: calc(100dvh - 82px) !important;
+   margin: 0 !important;
+   padding: 0 !important;
++  display: flex !important;
++  flex-direction: column !important;
+   overflow: hidden !important;
+ }
+ 
+-#app .report-sas-page.report-sas-page--fullscreen .report-sas-accordion,
+-#app .report-sas-page.report-sas-page--fullscreen .report-sas-grid-shell,
+-#app .report-sas-page.report-sas-page--fullscreen .report-sas-grid {
++#app .report-sas-page .report-sas-accordion,
++#app .report-sas-page .report-sas-results-panel,
++#app .report-sas-page .p-accordioncontent,
++#app .report-sas-page .p-accordioncontent-content,
++#app .report-sas-page .report-sas-grid-shell,
++#app .report-sas-page .reporte-sas-table-shell,
++#app .report-sas-page .reporte-sas-main-grid {
+   width: 100% !important;
+   height: 100% !important;
+   min-height: 0 !important;
++  flex: 1 1 auto !important;
+ }
+ 
+-#app .report-sas-page.report-sas-page--fullscreen .report-sas-grid :is(
++#app .report-sas-page .reporte-sas-main-grid :is(
+   .p-datatable-table-container,
+   .p-datatable-wrapper,
+   [data-pc-section='tablecontainer']
+ ) {
+-  flex: 1 1 auto !important;
++  height: auto !important;
+   min-height: 0 !important;
++  max-height: none !important;
++  flex: 1 1 auto !important;
+   overflow: auto !important;
+ }
+ /* ===== FIN: fm-report-sas-auto-height.css ===== */
+@@ -4184,6 +4191,30 @@ html body #app .p-datatable.p-component .fm-grid-empty {
+       min-height: 0 !important;
+       max-height: 100% !important;
+       flex: 1 1 auto !important;
++      display: flex !important;
++      flex-direction: column !important;
++      overflow: hidden !important;
++    }
++
++    #app .ot-fallidas-ct--grid-expanded #tabla,
++    #app .ot-fallidas-ct--grid-expanded #tabla.p-datatable {
++      height: 100% !important;
++      min-height: 0 !important;
++      max-height: 100% !important;
++      flex: 1 1 auto !important;
++      display: flex !important;
++      flex-direction: column !important;
++      overflow: hidden !important;
++    }
++
++    #app .ot-fallidas-ct--grid-expanded #tabla .p-datatable-table-container,
++    #app .ot-fallidas-ct--grid-expanded #tabla .p-datatable-wrapper,
++    #app .ot-fallidas-ct--grid-expanded #tabla [data-pc-section='tablecontainer'] {
++      height: auto !important;
++      min-height: 0 !important;
++      max-height: none !important;
++      flex: 1 1 auto !important;
++      overflow: auto !important;
+     }
+ 
+     #app .busqueda-ots-page--grid-expanded .busqueda-ots-accordion,
+@@ -6212,3 +6243,44 @@ html body .p-dialog.cmo-modificar-dialog .jobtype-relate-button.p-disabled {
+ }
+ /* --- Fin botones CMO --- */
+ /* ===== FIN: cmo-actividad.css ===== */
++
++
++/* ===== AJUSTE FINAL: GRILLAS PRINCIPALES + IFRAME LOADER ===== */
++@layer fieldmanager {
++  .legacy-iframe-stage {
++    position: relative;
++    width: 100%;
++    height: calc(100dvh - 82px);
++    min-width: 0;
++    min-height: 0;
++    flex: 1 1 auto;
++    overflow: hidden;
++    background: #fff;
++  }
++
++  .legacy-iframe-stage .legacy-iframe {
++    position: static !important;
++    width: 100% !important;
++    height: 100% !important;
++    min-width: 0 !important;
++    min-height: 0 !important;
++    max-height: none !important;
++    display: block !important;
++    margin: 0 !important;
++    border: 0 !important;
++    background: #fff !important;
++  }
++
++  .legacy-iframe-stage .legacy-iframe--loading {
++    visibility: hidden !important;
++  }
++
++  @media (min-width: 961px) {
++    .main-layout > .legacy-iframe-stage {
++      height: var(--fm-desktop-content-height) !important;
++      min-height: 0 !important;
++      max-height: var(--fm-desktop-content-height) !important;
++      flex: 1 1 auto !important;
++    }
++  }
++}
