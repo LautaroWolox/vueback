@@ -7,63 +7,75 @@ const GRID_SELECTOR = '.ui-datatable, .dataTables_wrapper, .p-datatable, .ag-roo
 const SCROLL_SELECTOR = '.ui-datatable-scrollable-body, .ui-datatable-tablewrapper, .dataTables_scrollBody, .p-datatable-table-container, .p-datatable-wrapper, .ag-body-viewport, .jqx-grid-content, .ht_master .wtHolder'
 const PAGINATOR_SELECTOR = '.ui-paginator, .p-paginator, .dataTables_paginate, .pagination, .pager'
 
-const visible = (element, view) => {
+const isVisible = (element, view) => {
   if (!element || !view) return false
+
   const rect = element.getBoundingClientRect()
   const style = view.getComputedStyle(element)
-  return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0
+
+  return (
+    style.display !== 'none' &&
+    style.visibility !== 'hidden' &&
+    rect.width > 0 &&
+    rect.height > 0
+  )
 }
 
-const panelContent = (header) => {
+const getPanelContent = (header) => {
   const next = header?.nextElementSibling
   if (next?.matches?.(CONTENT_SELECTOR)) return next
   return header?.parentElement?.querySelector?.(CONTENT_SELECTOR) || null
 }
 
-const mainGrid = (doc, view) => {
+const findMainGrid = (doc, view) => {
   const headers = [...doc.querySelectorAll(HEADER_SELECTOR)]
 
   if (headers.length > 1) {
-    const content = panelContent(headers[1])
-    const grid = content?.querySelector?.(GRID_SELECTOR)
-    if (visible(grid, view)) return grid
+    const secondContent = getPanelContent(headers[1])
+    const secondGrid = secondContent?.querySelector?.(GRID_SELECTOR)
+    if (isVisible(secondGrid, view)) return secondGrid
   }
 
   return [...doc.querySelectorAll(GRID_SELECTOR)]
-    .filter((grid) => visible(grid, view))
+    .filter((grid) => isVisible(grid, view))
     .sort((a, b) => {
-      const ar = a.getBoundingClientRect()
-      const br = b.getBoundingClientRect()
-      return (br.width * br.height) - (ar.width * ar.height)
+      const aRect = a.getBoundingClientRect()
+      const bRect = b.getBoundingClientRect()
+      return (bRect.width * bRect.height) - (aRect.width * aRect.height)
     })[0] || null
 }
 
 export function useLegacyIframeLayout(iframeRef) {
-  let doc = null
+  let currentDocument = null
   let observer = null
   let removeSearchBehavior = null
-  let timer = null
-  let retries = []
+  let updateTimer = null
+  let retryTimers = []
 
   const clearTimers = () => {
-    if (timer) window.clearTimeout(timer)
-    retries.forEach((id) => window.clearTimeout(id))
-    timer = null
-    retries = []
+    if (updateTimer !== null) window.clearTimeout(updateTimer)
+    retryTimers.forEach((timer) => window.clearTimeout(timer))
+    updateTimer = null
+    retryTimers = []
   }
 
   const applyLayout = () => {
+    const doc = currentDocument
     const view = doc?.defaultView
     if (!doc?.body || !view) return
 
-    const grid = mainGrid(doc, view)
+    const grid = findMainGrid(doc, view)
     const scroll = grid?.querySelector?.(SCROLL_SELECTOR)
-    if (!grid || !visible(scroll, view)) return
+
+    if (!grid || !isVisible(scroll, view)) return
 
     const paginator = grid.querySelector(PAGINATOR_SELECTOR)
-    const paginatorHeight = visible(paginator, view) ? paginator.getBoundingClientRect().height : 0
-    const scrollTop = Math.max(0, scroll.getBoundingClientRect().top)
+    const paginatorHeight = isVisible(paginator, view)
+      ? paginator.getBoundingClientRect().height
+      : 0
+
     const viewportHeight = view.innerHeight || doc.documentElement.clientHeight || 0
+    const scrollTop = Math.max(0, scroll.getBoundingClientRect().top)
     const availableHeight = Math.floor(viewportHeight - scrollTop - paginatorHeight - 8)
 
     if (availableHeight < 160) return
@@ -78,47 +90,55 @@ export function useLegacyIframeLayout(iframeRef) {
     scroll.style.setProperty('overflow-y', 'auto', 'important')
   }
 
-  const schedule = () => {
+  const scheduleLayout = () => {
     clearTimers()
-    timer = window.setTimeout(applyLayout, 20)
-    retries = [100, 250, 500, 900].map((delay) => window.setTimeout(applyLayout, delay))
+    updateTimer = window.setTimeout(applyLayout, 20)
+    retryTimers = [100, 250, 500, 900].map((delay) =>
+      window.setTimeout(applyLayout, delay)
+    )
   }
 
   const cleanup = () => {
     clearTimers()
+
     observer?.disconnect()
     observer = null
+
     removeSearchBehavior?.()
     removeSearchBehavior = null
-    doc?.removeEventListener('click', schedule, true)
-    doc?.defaultView?.removeEventListener('resize', schedule)
-    doc = null
+
+    currentDocument?.removeEventListener('click', scheduleLayout, true)
+    currentDocument?.defaultView?.removeEventListener('resize', scheduleLayout)
+
+    currentDocument = null
   }
 
   const onIframeLoad = () => {
     cleanup()
 
     try {
-      doc = iframeRef.value?.contentDocument || iframeRef.value?.contentWindow?.document
+      currentDocument = iframeRef.value?.contentDocument || iframeRef.value?.contentWindow?.document
     } catch {
+      currentDocument = null
       return
     }
 
-    if (!doc?.body) return
+    if (!currentDocument?.body) return
 
-    removeSearchBehavior = installAccordionSearchBehavior(doc)
-    doc.addEventListener('click', schedule, true)
-    doc.defaultView?.addEventListener('resize', schedule)
+    removeSearchBehavior = installAccordionSearchBehavior(currentDocument)
 
-    observer = new MutationObserver(schedule)
-    observer.observe(doc.body, {
+    currentDocument.addEventListener('click', scheduleLayout, true)
+    currentDocument.defaultView?.addEventListener('resize', scheduleLayout)
+
+    observer = new MutationObserver(scheduleLayout)
+    observer.observe(currentDocument.body, {
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ['class', 'style', 'hidden', 'aria-expanded']
+      attributeFilter: ['class', 'hidden', 'aria-expanded']
     })
 
-    schedule()
+    scheduleLayout()
   }
 
   onBeforeUnmount(cleanup)
