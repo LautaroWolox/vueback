@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="fm-screen fm-screen--pad report-sas-page"
-    :class="{ 'report-sas-page--fullscreen': store.hasRows }"
-  >
+  <div class="fm-screen fm-screen--pad report-sas-page report-sas-page--fullscreen">
     <Accordion
       v-model:value="activePanels"
       multiple
@@ -56,30 +53,23 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.report-sas-page {
+.report-sas-page,
+.report-sas-page--fullscreen {
+  position: relative;
+  inset: auto;
   width: 100%;
-  height: calc(100dvh - 82px);
-  min-height: 520px;
+  max-width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  background: #fff;
-  color: #111;
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-.report-sas-page--fullscreen {
-  position: fixed;
-  inset: 82px 0 0;
-  z-index: 1;
-  width: 100vw;
-  max-width: 100vw;
-  height: calc(100dvh - 82px);
-  min-height: 0;
   margin: 0;
   padding: 0;
   overflow: hidden;
   background: #fff;
+  color: #111;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .report-sas-accordion,
@@ -125,10 +115,33 @@ onBeforeUnmount(() => {
   height: 100%;
   min-width: 0;
   min-height: 0;
+  max-height: 100%;
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+.report-sas-page :deep(.reporte-sas-table-shell),
+.report-sas-page :deep(.reporte-sas-main-grid) {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.report-sas-page :deep(.reporte-sas-main-grid .p-datatable-table-container),
+.report-sas-page :deep(.reporte-sas-main-grid .p-datatable-wrapper),
+.report-sas-page :deep(.reporte-sas-main-grid [data-pc-section="tablecontainer"]) {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 1 1 auto !important;
+  overflow: auto !important;
 }
 
 .report-sas-error {
@@ -149,7 +162,6 @@ onBeforeUnmount(() => {
 @media (max-width: 900px) {
   .report-sas-page,
   .report-sas-page--fullscreen {
-    position: static;
     width: 100%;
     height: calc(100dvh - 64px);
     min-height: 420px;
