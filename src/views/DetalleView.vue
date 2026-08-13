@@ -1,5 +1,10 @@
 <template>
+  <Teleport to="body">
+    <FmTypingLoader v-if="iframeLoading" fullscreen />
+  </Teleport>
+
   <iframe
+    :key="iframeSrc"
     ref="iframeRef"
     :src="iframeSrc"
     :title="titulo"
@@ -7,21 +12,58 @@
     frameborder="0"
     allowfullscreen
     class="legacy-iframe"
+    :class="{ 'legacy-iframe--loading': iframeLoading }"
     @load="onIframeLoad"
   />
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onUnmounted, ref } from 'vue'
+import FmTypingLoader from '@/components/shared/FmTypingLoader.vue'
 import { useLegacyIframeLayout } from '@/composables/useLegacyIframeLayout'
 import { useLegacyIframeViewport } from '@/composables/useLegacyIframeViewport'
 
+const MIN_LOADER_VISIBLE_MS = 550
 const iframeRef = ref(null)
+const iframeLoading = ref(true)
 const { onIframeLoad: applyLegacyLayout } = useLegacyIframeLayout(iframeRef)
 const { onIframeLoad: applyLegacyViewport } = useLegacyIframeViewport(iframeRef)
+
+let loadingStartedAt = performance.now()
+let hideLoaderTimer = null
+
+const clearHideLoaderTimer = () => {
+  if (hideLoaderTimer !== null) {
+    window.clearTimeout(hideLoaderTimer)
+    hideLoaderTimer = null
+  }
+}
+
 const onIframeLoad = () => {
-  applyLegacyLayout()
-  applyLegacyViewport()
+  let loadedHref = ''
+  try {
+    loadedHref = iframeRef.value?.contentWindow?.location?.href || ''
+  } catch {
+    // Si el navegador no permite leer la URL, el evento load sigue siendo válido.
+  }
+
+  if (loadedHref === 'about:blank') return
+
+  try {
+    applyLegacyLayout()
+    applyLegacyViewport()
+  } catch (error) {
+    console.error('Error aplicando layout al detalle legacy:', error)
+  }
+
+  const elapsed = performance.now() - loadingStartedAt
+  const remaining = Math.max(0, MIN_LOADER_VISIBLE_MS - elapsed)
+
+  clearHideLoaderTimer()
+  hideLoaderTimer = window.setTimeout(() => {
+    iframeLoading.value = false
+    hideLoaderTimer = null
+  }, remaining)
 }
 
 const iframeSrc = computed(() =>
@@ -29,6 +71,10 @@ const iframeSrc = computed(() =>
 )
 
 const titulo = `Detalle Acta - ${sessionStorage.getItem('nroActa') || ''}`
+
+onUnmounted(() => {
+  clearHideLoaderTimer()
+})
 </script>
 
 <style scoped>
@@ -42,6 +88,10 @@ const titulo = `Detalle Acta - ${sessionStorage.getItem('nroActa') || ''}`
   margin: 0;
   border: 0;
   background: #fff;
+}
+
+.legacy-iframe--loading {
+  visibility: hidden;
 }
 
 @media (min-width: 961px) {
