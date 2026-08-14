@@ -1,7 +1,10 @@
 .otf-grid-shell {
+  --otf-header-height: 34px;
+  position: relative;
   min-height: 0;
   border-left-width: 3px !important;
   background: #fff !important;
+  isolation: isolate;
 }
 
 :deep(#tabla.fm-pass-grid),
@@ -14,6 +17,7 @@
 
 :deep(#tabla .p-datatable-table-container),
 :deep(#tabla .p-datatable-wrapper) {
+  position: relative !important;
   width: 100% !important;
   max-width: 100% !important;
   min-height: 186px !important;
@@ -21,14 +25,26 @@
   overflow: auto !important;
   border: 1px solid #d1d1d1 !important;
   background: #fff !important;
+  isolation: isolate;
 }
 
 :deep(#tabla .p-datatable-table) {
   width: max-content !important;
   min-width: 100% !important;
   table-layout: fixed !important;
-  border-collapse: collapse !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
   font-size: 12px !important;
+}
+
+:deep(#tabla .p-datatable-thead) {
+  position: relative !important;
+  z-index: 30 !important;
+}
+
+:deep(#tabla .p-datatable-tbody) {
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 :deep(#tabla .p-datatable-thead > tr > th),
@@ -49,6 +65,14 @@
   color: #263f50 !important;
   font-size: 11px !important;
   font-weight: 700 !important;
+}
+
+:deep(#tabla .p-datatable-thead > tr:first-child > th) {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 40 !important;
+  background: #f4f7f9 !important;
+  background-clip: padding-box !important;
 }
 
 :deep(#tabla .p-column-header-content),
@@ -95,10 +119,21 @@
 
 :deep(#tabla .p-datatable-thead > tr.p-datatable-filter-row > th),
 :deep(#tabla .p-datatable-thead > tr.p-filter-row > th) {
+  position: sticky !important;
+  top: var(--otf-header-height) !important;
+  z-index: 39 !important;
   height: 33px !important;
   min-height: 33px !important;
   padding: 3px 5px !important;
   overflow: visible !important;
+  background: #fff !important;
+  background-color: #fff !important;
+  background-clip: padding-box !important;
+  box-shadow: 0 1px 0 #c9d3da;
+}
+
+:deep(#tabla .p-datatable-thead > tr.p-datatable-filter-row),
+:deep(#tabla .p-datatable-thead > tr.p-filter-row) {
   background: #fff !important;
 }
 
