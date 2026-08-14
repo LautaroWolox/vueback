@@ -5,25 +5,34 @@ $content = Get-Content -Raw -Path $path
 $marker = '/* ===== FIN: fm-menu-submenu-compact.css ===== */'
 if (-not $content.Contains($marker)) { throw 'No se encontro el cierre de fm-menu-submenu-compact.css' }
 
-# Limpia todos los intentos anteriores de separacion/gutter para que no compitan.
-$content = [regex]::Replace(
-  $content,
-  '(?s)/\* (?:Conserva el margen visual|Conserva el margen blanco|Separa el segundo nivel|Gutter blanco real).*?\*/.*?(?=(?:/\* ===== FIN: fm-menu-submenu-compact\.css ===== \*/)|(?:/\* (?:Conserva el margen visual|Conserva el margen blanco|Separa el segundo nivel|Gutter blanco real)))',
-  ''
+# Elimina todos los ajustes experimentales anteriores de este cambio.
+$comments = @(
+  'Conserva el margen visual del primer submenu cuando abre un segundo nivel.',
+  'Conserva el margen blanco entre el primer submenu y el segundo nivel.',
+  'Separa el segundo nivel sin recortar ni desplazar el panel padre.',
+  'Gutter blanco real entre submenu padre y segundo nivel.',
+  'Separacion limpia del submenu de segundo nivel.',
+  'El item que contiene otro submenu debe ser referencia de posicionamiento.',
+  'Segundo nivel: queda 6 px por fuera del panel padre, sin alterar su ancho.',
+  'El hijo arranca despues del gutter blanco del panel padre.',
+  'Ajuste definitivo del submenu de segundo nivel.'
 )
+
+foreach ($comment in $comments) {
+  $escaped = [regex]::Escape($comment)
+  $content = [regex]::Replace(
+    $content,
+    "(?s)/\*\s*$escaped\s*\*/\s*[^{}]+\{[^{}]*\}\s*",
+    ''
+  )
+}
+
+# Revierte propiedades experimentales que pudieron quedar en el bloque global de submenu.
+$content = $content -replace '(?m)^\s*padding-right:\s*6px\s*!important;\s*$', ''
 
 $block = @'
 
-/* Separacion limpia del submenu de segundo nivel. */
-#app .main-menu .p-menubar-submenu,
-#app .main-menu .p-submenu-list {
-  padding-right: 0 !important;
-  background: #fff !important;
-  box-sizing: border-box !important;
-  overflow: visible !important;
-}
-
-/* El item que contiene otro submenu debe ser referencia de posicionamiento. */
+/* Ajuste definitivo del submenu de segundo nivel. */
 #app .main-menu .p-menubar-submenu > .p-menubar-item,
 #app .main-menu .p-menubar-submenu > .p-menuitem,
 #app .main-menu .p-submenu-list > .p-menubar-item,
@@ -32,7 +41,6 @@ $block = @'
   overflow: visible !important;
 }
 
-/* Segundo nivel: queda 6 px por fuera del panel padre, sin alterar su ancho. */
 #app .main-menu .p-menubar-submenu > .p-menubar-item > .p-menubar-submenu,
 #app .main-menu .p-menubar-submenu > .p-menubar-item > .p-submenu-list,
 #app .main-menu .p-menubar-submenu > .p-menuitem > .p-menubar-submenu,
@@ -41,15 +49,18 @@ $block = @'
 #app .main-menu .p-submenu-list > .p-menubar-item > .p-submenu-list,
 #app .main-menu .p-submenu-list > .p-menuitem > .p-menubar-submenu,
 #app .main-menu .p-submenu-list > .p-menuitem > .p-submenu-list {
+  top: -3px !important;
   left: 100% !important;
   right: auto !important;
-  margin: 0 !important;
-  top: -3px !important;
-  translate: 6px 0 !important;
+  margin: 0 0 0 6px !important;
+  padding-right: 0 !important;
+  transform: none !important;
+  translate: none !important;
+  overflow: visible !important;
 }
 
 '@
 
 $content = $content.Replace($marker, $block + $marker)
 Set-Content -Path $path -Value $content -Encoding utf8
-Write-Host 'Submenus limpiados y separados correctamente.'
+Write-Host 'Submenu nivel 2 corregido: panel padre intacto y separacion blanca de 6px.'
