@@ -64,6 +64,20 @@ const PAGINATOR_SELECTORS = [
   '.pager'
 ]
 
+const NATIVE_ACCORDION_PATHS = new Set(['/gestionOperadores.html'])
+
+const getIframePathname = (iframe) => {
+  try {
+    return iframe?.contentWindow?.location?.pathname || new URL(iframe?.src || '', window.location.href).pathname
+  } catch {
+    try {
+      return new URL(iframe?.src || '', window.location.href).pathname
+    } catch {
+      return ''
+    }
+  }
+}
+
 const isVisible = (element, view) => {
   if (!element || !view) return false
   const rect = element.getBoundingClientRect()
@@ -213,15 +227,20 @@ export function useLegacyIframeLayout(iframeRef) {
 
   const onIframeLoad = () => {
     cleanup()
+    const iframe = iframeRef.value
     try {
-      currentDocument = iframeRef.value?.contentDocument || iframeRef.value?.contentWindow?.document
+      currentDocument = iframe?.contentDocument || iframe?.contentWindow?.document
     } catch {
       currentDocument = null
       return
     }
     if (!currentDocument?.body) return
 
-    removeSearchBehavior = installAccordionSearchBehavior(currentDocument)
+    const keepsNativeAccordion = NATIVE_ACCORDION_PATHS.has(getIframePathname(iframe))
+    if (!keepsNativeAccordion) {
+      removeSearchBehavior = installAccordionSearchBehavior(currentDocument)
+    }
+
     currentDocument.addEventListener('click', scheduleLayout, true)
     currentDocument.addEventListener('submit', scheduleLayout, true)
     currentDocument.defaultView?.addEventListener('resize', scheduleLayout)
