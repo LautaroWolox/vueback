@@ -7,54 +7,9 @@
     :aria-label="accessibleMessage"
   >
     <div class="fm-typing-loader__box">
-      <svg class="fm-typing-loader__image" viewBox="0 0 180 120" aria-hidden="true">
-        <defs>
-          <clipPath id="fm-code-screen-clip">
-            <rect x="27" y="27" width="76" height="39" rx="3" />
-          </clipPath>
-        </defs>
-
-        <rect x="14" y="14" width="102" height="66" rx="7" fill="#e8fbfd" stroke="#00a9bd" stroke-width="4" />
-        <rect x="27" y="27" width="76" height="39" rx="3" fill="#173142" />
-
-        <g clip-path="url(#fm-code-screen-clip)">
-          <g class="fm-code-stream">
-            <path class="fm-code-line fm-code-line--1" d="M38 34h25" />
-            <path class="fm-code-line fm-code-line--2" d="M38 43h41" />
-            <path class="fm-code-line fm-code-line--3" d="M38 52h18" />
-            <path class="fm-code-line fm-code-line--4" d="M38 61h34" />
-            <path class="fm-code-line fm-code-line--5" d="M38 70h27" />
-            <path class="fm-code-line fm-code-line--6" d="M38 79h43" />
-          </g>
-          <rect class="fm-code-cursor" x="82" y="57" width="3" height="6" rx="1" fill="#ffffff" />
-          <rect class="fm-screen-scan" x="27" y="27" width="76" height="8" fill="rgba(99, 227, 238, .13)" />
-        </g>
-
-        <path d="M65 80v14M44 94h42" stroke="#173142" stroke-width="4" stroke-linecap="round" />
-        <circle cx="138" cy="38" r="13" fill="#f5b47e" />
-        <path d="M127 35c2-12 23-16 27-1-6-2-10-5-14-8-2 5-6 8-13 9Z" fill="#263746" />
-        <path d="M122 61c5-13 28-14 34 0l7 31h-47l6-31Z" fill="#00a9bd" />
-
-        <g class="fm-typing-arm fm-typing-arm--left">
-          <path d="M125 66 99 82" stroke="#f5b47e" stroke-width="7" stroke-linecap="round" />
-          <path d="m97 82 13 5" stroke="#263746" stroke-width="5" stroke-linecap="round" />
-        </g>
-
-        <g class="fm-typing-arm fm-typing-arm--right">
-          <path d="M153 66 128 83" stroke="#f5b47e" stroke-width="7" stroke-linecap="round" />
-          <path d="m128 83-13 4" stroke="#263746" stroke-width="5" stroke-linecap="round" />
-        </g>
-
-        <g class="fm-keyboard-keys" fill="#00a9bd">
-          <rect x="94" y="87" width="5" height="2" rx="1" />
-          <rect x="102" y="89" width="5" height="2" rx="1" />
-          <rect x="110" y="87" width="5" height="2" rx="1" />
-          <rect x="118" y="89" width="5" height="2" rx="1" />
-          <rect x="126" y="87" width="5" height="2" rx="1" />
-        </g>
-
-        <path d="M126 92v17M151 92v17" stroke="#263746" stroke-width="8" stroke-linecap="round" />
-      </svg>
+      <div class="fm-brand-spinner" aria-hidden="true">
+        <span class="fm-brand-spinner__core"></span>
+      </div>
 
       <strong v-if="showTitle && displayTitle" class="fm-typing-loader__title">{{ displayTitle }}</strong>
       <div v-if="showMessage" class="fm-typing-loader__message">
@@ -68,8 +23,8 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
-const GLOBAL_TITLE = 'Cargando Información'
-const GLOBAL_MESSAGE = 'Preparando Grilla'
+const GLOBAL_TITLE = 'Cargando información'
+const GLOBAL_MESSAGE = 'Aguarde unos instantes'
 
 const props = defineProps({
   title: { type: String, default: GLOBAL_TITLE },
@@ -108,106 +63,58 @@ const loaderClasses = computed(() => ({
 </script>
 
 <style scoped>
-.fm-code-line {
-  fill: none;
-  stroke: #63e3ee;
-  stroke-width: 3.5;
-  stroke-linecap: round;
-  stroke-dasharray: 48;
-  stroke-dashoffset: 48;
-  animation: fm-code-write 1.55s ease-in-out infinite;
+.fm-brand-spinner {
+  position: relative;
+  width: 82px;
+  height: 82px;
+  margin: 2px 0 8px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from -18deg,
+    #16c7d9 0deg,
+    #00a9bd 72deg,
+    #1689d8 145deg,
+    #4657d9 218deg,
+    #7b3ed8 286deg,
+    #e3268e 332deg,
+    transparent 332deg 360deg
+  );
+  box-shadow:
+    0 0 0 7px rgba(0, 169, 189, .07),
+    0 8px 22px rgba(37, 67, 128, .16);
+  animation: fm-brand-spinner-rotate .92s linear infinite;
 }
 
-.fm-code-line--2 { animation-delay: .12s; }
-.fm-code-line--3 { animation-delay: .24s; }
-.fm-code-line--4 { animation-delay: .36s; }
-.fm-code-line--5 { animation-delay: .48s; }
-.fm-code-line--6 { animation-delay: .60s; }
-
-.fm-code-stream {
-  animation: fm-code-scroll 2.2s ease-in-out infinite;
+.fm-brand-spinner::before {
+  content: '';
+  position: absolute;
+  inset: 9px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px rgba(31, 62, 89, .06);
 }
 
-.fm-code-cursor {
-  animation: fm-cursor-blink .65s steps(2, end) infinite;
+.fm-brand-spinner__core {
+  position: absolute;
+  inset: 24px;
+  z-index: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 30%,
+    rgba(22, 199, 217, .22),
+    rgba(70, 87, 217, .10) 52%,
+    rgba(227, 38, 142, .08) 72%,
+    transparent 73%
+  );
 }
 
-.fm-screen-scan {
-  animation: fm-screen-scan 1.6s linear infinite;
-}
-
-.fm-typing-arm {
-  transform-box: fill-box;
-}
-
-.fm-typing-arm--left {
-  transform-origin: 95% 18%;
-  animation: fm-type-left .42s ease-in-out infinite alternate;
-}
-
-.fm-typing-arm--right {
-  transform-origin: 8% 16%;
-  animation: fm-type-right .42s ease-in-out .21s infinite alternate;
-}
-
-.fm-keyboard-keys rect {
-  animation: fm-key-press .84s ease-in-out infinite;
-}
-
-.fm-keyboard-keys rect:nth-child(2) { animation-delay: .12s; }
-.fm-keyboard-keys rect:nth-child(3) { animation-delay: .24s; }
-.fm-keyboard-keys rect:nth-child(4) { animation-delay: .36s; }
-.fm-keyboard-keys rect:nth-child(5) { animation-delay: .48s; }
-
-@keyframes fm-code-write {
-  0% { stroke-dashoffset: 48; opacity: .30; }
-  45%, 78% { stroke-dashoffset: 0; opacity: 1; }
-  100% { stroke-dashoffset: -48; opacity: .22; }
-}
-
-@keyframes fm-code-scroll {
-  0%, 36% { transform: translateY(0); }
-  65%, 100% { transform: translateY(-18px); }
-}
-
-@keyframes fm-cursor-blink {
-  0%, 45% { opacity: 1; }
-  46%, 100% { opacity: 0; }
-}
-
-@keyframes fm-screen-scan {
-  from { transform: translateY(-9px); }
-  to { transform: translateY(47px); }
-}
-
-@keyframes fm-type-left {
-  from { transform: rotate(2deg) translateY(0); }
-  to { transform: rotate(-5deg) translateY(2px); }
-}
-
-@keyframes fm-type-right {
-  from { transform: rotate(-2deg) translateY(1px); }
-  to { transform: rotate(5deg) translateY(-1px); }
-}
-
-@keyframes fm-key-press {
-  0%, 55%, 100% { opacity: .30; transform: translateY(0); }
-  20%, 40% { opacity: 1; transform: translateY(1px); }
+@keyframes fm-brand-spinner-rotate {
+  to { transform: rotate(360deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fm-code-line,
-  .fm-code-stream,
-  .fm-code-cursor,
-  .fm-screen-scan,
-  .fm-typing-arm,
-  .fm-keyboard-keys rect {
-    animation: none !important;
-  }
-
-  .fm-code-line {
-    stroke-dashoffset: 0;
-    opacity: 1;
+  .fm-brand-spinner {
+    animation-duration: 2.4s;
   }
 }
 </style>
