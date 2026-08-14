@@ -45,9 +45,10 @@ const isNotebookEnvironment = (view) => {
   const finePointer = Boolean(view.matchMedia?.('(pointer: fine)')?.matches)
   const coarsePointer = Boolean(view.matchMedia?.('(pointer: coarse)')?.matches)
 
-  // screen.width no cae con el zoom del navegador. Así una notebook de 1366 px
-  // sigue siendo tratada como notebook aunque a 150% tenga ~910 CSS px de viewport.
-  return screenWidth >= 900 && screenHeight >= 560 && (finePointer || !coarsePointer)
+  // El zoom del navegador reduce innerWidth, pero no debe convertir una notebook
+  // en tablet/móvil. Los umbrales bajos también contemplan escalado de Windows
+  // 125%/150% en equipos 1280x720 y 1366x768.
+  return screenWidth >= 800 && screenHeight >= 480 && (finePointer || !coarsePointer)
 }
 
 const applyViewportProfile = (iframe, document) => {
