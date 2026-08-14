@@ -1,0 +1,15 @@
+diff --git a/src/assets/css/fm-global.css b/src/assets/css/fm-global.css
+--- a/src/assets/css/fm-global.css
++++ b/src/assets/css/fm-global.css
+@@ -6,4 +6,11 @@
+   background: #fff !important;
+ }
+ 
++/* Conserva el margen visual del primer submenu cuando abre un segundo nivel. */
++#app .main-menu .p-menubar-submenu .p-menubar-submenu,
++#app .main-menu .p-submenu-list .p-submenu-list {
++  margin-top: 0 !important;
++  margin-left: 4px !important;
++}
++
+ #app .main-menu .p-menubar-submenu .p-menubar-item,
