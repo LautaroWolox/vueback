@@ -1,6 +1,13 @@
 <template>
   <div class="legacy-iframe-stage legacy-iframe-stage--detail">
-    <FmTypingLoader v-if="iframeLoading" overlay title="Cargando Información" message="Preparando pantalla" />
+    <FmTypingLoader
+      v-if="iframeLoading"
+      overlay
+      variant="detail"
+      title="Cargando detalle"
+      message="Preparando el detalle del acta"
+    />
+
     <iframe
       :key="iframeSrc"
       ref="iframeRef"
