@@ -12,11 +12,6 @@
         ¿Confirma que desea incluir OT seleccionada?
       </p>
 
-      <div v-if="existingNote" class="otf-existing-notes">
-        <span class="otf-existing-notes__label">Nota existente</span>
-        <div class="otf-existing-notes__content">{{ existingNote }}</div>
-      </div>
-
       <div class="fm-field otf-include-motivo-field">
         <label for="motivo-inclusion">Motivo</label>
         <FmCompactSelect
@@ -37,6 +32,11 @@
           :max-panel-height="150"
         />
         <span v-else-if="status.motivos === 'error'" class="fm-field-error">Error al cargar.</span>
+      </div>
+
+      <div v-if="existingNote" class="otf-existing-notes">
+        <span class="otf-existing-notes__label">Nota existente</span>
+        <div class="otf-existing-notes__content">{{ existingNote }}</div>
       </div>
 
       <div class="fm-field otf-include-comment-field">
