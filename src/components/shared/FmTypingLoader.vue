@@ -108,12 +108,67 @@ const loaderClasses = computed(() => ({
   );
 }
 
+/* Variante exclusiva para la carga del perfil al volver del login/2FA. */
+.fm-typing-loader--profile .fm-brand-spinner {
+  width: 88px;
+  height: 88px;
+  margin-bottom: 10px;
+  background: conic-gradient(
+    from -24deg,
+    #16c7d9 0deg,
+    #00a9bd 78deg,
+    #198bd8 145deg,
+    #5362e6 218deg,
+    #8a43dc 286deg,
+    #e3268e 334deg,
+    transparent 334deg 360deg
+  );
+  box-shadow:
+    0 0 0 7px rgba(0, 169, 189, .06),
+    0 9px 24px rgba(43, 62, 127, .17);
+  animation-duration: 1.05s;
+}
+
+.fm-typing-loader--profile .fm-brand-spinner::before {
+  inset: 7px;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px rgba(31, 62, 89, .05);
+}
+
+.fm-typing-loader--profile .fm-brand-spinner__core {
+  inset: 17px;
+  background: conic-gradient(
+    from 150deg,
+    #e3268e 0deg,
+    #8a43dc 92deg,
+    #5362e6 165deg,
+    #198bd8 238deg,
+    #16c7d9 310deg,
+    transparent 310deg 360deg
+  );
+  box-shadow: 0 0 12px rgba(83, 98, 230, .09);
+  animation: fm-profile-spinner-counter 1.35s linear infinite reverse;
+}
+
+.fm-typing-loader--profile .fm-brand-spinner__core::before {
+  content: '';
+  position: absolute;
+  inset: 7px;
+  border-radius: 50%;
+  background: #fff;
+}
+
 @keyframes fm-brand-spinner-rotate {
   to { transform: rotate(360deg); }
 }
 
+@keyframes fm-profile-spinner-counter {
+  to { transform: rotate(360deg); }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .fm-brand-spinner {
+  .fm-brand-spinner,
+  .fm-typing-loader--profile .fm-brand-spinner__core {
     animation-duration: 2.4s;
   }
 }

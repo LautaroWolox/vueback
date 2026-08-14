@@ -2,8 +2,9 @@
   <FmTypingLoader
     v-if="loadingUser"
     fullscreen
+    variant="profile"
     title="Cargando perfil"
-    :show-message="false"
+    message="Aguarde unos instantes"
   />
 
   <div v-else class="login-page">
