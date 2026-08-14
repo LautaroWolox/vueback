@@ -34,9 +34,8 @@ const useEmulacionStore = defineStore('emulacionStore', {
             this.legajoSelected = String(selection ?? '').trim()
         },
 
-        $setActiveTab(value) {
-            const values = Array.isArray(value) ? value : [value]
-            this.activeTab = values.map(String)
+        $setActiveTab() {
+            this.activeTab = ['0']
         },
 
         $resetFilters() {
@@ -100,7 +99,7 @@ const useEmulacionStore = defineStore('emulacionStore', {
                     return
                 }
 
-                this.$setActiveTab(['0', '1'])
+                this.$setActiveTab()
                 this.$requestConfirmation(rows[0])
             } catch (error) {
                 this.error_code = 500
