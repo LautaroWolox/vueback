@@ -1,0 +1,11 @@
+diff --git a/src/components/CustomMenu.vue b/src/components/CustomMenu.vue
+--- a/src/components/CustomMenu.vue
++++ b/src/components/CustomMenu.vue
+@@ -1,5 +1,6 @@
+ :deep(.p-menubar-submenu .p-menubar-submenu),
+ :deep(.p-submenu-list .p-submenu-list) {
+   min-width: 276px !important;
+-  margin-top: -3px !important;
++  margin-top: 0 !important;
++  margin-left: 4px !important;
+ }
