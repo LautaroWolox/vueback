@@ -15,6 +15,19 @@ const legacyResponsiveCss = globalCss
   .trim()
 
 const STYLE_ID = 'fm-legacy-responsive-styles'
+const NATIVE_CONTROLS_PATHS = new Set(['/gestionOperadores.html'])
+
+const getIframePathname = (iframe) => {
+  try {
+    return iframe.contentWindow?.location?.pathname || new URL(iframe.src, window.location.href).pathname
+  } catch {
+    try {
+      return new URL(iframe.src, window.location.href).pathname
+    } catch {
+      return ''
+    }
+  }
+}
 
 const applyResponsiveStyles = (iframe) => {
   try {
@@ -22,6 +35,10 @@ const applyResponsiveStyles = (iframe) => {
     if (!document?.head || !document?.body) return
 
     document.body.classList.add('fm-responsive-legacy')
+    document.body.classList.toggle(
+      'fm-legacy-native-controls',
+      NATIVE_CONTROLS_PATHS.has(getIframePathname(iframe))
+    )
 
     let style = document.getElementById(STYLE_ID)
     if (!style) {
