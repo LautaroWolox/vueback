@@ -7,8 +7,13 @@
       message="Consultando la información del legajo"
     />
 
-    <Accordion :value="['0']" multiple class="fm-accordion emulation-accordion">
-      <AccordionPanel value="0" class="emulation-filter-panel">
+    <Accordion
+      :value="store.activeTab"
+      multiple
+      class="fm-accordion emulation-accordion"
+      @update:value="store.$setActiveTab"
+    >
+      <AccordionPanel value="0" disabled class="emulation-filter-panel">
         <AccordionHeader>
           <span class="emulation-accordion__title">FILTROS DE BÚSQUEDA</span>
         </AccordionHeader>
