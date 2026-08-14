@@ -7,14 +7,9 @@
       message="Consultando la información del legajo"
     />
 
-    <Accordion
-      :value="store.activeTab"
-      multiple
-      class="fm-accordion emulation-accordion"
-      @update:value="store.$setActiveTab"
-    >
-      <AccordionPanel value="0" disabled class="emulation-filter-panel">
-        <AccordionHeader>
+    <Accordion value="0" class="fm-accordion emulation-accordion">
+      <AccordionPanel value="0" class="emulation-filter-panel">
+        <AccordionHeader class="emulation-accordion__header-locked">
           <span class="emulation-accordion__title">FILTROS DE BÚSQUEDA</span>
         </AccordionHeader>
         <AccordionContent>
@@ -55,6 +50,10 @@ const store = emulacionStore()
   min-height: 32px;
   padding: 6px 12px;
   border-radius: 4px 4px 0 0;
+}
+
+.emulation-accordion__header-locked {
+  pointer-events: none;
 }
 
 .emulation-filter-panel :deep(.p-accordioncontent-content) {
