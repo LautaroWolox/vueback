@@ -18,7 +18,7 @@
     <FmTypingLoader
       v-if="loading"
       overlay
-      variant="grid"
+      :variant="loadingVariant"
       :title="loadingTitle"
       :message="loadingMessage"
     />
@@ -29,7 +29,8 @@
 defineProps({
   title: { type: String, default: '' },
   loading: { type: Boolean, default: false },
-  loadingTitle: { type: String, default: 'Cargando Información' },
-  loadingMessage: { type: String, default: 'Preparando Grilla' }
+  loadingVariant: { type: String, default: 'auto' },
+  loadingTitle: { type: String, default: '' },
+  loadingMessage: { type: String, default: '' }
 })
 </script>
