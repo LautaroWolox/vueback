@@ -62,6 +62,14 @@ $plugin = $plugin.Replace(
 
 [System.IO.File]::WriteAllText($pluginPath, $plugin, $utf8NoBom)
 
+# 4) Zoom reversible de dialogs: cualquier geometria inline aplicada a 150/175/200%
+# se restaura antes de recalcular. Al volver a 100% el JSP recupera su popup original.
+$reversibleScript = git show "${remoteRef}:apply-legacy-dialog-zoom-reversible.ps1"
+if ($LASTEXITCODE -ne 0 -or -not $reversibleScript) {
+  throw 'No se pudo leer apply-legacy-dialog-zoom-reversible.ps1 desde github-origen.'
+}
+Invoke-Expression ($reversibleScript -join "`r`n")
+
 Write-Host ''
 Write-Host '============================================================'
 Write-Host 'RESPONSIVE MASTER DE IFRAMES APLICADO'
@@ -72,6 +80,7 @@ Write-Host 'OK - paginador queda debajo de la grilla.'
 Write-Host 'OK - acordeones legacy no reciben flex/height/overflow invasivo.'
 Write-Host 'OK - notebook mantiene layout desktop con zoom alto.'
 Write-Host 'OK - dialogs/popups quedan dentro del visualViewport.'
+Write-Host 'OK - al volver el zoom a 100% el popup restaura su geometria original.'
 Write-Host 'OK - Detalle Acta usa 100dvh porque no tiene menu.'
 Write-Host 'Archivos modificados:'
 Write-Host '  src/assets/css/fm-global.css'
