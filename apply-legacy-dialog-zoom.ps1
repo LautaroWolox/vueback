@@ -43,6 +43,11 @@ html.fm-legacy-notebook-compact body.fm-responsive-legacy {
   min-height: 100% !important;
 }
 
+html.fm-legacy-notebook-compact {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
 html.fm-legacy-notebook-compact body.fm-responsive-legacy {
   overflow-y: auto !important;
 }
@@ -134,6 +139,7 @@ body.fm-responsive-legacy.fm-legacy-notebook-compact .modal-body .ui-datatable-t
 /* Bootstrap suele ocultar el scroll del body al abrir un modal. El modal conserva
  * su propio scroll, y el documento no queda permanentemente bloqueado al cerrar. */
 body.fm-responsive-legacy.fm-legacy-notebook-compact.modal-open {
+  overflow-y: auto !important;
   padding-right: 0 !important;
 }
 /* --- FIN: fm-legacy-dialog-zoom --- */
@@ -145,4 +151,5 @@ $content = $prefix + $legacy + $suffix
 [System.IO.File]::WriteAllText($path, $content, $utf8NoBom)
 Write-Host 'Dialogs legacy adaptados para zoom alto.'
 Write-Host 'El popup queda dentro del visualViewport y usa scroll interno.'
+Write-Host 'Se preserva el scroll vertical principal en notebook compacta.'
 Write-Host "Archivo modificado: $path"
