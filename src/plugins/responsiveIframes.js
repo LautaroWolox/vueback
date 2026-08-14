@@ -57,8 +57,14 @@ const applyViewportProfile = (iframe, document) => {
 
   const notebook = isNotebookEnvironment(view)
   const viewportWidth = Math.max(
+    Number(view.visualViewport?.width || 0),
     Number(view.innerWidth || 0),
     Number(document.documentElement?.clientWidth || 0)
+  )
+  const viewportHeight = Math.max(
+    Number(view.visualViewport?.height || 0),
+    Number(view.innerHeight || 0),
+    Number(document.documentElement?.clientHeight || 0)
   )
 
   document.body.classList.toggle('fm-legacy-notebook', notebook)
@@ -66,6 +72,18 @@ const applyViewportProfile = (iframe, document) => {
     'fm-legacy-notebook-compact',
     notebook && viewportWidth <= 1100
   )
+  document.documentElement.classList.toggle('fm-legacy-notebook', notebook)
+  document.documentElement.classList.toggle(
+    'fm-legacy-notebook-compact',
+    notebook && viewportWidth <= 1100
+  )
+
+  const cssWidth = `${Math.max(320, Math.floor(viewportWidth))}px`
+  const cssHeight = `${Math.max(240, Math.floor(viewportHeight))}px`
+  document.documentElement.style.setProperty('--fm-legacy-visual-width', cssWidth)
+  document.documentElement.style.setProperty('--fm-legacy-visual-height', cssHeight)
+  document.body.style.setProperty('--fm-legacy-visual-width', cssWidth)
+  document.body.style.setProperty('--fm-legacy-visual-height', cssHeight)
 }
 
 const bindViewportProfile = (iframe, document) => {
@@ -78,6 +96,7 @@ const bindViewportProfile = (iframe, document) => {
   const update = () => applyViewportProfile(iframe, document)
   view.addEventListener('resize', update, { passive: true })
   view.visualViewport?.addEventListener('resize', update, { passive: true })
+  view.visualViewport?.addEventListener('scroll', update, { passive: true })
   viewportBindings.set(document, update)
   update()
 }
