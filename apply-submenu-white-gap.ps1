@@ -6,8 +6,10 @@ $selector = '#app \.main-menu \.p-menubar-submenu \.p-menubar-submenu,\s*#app \.
 $replacement = @'
 #app .main-menu .p-menubar-submenu .p-menubar-submenu,
 #app .main-menu .p-submenu-list .p-submenu-list {
-  margin-top: 0 !important;
-  margin-left: 6px !important;
+  left: calc(100% + 6px) !important;
+  right: auto !important;
+  margin-left: 0 !important;
+  margin-top: -3px !important;
 }
 '@
 
@@ -18,11 +20,13 @@ if ($content -match $selector) {
   if (-not $content.Contains($marker)) { throw 'No se encontro el cierre de fm-menu-submenu-compact.css' }
   $block = @'
 
-/* Conserva el margen blanco entre el primer submenu y el segundo nivel. */
+/* Separa el segundo nivel sin recortar ni desplazar el panel padre. */
 #app .main-menu .p-menubar-submenu .p-menubar-submenu,
 #app .main-menu .p-submenu-list .p-submenu-list {
-  margin-top: 0 !important;
-  margin-left: 6px !important;
+  left: calc(100% + 6px) !important;
+  right: auto !important;
+  margin-left: 0 !important;
+  margin-top: -3px !important;
 }
 
 '@
@@ -30,4 +34,4 @@ if ($content -match $selector) {
 }
 
 Set-Content -Path $path -Value $content -Encoding utf8
-Write-Host 'Margen de submenu aplicado en fm-global.css.'
+Write-Host 'Separacion de submenu aplicada sin recortar el panel padre.'
