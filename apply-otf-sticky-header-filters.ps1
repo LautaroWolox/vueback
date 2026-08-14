@@ -17,37 +17,61 @@ $content = [regex]::Replace(
 
 $css = @'
 /* --- INICIO: otf-sticky-header-filters --- */
-/* Registro OTs Fallidas: encabezado + filtros permanecen fijos al scroll vertical. */
-html body #app #tabla .p-datatable-thead > tr:first-child > th {
+/*
+ * Registro OTs Fallidas:
+ * se congela TODO el THEAD para que nombres de columnas + filtros
+ * permanezcan juntos arriba durante el scroll vertical.
+ */
+html body #app #tabla.p-datatable .p-datatable-table-container,
+html body #app #tabla.p-datatable .p-datatable-wrapper,
+html body #app #tabla.p-datatable [data-pc-section='tablecontainer'] {
+  position: relative !important;
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+}
+
+html body #app #tabla.p-datatable .p-datatable-table > .p-datatable-thead,
+html body #app #tabla.p-datatable table > .p-datatable-thead {
   position: sticky !important;
   top: 0 !important;
-  z-index: 42 !important;
-  background: #f4f7f9 !important;
-  background-color: #f4f7f9 !important;
-  background-clip: padding-box !important;
-}
-
-html body #app #tabla .p-datatable-thead > tr.p-datatable-filter-row > th,
-html body #app #tabla .p-datatable-thead > tr.p-filter-row > th {
-  position: sticky !important;
-  top: 34px !important;
-  z-index: 41 !important;
+  z-index: 80 !important;
   background: #fff !important;
   background-color: #fff !important;
-  background-clip: padding-box !important;
-  box-shadow: 0 1px 0 #c9d3da !important;
 }
 
-html body #app #tabla .p-datatable-thead > tr.p-datatable-filter-row > th .fm-filter-cell,
-html body #app #tabla .p-datatable-thead > tr.p-filter-row > th .fm-filter-cell {
+/* La geometria sticky la maneja el THEAD completo. */
+html body #app #tabla.p-datatable .p-datatable-thead > tr > th {
+  position: relative !important;
+  top: auto !important;
+  z-index: auto !important;
+  background-clip: padding-box !important;
+}
+
+/* Primera fila: nombres de columnas. */
+html body #app #tabla.p-datatable .p-datatable-thead > tr:first-child > th {
+  background: #f4f7f9 !important;
+  background-color: #f4f7f9 !important;
+  box-shadow: inset 0 -1px 0 #c9d3da !important;
+}
+
+/* Segunda fila: filtros. */
+html body #app #tabla.p-datatable .p-datatable-thead > tr.p-datatable-filter-row > th,
+html body #app #tabla.p-datatable .p-datatable-thead > tr.p-filter-row > th,
+html body #app #tabla.p-datatable .p-datatable-thead > tr:nth-child(2) > th {
+  background: #fff !important;
+  background-color: #fff !important;
+  box-shadow: inset 0 -1px 0 #c9d3da !important;
+}
+
+html body #app #tabla.p-datatable .p-datatable-thead .fm-filter-cell {
   position: relative !important;
   z-index: 2 !important;
   background: #fff !important;
   background-color: #fff !important;
 }
 
-html body #app #tabla .p-datatable-thead .fm-column-filter,
-html body #app #tabla .p-datatable-thead .p-inputtext {
+html body #app #tabla.p-datatable .p-datatable-thead .fm-column-filter,
+html body #app #tabla.p-datatable .p-datatable-thead .p-inputtext {
   position: relative !important;
   z-index: 3 !important;
   background: #fff !important;
@@ -55,18 +79,10 @@ html body #app #tabla .p-datatable-thead .p-inputtext {
   opacity: 1 !important;
 }
 
-html body #app #tabla .p-datatable-thead .fm-filter-prefix,
-html body #app #tabla .p-datatable-thead .fm-icon-button {
+html body #app #tabla.p-datatable .p-datatable-thead .fm-filter-prefix,
+html body #app #tabla.p-datatable .p-datatable-thead .fm-icon-button {
   position: relative !important;
   z-index: 4 !important;
-}
-
-/* Mantiene el scroll dentro del contenedor de la grilla, que es el contexto sticky. */
-html body #app #tabla .p-datatable-table-container,
-html body #app #tabla .p-datatable-wrapper,
-html body #app #tabla [data-pc-section='tablecontainer'] {
-  position: relative !important;
-  overflow: auto !important;
 }
 /* --- FIN: otf-sticky-header-filters --- */
 '@
@@ -74,6 +90,6 @@ html body #app #tabla [data-pc-section='tablecontainer'] {
 $content = $content.TrimEnd() + "`r`n`r`n" + $css + "`r`n"
 [System.IO.File]::WriteAllText($path, $content, $utf8NoBom)
 
-Write-Host 'Registro OTs Fallidas: encabezado y filtros fijados al scroll vertical.'
-Write-Host 'El scroll de datos pasa por debajo sin mover las dos filas superiores.'
+Write-Host 'Registro OTs Fallidas: THEAD completo congelado.'
+Write-Host 'Nombres de columnas y filtros permanecen fijos durante el scroll vertical.'
 Write-Host "Archivo modificado: $path"
