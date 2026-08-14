@@ -37,6 +37,7 @@ export interface StoreState {
   selectedRows: number[]
   nroOT: string | null
   loading: boolean
+  gridResetVersion: number
 }
 export interface ActionResponse {
     status: boolean
