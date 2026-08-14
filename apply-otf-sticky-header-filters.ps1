@@ -19,8 +19,9 @@ $css = @'
 /* --- INICIO: otf-sticky-header-filters --- */
 /*
  * Registro OTs Fallidas
- * Cabecera y filtros fijos, con capa opaca real para impedir que
- * las filas del tbody se pinten por detras durante el scroll.
+ * Se congela el THEAD completo como una sola unidad para evitar
+ * saltos/espacios entre cabecera y filtros. El fondo es totalmente
+ * opaco para que el tbody no se vea por detras durante el scroll.
  */
 html body #app #tabla.p-datatable .p-datatable-table-container,
 html body #app #tabla.p-datatable .p-datatable-wrapper,
@@ -38,49 +39,65 @@ html body #app #tabla.p-datatable table {
   border-spacing: 0 !important;
 }
 
+/*
+ * IMPORTANTE:
+ * Sticky sobre todo el THEAD, no fila por fila.
+ * Asi desaparece el hueco blanco que se generaba al separar
+ * la cabecera y los filtros con top distintos.
+ */
 html body #app #tabla.p-datatable .p-datatable-thead {
-  position: relative !important;
-  z-index: 100 !important;
-}
-
-html body #app #tabla.p-datatable .p-datatable-tbody {
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-/* Primera fila: nombres de columnas */
-html body #app #tabla.p-datatable .p-datatable-thead > tr:first-child > th {
   position: sticky !important;
   top: 0 !important;
   z-index: 120 !important;
-  background: #f4f7f9 !important;
-  background-color: #f4f7f9 !important;
-  background-clip: border-box !important;
+  background: #fff !important;
+  background-color: #fff !important;
   opacity: 1 !important;
   isolation: isolate !important;
+  transform: translateZ(0) !important;
+}
+
+/* Las celdas ya no manejan sticky individualmente. */
+html body #app #tabla.p-datatable .p-datatable-thead > tr > th {
+  position: relative !important;
+  top: auto !important;
+  z-index: auto !important;
+  opacity: 1 !important;
+  background-clip: border-box !important;
+}
+
+/* Primera fila: nombres de columnas */
+html body #app #tabla.p-datatable .p-datatable-thead > tr:first-child,
+html body #app #tabla.p-datatable .p-datatable-thead > tr:first-child > th {
+  background: #f4f7f9 !important;
+  background-color: #f4f7f9 !important;
+}
+
+html body #app #tabla.p-datatable .p-datatable-thead > tr:first-child > th {
   box-shadow: inset 0 -1px 0 #c9d3da !important;
 }
 
-/* Segunda fila: filtros */
+/* Segunda fila: filtros, pegada directamente debajo de la cabecera */
+html body #app #tabla.p-datatable .p-datatable-thead > tr.p-datatable-filter-row,
+html body #app #tabla.p-datatable .p-datatable-thead > tr.p-filter-row,
+html body #app #tabla.p-datatable .p-datatable-thead > tr:nth-child(2),
 html body #app #tabla.p-datatable .p-datatable-thead > tr.p-datatable-filter-row > th,
 html body #app #tabla.p-datatable .p-datatable-thead > tr.p-filter-row > th,
 html body #app #tabla.p-datatable .p-datatable-thead > tr:nth-child(2) > th {
-  position: sticky !important;
-  top: 34px !important;
-  z-index: 119 !important;
-  overflow: hidden !important;
   background: #fff !important;
   background-color: #fff !important;
-  background-clip: border-box !important;
   opacity: 1 !important;
-  isolation: isolate !important;
+}
+
+html body #app #tabla.p-datatable .p-datatable-thead > tr.p-datatable-filter-row > th,
+html body #app #tabla.p-datatable .p-datatable-thead > tr.p-filter-row > th,
+html body #app #tabla.p-datatable .p-datatable-thead > tr:nth-child(2) > th {
+  overflow: visible !important;
   box-shadow: inset 0 -1px 0 #c9d3da !important;
 }
 
 /*
- * Capa blanca fisica dentro de cada celda de filtro.
- * Esto fuerza el repintado por encima del tbody incluso en Chrome
- * cuando sticky + tablas genera artefactos de stacking.
+ * Una capa opaca cubre toda la celda de filtro.
+ * El contenido real del filtro se pinta por encima de esa capa.
  */
 html body #app #tabla.p-datatable .p-datatable-thead > tr.p-datatable-filter-row > th::before,
 html body #app #tabla.p-datatable .p-datatable-thead > tr.p-filter-row > th::before,
@@ -95,7 +112,6 @@ html body #app #tabla.p-datatable .p-datatable-thead > tr:nth-child(2) > th::bef
   opacity: 1 !important;
 }
 
-/* Todo el contenido real del filtro queda sobre la capa blanca */
 html body #app #tabla.p-datatable .p-datatable-thead > tr.p-datatable-filter-row > th > *,
 html body #app #tabla.p-datatable .p-datatable-thead > tr.p-filter-row > th > *,
 html body #app #tabla.p-datatable .p-datatable-thead > tr:nth-child(2) > th > * {
@@ -111,7 +127,12 @@ html body #app #tabla.p-datatable .p-datatable-thead .p-inputtext {
   opacity: 1 !important;
 }
 
-/* El tbody nunca puede competir con las capas sticky */
+/* El contenido de datos queda siempre por debajo del THEAD. */
+html body #app #tabla.p-datatable .p-datatable-tbody {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
 html body #app #tabla.p-datatable .p-datatable-tbody > tr,
 html body #app #tabla.p-datatable .p-datatable-tbody > tr > td {
   position: relative !important;
@@ -123,6 +144,6 @@ html body #app #tabla.p-datatable .p-datatable-tbody > tr > td {
 $content = $content.TrimEnd() + "`r`n`r`n" + $css + "`r`n"
 [System.IO.File]::WriteAllText($path, $content, $utf8NoBom)
 
-Write-Host 'Registro OTs Fallidas: cabecera y filtros fijados con capa opaca.'
-Write-Host 'Las filas ya no deben verse por detras de los filtros durante el scroll.'
+Write-Host 'Registro OTs Fallidas: THEAD completo congelado sin huecos.'
+Write-Host 'Cabecera y filtros quedan unidos y opacos durante el scroll.'
 Write-Host "Archivo modificado: $path"
