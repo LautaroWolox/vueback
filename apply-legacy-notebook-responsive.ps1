@@ -43,7 +43,7 @@ body.fm-responsive-legacy [class*=grid-container] {
 '@
 
 $universalPattern = '(?ms)^body\.fm-responsive-legacy(?::not\(\.fm-legacy-native-controls\))? \*,\r?\nbody\.fm-responsive-legacy(?::not\(\.fm-legacy-native-controls\))? \*::before,\r?\nbody\.fm-responsive-legacy(?::not\(\.fm-legacy-native-controls\))? \*::after \{\r?\n\s*box-sizing: border-box !important;\r?\n\}'
-$universalRegex = New-Object System.Text.RegularExpressions.Regex($universalPattern)
+$universalRegex = New-Object System.Text.RegularExpressions.Regex -ArgumentList $universalPattern
 $legacy = $universalRegex.Replace($legacy, $selectiveBoxSizing, 1)
 
 # No modificar el box/layout propio de los acordeones legacy. Este bloque sólo
@@ -56,7 +56,7 @@ body.fm-responsive-legacy .panel,
 body.fm-responsive-legacy .card,
 body.fm-responsive-legacy .ui-panel {
 '@
-$accordionRegex = New-Object System.Text.RegularExpressions.Regex($accordionWidthPattern)
+$accordionRegex = New-Object System.Text.RegularExpressions.Regex -ArgumentList $accordionWidthPattern
 $legacy = $accordionRegex.Replace($legacy, $accordionWidthReplacement, 1)
 
 # En notebook no se deben activar las transformaciones agresivas pensadas para
@@ -97,9 +97,11 @@ foreach ($selector in $structuralSelectors) {
 
 $markerStart = '/* --- INICIO: fm-legacy-notebook-zoom --- */'
 $markerEnd = '/* --- FIN: fm-legacy-notebook-zoom --- */'
+$escapedMarkerStart = [regex]::Escape($markerStart)
+$escapedMarkerEnd = [regex]::Escape($markerEnd)
 $legacy = [regex]::Replace(
   $legacy,
-  "(?s)\s*$([regex]::Escape($markerStart)).*?$([regex]::Escape($markerEnd))\s*",
+  "(?s)\s*$escapedMarkerStart.*?$escapedMarkerEnd\s*",
   "`r`n"
 )
 
