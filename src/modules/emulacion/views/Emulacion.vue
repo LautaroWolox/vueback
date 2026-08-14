@@ -3,7 +3,8 @@
     <FmTypingLoader
       v-if="store.toggleLoader"
       fullscreen
-      title="Buscando operador"
+      variant="emulation"
+      title="Cargando emulación"
       message="Consultando la información del legajo"
     />
 
