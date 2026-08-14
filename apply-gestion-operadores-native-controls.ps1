@@ -11,13 +11,11 @@ $content = $content.Replace(
 )
 
 # Gestion de Operadores conserva el box model nativo/legacy de sus controles.
-$content = $content.Replace(
-@'body.fm-responsive-legacy *,
-body.fm-responsive-legacy *::before,
-body.fm-responsive-legacy *::after {'@,
-@'body.fm-responsive-legacy:not(.fm-legacy-native-controls) *,
-body.fm-responsive-legacy:not(.fm-legacy-native-controls) *::before,
-body.fm-responsive-legacy:not(.fm-legacy-native-controls) *::after {'@
+$content = [regex]::Replace(
+  $content,
+  'body\.fm-responsive-legacy \*,\r?\nbody\.fm-responsive-legacy \*::before,\r?\nbody\.fm-responsive-legacy \*::after \{',
+  "body.fm-responsive-legacy:not(.fm-legacy-native-controls) *,`r`nbody.fm-responsive-legacy:not(.fm-legacy-native-controls) *::before,`r`nbody.fm-responsive-legacy:not(.fm-legacy-native-controls) *::after {",
+  1
 )
 
 $selectors = @(
