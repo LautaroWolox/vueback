@@ -14,7 +14,7 @@
       <AccordionPanel value="1">
         <AccordionHeader>OTS FALLIDAS REPROCESO</AccordionHeader>
         <AccordionContent>
-          <Table />
+          <Table :key="store.gridResetVersion" />
         </AccordionContent>
       </AccordionPanel>
     </Accordion>
