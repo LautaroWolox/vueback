@@ -17,6 +17,7 @@ const legacyResponsiveCss = globalCss
 const STYLE_ID = 'fm-legacy-responsive-styles'
 const NATIVE_CONTROLS_PATHS = new Set(['/gestionOperadores.html'])
 const actionObservers = new WeakMap()
+const viewportBindings = new WeakMap()
 
 const getIframePathname = (iframe) => {
   try {
@@ -28,6 +29,56 @@ const getIframePathname = (iframe) => {
       return ''
     }
   }
+}
+
+const isNotebookEnvironment = (view) => {
+  if (!view) return false
+
+  const screenWidth = Math.max(
+    Number(view.screen?.width || 0),
+    Number(view.screen?.availWidth || 0)
+  )
+  const screenHeight = Math.max(
+    Number(view.screen?.height || 0),
+    Number(view.screen?.availHeight || 0)
+  )
+  const finePointer = Boolean(view.matchMedia?.('(pointer: fine)')?.matches)
+  const coarsePointer = Boolean(view.matchMedia?.('(pointer: coarse)')?.matches)
+
+  // screen.width no cae con el zoom del navegador. Así una notebook de 1366 px
+  // sigue siendo tratada como notebook aunque a 150% tenga ~910 CSS px de viewport.
+  return screenWidth >= 900 && screenHeight >= 560 && (finePointer || !coarsePointer)
+}
+
+const applyViewportProfile = (iframe, document) => {
+  const view = document?.defaultView || iframe?.contentWindow
+  if (!document?.body || !view) return
+
+  const notebook = isNotebookEnvironment(view)
+  const viewportWidth = Math.max(
+    Number(view.innerWidth || 0),
+    Number(document.documentElement?.clientWidth || 0)
+  )
+
+  document.body.classList.toggle('fm-legacy-notebook', notebook)
+  document.body.classList.toggle(
+    'fm-legacy-notebook-compact',
+    notebook && viewportWidth <= 1100
+  )
+}
+
+const bindViewportProfile = (iframe, document) => {
+  const view = document?.defaultView || iframe?.contentWindow
+  if (!view || viewportBindings.has(document)) {
+    applyViewportProfile(iframe, document)
+    return
+  }
+
+  const update = () => applyViewportProfile(iframe, document)
+  view.addEventListener('resize', update, { passive: true })
+  view.visualViewport?.addEventListener('resize', update, { passive: true })
+  viewportBindings.set(document, update)
+  update()
 }
 
 const getControlLabel = (element) => String(
@@ -80,6 +131,7 @@ const applyResponsiveStyles = (iframe) => {
 
     document.body.classList.add('fm-responsive-legacy')
     document.body.classList.toggle('fm-legacy-native-controls', usesNativeControls)
+    bindViewportProfile(iframe, document)
 
     let style = document.getElementById(STYLE_ID)
     if (!style) {
