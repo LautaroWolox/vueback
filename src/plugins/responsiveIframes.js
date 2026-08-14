@@ -237,21 +237,28 @@ const findDialogScrollArea = (surface, view) => {
   return overflowCandidates[0] || surface
 }
 
+const ensureDocumentScrollBaseline = (document) => {
+  const html = document?.documentElement
+  const body = document?.body
+  if (!html || !body || documentScrollState.has(document)) return
+
+  documentScrollState.set(document, {
+    htmlOverflow: html.style.overflow,
+    htmlOverflowY: html.style.overflowY,
+    bodyOverflow: body.style.overflow,
+    bodyOverflowY: body.style.overflowY
+  })
+}
+
 const setDocumentScroll = (document, enabled) => {
   const html = document?.documentElement
   const body = document?.body
   if (!html || !body) return
 
-  if (enabled) {
-    if (!documentScrollState.has(document)) {
-      documentScrollState.set(document, {
-        htmlOverflow: html.style.overflow,
-        htmlOverflowY: html.style.overflowY,
-        bodyOverflow: body.style.overflow,
-        bodyOverflowY: body.style.overflowY
-      })
-    }
+  ensureDocumentScrollBaseline(document)
+  const baseline = documentScrollState.get(document)
 
+  if (enabled) {
     html.classList.add('fm-legacy-dialog-open')
     body.classList.add('fm-legacy-dialog-open')
     html.style.setProperty('overflow-y', 'auto', 'important')
@@ -262,14 +269,12 @@ const setDocumentScroll = (document, enabled) => {
   html.classList.remove('fm-legacy-dialog-open')
   body.classList.remove('fm-legacy-dialog-open')
 
-  const previous = documentScrollState.get(document)
-  if (!previous) return
+  if (!baseline) return
 
-  html.style.overflow = previous.htmlOverflow
-  html.style.overflowY = previous.htmlOverflowY
-  body.style.overflow = previous.bodyOverflow
-  body.style.overflowY = previous.bodyOverflowY
-  documentScrollState.delete(document)
+  html.style.overflow = baseline.htmlOverflow
+  html.style.overflowY = baseline.htmlOverflowY
+  body.style.overflow = baseline.bodyOverflow
+  body.style.overflowY = baseline.bodyOverflowY
 }
 
 const applyDialogSurfaceLayout = (surface, document, view, viewport) => {
@@ -490,6 +495,7 @@ const applyResponsiveStyles = (iframe) => {
 
     document.body.classList.add('fm-responsive-legacy')
     document.body.classList.toggle('fm-legacy-native-controls', usesNativeControls)
+    ensureDocumentScrollBaseline(document)
 
     let style = document.getElementById(STYLE_ID)
     if (!style) {
