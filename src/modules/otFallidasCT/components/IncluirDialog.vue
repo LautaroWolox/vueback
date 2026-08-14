@@ -12,6 +12,11 @@
         ¿Confirma que desea incluir OT seleccionada?
       </p>
 
+      <div v-if="existingNote" class="otf-existing-notes">
+        <span class="otf-existing-notes__label">Nota existente</span>
+        <div class="otf-existing-notes__content">{{ existingNote }}</div>
+      </div>
+
       <div class="fm-field otf-include-motivo-field">
         <label for="motivo-inclusion">Motivo</label>
         <FmCompactSelect
@@ -82,6 +87,23 @@ const motivoSelected = ref(null)
 const comentario = ref('')
 
 const motivoOptions = computed(() => motivos.value ?? [])
+
+const normalizeVisibleNote = (value) => String(value ?? '')
+  .replace(/<[^>]*>/g, ' ')
+  .replace(/&nbsp;|&#160;/gi, ' ')
+  .replace(/\s+/g, ' ')
+  .trim()
+
+const existingNote = computed(() => {
+  const target = String(store.nroOT ?? '').trim()
+  if (!target) return ''
+
+  const row = store.rows.find((item) => (
+    String(item.nroOrdenTrabajo ?? '').trim() === target
+  ))
+
+  return normalizeVisibleNote(row?.nota)
+})
 
 const reset = () => {
   motivoSelected.value = null
