@@ -16,6 +16,7 @@ const legacyResponsiveCss = globalCss
 
 const STYLE_ID = 'fm-legacy-responsive-styles'
 const NATIVE_CONTROLS_PATHS = new Set(['/gestionOperadores.html'])
+const actionObservers = new WeakMap()
 
 const getIframePathname = (iframe) => {
   try {
@@ -29,16 +30,56 @@ const getIframePathname = (iframe) => {
   }
 }
 
+const getControlLabel = (element) => String(
+  element.value ||
+  element.textContent ||
+  element.getAttribute?.('aria-label') ||
+  element.getAttribute?.('title') ||
+  ''
+).trim().replace(/\s+/g, ' ').toUpperCase()
+
+const markGestionOperadoresActions = (document) => {
+  if (!document?.body?.classList.contains('fm-legacy-native-controls')) return
+
+  const controls = document.querySelectorAll(
+    'button, input[type="button"], input[type="submit"], a.btn, .ui-button'
+  )
+
+  controls.forEach((control) => {
+    const label = getControlLabel(control)
+    control.classList.toggle('fm-legacy-action-search', label === 'BUSCAR')
+    control.classList.toggle('fm-legacy-action-clear', label === 'LIMPIAR')
+  })
+}
+
+const observeGestionOperadoresActions = (document) => {
+  if (!document?.body?.classList.contains('fm-legacy-native-controls')) return
+
+  markGestionOperadoresActions(document)
+
+  if (actionObservers.has(document)) return
+
+  const observer = new MutationObserver(() => {
+    markGestionOperadoresActions(document)
+  })
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  })
+
+  actionObservers.set(document, observer)
+}
+
 const applyResponsiveStyles = (iframe) => {
   try {
     const document = iframe.contentDocument || iframe.contentWindow?.document
     if (!document?.head || !document?.body) return
 
+    const usesNativeControls = NATIVE_CONTROLS_PATHS.has(getIframePathname(iframe))
+
     document.body.classList.add('fm-responsive-legacy')
-    document.body.classList.toggle(
-      'fm-legacy-native-controls',
-      NATIVE_CONTROLS_PATHS.has(getIframePathname(iframe))
-    )
+    document.body.classList.toggle('fm-legacy-native-controls', usesNativeControls)
 
     let style = document.getElementById(STYLE_ID)
     if (!style) {
@@ -48,6 +89,10 @@ const applyResponsiveStyles = (iframe) => {
     }
 
     style.textContent = legacyResponsiveCss
+
+    if (usesNativeControls) {
+      observeGestionOperadoresActions(document)
+    }
   } catch {}
 }
 
