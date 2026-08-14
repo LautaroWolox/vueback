@@ -19,7 +19,8 @@ $comments = @(
   'El item que contiene otro submenu debe ser referencia de posicionamiento.',
   'Segundo nivel: queda 6 px por fuera del panel padre, sin alterar su ancho.',
   'Separacion final: el panel padre conserva su geometria original.',
-  'El segundo nivel se desplaza por fuera sin participar del layout del padre.'
+  'El segundo nivel se desplaza por fuera sin participar del layout del padre.',
+  'Espacio blanco inferior final de los submenus.'
 )
 
 foreach ($comment in $comments) {
@@ -31,10 +32,30 @@ foreach ($comment in $comments) {
   )
 }
 
+# 2) Restaura el margen blanco inferior de todos los dropdowns.
+# Se inserta al final del bloque compacto para ganar la cascada sin cambiar anchos ni posiciones.
+$compactEnd = '/* ===== FIN: fm-menu-submenu-compact.css ===== */'
+if (-not $global.Contains($compactEnd)) {
+  throw 'No se encontro el cierre de fm-menu-submenu-compact.css.'
+}
+
+$bottomSpace = @'
+
+/* Espacio blanco inferior final de los submenus. */
+#app .main-menu .p-menubar-submenu,
+#app .main-menu .p-submenu-list,
+body > .p-menubar-submenu,
+body > .p-submenu-list {
+  padding-bottom: 10px !important;
+  background: #fff !important;
+}
+
+'@
+
+$global = $global.Replace($compactEnd, $bottomSpace + $compactEnd)
 [System.IO.File]::WriteAllText($globalPath, $global, $utf8NoBom)
 
-# 2) Corrige el panel base. El ancho de 238px corresponde al contenido;
-# los bordes quedan por fuera para que el panel no pierda esos píxeles visuales.
+# 3) Mantiene el panel base completo, sin alterar su geometría horizontal.
 $menu = Get-Content -Raw -Path $menuPath
 
 $basePattern = '(?s):deep\(\.p-menubar-submenu\),\s*:deep\(\.p-submenu-list\)\s*\{.*?\}'
@@ -61,8 +82,7 @@ if ($menu -notmatch $basePattern) {
 }
 $menu = [regex]::Replace($menu, $basePattern, $baseReplacement, 1)
 
-# 3) El segundo nivel se separa 6px usando sólo margen del elemento absoluto.
-# No se modifica padding, width ni box model del panel padre.
+# 4) El segundo nivel se separa 6px sin tocar el ancho del panel padre.
 $nestedPattern = '(?s):deep\(\.p-menubar-submenu \.p-menubar-submenu\),\s*:deep\(\.p-submenu-list \.p-submenu-list\)\s*\{.*?\}'
 $nestedReplacement = @'
 :deep(.p-menubar-submenu .p-menubar-submenu),
@@ -81,7 +101,7 @@ $menu = [regex]::Replace($menu, $nestedPattern, $nestedReplacement, 1)
 
 [System.IO.File]::WriteAllText($menuPath, $menu, $utf8NoBom)
 
-Write-Host 'Submenus corregidos: panel base completo y segundo nivel separado 6px.'
+Write-Host 'Submenus corregidos: margen blanco inferior restaurado (10px).'
 Write-Host 'Archivos modificados:'
 Write-Host " - $globalPath"
 Write-Host " - $menuPath"
