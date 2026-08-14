@@ -106,6 +106,14 @@ body.fm-responsive-legacy .fm-legacy-responsive-dialog {
   max-height: calc(var(--fm-legacy-visual-height, 100dvh) - 16px) !important;
 }
 
+/* A zoom alto el dialog completo tambien scrollea. Si el JSP calcula mal su body,
+ * nunca se pierden tabs, botones o contenido por fuera del viewport. */
+body.fm-responsive-legacy.fm-legacy-notebook-compact .fm-legacy-responsive-dialog {
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+}
+
 body.fm-responsive-legacy .fm-legacy-responsive-dialog-scroll {
   min-width: 0 !important;
   max-width: 100% !important;
