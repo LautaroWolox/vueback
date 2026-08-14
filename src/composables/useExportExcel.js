@@ -9,7 +9,7 @@ export function useExcelExport() {
     const headerRow = worksheet.addRow(
       fields.map(field => {
         const colDef = columns.find(c => c.field === field);
-        return colDef ? colDef.header : field;
+        return colDef ? (colDef.exportHeader ?? colDef.header) : field;
       })
     );
     // estilo encabezado
@@ -28,7 +28,7 @@ export function useExcelExport() {
       });
       Object.keys(grouped).forEach(key => {
         const columnDef = columns.find(c => c.field === groupField);
-        const groupHeaderLabel = columnDef?.header || groupField;
+        const groupHeaderLabel = columnDef?.exportHeader ?? columnDef?.header ?? groupField;
         const headerRow = worksheet.addRow([`${groupHeaderLabel}: ${key}`]);
         worksheet.mergeCells(headerRow.number, 1, headerRow.number, fields.length);
         headerRow.getCell(1).font = { bold: true };
