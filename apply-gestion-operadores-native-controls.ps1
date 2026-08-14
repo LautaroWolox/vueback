@@ -10,7 +10,7 @@ $content = $content.Replace(
   'body.fm-responsive-legacy input:not([type=checkbox]):not([type=radio]):not([type=button]):not([type=submit]):not([type=reset]),'
 )
 
-# Gestion de Operadores conserva el box model nativo/legacy de sus controles.
+# Gestion de Operadores conserva el box model legacy de sus controles generales.
 $content = [regex]::Replace(
   $content,
   'body\.fm-responsive-legacy \*,\r?\nbody\.fm-responsive-legacy \*::before,\r?\nbody\.fm-responsive-legacy \*::after \{',
@@ -51,6 +51,94 @@ $content = [regex]::Replace(
   1
 )
 
+$markerStart = '/* --- INICIO: gestion-operadores-action-buttons --- */'
+$markerEnd = '/* --- FIN: gestion-operadores-action-buttons --- */'
+
+# Si el bloque ya existe, se reemplaza para que el script sea idempotente.
+$escapedStart = [regex]::Escape($markerStart)
+$escapedEnd = [regex]::Escape($markerEnd)
+$content = [regex]::Replace(
+  $content,
+  "(?s)\s*$escapedStart.*?$escapedEnd\s*",
+  "`r`n"
+)
+
+$buttonCss = @'
+/* --- INICIO: gestion-operadores-action-buttons --- */
+/* Gestion de Operadores: BUSCAR y LIMPIAR con la misma apariencia FM/Vue. */
+body.fm-responsive-legacy.fm-legacy-native-controls .fm-legacy-action-search,
+body.fm-responsive-legacy.fm-legacy-native-controls input.fm-legacy-action-search,
+body.fm-responsive-legacy.fm-legacy-native-controls button.fm-legacy-action-search {
+  width: auto !important;
+  min-width: 80px !important;
+  max-width: none !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
+  padding: 0 14px !important;
+  border: 1px solid #00a9bd !important;
+  border-radius: 18px !important;
+  background: #00a9bd !important;
+  background-image: none !important;
+  color: #fff !important;
+  font-family: inherit !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  line-height: 32px !important;
+  text-align: center !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+  vertical-align: middle !important;
+}
+
+body.fm-responsive-legacy.fm-legacy-native-controls .fm-legacy-action-search:hover,
+body.fm-responsive-legacy.fm-legacy-native-controls .fm-legacy-action-search:focus {
+  border-color: #008fa1 !important;
+  background: #008fa1 !important;
+  color: #fff !important;
+}
+
+body.fm-responsive-legacy.fm-legacy-native-controls .fm-legacy-action-clear,
+body.fm-responsive-legacy.fm-legacy-native-controls input.fm-legacy-action-clear,
+body.fm-responsive-legacy.fm-legacy-native-controls button.fm-legacy-action-clear {
+  width: auto !important;
+  min-width: 78px !important;
+  max-width: none !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
+  padding: 0 14px !important;
+  border: 1px solid #00a9bd !important;
+  border-radius: 18px !important;
+  background: #fff !important;
+  background-image: none !important;
+  color: #00a0b4 !important;
+  font-family: inherit !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  line-height: 32px !important;
+  text-align: center !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+  vertical-align: middle !important;
+}
+
+body.fm-responsive-legacy.fm-legacy-native-controls .fm-legacy-action-clear:hover,
+body.fm-responsive-legacy.fm-legacy-native-controls .fm-legacy-action-clear:focus {
+  border-color: #008fa1 !important;
+  background: #f2fcfe !important;
+  color: #008fa1 !important;
+}
+/* --- FIN: gestion-operadores-action-buttons --- */
+'@
+
+$legacyEnd = '/* ===== FIN: fm-legacy-responsive.css ===== */'
+if (-not $content.Contains($legacyEnd)) {
+  throw 'No se encontro el cierre de fm-legacy-responsive.css en fm-global.css.'
+}
+
+$content = $content.Replace($legacyEnd, "$buttonCss`r`n$legacyEnd")
+
 [System.IO.File]::WriteAllText($path, $content, $utf8NoBom)
-Write-Host 'Gestion de Operadores aislada de estilos de botones Vue/legacy responsive.'
+Write-Host 'Gestion de Operadores: botones BUSCAR y LIMPIAR alineados al estilo FM.'
 Write-Host "Archivo modificado: $path"
