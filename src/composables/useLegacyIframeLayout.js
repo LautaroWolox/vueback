@@ -180,7 +180,11 @@ export function useLegacyIframeLayout(iframeRef) {
       markedPaginator?.classList.add('fm-legacy-main-grid-paginator')
     }
 
-    const viewportHeight = Math.max(view.innerHeight || 0, doc.documentElement?.clientHeight || 0)
+    const viewportHeight = Math.max(
+      view.visualViewport?.height || 0,
+      view.innerHeight || 0,
+      doc.documentElement?.clientHeight || 0
+    )
     const scrollRect = scroll.getBoundingClientRect()
     const gridRect = grid.getBoundingClientRect()
     const paginatorRect = isVisible(paginator, view) ? paginator.getBoundingClientRect() : null
@@ -194,9 +198,15 @@ export function useLegacyIframeLayout(iframeRef) {
       reservedBelow = Math.min(Math.max(0, gridRect.bottom - scrollRect.bottom), 80)
     }
 
-    const availableHeight = Math.floor(viewportHeight - Math.max(0, scrollRect.top) - reservedBelow - 6)
-    if (availableHeight < 160) return
+    const rawAvailableHeight = Math.floor(
+      viewportHeight - Math.max(0, scrollRect.top) - reservedBelow - 6
+    )
+    const compactNotebook = doc.body.classList.contains('fm-legacy-notebook-compact')
+    const minimumHeight = compactNotebook ? 120 : 160
 
+    if (rawAvailableHeight < 90) return
+
+    const availableHeight = Math.max(rawAvailableHeight, minimumHeight)
     grid.style.setProperty('--fm-legacy-main-grid-body-height', `${availableHeight}px`)
   }
 
@@ -215,6 +225,7 @@ export function useLegacyIframeLayout(iframeRef) {
     currentDocument?.removeEventListener('click', scheduleLayout, true)
     currentDocument?.removeEventListener('submit', scheduleLayout, true)
     currentDocument?.defaultView?.removeEventListener('resize', scheduleLayout)
+    currentDocument?.defaultView?.visualViewport?.removeEventListener('resize', scheduleLayout)
     markedGrid?.classList.remove('fm-legacy-main-grid')
     markedGrid?.style?.removeProperty('--fm-legacy-main-grid-body-height')
     markedScroll?.classList.remove('fm-legacy-main-grid-scroll')
@@ -244,6 +255,7 @@ export function useLegacyIframeLayout(iframeRef) {
     currentDocument.addEventListener('click', scheduleLayout, true)
     currentDocument.addEventListener('submit', scheduleLayout, true)
     currentDocument.defaultView?.addEventListener('resize', scheduleLayout)
+    currentDocument.defaultView?.visualViewport?.addEventListener('resize', scheduleLayout)
 
     observer = new MutationObserver(scheduleLayout)
     observer.observe(currentDocument.body, {
