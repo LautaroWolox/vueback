@@ -45,6 +45,7 @@ export const useFallidasCtStore = defineStore('fallidasCT', {
         selectedRows: [],
         nroOT: null,
         loading: false,
+        gridResetVersion: 0,
     }),
 
     getters: {
@@ -61,17 +62,26 @@ export const useFallidasCtStore = defineStore('fallidasCT', {
     actions: {
         setFilter<K extends keyof Filters>(key: K, value: Filters[K]): void {
             this.filters[key] = value
-        },        
-        async setData() {
+        },
+        resetGrid(): void {
+            this.rows = []
             this.selectedRows = []
+            this.nroOT = null
+            this.gridResetVersion += 1
+        },
+        async setData() {
+            this.resetGrid()
             this.loading = true;
-            const { data } = await useFetch('/pc/registroOTFallidasReproceso/searchFallidas.html')
-                .post(this.filters)
-                .json<Row[]>() 
-            this.loading = false;    
-            if (data.value) {
-                this.activeTab = ['1']
-                this.rows = data.value.map(normalizeNoteRow)
+            try {
+                const { data } = await useFetch('/pc/registroOTFallidasReproceso/searchFallidas.html')
+                    .post(this.filters)
+                    .json<Row[]>()
+                if (data.value) {
+                    this.activeTab = ['1']
+                    this.rows = data.value.map(normalizeNoteRow)
+                }
+            } finally {
+                this.loading = false;
             }
         },
         setSelectedRows(rows: number[]): void {
@@ -145,7 +155,7 @@ export const useFallidasCtStore = defineStore('fallidasCT', {
         },
         clearFilters() {
             this.filters = emptyFilters()
-            this.selectedRows = []
+            this.resetGrid()
         },
         clearStore(): void {
             this.$reset()
