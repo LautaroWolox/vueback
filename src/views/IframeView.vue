@@ -1,6 +1,13 @@
 <template>
   <div class="legacy-iframe-stage">
-    <FmTypingLoader v-if="iframeLoading" overlay title="Cargando Información" message="Preparando pantalla" />
+    <FmTypingLoader
+      v-if="iframeLoading"
+      overlay
+      :variant="loaderProfile.variant"
+      :title="loaderProfile.title"
+      :message="loaderProfile.message"
+    />
+
     <iframe
       :key="iframeSrc"
       ref="iframeRef"
@@ -18,8 +25,10 @@
 
 <script setup>
 import { computed, onUnmounted, ref, watch, watchEffect } from 'vue'
+import { useRoute } from 'vue-router'
 import router from '@/router'
 import FmTypingLoader from '@/components/shared/FmTypingLoader.vue'
+import { getLoaderProfile } from '@/components/shared/fmLoaderProfiles.js'
 import { useLegacyIframeLayout } from '@/composables/useLegacyIframeLayout'
 
 const MIN_LOADER_VISIBLE_MS = 450
@@ -28,10 +37,16 @@ const props = defineProps({
   titleParam: { type: String, required: true }
 })
 
+const route = useRoute()
 const iframeRef = ref(null)
 const iframeLoading = ref(true)
 const { onIframeLoad: applyLegacyLayout } = useLegacyIframeLayout(iframeRef)
 const titulo = computed(() => props.titleParam || sessionStorage.getItem('titleParam') || '')
+const loaderProfile = computed(() => getLoaderProfile({
+  name: route.name,
+  path: route.path,
+  title: titulo.value
+}))
 let loadingStartedAt = performance.now()
 let loadingGeneration = 0
 let hideLoaderTimer = null
@@ -86,8 +101,8 @@ function handleRedirect(event) {
   if (message?.type === 'redirect' && message.nroActa && message.url) {
     sessionStorage.setItem('nroActa', message.nroActa)
     sessionStorage.setItem('urlDetalle', message.url)
-    const route = router.resolve({ name: 'DEAC' })
-    window.open(route.href, '_blank')
+    const detailRoute = router.resolve({ name: 'DEAC' })
+    window.open(detailRoute.href, '_blank')
   }
 }
 
