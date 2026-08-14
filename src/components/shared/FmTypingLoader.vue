@@ -376,7 +376,7 @@ const tickStyle = (index) => ({
   display: block;
   width: 7px;
   height: 7px;
-  opacity: calc(.30 + (var(--i) * .035));
+  opacity: .82;
   transform: translate(-50%, -50%) rotate(calc(var(--i) * 22.5deg)) translateY(-34px);
 }
 
