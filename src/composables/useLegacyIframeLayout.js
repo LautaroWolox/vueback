@@ -40,6 +40,15 @@ const GRID_SELECTOR = [
   '.handsontable',
   '.table-responsive'
 ].join(',')
+const DIALOG_SELECTOR = [
+  '.ui-dialog',
+  '.p-dialog',
+  '.modal',
+  '.modal-dialog',
+  '.modal-content',
+  '[role="dialog"]',
+  '[aria-modal="true"]'
+].join(',')
 
 const SCROLL_SELECTORS = [
   '.ui-datatable-scrollable-body',
@@ -85,6 +94,8 @@ const isVisible = (element, view) => {
   return !element.hidden && style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0
 }
 
+const isInsideDialog = (element) => Boolean(element?.closest?.(DIALOG_SELECTOR))
+
 const findVisibleByPriority = (container, selectors, view) => {
   if (!container) return null
   for (const selector of selectors) {
@@ -107,7 +118,7 @@ const getTopLevelHeaders = (root) => [...root.querySelectorAll(HEADER_SELECTOR)]
 const findGridIn = (container, view) => {
   if (!container) return null
   return [...container.querySelectorAll(GRID_SELECTOR)]
-    .filter((grid) => isVisible(grid, view))
+    .filter((grid) => isVisible(grid, view) && !isInsideDialog(grid))
     .sort((a, b) => {
       const aRect = a.getBoundingClientRect()
       const bRect = b.getBoundingClientRect()
@@ -116,15 +127,18 @@ const findGridIn = (container, view) => {
 }
 
 const findMainGrid = (doc, view) => {
-  const roots = [...doc.querySelectorAll(ACCORDION_ROOT_SELECTOR)].filter((root) => isVisible(root, view))
+  const roots = [...doc.querySelectorAll(ACCORDION_ROOT_SELECTOR)]
+    .filter((root) => isVisible(root, view) && !isInsideDialog(root))
+
   for (const root of roots) {
     const headers = getTopLevelHeaders(root)
     if (headers.length < 2) continue
     const secondContent = getPanelContent(headers[1])
-    if (!isVisible(secondContent, view)) continue
+    if (!isVisible(secondContent, view) || isInsideDialog(secondContent)) continue
     const grid = findGridIn(secondContent, view)
     if (grid) return { grid, panel: secondContent }
   }
+
   const grid = findGridIn(doc, view)
   return grid ? { grid, panel: grid.parentElement } : null
 }
@@ -146,6 +160,16 @@ export function useLegacyIframeLayout(iframeRef) {
     retryTimers = []
   }
 
+  const resetMarkedGrid = () => {
+    markedGrid?.classList.remove('fm-legacy-main-grid')
+    markedGrid?.style?.removeProperty('--fm-legacy-main-grid-body-height')
+    markedScroll?.classList.remove('fm-legacy-main-grid-scroll')
+    markedPaginator?.classList.remove('fm-legacy-main-grid-paginator')
+    markedGrid = null
+    markedScroll = null
+    markedPaginator = null
+  }
+
   const applyLayout = () => {
     const doc = currentDocument
     const view = doc?.defaultView
@@ -154,16 +178,22 @@ export function useLegacyIframeLayout(iframeRef) {
     const target = findMainGrid(doc, view)
     const grid = target?.grid
     const panel = target?.panel
-    if (!grid) return
+
+    if (!grid) {
+      resetMarkedGrid()
+      return
+    }
 
     const scroll = findVisibleByPriority(grid, SCROLL_SELECTORS, view)
-    if (!scroll) return
+    if (!scroll || isInsideDialog(scroll)) {
+      resetMarkedGrid()
+      return
+    }
 
     const paginator = findVisibleByPriority(grid, PAGINATOR_SELECTORS, view) || findVisibleByPriority(panel, PAGINATOR_SELECTORS, view)
 
     if (markedGrid !== grid) {
-      markedGrid?.classList.remove('fm-legacy-main-grid')
-      markedGrid?.style?.removeProperty('--fm-legacy-main-grid-body-height')
+      resetMarkedGrid()
       markedGrid = grid
       markedGrid.classList.add('fm-legacy-main-grid')
     }
@@ -226,13 +256,7 @@ export function useLegacyIframeLayout(iframeRef) {
     currentDocument?.removeEventListener('submit', scheduleLayout, true)
     currentDocument?.defaultView?.removeEventListener('resize', scheduleLayout)
     currentDocument?.defaultView?.visualViewport?.removeEventListener('resize', scheduleLayout)
-    markedGrid?.classList.remove('fm-legacy-main-grid')
-    markedGrid?.style?.removeProperty('--fm-legacy-main-grid-body-height')
-    markedScroll?.classList.remove('fm-legacy-main-grid-scroll')
-    markedPaginator?.classList.remove('fm-legacy-main-grid-paginator')
-    markedGrid = null
-    markedScroll = null
-    markedPaginator = null
+    resetMarkedGrid()
     currentDocument = null
   }
 
