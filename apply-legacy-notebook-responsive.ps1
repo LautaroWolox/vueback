@@ -42,29 +42,9 @@ body.fm-responsive-legacy [class*=grid-container] {
 }
 '@
 
-$universalBlocks = @(
-@'
-body.fm-responsive-legacy *,
-body.fm-responsive-legacy *::before,
-body.fm-responsive-legacy *::after {
-  box-sizing: border-box !important;
-}
-'@,
-@'
-body.fm-responsive-legacy:not(.fm-legacy-native-controls) *,
-body.fm-responsive-legacy:not(.fm-legacy-native-controls) *::before,
-body.fm-responsive-legacy:not(.fm-legacy-native-controls) *::after {
-  box-sizing: border-box !important;
-}
-'@
-)
-
-foreach ($block in $universalBlocks) {
-  if ($legacy.Contains($block)) {
-    $legacy = $legacy.Replace($block, $selectiveBoxSizing)
-    break
-  }
-}
+$universalPattern = '(?ms)^body\.fm-responsive-legacy(?::not\(\.fm-legacy-native-controls\))? \*,\r?\nbody\.fm-responsive-legacy(?::not\(\.fm-legacy-native-controls\))? \*::before,\r?\nbody\.fm-responsive-legacy(?::not\(\.fm-legacy-native-controls\))? \*::after \{\r?\n\s*box-sizing: border-box !important;\r?\n\}'
+$universalRegex = New-Object System.Text.RegularExpressions.Regex($universalPattern)
+$legacy = $universalRegex.Replace($legacy, $selectiveBoxSizing, 1)
 
 # No modificar el box/layout propio de los acordeones legacy. Este bloque sólo
 # mantiene anchos fluidos en formularios/paneles comunes.
@@ -76,7 +56,8 @@ body.fm-responsive-legacy .panel,
 body.fm-responsive-legacy .card,
 body.fm-responsive-legacy .ui-panel {
 '@
-$legacy = [regex]::Replace($legacy, $accordionWidthPattern, $accordionWidthReplacement, 1)
+$accordionRegex = New-Object System.Text.RegularExpressions.Regex($accordionWidthPattern)
+$legacy = $accordionRegex.Replace($legacy, $accordionWidthReplacement, 1)
 
 # En notebook no se deben activar las transformaciones agresivas pensadas para
 # móvil (convertir filas a grid, apilar botones, rearmar footers, etc.) aunque
