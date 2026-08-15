@@ -21,8 +21,8 @@ $css = @'
 /* --- INICIO: reporte-sas-sticky-final --- */
 /*
  * Reporte SAS: mismo comportamiento visual que Registro OTs Fallidas.
- * Las dos filas del encabezado se congelan por celda para evitar que el
- * contenido del tbody se pinte entre los titulos y los filtros en Chrome.
+ * Titulos + filtros permanecen fijos y opacos. La fila de titulos NO usa
+ * pseudo-capa para evitar que el overlay tape el texto de los encabezados.
  */
 .reporte-sas-main-grid :deep(.p-datatable-table-container),
 .reporte-sas-main-grid :deep(.p-datatable-wrapper),
@@ -54,7 +54,54 @@ $css = @'
   background-color: #f1f1f1 !important;
   background-clip: border-box !important;
   opacity: 1 !important;
+  color: #242424 !important;
+  visibility: visible !important;
   box-shadow: inset 0 -1px 0 #bcbcbc !important;
+}
+
+/*
+ * IMPORTANTE: no colocar ::before sobre la fila de titulos.
+ * El fondo solido del TH ya evita transparencia y asi PrimeVue conserva
+ * visibles title + icono de ordenamiento + resizer.
+ */
+.reporte-sas-main-grid :deep(.p-datatable-thead > tr:first-child > th::before) {
+  content: none !important;
+  display: none !important;
+}
+
+.reporte-sas-main-grid :deep(.p-datatable-thead > tr:first-child .p-column-header-content),
+.reporte-sas-main-grid :deep(.p-datatable-thead > tr:first-child .p-datatable-column-title),
+.reporte-sas-main-grid :deep(.p-datatable-thead > tr:first-child .p-column-title),
+.reporte-sas-main-grid :deep(.p-datatable-thead > tr:first-child [data-pc-section='columntitle']) {
+  position: relative !important;
+  z-index: 5 !important;
+  display: flex !important;
+  align-items: center !important;
+  min-width: 0 !important;
+  color: #242424 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.reporte-sas-main-grid :deep(.p-datatable-thead > tr:first-child .p-datatable-column-title),
+.reporte-sas-main-grid :deep(.p-datatable-thead > tr:first-child .p-column-title),
+.reporte-sas-main-grid :deep(.p-datatable-thead > tr:first-child [data-pc-section='columntitle']) {
+  display: block !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 1.1 !important;
+}
+
+.reporte-sas-main-grid :deep(.p-datatable-thead > tr:first-child .p-sortable-column-icon),
+.reporte-sas-main-grid :deep(.p-datatable-thead > tr:first-child .p-sortable-column-badge),
+.reporte-sas-main-grid :deep(.p-datatable-thead > tr:first-child [data-pc-section='sorticon']) {
+  position: relative !important;
+  z-index: 6 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 /* Filtros: exactamente debajo de los nombres de columnas */
@@ -74,8 +121,7 @@ $css = @'
   box-shadow: inset 0 -1px 0 #c9d3da !important;
 }
 
-/* Capa opaca real: evita cualquier texto del tbody por detras. */
-.reporte-sas-main-grid :deep(.p-datatable-thead > tr:first-child > th::before),
+/* Capa opaca SOLO para filtros: evita texto del tbody por detras. */
 .reporte-sas-main-grid :deep(.p-datatable-thead > tr.p-datatable-filter-row > th::before),
 .reporte-sas-main-grid :deep(.p-datatable-thead > tr.p-filter-row > th::before),
 .reporte-sas-main-grid :deep(.p-datatable-thead > tr:nth-child(2) > th::before) {
@@ -84,34 +130,30 @@ $css = @'
   inset: 0 !important;
   z-index: 0 !important;
   pointer-events: none !important;
+  background: #fff !important;
+  background-color: #fff !important;
   opacity: 1 !important;
 }
 
-.reporte-sas-main-grid :deep(.p-datatable-thead > tr:first-child > th::before) {
-  background: #f1f1f1 !important;
-}
-
-.reporte-sas-main-grid :deep(.p-datatable-thead > tr.p-datatable-filter-row > th::before),
-.reporte-sas-main-grid :deep(.p-datatable-thead > tr.p-filter-row > th::before),
-.reporte-sas-main-grid :deep(.p-datatable-thead > tr:nth-child(2) > th::before) {
-  background: #fff !important;
-}
-
-/* El contenido de header/filtros queda por encima de la capa opaca. */
-.reporte-sas-main-grid :deep(.p-column-header-content),
-.reporte-sas-main-grid :deep(.fm-filter-cell),
-.reporte-sas-main-grid :deep(.p-column-filter) {
+/* El contenido de filtros queda por encima de la capa opaca. */
+.reporte-sas-main-grid :deep(.p-datatable-thead > tr.p-datatable-filter-row .fm-filter-cell),
+.reporte-sas-main-grid :deep(.p-datatable-thead > tr.p-filter-row .fm-filter-cell),
+.reporte-sas-main-grid :deep(.p-datatable-thead > tr:nth-child(2) .fm-filter-cell),
+.reporte-sas-main-grid :deep(.p-datatable-thead .p-column-filter) {
   position: relative !important;
-  z-index: 2 !important;
+  z-index: 3 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .reporte-sas-main-grid :deep(.p-datatable-thead .p-inputtext),
 .reporte-sas-main-grid :deep(.p-datatable-thead .fm-column-filter) {
   position: relative !important;
-  z-index: 3 !important;
+  z-index: 4 !important;
   background: #fff !important;
   background-color: #fff !important;
   opacity: 1 !important;
+  visibility: visible !important;
 }
 
 /* El cuerpo nunca compite en la misma capa que cabecera/filtros. */
@@ -132,6 +174,7 @@ if ($styleCloseIndex -lt 0) {
 $content = $content.Insert($styleCloseIndex, "`r`n" + $css.Trim() + "`r`n")
 [System.IO.File]::WriteAllText($path, $content, $utf8NoBom)
 
-Write-Host 'Reporte SAS: cabecera y filtros sticky/opacos aplicados.'
-Write-Host 'Los registros quedan completamente por debajo durante el scroll.'
+Write-Host 'Reporte SAS: nombres de columnas restaurados y visibles.'
+Write-Host 'Cabecera y filtros permanecen sticky/opacos durante el scroll.'
+Write-Host 'Los registros quedan completamente por debajo.'
 Write-Host "Archivo modificado: $path"
