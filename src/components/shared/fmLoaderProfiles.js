@@ -7,8 +7,8 @@ const DEFAULT_PROFILE = Object.freeze({
 const PROFILES = Object.freeze({
   LOGIN2FA: {
     variant: 'profile',
-    title: 'Cargando tu perfil',
-    message: 'Obteniendo información del usuario'
+    title: 'Cargando perfil',
+    message: 'Obteniendo información del perfil'
   },
   MAIN: {
     variant: 'dashboard',
