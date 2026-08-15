@@ -7,57 +7,32 @@
     :aria-label="accessibleMessage"
   >
     <div class="fm-typing-loader__box">
-      <svg class="fm-typing-loader__image" viewBox="0 0 180 120" aria-hidden="true">
-        <defs>
-          <clipPath id="fm-code-screen-clip">
-            <rect x="27" y="27" width="76" height="39" rx="3" />
-          </clipPath>
-        </defs>
+      <div
+        class="fm-brand-spinner"
+        :class="`fm-brand-spinner--${activeVariant}`"
+        aria-hidden="true"
+      >
+        <span class="fm-brand-spinner__ring fm-brand-spinner__ring--outer"></span>
+        <span class="fm-brand-spinner__ring fm-brand-spinner__ring--inner"></span>
 
-        <rect x="14" y="14" width="102" height="66" rx="7" fill="#e8fbfd" stroke="#00a9bd" stroke-width="4" />
-        <rect x="27" y="27" width="76" height="39" rx="3" fill="#173142" />
+        <span
+          v-for="index in 16"
+          :key="index"
+          class="fm-brand-spinner__tick"
+          :style="tickStyle(index - 1)"
+        ></span>
 
-        <g clip-path="url(#fm-code-screen-clip)">
-          <g class="fm-code-stream">
-            <path class="fm-code-line fm-code-line--1" d="M38 34h25" />
-            <path class="fm-code-line fm-code-line--2" d="M38 43h41" />
-            <path class="fm-code-line fm-code-line--3" d="M38 52h18" />
-            <path class="fm-code-line fm-code-line--4" d="M38 61h34" />
-            <path class="fm-code-line fm-code-line--5" d="M38 70h27" />
-            <path class="fm-code-line fm-code-line--6" d="M38 79h43" />
-          </g>
-          <rect class="fm-code-cursor" x="82" y="57" width="3" height="6" rx="1" fill="#ffffff" />
-          <rect class="fm-screen-scan" x="27" y="27" width="76" height="8" fill="rgba(99, 227, 238, .13)" />
-        </g>
+        <span class="fm-brand-spinner__core">
+          <i v-if="centerIcon" :class="centerIcon"></i>
+          <span v-else-if="activeVariant === 'emulation'" class="fm-brand-spinner__infinity">∞</span>
+        </span>
+      </div>
 
-        <path d="M65 80v14M44 94h42" stroke="#173142" stroke-width="4" stroke-linecap="round" />
-        <circle cx="138" cy="38" r="13" fill="#f5b47e" />
-        <path d="M127 35c2-12 23-16 27-1-6-2-10-5-14-8-2 5-6 8-13 9Z" fill="#263746" />
-        <path d="M122 61c5-13 28-14 34 0l7 31h-47l6-31Z" fill="#00a9bd" />
+      <strong v-if="showTitle && displayTitle" class="fm-typing-loader__title">
+        {{ displayTitle }}
+      </strong>
 
-        <g class="fm-typing-arm fm-typing-arm--left">
-          <path d="M125 66 99 82" stroke="#f5b47e" stroke-width="7" stroke-linecap="round" />
-          <path d="m97 82 13 5" stroke="#263746" stroke-width="5" stroke-linecap="round" />
-        </g>
-
-        <g class="fm-typing-arm fm-typing-arm--right">
-          <path d="M153 66 128 83" stroke="#f5b47e" stroke-width="7" stroke-linecap="round" />
-          <path d="m128 83-13 4" stroke="#263746" stroke-width="5" stroke-linecap="round" />
-        </g>
-
-        <g class="fm-keyboard-keys" fill="#00a9bd">
-          <rect x="94" y="87" width="5" height="2" rx="1" />
-          <rect x="102" y="89" width="5" height="2" rx="1" />
-          <rect x="110" y="87" width="5" height="2" rx="1" />
-          <rect x="118" y="89" width="5" height="2" rx="1" />
-          <rect x="126" y="87" width="5" height="2" rx="1" />
-        </g>
-
-        <path d="M126 92v17M151 92v17" stroke="#263746" stroke-width="8" stroke-linecap="round" />
-      </svg>
-
-      <strong v-if="showTitle && displayTitle" class="fm-typing-loader__title">{{ displayTitle }}</strong>
-      <div v-if="showMessage" class="fm-typing-loader__message">
+      <div v-if="effectiveShowMessage && displayMessage" class="fm-typing-loader__message">
         {{ displayMessage }}<span class="fm-typing-loader__dots" aria-hidden="true"></span>
       </div>
     </div>
@@ -67,14 +42,38 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { getLoaderProfile } from './fmLoaderProfiles.js'
 
-const GLOBAL_TITLE = 'Cargando Información'
-const GLOBAL_MESSAGE = 'Preparando Grilla'
+const TICK_COLORS = [
+  '#16c7d9', '#00b5ca', '#039fe0', '#198bd8',
+  '#3976e0', '#5362e6', '#7051df', '#8a43dc',
+  '#a636d0', '#c12ab8', '#d926a0', '#e3268e',
+  '#d926a0', '#a636d0', '#7051df', '#3976e0'
+]
+
+const GENERIC_TITLES = new Set([
+  '',
+  'cargando',
+  'cargando información',
+  'cargando informacion',
+  'cargando pantalla',
+  'cargando perfil'
+])
+
+const GENERIC_MESSAGES = new Set([
+  '',
+  'preparando grilla',
+  'preparando pantalla',
+  'cargando pantalla',
+  'aguarde unos instantes'
+])
+
+const normalize = (value) => String(value ?? '').trim().toLowerCase()
 
 const props = defineProps({
-  title: { type: String, default: GLOBAL_TITLE },
-  message: { type: String, default: GLOBAL_MESSAGE },
-  variant: { type: String, default: 'inline' },
+  title: { type: String, default: '' },
+  message: { type: String, default: '' },
+  variant: { type: String, default: 'auto' },
   fullscreen: { type: Boolean, default: false },
   overlay: { type: Boolean, default: false },
   inline: { type: Boolean, default: false },
@@ -83,131 +82,375 @@ const props = defineProps({
 })
 
 const route = useRoute()
-const isLoginRoute = computed(() => {
-  const routeName = String(route.name ?? '').toLowerCase()
-  const routePath = String(route.path ?? '').toLowerCase()
+const routeProfile = computed(() => getLoaderProfile(route))
 
-  return routeName.includes('login') || routePath.includes('login') || routePath === '/'
+const activeVariant = computed(() => {
+  const requested = normalize(props.variant || 'auto')
+
+  if (!requested || requested === 'auto') return routeProfile.value.variant
+
+  // Los shells de grilla existentes siguen intactos, pero si la pantalla
+  // tiene un contexto más específico (reporte, materiales, búsqueda, etc.)
+  // usamos esa variante visual sin tocar la pantalla ni su layout.
+  if (
+    requested === 'grid' &&
+    routeProfile.value.variant &&
+    !['grid', 'iframe'].includes(routeProfile.value.variant)
+  ) {
+    return routeProfile.value.variant
+  }
+
+  return requested
 })
 
-const displayTitle = computed(() => (
-  isLoginRoute.value ? (props.title || props.message) : GLOBAL_TITLE
-))
-const displayMessage = computed(() => (
-  isLoginRoute.value ? props.message : GLOBAL_MESSAGE
-))
+const displayTitle = computed(() => {
+  if (GENERIC_TITLES.has(normalize(props.title))) return routeProfile.value.title
+  return props.title || routeProfile.value.title || 'Cargando información'
+})
+
+const displayMessage = computed(() => {
+  if (GENERIC_MESSAGES.has(normalize(props.message))) return routeProfile.value.message
+  return props.message || routeProfile.value.message || 'Aguarde unos instantes'
+})
+
+// El login anterior ocultaba el subtítulo. Para el nuevo loader de perfil
+// mostramos siempre la frase contextual debajo del spinner.
+const effectiveShowMessage = computed(() => props.showMessage || activeVariant.value === 'profile')
+
+const centerIcon = computed(() => ({
+  dashboard: 'pi pi-chart-line',
+  detail: 'pi pi-file',
+  report: 'pi pi-chart-bar',
+  search: 'pi pi-search',
+  materials: 'pi pi-box',
+  config: 'pi pi-cog',
+  process: 'pi pi-check'
+}[activeVariant.value] || ''))
+
 const accessibleMessage = computed(() => (
-  `${displayTitle.value}. ${props.showMessage ? displayMessage.value : ''}`.trim()
+  `${displayTitle.value}. ${effectiveShowMessage.value ? displayMessage.value : ''}`.trim()
 ))
+
 const loaderClasses = computed(() => ({
   'fm-typing-loader--fullscreen': props.fullscreen,
   'fm-typing-loader--overlay': props.overlay,
   'fm-typing-loader--inline': props.inline || (!props.fullscreen && !props.overlay),
-  [`fm-typing-loader--${props.variant}`]: Boolean(props.variant)
+  [`fm-typing-loader--${activeVariant.value}`]: Boolean(activeVariant.value)
 }))
+
+const tickStyle = (index) => ({
+  '--i': index,
+  '--tick-color': TICK_COLORS[index % TICK_COLORS.length]
+})
 </script>
 
 <style scoped>
-.fm-code-line {
-  fill: none;
-  stroke: #63e3ee;
-  stroke-width: 3.5;
-  stroke-linecap: round;
-  stroke-dasharray: 48;
-  stroke-dashoffset: 48;
-  animation: fm-code-write 1.55s ease-in-out infinite;
+.fm-brand-spinner {
+  --fm-spinner-size: 86px;
+  position: relative;
+  width: var(--fm-spinner-size);
+  height: var(--fm-spinner-size);
+  margin: 2px 0 12px;
+  flex: 0 0 auto;
 }
 
-.fm-code-line--2 { animation-delay: .12s; }
-.fm-code-line--3 { animation-delay: .24s; }
-.fm-code-line--4 { animation-delay: .36s; }
-.fm-code-line--5 { animation-delay: .48s; }
-.fm-code-line--6 { animation-delay: .60s; }
-
-.fm-code-stream {
-  animation: fm-code-scroll 2.2s ease-in-out infinite;
+.fm-brand-spinner__ring,
+.fm-brand-spinner__ring::after,
+.fm-brand-spinner__core,
+.fm-brand-spinner__tick {
+  position: absolute;
+  box-sizing: border-box;
 }
 
-.fm-code-cursor {
-  animation: fm-cursor-blink .65s steps(2, end) infinite;
+.fm-brand-spinner__ring {
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from -20deg,
+    #16c7d9 0deg,
+    #00a9bd 70deg,
+    #198bd8 142deg,
+    #5362e6 215deg,
+    #8a43dc 282deg,
+    #e3268e 334deg,
+    transparent 334deg 360deg
+  );
+  box-shadow: 0 7px 20px rgba(37, 67, 128, .14);
+  animation: fm-spinner-rotate .95s linear infinite;
 }
 
-.fm-screen-scan {
-  animation: fm-screen-scan 1.6s linear infinite;
+.fm-brand-spinner__ring::after {
+  content: '';
+  inset: 8px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px rgba(31, 62, 89, .05);
 }
 
-.fm-typing-arm {
-  transform-box: fill-box;
+.fm-brand-spinner__ring--inner {
+  display: none;
+  inset: 15px;
+  background: conic-gradient(
+    from 150deg,
+    #e3268e 0deg,
+    #8a43dc 88deg,
+    #5362e6 165deg,
+    #198bd8 238deg,
+    #16c7d9 310deg,
+    transparent 310deg 360deg
+  );
+  box-shadow: none;
+  animation-duration: 1.35s;
+  animation-direction: reverse;
 }
 
-.fm-typing-arm--left {
-  transform-origin: 95% 18%;
-  animation: fm-type-left .42s ease-in-out infinite alternate;
+.fm-brand-spinner__ring--inner::after {
+  inset: 6px;
 }
 
-.fm-typing-arm--right {
-  transform-origin: 8% 16%;
-  animation: fm-type-right .42s ease-in-out .21s infinite alternate;
+.fm-brand-spinner__core {
+  z-index: 4;
+  inset: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #4263d9;
+  font-size: 23px;
 }
 
-.fm-keyboard-keys rect {
-  animation: fm-key-press .84s ease-in-out infinite;
+.fm-brand-spinner__core .pi {
+  font-size: inherit;
 }
 
-.fm-keyboard-keys rect:nth-child(2) { animation-delay: .12s; }
-.fm-keyboard-keys rect:nth-child(3) { animation-delay: .24s; }
-.fm-keyboard-keys rect:nth-child(4) { animation-delay: .36s; }
-.fm-keyboard-keys rect:nth-child(5) { animation-delay: .48s; }
-
-@keyframes fm-code-write {
-  0% { stroke-dashoffset: 48; opacity: .30; }
-  45%, 78% { stroke-dashoffset: 0; opacity: 1; }
-  100% { stroke-dashoffset: -48; opacity: .22; }
+.fm-brand-spinner__tick {
+  display: none;
+  z-index: 3;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--tick-color);
+  transform: translate(-50%, -50%) rotate(calc(var(--i) * 22.5deg)) translateY(-34px);
+  transform-origin: center;
 }
 
-@keyframes fm-code-scroll {
-  0%, 36% { transform: translateY(0); }
-  65%, 100% { transform: translateY(-18px); }
+.fm-brand-spinner__infinity {
+  display: inline-block;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 1;
+  color: transparent;
+  background: linear-gradient(90deg, #16c7d9, #3976e0 45%, #8a43dc 68%, #e3268e);
+  -webkit-background-clip: text;
+  background-clip: text;
 }
 
-@keyframes fm-cursor-blink {
-  0%, 45% { opacity: 1; }
-  46%, 100% { opacity: 0; }
+.fm-brand-spinner--profile {
+  --fm-spinner-size: 90px;
 }
 
-@keyframes fm-screen-scan {
-  from { transform: translateY(-9px); }
-  to { transform: translateY(47px); }
+.fm-brand-spinner--profile .fm-brand-spinner__ring--inner {
+  display: block;
 }
 
-@keyframes fm-type-left {
-  from { transform: rotate(2deg) translateY(0); }
-  to { transform: rotate(-5deg) translateY(2px); }
+.fm-brand-spinner--profile .fm-brand-spinner__core {
+  inset: 31px;
+  background: radial-gradient(circle, rgba(22, 199, 217, .10), transparent 70%);
 }
 
-@keyframes fm-type-right {
-  from { transform: rotate(-2deg) translateY(1px); }
-  to { transform: rotate(5deg) translateY(-1px); }
+.fm-brand-spinner--dashboard .fm-brand-spinner__ring--outer {
+  background: conic-gradient(
+    #16c7d9 0 55deg,
+    transparent 55deg 78deg,
+    #198bd8 78deg 145deg,
+    transparent 145deg 170deg,
+    #7051df 170deg 238deg,
+    transparent 238deg 265deg,
+    #e3268e 265deg 330deg,
+    transparent 330deg 360deg
+  );
+  animation-duration: 1.15s;
 }
 
-@keyframes fm-key-press {
-  0%, 55%, 100% { opacity: .30; transform: translateY(0); }
-  20%, 40% { opacity: 1; transform: translateY(1px); }
+.fm-brand-spinner--grid {
+  animation: fm-spinner-rotate 1.1s linear infinite;
+}
+
+.fm-brand-spinner--grid .fm-brand-spinner__ring,
+.fm-brand-spinner--grid .fm-brand-spinner__core {
+  display: none;
+}
+
+.fm-brand-spinner--grid .fm-brand-spinner__tick {
+  display: block;
+  width: 7px;
+  height: 13px;
+}
+
+.fm-brand-spinner--detail .fm-brand-spinner__ring--outer {
+  background: conic-gradient(
+    from 15deg,
+    #16c7d9,
+    #198bd8 35%,
+    transparent 46% 57%,
+    #8a43dc 72%,
+    #e3268e 88%,
+    #16c7d9
+  );
+  animation-duration: 1.2s;
+}
+
+.fm-brand-spinner--detail .fm-brand-spinner__core {
+  color: #2e6fda;
+}
+
+.fm-brand-spinner--emulation {
+  animation: fm-spinner-rotate 1.4s linear infinite;
+}
+
+.fm-brand-spinner--emulation .fm-brand-spinner__ring {
+  display: none;
+}
+
+.fm-brand-spinner--emulation .fm-brand-spinner__tick {
+  display: block;
+  width: 8px;
+  height: 8px;
+  transform: translate(-50%, -50%) rotate(calc(var(--i) * 22.5deg)) translateY(-35px);
+}
+
+.fm-brand-spinner--emulation .fm-brand-spinner__core {
+  inset: 18px;
+  animation: fm-spinner-counter 1.4s linear infinite;
+}
+
+.fm-brand-spinner--report {
+  animation: fm-spinner-rotate 1.5s linear infinite;
+}
+
+.fm-brand-spinner--report .fm-brand-spinner__ring {
+  display: none;
+}
+
+.fm-brand-spinner--report .fm-brand-spinner__tick {
+  display: block;
+  width: 3px;
+  height: 18px;
+  transform: translate(-50%, -50%) rotate(calc(var(--i) * 22.5deg)) translateY(-33px);
+}
+
+.fm-brand-spinner--report .fm-brand-spinner__core {
+  color: #5064da;
+  font-size: 21px;
+}
+
+.fm-brand-spinner--search .fm-brand-spinner__ring--outer {
+  background: conic-gradient(
+    from 35deg,
+    #16c7d9 0 88deg,
+    #198bd8 120deg,
+    transparent 142deg 205deg,
+    #8a43dc 225deg,
+    #e3268e 310deg,
+    transparent 334deg 360deg
+  );
+  animation-duration: 1.05s;
+}
+
+.fm-brand-spinner--search .fm-brand-spinner__core {
+  color: #0baec3;
+}
+
+.fm-brand-spinner--materials .fm-brand-spinner__ring--outer {
+  animation-duration: 1.25s;
+}
+
+.fm-brand-spinner--materials .fm-brand-spinner__core {
+  inset: 22px;
+  border: 2px solid rgba(83, 98, 230, .12);
+  color: #6d50dc;
+  font-size: 24px;
+}
+
+.fm-brand-spinner--config .fm-brand-spinner__ring--outer {
+  background: conic-gradient(
+    #16c7d9 0 52deg,
+    transparent 52deg 72deg,
+    #198bd8 72deg 132deg,
+    transparent 132deg 154deg,
+    #5362e6 154deg 218deg,
+    transparent 218deg 240deg,
+    #8a43dc 240deg 295deg,
+    transparent 295deg 315deg,
+    #e3268e 315deg 350deg,
+    transparent 350deg 360deg
+  );
+  animation-duration: 1.25s;
+}
+
+.fm-brand-spinner--config .fm-brand-spinner__core {
+  color: #654edb;
+  animation: fm-spinner-counter 1.75s linear infinite;
+}
+
+.fm-brand-spinner--process .fm-brand-spinner__ring--inner {
+  display: block;
+  inset: 19px;
+  opacity: .55;
+}
+
+.fm-brand-spinner--process .fm-brand-spinner__core {
+  inset: 26px;
+  color: #09aebd;
+  font-size: 25px;
+}
+
+.fm-brand-spinner--iframe {
+  animation: fm-spinner-rotate 1.15s linear infinite;
+}
+
+.fm-brand-spinner--iframe .fm-brand-spinner__ring {
+  display: none;
+}
+
+.fm-brand-spinner--iframe .fm-brand-spinner__tick {
+  display: block;
+  width: 7px;
+  height: 7px;
+  opacity: calc(.30 + (var(--i) * .035));
+  transform: translate(-50%, -50%) rotate(calc(var(--i) * 22.5deg)) translateY(-34px);
+}
+
+.fm-brand-spinner--iframe .fm-brand-spinner__core {
+  inset: 31px;
+  background: radial-gradient(circle, rgba(22, 199, 217, .20), rgba(83, 98, 230, .08) 55%, transparent 72%);
+}
+
+.fm-typing-loader__title {
+  color: #173142;
+  font-weight: 700;
+}
+
+.fm-typing-loader__message {
+  color: #607482;
+}
+
+@keyframes fm-spinner-rotate {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fm-spinner-counter {
+  to { transform: rotate(-360deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fm-code-line,
-  .fm-code-stream,
-  .fm-code-cursor,
-  .fm-screen-scan,
-  .fm-typing-arm,
-  .fm-keyboard-keys rect {
-    animation: none !important;
-  }
-
-  .fm-code-line {
-    stroke-dashoffset: 0;
-    opacity: 1;
+  .fm-brand-spinner,
+  .fm-brand-spinner__ring,
+  .fm-brand-spinner__core {
+    animation-duration: 2.8s !important;
   }
 }
 </style>
