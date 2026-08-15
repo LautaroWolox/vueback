@@ -16,6 +16,7 @@ Write-Host '  6) cabecera + filtros sticky de OTs Fallidas' -ForegroundColor Gra
 Write-Host '  7) cabecera + filtros sticky en las demas grillas' -ForegroundColor Gray
 Write-Host '  8) sticky reforzado especifico de Reporte SAS' -ForegroundColor Gray
 Write-Host '  9) spinners contextuales Telecom / Personal' -ForegroundColor Gray
+Write-Host ' 10) reparacion final de textos visibles UTF-8' -ForegroundColor Gray
 Write-Host ''
 
 $scripts = @(
@@ -27,22 +28,25 @@ $scripts = @(
   'apply-otf-sticky-header-filters.ps1',
   'apply-grid-sticky-all.ps1',
   'apply-reporte-sas-sticky-final.ps1',
-  'apply-spinner-only.ps1'
+  'apply-spinner-only.ps1',
+  'apply-visible-text-utf8-repair.ps1'
 )
 
 foreach ($script in $scripts) {
   Write-Host "Aplicando $script ..." -ForegroundColor Yellow
 
-  $scriptContent = git show "$sourceRef`:$script"
-  if ($LASTEXITCODE -ne 0) {
-    throw "No se pudo leer $script desde $sourceRef. Ejecuta primero: git fetch github-origen"
-  }
-
   $tempFile = Join-Path $env:TEMP ("fm-" + [guid]::NewGuid().ToString('N') + '.ps1')
-  $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
-  [System.IO.File]::WriteAllText($tempFile, (($scriptContent -join "`n") + "`n"), $utf8NoBom)
+  $spec = "$sourceRef`:$script"
+  $command = 'git show "' + $spec + '" > "' + $tempFile + '"'
 
   try {
+    # Importante: cmd redirige los bytes crudos de git al archivo temporal.
+    # Asi PowerShell no recodifica UTF-8 ni rompe tildes/acentos.
+    & cmd.exe /d /c $command
+    if ($LASTEXITCODE -ne 0 -or -not (Test-Path $tempFile)) {
+      throw "No se pudo leer $script desde $sourceRef. Ejecuta primero: git fetch github-origen"
+    }
+
     & powershell -NoProfile -ExecutionPolicy Bypass -File $tempFile
     if ($LASTEXITCODE -ne 0) {
       throw "$script termino con codigo $LASTEXITCODE"
