@@ -9,17 +9,19 @@ Write-Host '============================================================' -Foreg
 Write-Host 'Este proceso conserva/reaplica:' -ForegroundColor Gray
 Write-Host '  1) submenus sin estiramiento' -ForegroundColor Gray
 Write-Host '  2) responsive final de pantallas legacy/iframe' -ForegroundColor Gray
-Write-Host '  3) dialogs iframe centrados en cualquier zoom' -ForegroundColor Gray
-Write-Host '  4) cabecera + filtros sticky de OTs Fallidas' -ForegroundColor Gray
-Write-Host '  5) cabecera + filtros sticky en las demas grillas' -ForegroundColor Gray
-Write-Host '  6) sticky reforzado especifico de Reporte SAS' -ForegroundColor Gray
-Write-Host '  7) spinners contextuales Telecom / Personal' -ForegroundColor Gray
+Write-Host '  3) detalle Acta usando todo el viewport' -ForegroundColor Gray
+Write-Host '  4) dialogs iframe con zoom reversible y centrado' -ForegroundColor Gray
+Write-Host '  5) cabecera + filtros sticky de OTs Fallidas' -ForegroundColor Gray
+Write-Host '  6) cabecera + filtros sticky en las demas grillas' -ForegroundColor Gray
+Write-Host '  7) sticky reforzado especifico de Reporte SAS' -ForegroundColor Gray
+Write-Host '  8) spinners contextuales Telecom / Personal' -ForegroundColor Gray
 Write-Host ''
 
 $scripts = @(
   'apply-submenu-final.ps1',
   'apply-legacy-responsive-final.ps1',
-  'apply-iframe-dialog-center-final.ps1',
+  'apply-detail-dialog-zoom-v2.ps1',
+  'apply-legacy-dialog-zoom-reversible.ps1',
   'apply-otf-sticky-header-filters.ps1',
   'apply-grid-sticky-all.ps1',
   'apply-reporte-sas-sticky-final.ps1',
