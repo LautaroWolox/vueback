@@ -15,8 +15,9 @@ Write-Host '  5) limpieza de bloques responsive duplicados' -ForegroundColor Gra
 Write-Host '  6) cabecera + filtros sticky de OTs Fallidas' -ForegroundColor Gray
 Write-Host '  7) cabecera + filtros sticky en las demas grillas' -ForegroundColor Gray
 Write-Host '  8) sticky reforzado especifico de Reporte SAS' -ForegroundColor Gray
-Write-Host '  9) spinners contextuales Telecom / Personal' -ForegroundColor Gray
-Write-Host ' 10) reparacion final de textos visibles UTF-8' -ForegroundColor Gray
+Write-Host '  9) Reporte SAS con el mismo diseno visual que OTs Fallidas' -ForegroundColor Gray
+Write-Host ' 10) spinners contextuales Telecom / Personal' -ForegroundColor Gray
+Write-Host ' 11) reparacion final de textos visibles UTF-8' -ForegroundColor Gray
 Write-Host ''
 
 $scripts = @(
@@ -28,6 +29,7 @@ $scripts = @(
   'apply-otf-sticky-header-filters.ps1',
   'apply-grid-sticky-all.ps1',
   'apply-reporte-sas-sticky-final.ps1',
+  'apply-reporte-sas-match-otf.ps1',
   'apply-spinner-only.ps1',
   'apply-visible-text-utf8-repair.ps1'
 )
@@ -68,6 +70,7 @@ Write-Host 'Archivos que pueden cambiar por los fixes ya aprobados:' -Foreground
 Write-Host ' - src/assets/css/fm-global.css' -ForegroundColor Gray
 Write-Host ' - src/components/CustomMenu.vue' -ForegroundColor Gray
 Write-Host ' - src/plugins/responsiveIframes.js' -ForegroundColor Gray
+Write-Host ' - src/modules/reporteSas/ReporteSAS.vue' -ForegroundColor Gray
 Write-Host ' - src/modules/reporteSas/components/Tabla.vue' -ForegroundColor Gray
 Write-Host ' - archivos responsive legacy que actualicen los scripts finales' -ForegroundColor Gray
 Write-Host ' - src/components/shared/FmTypingLoader.vue' -ForegroundColor Gray
