@@ -1,64 +1,25 @@
 <template>
   <div
-    class="fm-typing-loader"
+    class="fm-loader"
     :class="loaderClasses"
     role="status"
     aria-live="polite"
     :aria-label="accessibleMessage"
   >
-    <div class="fm-typing-loader__box">
-      <svg class="fm-typing-loader__image" viewBox="0 0 180 120" aria-hidden="true">
-        <defs>
-          <clipPath id="fm-code-screen-clip">
-            <rect x="27" y="27" width="76" height="39" rx="3" />
-          </clipPath>
-        </defs>
+    <div class="fm-loader__card">
+      <div class="fm-loader__spinner" aria-hidden="true">
+        <span class="fm-loader__ring fm-loader__ring--outer"></span>
+        <span class="fm-loader__ring fm-loader__ring--middle"></span>
+        <span class="fm-loader__ring fm-loader__ring--inner"></span>
+        <span class="fm-loader__core"></span>
+      </div>
 
-        <rect x="14" y="14" width="102" height="66" rx="7" fill="#e8fbfd" stroke="#00a9bd" stroke-width="4" />
-        <rect x="27" y="27" width="76" height="39" rx="3" fill="#173142" />
+      <strong v-if="showTitle && displayTitle" class="fm-loader__title">
+        {{ displayTitle }}
+      </strong>
 
-        <g clip-path="url(#fm-code-screen-clip)">
-          <g class="fm-code-stream">
-            <path class="fm-code-line fm-code-line--1" d="M38 34h25" />
-            <path class="fm-code-line fm-code-line--2" d="M38 43h41" />
-            <path class="fm-code-line fm-code-line--3" d="M38 52h18" />
-            <path class="fm-code-line fm-code-line--4" d="M38 61h34" />
-            <path class="fm-code-line fm-code-line--5" d="M38 70h27" />
-            <path class="fm-code-line fm-code-line--6" d="M38 79h43" />
-          </g>
-          <rect class="fm-code-cursor" x="82" y="57" width="3" height="6" rx="1" fill="#ffffff" />
-          <rect class="fm-screen-scan" x="27" y="27" width="76" height="8" fill="rgba(99, 227, 238, .13)" />
-        </g>
-
-        <path d="M65 80v14M44 94h42" stroke="#173142" stroke-width="4" stroke-linecap="round" />
-        <circle cx="138" cy="38" r="13" fill="#f5b47e" />
-        <path d="M127 35c2-12 23-16 27-1-6-2-10-5-14-8-2 5-6 8-13 9Z" fill="#263746" />
-        <path d="M122 61c5-13 28-14 34 0l7 31h-47l6-31Z" fill="#00a9bd" />
-
-        <g class="fm-typing-arm fm-typing-arm--left">
-          <path d="M125 66 99 82" stroke="#f5b47e" stroke-width="7" stroke-linecap="round" />
-          <path d="m97 82 13 5" stroke="#263746" stroke-width="5" stroke-linecap="round" />
-        </g>
-
-        <g class="fm-typing-arm fm-typing-arm--right">
-          <path d="M153 66 128 83" stroke="#f5b47e" stroke-width="7" stroke-linecap="round" />
-          <path d="m128 83-13 4" stroke="#263746" stroke-width="5" stroke-linecap="round" />
-        </g>
-
-        <g class="fm-keyboard-keys" fill="#00a9bd">
-          <rect x="94" y="87" width="5" height="2" rx="1" />
-          <rect x="102" y="89" width="5" height="2" rx="1" />
-          <rect x="110" y="87" width="5" height="2" rx="1" />
-          <rect x="118" y="89" width="5" height="2" rx="1" />
-          <rect x="126" y="87" width="5" height="2" rx="1" />
-        </g>
-
-        <path d="M126 92v17M151 92v17" stroke="#263746" stroke-width="8" stroke-linecap="round" />
-      </svg>
-
-      <strong v-if="showTitle && displayTitle" class="fm-typing-loader__title">{{ displayTitle }}</strong>
-      <div v-if="showMessage" class="fm-typing-loader__message">
-        {{ displayMessage }}<span class="fm-typing-loader__dots" aria-hidden="true"></span>
+      <div v-if="effectiveShowMessage && displayMessage" class="fm-loader__message">
+        {{ displayMessage }}<span class="fm-loader__dots" aria-hidden="true"></span>
       </div>
     </div>
   </div>
@@ -67,147 +28,266 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-
-const GLOBAL_TITLE = 'Cargando Información'
-const GLOBAL_MESSAGE = 'Preparando Grilla'
+import {
+  GENERIC_LOADER_MESSAGES,
+  GENERIC_LOADER_TITLES,
+  getLoaderProfile,
+} from './fmLoaderProfiles'
 
 const props = defineProps({
-  title: { type: String, default: GLOBAL_TITLE },
-  message: { type: String, default: GLOBAL_MESSAGE },
-  variant: { type: String, default: 'inline' },
+  title: { type: String, default: 'Cargando Información' },
+  message: { type: String, default: 'Preparando Grilla' },
+  variant: { type: String, default: 'default' },
   fullscreen: { type: Boolean, default: false },
   overlay: { type: Boolean, default: false },
   inline: { type: Boolean, default: false },
   showTitle: { type: Boolean, default: true },
-  showMessage: { type: Boolean, default: true }
+  showMessage: { type: Boolean, default: true },
 })
 
 const route = useRoute()
-const isLoginRoute = computed(() => {
-  const routeName = String(route.name ?? '').toLowerCase()
-  const routePath = String(route.path ?? '').toLowerCase()
+const routeProfile = computed(() => getLoaderProfile(route.name))
 
-  return routeName.includes('login') || routePath.includes('login') || routePath === '/'
+const hasCustomTitle = computed(() => {
+  const value = String(props.title ?? '').trim()
+  return Boolean(value) && !GENERIC_LOADER_TITLES.includes(value)
+})
+
+const hasCustomMessage = computed(() => {
+  const value = String(props.message ?? '').trim()
+  return Boolean(value) && !GENERIC_LOADER_MESSAGES.includes(value)
 })
 
 const displayTitle = computed(() => (
-  isLoginRoute.value ? (props.title || props.message) : GLOBAL_TITLE
+  hasCustomTitle.value ? props.title : routeProfile.value.title
 ))
+
 const displayMessage = computed(() => (
-  isLoginRoute.value ? props.message : GLOBAL_MESSAGE
+  hasCustomMessage.value ? props.message : routeProfile.value.message
 ))
+
+const effectiveVariant = computed(() => (
+  routeProfile.value.variant || props.variant || 'default'
+))
+
+const effectiveShowMessage = computed(() => (
+  routeProfile.value.forceMessage || props.showMessage
+))
+
 const accessibleMessage = computed(() => (
-  `${displayTitle.value}. ${props.showMessage ? displayMessage.value : ''}`.trim()
+  `${displayTitle.value}. ${effectiveShowMessage.value ? displayMessage.value : ''}`.trim()
 ))
+
 const loaderClasses = computed(() => ({
-  'fm-typing-loader--fullscreen': props.fullscreen,
-  'fm-typing-loader--overlay': props.overlay,
-  'fm-typing-loader--inline': props.inline || (!props.fullscreen && !props.overlay),
-  [`fm-typing-loader--${props.variant}`]: Boolean(props.variant)
+  'fm-loader--fullscreen': props.fullscreen,
+  'fm-loader--overlay': props.overlay,
+  'fm-loader--inline': props.inline || (!props.fullscreen && !props.overlay),
+  [`fm-loader--${effectiveVariant.value}`]: Boolean(effectiveVariant.value),
 }))
 </script>
 
 <style scoped>
-.fm-code-line {
-  fill: none;
-  stroke: #63e3ee;
-  stroke-width: 3.5;
-  stroke-linecap: round;
-  stroke-dasharray: 48;
-  stroke-dashoffset: 48;
-  animation: fm-code-write 1.55s ease-in-out infinite;
+.fm-loader {
+  --fm-loader-cyan: #00a9bd;
+  --fm-loader-blue: #246bfd;
+  --fm-loader-violet: #8b38d1;
+  --fm-loader-magenta: #d9208f;
+  --fm-loader-ink: #173142;
+  --fm-loader-muted: #607887;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  color: var(--fm-loader-ink);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-.fm-code-line--2 { animation-delay: .12s; }
-.fm-code-line--3 { animation-delay: .24s; }
-.fm-code-line--4 { animation-delay: .36s; }
-.fm-code-line--5 { animation-delay: .48s; }
-.fm-code-line--6 { animation-delay: .60s; }
-
-.fm-code-stream {
-  animation: fm-code-scroll 2.2s ease-in-out infinite;
+.fm-loader--fullscreen {
+  position: fixed;
+  z-index: 5000;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  padding: 24px;
+  background: rgba(239, 250, 252, .96);
+  backdrop-filter: blur(2px);
 }
 
-.fm-code-cursor {
-  animation: fm-cursor-blink .65s steps(2, end) infinite;
+.fm-loader--overlay {
+  position: absolute;
+  z-index: 900;
+  inset: 0;
+  min-width: 100%;
+  min-height: 100%;
+  padding: 18px;
+  background: rgba(245, 251, 252, .90);
+  backdrop-filter: blur(1px);
 }
 
-.fm-screen-scan {
-  animation: fm-screen-scan 1.6s linear infinite;
+.fm-loader--inline {
+  width: 100%;
+  min-height: 170px;
+  padding: 18px;
 }
 
-.fm-typing-arm {
-  transform-box: fill-box;
+.fm-loader__card {
+  width: min(286px, calc(100vw - 32px));
+  min-height: 188px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 22px 24px 20px;
+  border: 1px solid #d3e2e7;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .98);
+  box-shadow: 0 16px 38px rgba(24, 68, 82, .13);
+  box-sizing: border-box;
+  text-align: center;
 }
 
-.fm-typing-arm--left {
-  transform-origin: 95% 18%;
-  animation: fm-type-left .42s ease-in-out infinite alternate;
+.fm-loader__spinner {
+  position: relative;
+  width: 86px;
+  height: 86px;
+  flex: 0 0 86px;
+  margin-bottom: 14px;
 }
 
-.fm-typing-arm--right {
-  transform-origin: 8% 16%;
-  animation: fm-type-right .42s ease-in-out .21s infinite alternate;
+.fm-loader__ring,
+.fm-loader__core {
+  position: absolute;
+  border-radius: 50%;
+  box-sizing: border-box;
 }
 
-.fm-keyboard-keys rect {
-  animation: fm-key-press .84s ease-in-out infinite;
+.fm-loader__ring--outer {
+  inset: 0;
+  background:
+    conic-gradient(
+      from 18deg,
+      var(--fm-loader-blue) 0 24%,
+      transparent 24% 29%,
+      var(--fm-loader-violet) 29% 48%,
+      transparent 48% 54%,
+      var(--fm-loader-magenta) 54% 72%,
+      transparent 72% 78%,
+      var(--fm-loader-cyan) 78% 100%
+    );
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 0);
+  mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 0);
+  animation: fm-loader-spin 1.15s linear infinite;
 }
 
-.fm-keyboard-keys rect:nth-child(2) { animation-delay: .12s; }
-.fm-keyboard-keys rect:nth-child(3) { animation-delay: .24s; }
-.fm-keyboard-keys rect:nth-child(4) { animation-delay: .36s; }
-.fm-keyboard-keys rect:nth-child(5) { animation-delay: .48s; }
-
-@keyframes fm-code-write {
-  0% { stroke-dashoffset: 48; opacity: .30; }
-  45%, 78% { stroke-dashoffset: 0; opacity: 1; }
-  100% { stroke-dashoffset: -48; opacity: .22; }
+.fm-loader__ring--middle {
+  inset: 12px;
+  border: 6px solid rgba(0, 169, 189, .13);
+  border-top-color: var(--fm-loader-cyan);
+  border-right-color: var(--fm-loader-blue);
+  animation: fm-loader-spin-reverse 1.55s linear infinite;
 }
 
-@keyframes fm-code-scroll {
-  0%, 36% { transform: translateY(0); }
-  65%, 100% { transform: translateY(-18px); }
+.fm-loader__ring--inner {
+  inset: 26px;
+  border: 5px solid rgba(139, 56, 209, .10);
+  border-bottom-color: var(--fm-loader-magenta);
+  border-left-color: var(--fm-loader-violet);
+  animation: fm-loader-spin .95s ease-in-out infinite;
 }
 
-@keyframes fm-cursor-blink {
-  0%, 45% { opacity: 1; }
-  46%, 100% { opacity: 0; }
+.fm-loader__core {
+  inset: 35px;
+  background: radial-gradient(circle, #fff 0 24%, #dff9fb 42%, #8be7ee 100%);
+  box-shadow: 0 0 0 4px rgba(0, 169, 189, .08);
+  animation: fm-loader-pulse 1.35s ease-in-out infinite;
 }
 
-@keyframes fm-screen-scan {
-  from { transform: translateY(-9px); }
-  to { transform: translateY(47px); }
+.fm-loader__title {
+  display: block;
+  max-width: 100%;
+  color: var(--fm-loader-ink);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 
-@keyframes fm-type-left {
-  from { transform: rotate(2deg) translateY(0); }
-  to { transform: rotate(-5deg) translateY(2px); }
+.fm-loader__message {
+  max-width: 100%;
+  margin-top: 7px;
+  color: var(--fm-loader-muted);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
-@keyframes fm-type-right {
-  from { transform: rotate(-2deg) translateY(1px); }
-  to { transform: rotate(5deg) translateY(-1px); }
+.fm-loader__dots::after {
+  content: '';
+  display: inline-block;
+  width: 1.1em;
+  text-align: left;
+  animation: fm-loader-dots 1.25s steps(4, end) infinite;
 }
 
-@keyframes fm-key-press {
-  0%, 55%, 100% { opacity: .30; transform: translateY(0); }
-  20%, 40% { opacity: 1; transform: translateY(1px); }
+.fm-loader--profile .fm-loader__ring--outer { animation-duration: 1.35s; }
+.fm-loader--profile .fm-loader__ring--middle { animation-duration: 1.9s; }
+.fm-loader--grid .fm-loader__ring--outer { animation-duration: .95s; }
+.fm-loader--grid .fm-loader__ring--inner { animation-duration: .72s; }
+.fm-loader--report .fm-loader__ring--middle { animation-duration: 1.15s; }
+.fm-loader--report .fm-loader__core { animation-duration: 1.05s; }
+.fm-loader--emulation .fm-loader__ring--outer { animation-duration: 1.65s; }
+.fm-loader--emulation .fm-loader__ring--inner { animation-duration: 1.15s; }
+.fm-loader--detail .fm-loader__ring--middle,
+.fm-loader--search .fm-loader__ring--middle { animation-duration: 1.05s; }
+.fm-loader--config .fm-loader__ring--outer { animation-duration: 1.75s; }
+.fm-loader--process .fm-loader__ring--outer { animation-duration: .82s; }
+.fm-loader--iframe .fm-loader__ring--outer { animation-duration: 1.25s; }
+
+@keyframes fm-loader-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fm-loader-spin-reverse {
+  to { transform: rotate(-360deg); }
+}
+
+@keyframes fm-loader-pulse {
+  0%, 100% { transform: scale(.88); opacity: .62; }
+  50% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fm-loader-dots {
+  0% { content: ''; }
+  25% { content: '.'; }
+  50% { content: '..'; }
+  75%, 100% { content: '...'; }
+}
+
+@media (max-width: 600px) {
+  .fm-loader__card {
+    width: min(268px, calc(100vw - 24px));
+    min-height: 176px;
+    padding: 19px 18px 17px;
+  }
+
+  .fm-loader__spinner {
+    width: 76px;
+    height: 76px;
+    flex-basis: 76px;
+  }
+
+  .fm-loader__ring--middle { inset: 11px; }
+  .fm-loader__ring--inner { inset: 23px; }
+  .fm-loader__core { inset: 31px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fm-code-line,
-  .fm-code-stream,
-  .fm-code-cursor,
-  .fm-screen-scan,
-  .fm-typing-arm,
-  .fm-keyboard-keys rect {
+  .fm-loader__ring,
+  .fm-loader__core,
+  .fm-loader__dots::after {
     animation: none !important;
-  }
-
-  .fm-code-line {
-    stroke-dashoffset: 0;
-    opacity: 1;
   }
 }
 </style>
