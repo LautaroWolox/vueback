@@ -20,7 +20,15 @@
       <AccordionPanel value="1" class="busqueda-ots-results-panel">
         <AccordionHeader>DATOS DE LAS ORDENES DE TRABAJO</AccordionHeader>
         <AccordionContent>
+          <ReprocesoStepper
+            v-if="reprocessFlowActive"
+            :rows="store.eligibleRows"
+            @cancel="closeReprocessFlow"
+            @execute="executeStepperReprocess"
+          />
+
           <Tabla
+            v-else
             :expanded="gridExpanded"
             @open-external="externalDialogVisible = true"
             @open-failed="openFailedOrders"
@@ -40,20 +48,6 @@
       :rows="failedRows"
     />
 
-    <ReprocesarOtsDialog
-      v-model:visible="reprocessDialogVisible"
-      :rows="store.eligibleRows"
-      @alert="showAlert"
-      @proceed="openChangeTechnician"
-    />
-
-    <CambioTecnicoDialog
-      v-model:visible="changeTechnicianDialogVisible"
-      :rows="selectedForChange"
-      @alert="showAlert"
-      @execute="executeMockReprocess"
-    />
-
     <BuscadorAlertDialog
       v-model:visible="alertVisible"
       :message="alertMessage"
@@ -69,10 +63,9 @@ import AccordionHeader from 'primevue/accordionheader'
 import AccordionContent from 'primevue/accordioncontent'
 import FiltrosBusqueda from './components/FiltrosBusqueda.vue'
 import Tabla from './components/Tabla.vue'
+import ReprocesoStepper from './components/ReprocesoStepper.vue'
 import OtsExternasDialog from './components/OtsExternasDialog.vue'
 import OtsFallidasDialog from './components/OtsFallidasDialog.vue'
-import ReprocesarOtsDialog from './components/ReprocesarOtsDialog.vue'
-import CambioTecnicoDialog from './components/CambioTecnicoDialog.vue'
 import BuscadorAlertDialog from './components/BuscadorAlertDialog.vue'
 import { useBuscadorOtsStore } from './store/buscadorOtsStore'
 
@@ -81,9 +74,7 @@ const activePanels = ref(['0', '1'])
 const externalDialogVisible = ref(false)
 const failedDialogVisible = ref(false)
 const failedRows = ref([])
-const reprocessDialogVisible = ref(false)
-const changeTechnicianDialogVisible = ref(false)
-const selectedForChange = ref([])
+const reprocessFlowActive = ref(false)
 const alertVisible = ref(false)
 const alertMessage = ref('')
 
@@ -100,6 +91,7 @@ const bothPanelsOpen = computed(() => (
 ))
 
 const prepareSearchLayout = () => {
+  reprocessFlowActive.value = false
   activePanels.value = ['1']
 }
 
@@ -115,23 +107,17 @@ const showAlert = (message) => {
 }
 
 const openReprocessFlow = () => {
-  if (!store.eligibleRows.length) {
-    showAlert('No hay OTs en condiciones de continuar con el procesamiento.')
-    return
-  }
-
-  reprocessDialogVisible.value = true
+  reprocessFlowActive.value = true
+  activePanels.value = ['1']
 }
 
-const openChangeTechnician = (rows) => {
-  selectedForChange.value = [...rows]
-  changeTechnicianDialogVisible.value = true
+const closeReprocessFlow = () => {
+  reprocessFlowActive.value = false
 }
 
-const executeMockReprocess = ({ rows, technician }) => {
+const executeStepperReprocess = ({ rows, technician }) => {
   store.applyMockReprocess(rows, technician)
-  changeTechnicianDialogVisible.value = false
-  showAlert('Se enviaron a procesar las órdenes seleccionadas.')
+  reprocessFlowActive.value = false
 }
 
 const normalizeFailedRow = (value, parent, index) => {
