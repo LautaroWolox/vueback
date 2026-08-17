@@ -79,6 +79,8 @@ export const useBuscadorOtsStore = defineStore('buscadorOts', () => {
        * ===============================================================
        */
       if (import.meta.env.DEV) {
+        // Hace visible el spinner durante la prueba local sin afectar producción.
+        await new Promise((resolve) => setTimeout(resolve, 450))
         rows.value = buildMockSearchRows(parsedOtNumbers.value)
         externalRows.value = []
         return
