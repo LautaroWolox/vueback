@@ -1,0 +1,500 @@
+/* === INICIO BUSCADOR OTS - STEPPER REPROCESO === */
+@layer fieldmanager {
+  .busqueda-ots-reprocess-flow {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-left: 3px solid var(--fm-cyan);
+    background: var(--fm-white);
+    color: var(--fm-text);
+  }
+
+  .busqueda-ots-reprocess-flow__header {
+    min-height: 66px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--fm-border);
+    background: linear-gradient(180deg, #ffffff 0%, #f7fafb 100%);
+  }
+
+  .busqueda-ots-reprocess-flow__heading {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+  }
+
+  .busqueda-ots-reprocess-flow__icon {
+    width: 36px;
+    min-width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #b8e8ee;
+    border-radius: 50%;
+    background: var(--fm-cyan-soft);
+    color: var(--fm-cyan-dark);
+    font-size: 15px;
+  }
+
+  .busqueda-ots-reprocess-flow__heading h3 {
+    margin: 0;
+    color: #102b3a;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .busqueda-ots-reprocess-flow__heading p {
+    margin: 3px 0 0;
+    color: var(--fm-text-muted);
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .fm-workflow-stepper,
+  .busqueda-ots-reprocess-stepper {
+    width: 100%;
+    min-height: 0;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    padding: 14px 18px 16px;
+    overflow: auto;
+    background: #f7f9fa;
+  }
+
+  .fm-workflow-stepper .p-steplist {
+    width: min(900px, 100%);
+    margin: 0 auto 14px;
+    padding: 0 4px;
+    background: transparent;
+  }
+
+  .fm-workflow-stepper .p-step {
+    min-width: 0;
+  }
+
+  .fm-workflow-stepper .p-step-header {
+    padding: 4px 8px;
+    border-radius: 8px;
+    background: transparent;
+    color: #69808d;
+  }
+
+  .fm-workflow-stepper .p-step-number {
+    width: 28px;
+    min-width: 28px;
+    height: 28px;
+    border: 1px solid #bdcbd2;
+    background: var(--fm-white);
+    color: #607887;
+    font-size: 12px;
+    font-weight: 700;
+    box-shadow: none;
+  }
+
+  .fm-workflow-stepper .p-step-active .p-step-number,
+  .fm-workflow-stepper [data-p-active="true"] .p-step-number {
+    border-color: var(--fm-cyan);
+    background: var(--fm-cyan);
+    color: var(--fm-white);
+    box-shadow: 0 4px 12px rgba(0, 143, 161, .22);
+  }
+
+  .fm-workflow-stepper .p-step-active .p-step-header,
+  .fm-workflow-stepper [data-p-active="true"] .p-step-header {
+    color: var(--fm-cyan-dark);
+  }
+
+  .fm-workflow-stepper .p-stepper-separator {
+    background: #ced9de;
+  }
+
+  .fm-workflow-stepper__step-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .fm-workflow-stepper__step-label .pi {
+    font-size: 12px;
+  }
+
+  .fm-workflow-stepper .p-steppanels {
+    min-height: 0;
+    flex: 1 1 auto;
+    padding: 0;
+    background: transparent;
+  }
+
+  .fm-workflow-stepper .p-steppanel {
+    height: 100%;
+    background: transparent;
+  }
+
+  .fm-workflow-stepper__panel {
+    width: 100%;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid var(--fm-border);
+    border-radius: 8px;
+    background: var(--fm-white);
+    box-shadow: 0 8px 22px rgba(23, 49, 66, .08);
+  }
+
+  .fm-workflow-stepper__panel-title {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+  }
+
+  .fm-workflow-stepper__panel-title h4 {
+    margin: 2px 0 3px;
+    color: #102b3a;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .fm-workflow-stepper__panel-title p {
+    margin: 0;
+    color: var(--fm-text-muted);
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .fm-workflow-stepper__eyebrow {
+    display: block;
+    color: var(--fm-cyan-strong);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .7px;
+  }
+
+  .fm-workflow-stepper__counter {
+    min-height: 25px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+    border: 1px solid #b8e8ee;
+    border-radius: 999px;
+    background: var(--fm-cyan-soft);
+    color: var(--fm-cyan-dark);
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .fm-workflow-stepper__counter--ready {
+    border-color: #b8ded5;
+    background: #edf9f6;
+    color: #1b7764;
+  }
+
+  .fm-workflow-stepper__message.p-message {
+    margin: 0;
+    border-radius: 5px;
+    font-size: 11px;
+  }
+
+  .fm-workflow-stepper__grid-shell {
+    min-height: 270px;
+    max-height: 420px;
+    flex: 1 1 auto;
+    overflow: hidden;
+    border: 1px solid var(--fm-border);
+    border-left: 3px solid var(--fm-cyan);
+    background: var(--fm-white);
+  }
+
+  .fm-workflow-stepper__grid,
+  .fm-workflow-stepper__grid.p-datatable {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .fm-workflow-stepper__selected-summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 11px;
+    border: 1px solid #cfe2e7;
+    border-radius: 6px;
+    background: #f7fbfc;
+  }
+
+  .fm-workflow-stepper__summary-icon {
+    width: 31px;
+    min-width: 31px;
+    height: 31px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--fm-cyan-soft);
+    color: var(--fm-cyan-dark);
+  }
+
+  .fm-workflow-stepper__selected-summary strong,
+  .fm-workflow-stepper__selected-summary span {
+    display: block;
+  }
+
+  .fm-workflow-stepper__selected-summary strong {
+    color: #173142;
+    font-size: 11px;
+  }
+
+  .fm-workflow-stepper__selected-summary span {
+    max-width: 900px;
+    margin-top: 2px;
+    overflow: hidden;
+    color: var(--fm-text-muted);
+    font-size: 10px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .fm-workflow-stepper__form {
+    padding: 14px;
+    border: 1px solid var(--fm-border);
+    border-radius: 7px;
+    background: #fbfcfd;
+  }
+
+  .fm-workflow-stepper__search-field .fm-action-button,
+  .fm-workflow-stepper__search-field .fm-ui-button {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .fm-workflow-stepper__technician-card {
+    margin-top: 13px;
+    display: grid;
+    grid-template-columns: 38px minmax(180px, .8fr) minmax(260px, 1.2fr);
+    align-items: center;
+    gap: 11px;
+    padding: 11px 13px;
+    border: 1px solid #b8e8ee;
+    border-radius: 7px;
+    background: #f1fbfc;
+  }
+
+  .fm-workflow-stepper__technician-avatar {
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--fm-cyan);
+    color: var(--fm-white);
+    font-size: 16px;
+  }
+
+  .fm-workflow-stepper__technician-main strong,
+  .fm-workflow-stepper__technician-main small {
+    display: block;
+  }
+
+  .fm-workflow-stepper__technician-main strong {
+    margin-top: 2px;
+    color: #173142;
+    font-size: 12px;
+  }
+
+  .fm-workflow-stepper__technician-main small {
+    margin-top: 1px;
+    color: var(--fm-text-muted);
+    font-size: 10px;
+  }
+
+  .fm-workflow-stepper__technician-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    color: #365363;
+    font-size: 10px;
+  }
+
+  .fm-workflow-stepper__technician-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .fm-workflow-stepper__technician-meta .pi {
+    width: 13px;
+    color: var(--fm-cyan-strong);
+  }
+
+  .fm-workflow-stepper__review-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .fm-workflow-stepper__review-card {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 13px;
+    border: 1px solid var(--fm-border);
+    border-radius: 7px;
+    background: #fafcfd;
+  }
+
+  .fm-workflow-stepper__review-card-icon {
+    width: 36px;
+    min-width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--fm-cyan-soft);
+    color: var(--fm-cyan-dark);
+    font-size: 15px;
+  }
+
+  .fm-workflow-stepper__review-card strong,
+  .fm-workflow-stepper__review-card small {
+    display: block;
+  }
+
+  .fm-workflow-stepper__review-card strong {
+    margin-top: 2px;
+    color: #173142;
+    font-size: 12px;
+  }
+
+  .fm-workflow-stepper__review-card small {
+    max-width: 440px;
+    margin-top: 2px;
+    overflow: hidden;
+    color: var(--fm-text-muted);
+    font-size: 10px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .fm-workflow-stepper__form--note {
+    flex: 1 1 auto;
+  }
+
+  .fm-workflow-stepper__note-field textarea.p-textarea,
+  .fm-workflow-stepper__note-field .p-textarea {
+    width: 100%;
+    min-height: 96px;
+    padding: 8px 10px;
+    border: 1px solid var(--fm-border-strong);
+    border-radius: 4px;
+    background: var(--fm-white);
+    color: var(--fm-text);
+    font-size: 12px;
+    box-shadow: none;
+  }
+
+  .fm-workflow-stepper__note-field textarea.p-textarea:focus,
+  .fm-workflow-stepper__note-field .p-textarea:focus {
+    border-color: var(--fm-cyan);
+    box-shadow: 0 0 0 2px rgba(0, 169, 189, .14);
+  }
+
+  .fm-workflow-stepper__note-field > small {
+    display: block;
+    margin-top: 4px;
+    color: var(--fm-text-muted);
+    font-size: 10px;
+  }
+
+  .fm-workflow-stepper__actions {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding-top: 2px;
+  }
+
+  .fm-workflow-stepper__actions--split {
+    justify-content: space-between;
+  }
+
+  .fm-workflow-stepper__actions-group {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 1100px) {
+    .fm-workflow-stepper__technician-card {
+      grid-template-columns: 38px minmax(0, 1fr);
+    }
+
+    .fm-workflow-stepper__technician-meta {
+      grid-column: 2;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .busqueda-ots-reprocess-flow {
+      height: auto;
+      min-height: 620px;
+      overflow: visible;
+    }
+
+    .busqueda-ots-reprocess-flow__header,
+    .fm-workflow-stepper__panel-title,
+    .fm-workflow-stepper__actions--split {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .fm-workflow-stepper,
+    .busqueda-ots-reprocess-stepper {
+      overflow: visible;
+      padding: 12px 10px;
+    }
+
+    .fm-workflow-stepper .p-steplist {
+      overflow-x: auto;
+      justify-content: flex-start;
+    }
+
+    .fm-workflow-stepper__review-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .fm-workflow-stepper__technician-card {
+      grid-template-columns: 38px minmax(0, 1fr);
+    }
+
+    .fm-workflow-stepper__technician-meta {
+      grid-column: 1 / -1;
+    }
+
+    .fm-workflow-stepper__actions-group {
+      width: 100%;
+    }
+  }
+}
+/* === FIN BUSCADOR OTS - STEPPER REPROCESO === */
