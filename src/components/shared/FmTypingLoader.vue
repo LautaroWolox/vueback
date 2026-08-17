@@ -30,12 +30,12 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import {
   GENERIC_LOADER_MESSAGES,
-  GENERIC_LOADER_TITLES,
   getLoaderProfile,
 } from './fmLoaderProfiles'
 
 const props = defineProps({
   title: { type: String, default: 'Cargando Información' },
+  contextTitle: { type: String, default: '' },
   message: { type: String, default: 'Preparando Grilla' },
   variant: { type: String, default: 'default' },
   fullscreen: { type: Boolean, default: false },
@@ -48,18 +48,13 @@ const props = defineProps({
 const route = useRoute()
 const routeProfile = computed(() => getLoaderProfile(route.name))
 
-const hasCustomTitle = computed(() => {
-  const value = String(props.title ?? '').trim()
-  return Boolean(value) && !GENERIC_LOADER_TITLES.includes(value)
-})
-
 const hasCustomMessage = computed(() => {
   const value = String(props.message ?? '').trim()
   return Boolean(value) && !GENERIC_LOADER_MESSAGES.includes(value)
 })
 
 const displayTitle = computed(() => (
-  hasCustomTitle.value ? props.title : routeProfile.value.title
+  String(props.contextTitle ?? '').trim() || 'Cargando Información'
 ))
 
 const displayMessage = computed(() => (
