@@ -1,5 +1,7 @@
 <template>
-  <div class="legacy-iframe-stage">
+  <BuscadorOtsView v-if="isBuscadorOts" />
+
+  <div v-else class="legacy-iframe-stage">
     <FmTypingLoader v-if="iframeLoading" overlay title="Cargando Información" message="Preparando pantalla" />
     <iframe
       :key="iframeSrc"
@@ -20,6 +22,7 @@
 import { computed, onUnmounted, ref, watch, watchEffect } from 'vue'
 import router from '@/router'
 import FmTypingLoader from '@/components/shared/FmTypingLoader.vue'
+import BuscadorOtsView from '@/modules/buscadorOts/BuscadorOtsView.vue'
 import { useLegacyIframeLayout } from '@/composables/useLegacyIframeLayout'
 
 const MIN_LOADER_VISIBLE_MS = 450
@@ -28,6 +31,7 @@ const props = defineProps({
   titleParam: { type: String, required: true }
 })
 
+const isBuscadorOts = computed(() => props.urlParam === '/busquedaOtsGcc.html')
 const iframeRef = ref(null)
 const iframeLoading = ref(true)
 const { onIframeLoad: applyLegacyLayout } = useLegacyIframeLayout(iframeRef)
@@ -58,6 +62,8 @@ watch(iframeSrc, () => {
 }, { immediate: true })
 
 const onIframeLoad = () => {
+  if (isBuscadorOts.value) return
+
   let loadedHref = ''
   try {
     loadedHref = iframeRef.value?.contentWindow?.location?.href || ''
