@@ -21,6 +21,8 @@ const useEmulacionStore = defineStore('emulacionStore', {
         legajoSelected: '',
         activeTab: ['0'],
         toggleLoader: false,
+        loaderContextTitle: '',
+        loaderMessage: 'Consultando la información del legajo',
         data: [],
         error_code: '',
         error_message: '',
@@ -38,6 +40,11 @@ const useEmulacionStore = defineStore('emulacionStore', {
             this.activeTab = ['0']
         },
 
+        $setLoaderContext(title = '', message = '') {
+            this.loaderContextTitle = String(title ?? '').trim()
+            this.loaderMessage = String(message ?? '').trim() || 'Preparando pantalla'
+        },
+
         $resetFilters() {
             this.legajoSelected = ''
             this.data = []
@@ -45,6 +52,7 @@ const useEmulacionStore = defineStore('emulacionStore', {
             this.error_code = ''
             this.error_message = ''
             this.activeTab = ['0']
+            this.$setLoaderContext('', 'Consultando la información del legajo')
         },
 
         $resetData() {
@@ -76,6 +84,7 @@ const useEmulacionStore = defineStore('emulacionStore', {
                 return
             }
 
+            this.$setLoaderContext('', 'Consultando la información del legajo')
             this.toggleLoader = true
 
             try {
