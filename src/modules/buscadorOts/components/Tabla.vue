@@ -4,17 +4,23 @@
     :class="{ 'busqueda-ots-grid-shell--expanded': expanded }"
   >
     <DataTable
+      :key="expanded ? 'expanded-grid' : 'standard-grid'"
       ref="gridRef"
       v-model:filters="columnFilters"
+      v-model:selection="store.selectedRow"
       v-model:first="store.first"
       v-model:rows="store.pageRows"
       :value="store.visibleRows"
       data-key="id"
+      selection-mode="single"
+      :meta-key-selection="false"
+      :row-class="rowClass"
       class="fm-pass-grid busqueda-ots-grid"
       table-style="table-layout: fixed; min-width: 1880px; width: 100%"
       paginator
       scrollable
       scroll-height="flex"
+      :virtual-scroller-options="virtualScrollerOptions"
       removable-sort
       sort-mode="multiple"
       resizable-columns
@@ -73,11 +79,9 @@
               <button
                 type="button"
                 class="busqueda-ots-grid-action"
-                :class="{ 'busqueda-ots-grid-action--active': store.showColumnFilters }"
-                title="Mostrar filtros de columnas"
-                aria-label="Mostrar filtros de columnas"
-                :aria-pressed="store.showColumnFilters"
-                @click="store.toggleColumnFilters"
+                title="Reprocesar / cambiar técnico"
+                aria-label="Reprocesar / cambiar técnico"
+                @click="emit('open-reprocess')"
               >
                 <i class="pi pi-filter" aria-hidden="true"></i>
               </button>
@@ -165,14 +169,29 @@ defineProps({
   expanded: { type: Boolean, default: false }
 })
 
-const emit = defineEmits(['open-external', 'open-failed'])
+const emit = defineEmits(['open-external', 'open-failed', 'open-reprocess'])
 const store = useBuscadorOtsStore()
 const gridRef = ref(null)
 const columnFilters = ref(createColumnFilters())
 
+const virtualScrollerOptions = {
+  itemSize: 32,
+  numToleratedItems: 20,
+  delay: 0,
+  showLoader: false
+}
+
 watch(() => store.resetToken, () => {
   columnFilters.value = createColumnFilters()
 })
+
+const rowIdentity = (row) => String(row?.id ?? row?.nroOt ?? '')
+
+const rowClass = (row) => (
+  store.selectedRow && rowIdentity(store.selectedRow) === rowIdentity(row)
+    ? 'fm-selected-row'
+    : ''
+)
 
 const clearColumnFilter = (filterModel, filterCallback) => {
   filterModel.value = null
@@ -199,25 +218,46 @@ const downloadResults = () => {
 .busqueda-ots-grid-shell--expanded {
   height: 100%;
   min-height: 0;
-  flex: 1 1 auto;
+  flex: 1 1 0;
 }
 
 .busqueda-ots-grid,
 .busqueda-ots-grid.p-datatable {
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 1 1 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
   border: 0;
 }
 
 .busqueda-ots-grid :deep(.p-datatable-table-container),
-.busqueda-ots-grid :deep(.p-datatable-wrapper) {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: auto;
+.busqueda-ots-grid :deep(.p-datatable-wrapper),
+.busqueda-ots-grid :deep([data-pc-section='tablecontainer']) {
+  width: 100% !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 1 1 0 !important;
+  overflow: auto !important;
   background: #fff;
+}
+
+.busqueda-ots-grid :deep(.p-virtualscroller),
+.busqueda-ots-grid :deep(.p-virtualscroller-content) {
+  min-height: 0 !important;
+  max-height: none !important;
+}
+
+.busqueda-ots-grid :deep(.p-datatable-paginator-bottom),
+.busqueda-ots-grid :deep(> .p-paginator) {
+  flex: 0 0 39px !important;
+  width: 100% !important;
+  min-height: 39px !important;
+  margin-top: 0 !important;
 }
 
 .busqueda-ots-grid :deep(.p-datatable-thead > tr > th) {

@@ -10,9 +10,11 @@ export interface BuscadorOtRow {
   codigoSolucion?: string
   empresaContratista?: string
   baseTecnica?: string
+  provincia?: string
   pais?: string
   actividades?: string
   ubicacionOt?: string
+  origenOt?: string
   [key: string]: unknown
 }
 

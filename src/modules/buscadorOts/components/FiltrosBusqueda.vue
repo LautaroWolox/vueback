@@ -12,7 +12,7 @@
       <FmButton
         label="BUSCAR"
         :loading="store.searching"
-        @click="store.searchOts"
+        @click="handleSearch"
       />
       <FmButton
         label="LIMPIAR"
@@ -25,10 +25,21 @@
 </template>
 
 <script setup>
+import { nextTick } from 'vue'
 import FmButton from '@/components/shared/FmButton.vue'
 import { useBuscadorOtsStore } from '../store/buscadorOtsStore'
 
+const emit = defineEmits(['search-start', 'searched'])
 const store = useBuscadorOtsStore()
+
+const handleSearch = async () => {
+  if (!store.parsedOtNumbers.length || store.searching) return
+
+  emit('search-start')
+  await nextTick()
+  await store.searchOts()
+  emit('searched')
+}
 </script>
 
 <style scoped>

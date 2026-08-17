@@ -1,23 +1,38 @@
 <template>
   <div
     class="fm-screen fm-screen--pad busqueda-ots-page"
-    :class="{ 'busqueda-ots-page--grid-expanded': gridExpanded }"
+    :class="{
+      'busqueda-ots-page--grid-expanded': gridExpanded,
+      'busqueda-ots-page--both-open': bothPanelsOpen
+    }"
   >
     <Accordion v-model:value="activePanels" multiple class="fm-accordion busqueda-ots-accordion">
       <AccordionPanel value="0" class="busqueda-ots-filter-panel">
         <AccordionHeader>LISTA DE ORDENES DE TRABAJO A BUSCAR</AccordionHeader>
         <AccordionContent>
-          <FiltrosBusqueda />
+          <FiltrosBusqueda
+            @search-start="prepareSearchLayout"
+            @searched="finishSearchLayout"
+          />
         </AccordionContent>
       </AccordionPanel>
 
       <AccordionPanel value="1" class="busqueda-ots-results-panel">
         <AccordionHeader>DATOS DE LAS ORDENES DE TRABAJO</AccordionHeader>
         <AccordionContent>
+          <ReprocesoStepper
+            v-if="reprocessFlowActive"
+            :rows="store.eligibleRows"
+            @cancel="closeReprocessFlow"
+            @execute="executeStepperReprocess"
+          />
+
           <Tabla
+            v-else
             :expanded="gridExpanded"
             @open-external="externalDialogVisible = true"
             @open-failed="openFailedOrders"
+            @open-reprocess="openReprocessFlow"
           />
         </AccordionContent>
       </AccordionPanel>
@@ -32,6 +47,11 @@
       v-model:visible="failedDialogVisible"
       :rows="failedRows"
     />
+
+    <BuscadorAlertDialog
+      v-model:visible="alertVisible"
+      :message="alertMessage"
+    />
   </div>
 </template>
 
@@ -43,20 +63,62 @@ import AccordionHeader from 'primevue/accordionheader'
 import AccordionContent from 'primevue/accordioncontent'
 import FiltrosBusqueda from './components/FiltrosBusqueda.vue'
 import Tabla from './components/Tabla.vue'
+import ReprocesoStepper from './components/ReprocesoStepper.vue'
 import OtsExternasDialog from './components/OtsExternasDialog.vue'
 import OtsFallidasDialog from './components/OtsFallidasDialog.vue'
+import BuscadorAlertDialog from './components/BuscadorAlertDialog.vue'
 import { useBuscadorOtsStore } from './store/buscadorOtsStore'
 
 const store = useBuscadorOtsStore()
-const activePanels = ref([])
+const activePanels = ref(['0', '1'])
 const externalDialogVisible = ref(false)
 const failedDialogVisible = ref(false)
 const failedRows = ref([])
+const reprocessFlowActive = ref(false)
+const alertVisible = ref(false)
+const alertMessage = ref('')
 
-const gridExpanded = computed(() => {
-  const active = (Array.isArray(activePanels.value) ? activePanels.value : [activePanels.value]).map(String)
-  return !active.includes('0') && active.includes('1')
-})
+const activePanelValues = computed(() => (
+  Array.isArray(activePanels.value) ? activePanels.value : [activePanels.value]
+).map(String))
+
+const gridExpanded = computed(() => (
+  !activePanelValues.value.includes('0') && activePanelValues.value.includes('1')
+))
+
+const bothPanelsOpen = computed(() => (
+  activePanelValues.value.includes('0') && activePanelValues.value.includes('1')
+))
+
+const prepareSearchLayout = () => {
+  reprocessFlowActive.value = false
+  activePanels.value = ['1']
+}
+
+const finishSearchLayout = () => {
+  if (store.rows.length) {
+    activePanels.value = ['1']
+  }
+}
+
+const showAlert = (message) => {
+  alertMessage.value = message
+  alertVisible.value = true
+}
+
+const openReprocessFlow = () => {
+  reprocessFlowActive.value = true
+  activePanels.value = ['1']
+}
+
+const closeReprocessFlow = () => {
+  reprocessFlowActive.value = false
+}
+
+const executeStepperReprocess = ({ rows, technician }) => {
+  store.applyMockReprocess(rows, technician)
+  reprocessFlowActive.value = false
+}
 
 const normalizeFailedRow = (value, parent, index) => {
   const source = value && typeof value === 'object' ? value : {}
@@ -125,6 +187,23 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+/* El panel de búsqueda nunca debe comprimirse: sus botones forman parte de su altura real. */
+.busqueda-ots-filter-panel {
+  flex: 0 0 auto !important;
+  flex-shrink: 0 !important;
+  overflow: visible !important;
+}
+
+.busqueda-ots-page--both-open .busqueda-ots-filter-panel {
+  margin-bottom: 14px;
+}
+
+/* Si ambos están abiertos, el que puede ceder altura es el panel de resultados. */
+.busqueda-ots-page--both-open .busqueda-ots-results-panel {
+  min-height: 0;
+  flex-shrink: 1 !important;
 }
 
 .busqueda-ots-page--grid-expanded .busqueda-ots-accordion,
