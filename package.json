@@ -23,7 +23,7 @@
     "test:smoke": "vitest run tests/contracts/migrationArchitecture.spec.js tests/integration/routerArchitecture.spec.js tests/integration/IframeView.spec.js tests/unit/shared/FmTypingLoader.spec.js",
     "test:regression": "vitest run tests/unit tests/integration tests/contracts",
     "test:ci": "npm run test:regression && npm run build",
-    "test:all": "npm run test:ci",
+    "test:all": "npm run test:ci && npm run test:e2e",
     "test:e2e": "start-server-and-test preview http://localhost:4173 'cypress run --e2e'",
     "test:e2e:dev": "start-server-and-test 'vite dev --port 4173' http://localhost:4173 'cypress open --e2e'",
     "build-only": "vite build",
