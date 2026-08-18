@@ -66,11 +66,6 @@ export const getRutas = (rutas:any) => {
                     visible: hasMenu('GEOT')
                 },
                 {
-                    label: 'ABM MATERIALES',
-                    command: () => { router.push({ name: 'ABMM' }); },
-                    visible: hasMenu('ABMM') || (import.meta.env.DEV && hasMenu('GEMA'))
-                },
-                {
                     label: 'Errores de Gestión',
                     command: () => { router.push({ name: 'ERGE' }); },
                     visible: hasMenu('ERGE')
