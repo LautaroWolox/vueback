@@ -16,7 +16,6 @@ import router from './router'
 import { strings } from './strings.js'
 import { useAuthStore } from './store/auth'
 import { fmPrimePassThrough } from './components/shared/primePassThrough.js'
-import { installResponsiveIframes } from './plugins/responsiveIframes.js'
 import { installUserMenuProfile } from './plugins/userMenuProfile.js'
 import { installGridPaginatorDefaults } from './plugins/gridPaginatorDefaults.js'
 import { installReportSasAutoHeight } from './plugins/reportSasAutoHeight.js'
@@ -115,7 +114,22 @@ app.component('FmResponsivePage', FmResponsivePage)
 
 app.directive('tooltip', Tooltip)
 app.mount('#app')
-installResponsiveIframes()
+
+/*
+ * El responsive legacy es una mejora complementaria para las pantallas en iframe.
+ * Se carga después de montar Vue para que un problema en esa integración nunca
+ * pueda impedir el arranque completo de Field Manager.
+ */
+const installResponsiveIframesSafely = async () => {
+  try {
+    const { installResponsiveIframes } = await import('./plugins/responsiveIframes.js')
+    installResponsiveIframes()
+  } catch (error) {
+    console.error('[Field Manager] No se pudo inicializar el responsive legacy.', error)
+  }
+}
+
+installResponsiveIframesSafely()
 installUserMenuProfile()
 installGridPaginatorDefaults()
 installReportSasAutoHeight()
