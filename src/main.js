@@ -1,7 +1,7 @@
 import 'primeicons/primeicons.css'
 import 'primeflex/primeflex.css'
 import './assets/css/fm-global.css'
-import './assets/css/fm-menu-submenu-gap.css'
+import './assets/css/fm-menu-video.css'
 import Lara from '@primeuix/themes/lara'
 import { definePreset } from '@primeuix/themes'
 import { createApp } from 'vue'
