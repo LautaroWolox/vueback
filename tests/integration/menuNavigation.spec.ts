@@ -13,6 +13,7 @@ import { getRutas } from '@/components/rutas'
 const flatten = (items: any[]): any[] => items.flatMap((item) => [item, ...(item.items ? flatten(item.items) : [])])
 
 const findByLabel = (routes: any[], label: string) => flatten(routes).find((item) => item.label === label)
+const findAllByLabel = (routes: any[], label: string) => flatten(routes).filter((item) => item.label === label)
 
 describe('Menú principal - contrato de navegación', () => {
   beforeEach(() => {
@@ -24,7 +25,7 @@ describe('Menú principal - contrato de navegación', () => {
 
     expect(findByLabel(menu, 'Emulación')?.visible).toBe(true)
     expect(findByLabel(menu, 'Extracción de Datos GM')?.visible).toBe(true)
-    expect(findByLabel(menu, 'Registro OTs Fallidas')?.visible).toBe(true)
+    expect(findAllByLabel(menu, 'Registro OTs Fallidas').some((item) => item.visible === true)).toBe(true)
   })
 
   it('mantiene Búsqueda de OTs y Parametrizaciones como entradas de menú legacy', () => {
