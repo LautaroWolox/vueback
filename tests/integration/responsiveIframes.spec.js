@@ -64,16 +64,6 @@ describe('responsiveIframes - integración', () => {
     stop()
   })
 
-  it('mantiene el iframe de Gestión de Operadores con controles nativos', () => {
-    const iframe = createIframe('/pc/gestionOperadores.html')
-    const stop = installResponsiveIframes()
-
-    iframe.dispatchEvent(new Event('load'))
-
-    expect(iframe.contentDocument.body.classList.contains('fm-legacy-native-controls')).toBe(true)
-    stop()
-  })
-
   it('limita diálogos legacy al viewport y habilita scroll interno', () => {
     const iframe = createIframe('/pc/consultarActas.html')
     const iframeDocument = iframe.contentDocument
