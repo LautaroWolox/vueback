@@ -25,7 +25,7 @@ const rect = (top, height, width = 900) => ({
   toJSON() { return this },
 })
 
-const createLegacyDocument = () => {
+const createLegacyDocument = (url = 'http://localhost/consultarActas.html') => {
   const dom = new JSDOM(`<!doctype html><html><body>
     <div class="ui-accordion" id="main-accordion">
       <div class="ui-accordion-header">Filtros</div>
@@ -42,7 +42,7 @@ const createLegacyDocument = () => {
         </div>
       </div>
     </div>
-  </body></html>`, { url: 'http://localhost/pc/consultarActas.html' })
+  </body></html>`, { url })
 
   Object.defineProperty(dom.window, 'innerHeight', { configurable: true, value: 800 })
 
@@ -139,7 +139,7 @@ describe('useLegacyIframeLayout', () => {
   })
 
   it('conserva el acordeón nativo de Gestión de Operadores', async () => {
-    const { dom, doc } = createLegacyDocument()
+    const { dom, doc } = createLegacyDocument('http://localhost/gestionOperadores.html')
     const wrapper = mountHarness({
       contentDocument: doc,
       contentWindow: dom.window,
@@ -154,7 +154,7 @@ describe('useLegacyIframeLayout', () => {
     dom.window.close()
   })
 
-  it('recalcula el layout frente a resize sin perder el centrado lógico de la grilla', async () => {
+  it('recalcula el layout frente a resize sin perder el scroll de la grilla', async () => {
     const { dom, doc, resultScroll } = createLegacyDocument()
     const wrapper = mountHarness({
       contentDocument: doc,
