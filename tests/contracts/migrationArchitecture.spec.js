@@ -9,9 +9,45 @@ const modulesDirectory = path.join(root, 'src/modules')
 
 const routeBlock = (routeName) => {
   const marker = `name: '${routeName}'`
-  const index = routerSource.indexOf(marker)
-  if (index < 0) throw new Error(`No se encontró la ruta ${routeName}`)
-  return routerSource.slice(Math.max(0, index - 220), index + 520)
+  const markerIndex = routerSource.indexOf(marker)
+  if (markerIndex < 0) throw new Error(`No se encontró la ruta ${routeName}`)
+
+  const start = routerSource.lastIndexOf('{', markerIndex)
+  if (start < 0) throw new Error(`No se pudo determinar el inicio de la ruta ${routeName}`)
+
+  let depth = 0
+  let quote = null
+  let escaped = false
+
+  for (let index = start; index < routerSource.length; index += 1) {
+    const char = routerSource[index]
+
+    if (quote) {
+      if (escaped) {
+        escaped = false
+        continue
+      }
+      if (char === '\\') {
+        escaped = true
+        continue
+      }
+      if (char === quote) quote = null
+      continue
+    }
+
+    if (char === "'" || char === '"' || char === '`') {
+      quote = char
+      continue
+    }
+
+    if (char === '{') depth += 1
+    if (char === '}') {
+      depth -= 1
+      if (depth === 0) return routerSource.slice(start, index + 1)
+    }
+  }
+
+  throw new Error(`No se pudo determinar el final de la ruta ${routeName}`)
 }
 
 describe('Arquitectura de migración de Field Manager', () => {
@@ -26,18 +62,19 @@ describe('Arquitectura de migración de Field Manager', () => {
     expect(actualModules).toEqual(registeredModules)
   })
 
-  it.each(migratedScreens)('$routeName apunta al módulo Vue $moduleDirectory', (screen) => {
+  it.each(migratedScreens)('$routeName apunta exclusivamente al módulo Vue $moduleDirectory', (screen) => {
     const block = routeBlock(screen.routeName)
 
     expect(block).toContain(`modules/${screen.moduleDirectory}`)
     expect(block).toContain(screen.componentFile)
-    expect(block).not.toContain("views/IframeView.vue")
+    expect(block).not.toContain('IframeView.vue')
+    expect(block).not.toContain('urlParam:')
   })
 
   it.each(releaseLegacyScreens)('$routeName permanece explícitamente en IframeView', (screen) => {
     const block = routeBlock(screen.routeName)
 
-    expect(block).toContain("views/IframeView.vue")
+    expect(block).toContain('views/IframeView.vue')
     expect(block).toContain(`urlParam: '${screen.urlParam}'`)
   })
 
