@@ -7,6 +7,7 @@ Este directorio protege la migración progresiva de Field Manager sin modificar 
 - `unit/`: lógica aislada de stores, componentes compartidos, paginadores, acciones, loaders y composables.
 - `integration/`: interacción entre vistas, menú, router, iframe legacy, responsive y componentes compartidos.
 - `contracts/`: reglas de arquitectura y regresión que no deben cambiar accidentalmente.
+- `cypress/e2e/`: smoke tests reales de navegador para validar que la aplicación puede arrancar y renderizar flujos críticos.
 
 ## Comandos
 
@@ -20,10 +21,11 @@ npm run test:regression
 npm run test:watch
 npm run test:watch:unit
 npm run test:ci
+npm run test:e2e
 npm run test:all
 ```
 
-- `test`: ejecuta toda la suite una vez.
+- `test`: ejecuta toda la suite Vitest una vez.
 - `test:unit:run`: ejecuta únicamente unitarios.
 - `test:integration`: ejecuta únicamente integración.
 - `test:contracts`: valida arquitectura y regresiones estructurales.
@@ -32,7 +34,8 @@ npm run test:all
 - `test:watch:unit`: modo automático limitado a unitarios.
 - `test:regression`: unitarios + integración + contratos.
 - `test:ci`: regresión completa y, si todo pasa, build de producción.
-- `test:all`: alias de `test:ci`.
+- `test:e2e`: ejecuta Cypress contra el build servido con Vite Preview.
+- `test:all`: ejecuta regresión, build y E2E en una sola cadena.
 
 ## Criterio de calidad
 
@@ -70,6 +73,7 @@ Los tests deben privilegiar comportamiento observable, accesibilidad, estado del
 - Router: separación explícita entre pantallas Vue y pantallas legacy, permisos y compatibilidad JOCM/JOCO.
 - ABM Materiales: no debe reaparecer accidentalmente en esta versión.
 - Codificación: comentarios y textos visibles no deben volver a quedar con caracteres rotos.
+- Arranque de aplicación: Cypress verifica la pantalla de acceso tanto en escritorio como en viewport móvil.
 
 ## Regla para una nueva migración
 
@@ -82,7 +86,8 @@ Cada pantalla nueva debe incorporar, como mínimo:
 5. prueba de loading/error/empty state;
 6. prueba de grilla si usa DataTable: filtros, selección, paginación, acciones y exportación cuando corresponda;
 7. prueba de responsive o iframe fallback cuando corresponda;
-8. registro en `tests/contracts/migrationRegistry.js`.
+8. registro en `tests/contracts/migrationRegistry.js` con sus `unitSpecs` e `integrationSpecs`;
+9. smoke E2E cuando la pantalla incorpore un flujo crítico que pueda validarse sin depender de datos reales de producción.
 
 Mientras una pantalla siga en legacy debe permanecer en `releaseLegacyScreens`. Cuando Vue pase a ser la implementación activa, se mueve a `migratedScreens` y se agrega su prueba de integración específica. De esta forma, una migración incompleta no puede cambiar silenciosamente la ruta productiva.
 
@@ -113,4 +118,10 @@ Antes de entregar o subir la rama ejecutar:
 npm run test:ci
 ```
 
-Si `test:ci` termina correctamente, significa que unitarios, integración, contratos y build completaron sin errores. El pipeline corporativo puede invocar este mismo comando sin duplicar la lógica de ejecución dentro de los tests.
+Para validar absolutamente todo, incluido navegador:
+
+```bash
+npm run test:all
+```
+
+Si `test:ci` termina correctamente, unitarios, integración, contratos y build completaron sin errores. `test:all` agrega los smoke tests Cypress. El pipeline corporativo puede invocar `npm run test:ci` sin duplicar la lógica de ejecución dentro de los tests.
