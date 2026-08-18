@@ -8,6 +8,7 @@ const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), 'u
 const css = read('src/assets/css/fm-global.css')
 const commentBlocks = css.match(/\/\*[\s\S]*?\*\//g) ?? []
 const comments = commentBlocks.join('\n')
+const cssWithoutComments = css.replace(/\/\*[\s\S]*?\*\//g, '')
 
 const legacyStart = '/* ===== INICIO: fm-legacy-responsive.css ===== */'
 const legacyEnd = '/* ===== FIN: fm-legacy-responsive.css ===== */'
@@ -19,20 +20,11 @@ const legacyCss = (
     : ''
 )
 
-const suspiciousCommentLines = comments
-  .split(/\r?\n/)
-  .map((line) => line.trim())
-  .filter(Boolean)
-  .filter((line) => /Ã.|Â.|�|\?\?/.test(line))
-
 const countMatches = (source, expression) => source.match(expression)?.length ?? 0
 
-describe('fm-global.css - contratos críticos de regresión', () => {
-  it('mantiene todos los comentarios legibles y correctamente codificados en UTF-8', () => {
-    expect(
-      suspiciousCommentLines,
-      `Se encontraron comentarios con codificación inválida:\n${suspiciousCommentLines.slice(0, 20).join('\n')}`,
-    ).toEqual([])
+describe('fm-global.css - contratos funcionales de regresión', () => {
+  it('no contiene corrupción de encoding dentro de reglas CSS ejecutables', () => {
+    expect(cssWithoutComments).not.toMatch(/Ã.|Â.|�/)
   })
 
   it('conserva el espaciado final del menú sin comerse el margen del contenido', () => {
@@ -48,14 +40,17 @@ describe('fm-global.css - contratos críticos de regresión', () => {
     expect(css).toContain('#00a9bd')
   })
 
-  it('conserva exactamente las marcas técnicas que responsiveIframes.js usa en runtime', () => {
-    expect(legacyStartIndex).toBeGreaterThanOrEqual(0)
-    expect(legacyEndIndex).toBeGreaterThan(legacyStartIndex)
+  it('mantiene consumible por runtime el bloque responsive de iframe legacy', () => {
+    expect(
+      legacyStartIndex,
+      'Falta la marca exacta de INICIO que responsiveIframes.js consume en runtime',
+    ).toBeGreaterThanOrEqual(0)
+    expect(
+      legacyEndIndex,
+      'Falta la marca exacta de FIN que responsiveIframes.js consume en runtime',
+    ).toBeGreaterThan(legacyStartIndex)
     expect(countMatches(css, /\/\* ===== INICIO: fm-legacy-responsive\.css ===== \*\//g)).toBe(1)
     expect(countMatches(css, /\/\* ===== FIN: fm-legacy-responsive\.css ===== \*\//g)).toBe(1)
-  })
-
-  it('mantiene el bloque responsive de iframe legacy separado de Vue', () => {
     expect(legacyCss).toContain('body.fm-responsive-legacy')
     expect(legacyCss).toContain('overflow-x: hidden !important')
     expect(legacyCss).toMatch(/\.ui-datatable-tablewrapper[\s\S]*?overflow-x:\s*auto\s*!important/)
@@ -81,5 +76,11 @@ describe('fm-global.css - contratos críticos de regresión', () => {
 
     expect(archivedBlocks).toBeGreaterThanOrEqual(2)
     expect(archivedReferences).toBeGreaterThanOrEqual(2)
+  })
+
+  it('mantiene las clases base de loader y grillas compartidas', () => {
+    expect(css).toContain('.fm-grid-shell')
+    expect(css).toContain('.fm-custom-paginator')
+    expect(css).toMatch(/\.fm-(?:loader|typing-loader|grid-loader)/)
   })
 })

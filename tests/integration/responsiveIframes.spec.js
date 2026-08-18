@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 vi.mock('@/assets/css/fm-global.css?raw', () => ({
   default: `
 /* ===== INICIO: fm-legacy-responsive.css ===== */
-.fm-responsive-legacy { box-sizing: border-box; }
+body.fm-responsive-legacy { box-sizing: border-box; }
 /* ===== FIN: fm-legacy-responsive.css ===== */
 `,
 }))
@@ -13,7 +13,15 @@ import { installResponsiveIframes } from '@/plugins/responsiveIframes'
 const createIframe = () => {
   const iframe = document.createElement('iframe')
   document.body.appendChild(iframe)
-  return iframe
+
+  const iframeDocument = iframe.contentDocument
+  if (!iframeDocument) throw new Error('jsdom no creó contentDocument para el iframe')
+
+  iframeDocument.open()
+  iframeDocument.write('<!doctype html><html><head></head><body></body></html>')
+  iframeDocument.close()
+
+  return { iframe, iframeDocument, iframeWindow: iframe.contentWindow }
 }
 
 const makeVisible = (element, { top = 20, left = 20, width = 600, height = 300 } = {}) => {
@@ -36,12 +44,12 @@ describe('responsiveIframes - integración', () => {
   })
 
   it('marca e inicializa iframes existentes sin alterar el documento padre', () => {
-    const iframe = createIframe()
-    const iframeDocument = iframe.contentDocument
+    const { iframe, iframeDocument } = createIframe()
     const stop = installResponsiveIframes()
 
     expect(iframe.dataset.fmResponsiveAttached).toBe('true')
-    expect(iframeDocument?.body).not.toBeNull()
+    expect(iframeDocument.head).not.toBeNull()
+    expect(iframeDocument.body).not.toBeNull()
 
     iframe.dispatchEvent(new Event('load'))
 
@@ -52,9 +60,22 @@ describe('responsiveIframes - integración', () => {
     stop()
   })
 
+  it('inyecta el CSS responsive dentro del iframe y no en el documento Vue', () => {
+    const { iframe, iframeDocument } = createIframe()
+    const stop = installResponsiveIframes()
+
+    iframe.dispatchEvent(new Event('load'))
+
+    const style = iframeDocument.getElementById('fm-legacy-responsive-styles')
+    expect(style?.textContent).toContain('body.fm-responsive-legacy')
+    expect(document.getElementById('fm-legacy-responsive-styles')).toBeNull()
+
+    stop()
+  })
+
   it('adjunta automáticamente iframes agregados después de instalar el plugin', async () => {
     const stop = installResponsiveIframes()
-    const iframe = createIframe()
+    const { iframe } = createIframe()
 
     await new Promise((resolve) => setTimeout(resolve, 0))
 
@@ -63,10 +84,10 @@ describe('responsiveIframes - integración', () => {
   })
 
   it('no duplica el style responsive al recibir múltiples eventos load', () => {
-    const iframe = createIframe()
-    const iframeDocument = iframe.contentDocument
+    const { iframe, iframeDocument } = createIframe()
     const stop = installResponsiveIframes()
 
+    iframe.dispatchEvent(new Event('load'))
     iframe.dispatchEvent(new Event('load'))
     iframe.dispatchEvent(new Event('load'))
 
@@ -74,12 +95,20 @@ describe('responsiveIframes - integración', () => {
     stop()
   })
 
-  it('limita diálogos legacy al viewport y habilita scroll interno', () => {
-    const iframe = createIframe()
-    const iframeDocument = iframe.contentDocument
-    const iframeWindow = iframe.contentWindow
+  it('mantiene una sola asociación responsive por iframe', () => {
+    const { iframe } = createIframe()
+    const stop = installResponsiveIframes()
 
-    expect(iframeDocument?.body).not.toBeNull()
+    expect(iframe.dataset.fmResponsiveAttached).toBe('true')
+    iframe.dispatchEvent(new Event('load'))
+    expect(iframe.dataset.fmResponsiveAttached).toBe('true')
+
+    stop()
+  })
+
+  it('limita diálogos legacy al viewport y habilita scroll interno', () => {
+    const { iframe, iframeDocument, iframeWindow } = createIframe()
+
     Object.defineProperty(iframeWindow, 'innerWidth', { configurable: true, value: 1024 })
     Object.defineProperty(iframeWindow, 'innerHeight', { configurable: true, value: 700 })
 
@@ -103,6 +132,16 @@ describe('responsiveIframes - integración', () => {
     expect(body.style.getPropertyValue('overflow-x')).toBe('auto')
     expect(body.style.getPropertyValue('overflow-y')).toBe('auto')
 
+    stop()
+  })
+
+  it('no marca como responsive al body del documento padre', () => {
+    const { iframe } = createIframe()
+    const stop = installResponsiveIframes()
+
+    iframe.dispatchEvent(new Event('load'))
+
+    expect(document.body.classList.contains('fm-responsive-legacy')).toBe(false)
     stop()
   })
 })
