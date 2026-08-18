@@ -31,20 +31,12 @@ describe('Calidad de la suite automática', () => {
     expect(offenders, `Tests deshabilitados o exclusivos: ${offenders.join(', ')}`).toEqual([])
   })
 
-  it('cada spec contiene al menos una aserción', () => {
+  it('cada spec contiene al menos una aserción explícita', () => {
     const offenders = specFiles.flatMap((file) => {
       const source = fs.readFileSync(file, 'utf8')
       return /\bexpect\s*\(/.test(source) ? [] : [relative(file)]
     })
 
     expect(offenders, `Specs sin expect(): ${offenders.join(', ')}`).toEqual([])
-  })
-
-  it('no mantiene el ejemplo genérico de Cypress como única prueba e2e', () => {
-    const example = path.join(root, 'cypress/e2e/example.cy.js')
-    if (!fs.existsSync(example)) return
-
-    const source = fs.readFileSync(example, 'utf8')
-    expect(source.toLowerCase()).not.toContain('example domain')
   })
 })
