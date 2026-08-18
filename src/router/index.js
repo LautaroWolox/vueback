@@ -115,16 +115,6 @@ const routes = [
         }
       },
       {
-        path: 'abmMateriales.html',
-        name: 'ABMM',
-        beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/abmMateriales.html',
-          titleParam: 'ABM Materiales'
-        }
-      },
-      {
         path: 'gestionErrores.html',
         name: 'ERGE',
         beforeEnter: allowed,
