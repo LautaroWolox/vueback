@@ -50,6 +50,8 @@ const routeBlock = (routeName) => {
   throw new Error(`No se pudo determinar el final de la ruta ${routeName}`)
 }
 
+const existingSpec = (relativePath) => fs.existsSync(path.join(root, relativePath))
+
 describe('Arquitectura de migración de Field Manager', () => {
   it('mantiene registrados todos los módulos Vue activos de esta entrega', () => {
     const actualModules = fs.readdirSync(modulesDirectory, { withFileTypes: true })
@@ -76,6 +78,18 @@ describe('Arquitectura de migración de Field Manager', () => {
 
     expect(block).toContain('views/IframeView.vue')
     expect(block).toContain(`urlParam: '${screen.urlParam}'`)
+  })
+
+  it.each(migratedScreens)('$routeName declara pruebas unitarias e integración existentes', (screen) => {
+    expect(Array.isArray(screen.unitSpecs) && screen.unitSpecs.length > 0).toBe(true)
+    expect(Array.isArray(screen.integrationSpecs) && screen.integrationSpecs.length > 0).toBe(true)
+
+    screen.unitSpecs.forEach((spec) => {
+      expect(existingSpec(spec), `Falta el test unitario obligatorio: ${spec}`).toBe(true)
+    })
+    screen.integrationSpecs.forEach((spec) => {
+      expect(existingSpec(spec), `Falta el test de integración obligatorio: ${spec}`).toBe(true)
+    })
   })
 
   it('no reintroduce módulos descartados accidentalmente', () => {
