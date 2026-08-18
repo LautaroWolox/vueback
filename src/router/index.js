@@ -49,16 +49,6 @@ const routes = [
     component: () => import('../views/MainView.vue'),
     children: [
       {
-        path: 'soporteNegocio.html',
-        name: 'SONE',
-        beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: "/soporteNegocio.html",
-          titleParam:"Consola de soporte al negocio",
-        }
-      },      
-      {
         path: 'gestionOperadores.html',
         name: 'GEOP',
         beforeEnter: allowed,
@@ -173,32 +163,12 @@ const routes = [
           urlParam: "/configuracionQrtz.html",
           titleParam:"Configuración de Qrtz",
         }
-      }, 
+      },
       {
         path: 'extraccionDatosGM.html',
         name: 'EXDA',
         beforeEnter: allowed,
         component: () => import('../modules/reporteSas/ReporteSAS.vue')
-      },
-      {
-        path: 'BusquedaEnZonaOT.html',
-        name: 'OTZO',
-        beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/BusquedaEnZonaOT.html',
-          titleParam: 'busqueda de OT en zona'
-        }
-      },
-      {
-        path: 'busquedaEnMapa.html',
-        name: 'OMAP',
-        beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/busquedaEnMapa.html',
-          titleParam: 'busqueda de OT en mapa'
-        }
       },
 /*       {
         path: 'busquedaTecnico.html',

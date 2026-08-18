@@ -69,6 +69,14 @@ describe('Arquitectura de rutas FMR-22776', () => {
     expect(router.getRoutes().some((route) => route.name === 'ABMM')).toBe(false)
   })
 
+  it('no publica las rutas retiradas de Monitoreo y Ordenes Trabajo', () => {
+    const routeNames = router.getRoutes().map((route) => route.name)
+
+    expect(routeNames).not.toContain('SONE')
+    expect(routeNames).not.toContain('OTZO')
+    expect(routeNames).not.toContain('OMAP')
+  })
+
   it('autoriza una ruta cuando el perfil contiene el permiso exacto', () => {
     const next = runBeforeEnter('ROTF', ['ROTF'])
     expect(next).toHaveBeenCalledWith()

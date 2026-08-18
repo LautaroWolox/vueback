@@ -5,17 +5,6 @@ export const getRutas = (rutas:any) => {
 
     return [
         {
-            label: 'Monitoreo',
-            visible: hasMenu('MOER'),
-            items: [
-                {
-                    label: 'Consola de Soporte al Negocio',
-                    command: () => { router.push({ name: 'SONE' }); },
-                    visible: hasMenu('SONE')
-                }
-            ]
-        },
-        {
             label: 'Administración',
             visible: hasMenu('ABMV'),
             items: [
@@ -101,22 +90,6 @@ export const getRutas = (rutas:any) => {
                     label: 'Extracción de Datos GM',
                     command: () => { router.push({ name: 'EXDA' }); },
                     visible: hasMenu('EXDA')
-                }
-            ]
-        },
-        {
-            label: 'Ordenes Trabajo',
-            visible: hasMenu('OT  '),
-            items: [
-                {
-                    label: 'Busqueda en Zona',
-                    command: () => { router.push({ name: 'OTZO' }); },
-                    visible: hasMenu('OTZO')
-                },
-                {
-                    label: 'Busqueda en Mapa',
-                    command: () => { router.push({ name: 'OMAP' }); },
-                    visible: hasMenu('OMAP')
                 }
             ]
         },

@@ -58,6 +58,14 @@ describe('Menú principal - contrato de navegación', () => {
     expect(labels).not.toContain('ABM Materiales')
   })
 
+  it('elimina definitivamente Monitoreo y Ordenes Trabajo del menú principal', () => {
+    const menu = getRutas(['MOER', 'SONE', 'OT  ', 'OTZO', 'OMAP'])
+    const labels = menu.map((item) => item.label)
+
+    expect(labels).not.toContain('Monitoreo')
+    expect(labels).not.toContain('Ordenes Trabajo')
+  })
+
   it('no ejecuta rutas distintas a la asociada al ítem seleccionado', () => {
     const menu = getRutas(['CECO', 'BUOT', 'ROTF'])
     const buscador = findByLabel(menu, 'Búsqueda de OTs')
