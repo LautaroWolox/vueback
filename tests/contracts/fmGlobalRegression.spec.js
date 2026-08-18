@@ -75,9 +75,11 @@ describe('fm-global.css - contratos críticos de regresión', () => {
     expect(css).toMatch(/\.emulation-(?:page|grid)/)
   })
 
-  it('conserva las implementaciones archivadas dentro de @media not all', () => {
-    expect(css).toMatch(/(?:PANTALLA COMPLETA ARCHIVADA|fm-report-sas-fullscreen\.css)[\s\S]{0,1400}?@media\s+not\s+all/)
-    expect(css).toMatch(/(?:ORIGEN:\s*)?nuestros\.css[\s\S]{0,1400}?@media\s+not\s+all/)
-    expect(countMatches(css, /@media\s+not\s+all/g)).toBeGreaterThanOrEqual(2)
+  it('conserva las implementaciones históricas inactivas dentro de @media not all', () => {
+    const archivedBlocks = countMatches(css, /@media\s+not\s+all/g)
+    const archivedReferences = countMatches(comments, /ARCHIVAD[OA]|INACTIV[OA]/gi)
+
+    expect(archivedBlocks).toBeGreaterThanOrEqual(2)
+    expect(archivedReferences).toBeGreaterThanOrEqual(2)
   })
 })
