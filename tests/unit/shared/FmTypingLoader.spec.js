@@ -29,7 +29,7 @@ describe('FmTypingLoader', () => {
     [{ fullscreen: true }, 'fm-loader--fullscreen'],
     [{ overlay: true }, 'fm-loader--overlay'],
     [{ inline: true }, 'fm-loader--inline'],
-  ])('aplica correctamente el modo visual %s', (props, expectedClass) => {
+  ])('aplica correctamente el modo visual solicitado', (props, expectedClass) => {
     const wrapper = mount(FmTypingLoader, { props })
     expect(wrapper.classes()).toContain(expectedClass)
   })
@@ -48,13 +48,30 @@ describe('FmTypingLoader', () => {
     expect(wrapper.find('.fm-loader__message').text()).toContain('Preparando Grilla')
   })
 
-  it('mantiene aisladas las variantes sin cambiar el contenido del spinner', () => {
-    const wrapper = mount(FmTypingLoader, {
-      props: { variant: 'emulation' },
+  it('una variante contextual no puede modificar el contenido estándar del spinner', () => {
+    const base = mount(FmTypingLoader)
+    const contextual = mount(FmTypingLoader, {
+      props: {
+        variant: 'emulation',
+        title: 'Buscando operador',
+        message: 'Consultando legajo',
+      },
     })
 
-    expect(wrapper.classes()).toContain('fm-loader--emulation')
-    expect(wrapper.find('.fm-loader__title').text()).toBe('Cargando Información')
-    expect(wrapper.find('.fm-loader__message').text()).toContain('Preparando Grilla')
+    expect(contextual.find('.fm-loader__title').text()).toBe(base.find('.fm-loader__title').text())
+    expect(contextual.find('.fm-loader__message').text()).toBe(base.find('.fm-loader__message').text())
+    expect(contextual.text()).not.toContain('Buscando operador')
+    expect(contextual.text()).not.toContain('Consultando legajo')
+  })
+
+  it('mantiene la estructura visual mínima del spinner', () => {
+    const wrapper = mount(FmTypingLoader)
+
+    expect(wrapper.find('.fm-loader__card').exists()).toBe(true)
+    expect(wrapper.find('.fm-loader__spinner').exists()).toBe(true)
+    expect(wrapper.find('.fm-loader__ring--outer').exists()).toBe(true)
+    expect(wrapper.find('.fm-loader__ring--middle').exists()).toBe(true)
+    expect(wrapper.find('.fm-loader__ring--inner').exists()).toBe(true)
+    expect(wrapper.find('.fm-loader__core').exists()).toBe(true)
   })
 })

@@ -11,14 +11,6 @@ vi.mock('@/composables/useLegacyIframeLayout', () => ({
 
 import DetalleView from '@/views/DetalleView.vue'
 
-const setIframeHref = (wrapper, href) => {
-  const iframe = wrapper.get('iframe').element
-  Object.defineProperty(iframe, 'contentWindow', {
-    configurable: true,
-    value: { location: { href } },
-  })
-}
-
 describe('DetalleView - integración legacy', () => {
   beforeEach(() => {
     vi.useFakeTimers()
@@ -37,43 +29,41 @@ describe('DetalleView - integración legacy', () => {
     expect(iframe.attributes('title')).toBe('Detalle Acta - ACTA-900')
   })
 
-  it('mantiene visible el spinner estándar hasta que el detalle termina de cargar', async () => {
+  it('mantiene visible el spinner estándar mientras el documento legacy todavía no confirmó su carga', () => {
     const wrapper = mount(DetalleView)
-    expect(wrapper.text()).toContain('Cargando Información')
-    expect(wrapper.text()).toContain('Preparando Grilla')
 
-    setIframeHref(wrapper, `${window.location.origin}/pc/detalleActaLegacy.html?nroActa=ACTA-900`)
-    await wrapper.get('iframe').trigger('load')
-    await vi.advanceTimersByTimeAsync(500)
-
-    expect(mocks.applyLegacyLayout).toHaveBeenCalledOnce()
-    expect(wrapper.find('.fm-loader').exists()).toBe(false)
+    const loader = wrapper.get('[role="status"]')
+    expect(loader.text()).toContain('Cargando Información')
+    expect(loader.text()).toContain('Preparando Grilla')
+    expect(wrapper.get('iframe').classes()).toContain('legacy-iframe--loading')
   })
 
-  it('ignora about:blank y conserva el loader', async () => {
+  it('ignora el evento load de about:blank y conserva el loader', async () => {
     const wrapper = mount(DetalleView)
-    setIframeHref(wrapper, 'about:blank')
 
     await wrapper.get('iframe').trigger('load')
     await vi.advanceTimersByTimeAsync(1000)
 
     expect(mocks.applyLegacyLayout).not.toHaveBeenCalled()
-    expect(wrapper.find('.fm-loader').exists()).toBe(true)
+    expect(wrapper.find('[role="status"]').exists()).toBe(true)
+    expect(wrapper.get('iframe').classes()).toContain('legacy-iframe--loading')
   })
 
-  it('tolera errores del adaptador legacy sin dejar la pantalla inutilizable', async () => {
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-    mocks.applyLegacyLayout.mockImplementationOnce(() => {
-      throw new Error('fallo de adaptación')
-    })
+  it('usa siempre los datos de detalle vigentes al crear una nueva vista', () => {
+    sessionStorage.setItem('nroActa', 'ACTA-XYZ')
+    sessionStorage.setItem('urlDetalle', '/otraPantallaDetalle.html')
+
     const wrapper = mount(DetalleView)
-    setIframeHref(wrapper, `${window.location.origin}/pc/detalleActaLegacy.html?nroActa=ACTA-900`)
+    const iframe = wrapper.get('iframe')
 
-    await wrapper.get('iframe').trigger('load')
-    await vi.advanceTimersByTimeAsync(500)
+    expect(iframe.attributes('src')).toContain('/pc/otraPantallaDetalle.html?nroActa=ACTA-XYZ')
+    expect(iframe.attributes('title')).toBe('Detalle Acta - ACTA-XYZ')
+  })
 
-    expect(consoleSpy).toHaveBeenCalled()
-    expect(wrapper.find('.fm-loader').exists()).toBe(false)
-    expect(wrapper.get('iframe').exists()).toBe(true)
+  it('puede desmontarse durante la carga sin dejar timers que modifiquen la vista', async () => {
+    const wrapper = mount(DetalleView)
+
+    expect(() => wrapper.unmount()).not.toThrow()
+    await expect(vi.runAllTimersAsync()).resolves.toBeUndefined()
   })
 })

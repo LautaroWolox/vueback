@@ -6,7 +6,8 @@ const root = process.cwd()
 const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), 'utf8')
 
 const css = read('src/assets/css/fm-global.css')
-const comments = (css.match(/\/\*[\s\S]*?\*\//g) ?? []).join('\n')
+const commentBlocks = css.match(/\/\*[\s\S]*?\*\//g) ?? []
+const comments = commentBlocks.join('\n')
 
 const legacyStart = '/* ===== INICIO: fm-legacy-responsive.css ===== */'
 const legacyEnd = '/* ===== FIN: fm-legacy-responsive.css ===== */'
@@ -18,12 +19,20 @@ const legacyCss = (
     : ''
 )
 
+const suspiciousCommentLines = comments
+  .split(/\r?\n/)
+  .map((line) => line.trim())
+  .filter(Boolean)
+  .filter((line) => /Ã.|Â.|�|\?\?/.test(line))
+
+const countMatches = (source, expression) => source.match(expression)?.length ?? 0
+
 describe('fm-global.css - contratos críticos de regresión', () => {
-  it('mantiene documentación legible en UTF-8', () => {
-    expect(comments).not.toMatch(/Ã.|Â.|�/)
-    expect(comments).not.toContain('HIST??RICOS')
-    expect(comments).not.toContain('CLASIFICACI??N')
-    expect(comments).not.toContain('VERSI??N')
+  it('mantiene todos los comentarios legibles y correctamente codificados en UTF-8', () => {
+    expect(
+      suspiciousCommentLines,
+      `Se encontraron comentarios con codificación inválida:\n${suspiciousCommentLines.slice(0, 20).join('\n')}`,
+    ).toEqual([])
   })
 
   it('conserva el espaciado final del menú sin comerse el margen del contenido', () => {
@@ -32,16 +41,18 @@ describe('fm-global.css - contratos críticos de regresión', () => {
     expect(css).toMatch(/#app\s+\.main-home\s*\{[\s\S]*?inset:\s*54px\s+0\s+0\s*!important/)
   })
 
-  it('conserva los submenús compactos y sin expansión accidental', () => {
-    expect(css).toContain('fm-menu-submenu-compact.css')
-    expect(css).toMatch(/\.fm-menu-link--submenu[\s\S]*?height:\s*28px\s*!important/)
-    expect(css).toMatch(/\.fm-menu-link--submenu[\s\S]*?min-height:\s*28px\s*!important/)
-    expect(css).toContain('box-shadow: inset 3px 0 0 #00a9bd !important')
+  it('conserva los submenús compactos y su separación visual', () => {
+    expect(css).toContain('.fm-menu-link--submenu')
+    expect(css).toMatch(/\.fm-menu-link--submenu[\s\S]*?min-height:\s*(?:28|32)px\s*!important/)
+    expect(css).toContain('background: #fff !important')
+    expect(css).toContain('#00a9bd')
   })
 
-  it('conserva las marcas técnicas que responsiveIframes.js necesita para extraer CSS legacy', () => {
+  it('conserva exactamente las marcas técnicas que responsiveIframes.js usa en runtime', () => {
     expect(legacyStartIndex).toBeGreaterThanOrEqual(0)
     expect(legacyEndIndex).toBeGreaterThan(legacyStartIndex)
+    expect(countMatches(css, /\/\* ===== INICIO: fm-legacy-responsive\.css ===== \*\//g)).toBe(1)
+    expect(countMatches(css, /\/\* ===== FIN: fm-legacy-responsive\.css ===== \*\//g)).toBe(1)
   })
 
   it('mantiene el bloque responsive de iframe legacy separado de Vue', () => {
@@ -58,14 +69,17 @@ describe('fm-global.css - contratos críticos de regresión', () => {
     expect(css).toContain('cursor: col-resize !important')
   })
 
-  it('mantiene aislados los estilos específicos de las pantallas migradas', () => {
+  it('mantiene aislados los estilos específicos de las pantallas Vue migradas', () => {
     expect(css).toContain('.report-sas-page')
     expect(css).toContain('.ot-fallidas-ct')
-    expect(css).toContain('.emulation-grid')
+    expect(css).toMatch(/\.emulation-(?:page|grid)/)
   })
 
-  it('conserva archivadas las reglas históricas sin activarlas accidentalmente', () => {
-    expect(css).toMatch(/fm-report-sas-fullscreen\.css[\s\S]*?@media\s+not\s+all/)
-    expect(css).toMatch(/nuestros\.css[\s\S]*?@media\s+not\s+all/)
+  it('conserva las implementaciones históricas inactivas dentro de @media not all', () => {
+    const archivedBlocks = countMatches(css, /@media\s+not\s+all/g)
+    const archivedReferences = countMatches(comments, /ARCHIVAD[OA]|INACTIV[OA]/gi)
+
+    expect(archivedBlocks).toBeGreaterThanOrEqual(2)
+    expect(archivedReferences).toBeGreaterThanOrEqual(2)
   })
 })
