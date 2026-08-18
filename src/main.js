@@ -20,6 +20,7 @@ import { fmPrimePassThrough } from './components/shared/primePassThrough.js'
 import { installUserMenuProfile } from './plugins/userMenuProfile.js'
 import { installGridPaginatorDefaults } from './plugins/gridPaginatorDefaults.js'
 import { installReportSasAutoHeight } from './plugins/reportSasAutoHeight.js'
+import { installMenuSubmenuBehavior } from './plugins/menuSubmenuBehavior.js'
 
 import FmButton from './components/shared/FmButton.vue'
 import FmPanel from './components/shared/FmPanel.vue'
@@ -115,6 +116,8 @@ app.component('FmResponsivePage', FmResponsivePage)
 
 app.directive('tooltip', Tooltip)
 app.mount('#app')
+
+installMenuSubmenuBehavior()
 
 /*
  * El responsive legacy es una mejora complementaria para las pantallas en iframe.
