@@ -1,0 +1,47 @@
+name: FMR Tests
+
+on:
+  push:
+    branches:
+      - tests-fmr-22776-automaticos-final
+      - version-sin-buscador-ots
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: fmr-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Unit + Integration + Contracts + Build + E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Unit tests
+        run: npm run test:unit:run
+
+      - name: Integration tests
+        run: npm run test:integration
+
+      - name: Contract tests
+        run: npm run test:contracts
+
+      - name: Production build
+        run: npm run build
+
+      - name: Cypress E2E
+        run: npm run test:e2e

@@ -3,10 +3,18 @@ import { nextTick } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 import FmGridShell from '@/components/shared/FmGridShell.vue'
 import FmGridPaginator from '@/components/shared/FmGridPaginator.vue'
+import FmTypingLoader from '@/components/shared/FmTypingLoader.vue'
+
+const mountGridShell = (options = {}) => mount(FmGridShell, {
+  global: {
+    components: { FmTypingLoader },
+  },
+  ...options,
+})
 
 describe('FmGridShell', () => {
   it('mantiene las clases compartidas requeridas por fm-global.css', () => {
-    const wrapper = mount(FmGridShell, {
+    const wrapper = mountGridShell({
       slots: { default: '<div class="contenido">Contenido</div>' },
     })
 
@@ -19,7 +27,7 @@ describe('FmGridShell', () => {
   })
 
   it('muestra el loader estándar como overlay sin ocultar el contenido de la grilla', () => {
-    const wrapper = mount(FmGridShell, {
+    const wrapper = mountGridShell({
       props: {
         loading: true,
         loadingTitle: 'Texto particular',
@@ -42,7 +50,7 @@ describe('FmGridShell', () => {
   })
 
   it('no agrega overlay cuando loading está desactivado', () => {
-    const wrapper = mount(FmGridShell, {
+    const wrapper = mountGridShell({
       props: { loading: false },
       slots: { default: '<div class="contenido">Grilla</div>' },
     })

@@ -1,9 +1,17 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+vi.mock('@/assets/css/fm-global.css?raw', () => ({
+  default: `
+/* ===== INICIO: fm-legacy-responsive.css ===== */
+.fm-responsive-legacy { box-sizing: border-box; }
+/* ===== FIN: fm-legacy-responsive.css ===== */
+`,
+}))
+
 import { installResponsiveIframes } from '@/plugins/responsiveIframes'
 
-const createIframe = (src = '/pc/consultarActas.html') => {
+const createIframe = () => {
   const iframe = document.createElement('iframe')
-  iframe.src = src
   document.body.appendChild(iframe)
   return iframe
 }
@@ -29,12 +37,13 @@ describe('responsiveIframes - integración', () => {
 
   it('marca e inicializa iframes existentes sin alterar el documento padre', () => {
     const iframe = createIframe()
+    const iframeDocument = iframe.contentDocument
     const stop = installResponsiveIframes()
 
     expect(iframe.dataset.fmResponsiveAttached).toBe('true')
+    expect(iframeDocument?.body).not.toBeNull()
 
     iframe.dispatchEvent(new Event('load'))
-    const iframeDocument = iframe.contentDocument
 
     expect(iframeDocument.body.classList.contains('fm-responsive-legacy')).toBe(true)
     expect(iframeDocument.getElementById('fm-legacy-responsive-styles')).not.toBeNull()
@@ -45,7 +54,7 @@ describe('responsiveIframes - integración', () => {
 
   it('adjunta automáticamente iframes agregados después de instalar el plugin', async () => {
     const stop = installResponsiveIframes()
-    const iframe = createIframe('/pc/jobtypeContrato.html')
+    const iframe = createIframe()
 
     await new Promise((resolve) => setTimeout(resolve, 0))
 
@@ -55,20 +64,22 @@ describe('responsiveIframes - integración', () => {
 
   it('no duplica el style responsive al recibir múltiples eventos load', () => {
     const iframe = createIframe()
+    const iframeDocument = iframe.contentDocument
     const stop = installResponsiveIframes()
 
     iframe.dispatchEvent(new Event('load'))
     iframe.dispatchEvent(new Event('load'))
 
-    expect(iframe.contentDocument.querySelectorAll('#fm-legacy-responsive-styles')).toHaveLength(1)
+    expect(iframeDocument.querySelectorAll('#fm-legacy-responsive-styles')).toHaveLength(1)
     stop()
   })
 
   it('limita diálogos legacy al viewport y habilita scroll interno', () => {
-    const iframe = createIframe('/pc/consultarActas.html')
+    const iframe = createIframe()
     const iframeDocument = iframe.contentDocument
     const iframeWindow = iframe.contentWindow
 
+    expect(iframeDocument?.body).not.toBeNull()
     Object.defineProperty(iframeWindow, 'innerWidth', { configurable: true, value: 1024 })
     Object.defineProperty(iframeWindow, 'innerHeight', { configurable: true, value: 700 })
 
