@@ -27,12 +27,6 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
-import {
-  GENERIC_LOADER_MESSAGES,
-  GENERIC_LOADER_TITLES,
-  getLoaderProfile,
-} from './fmLoaderProfiles'
 
 const props = defineProps({
   title: { type: String, default: 'Cargando Información' },
@@ -45,37 +39,13 @@ const props = defineProps({
   showMessage: { type: Boolean, default: true },
 })
 
-const route = useRoute()
-const routeProfile = computed(() => getLoaderProfile(route.name))
-
-const hasCustomTitle = computed(() => {
-  const value = String(props.title ?? '').trim()
-  return Boolean(value) && !GENERIC_LOADER_TITLES.includes(value)
-})
-
-const hasCustomMessage = computed(() => {
-  const value = String(props.message ?? '').trim()
-  return Boolean(value) && !GENERIC_LOADER_MESSAGES.includes(value)
-})
-
-const displayTitle = computed(() => (
-  hasCustomTitle.value ? props.title : routeProfile.value.title
-))
-
-const displayMessage = computed(() => (
-  hasCustomMessage.value ? props.message : routeProfile.value.message
-))
-
-const effectiveVariant = computed(() => (
-  routeProfile.value.variant || props.variant || 'default'
-))
-
-const effectiveShowMessage = computed(() => (
-  routeProfile.value.forceMessage || props.showMessage
-))
+const displayTitle = computed(() => 'Cargando Información')
+const displayMessage = computed(() => 'Preparando Grilla')
+const effectiveVariant = computed(() => props.variant || 'default')
+const effectiveShowMessage = computed(() => true)
 
 const accessibleMessage = computed(() => (
-  `${displayTitle.value}. ${effectiveShowMessage.value ? displayMessage.value : ''}`.trim()
+  `${displayTitle.value}. ${displayMessage.value}`
 ))
 
 const loaderClasses = computed(() => ({
@@ -93,7 +63,7 @@ const loaderClasses = computed(() => ({
   --fm-loader-violet: #8b38d1;
   --fm-loader-magenta: #d9208f;
   --fm-loader-ink: #173142;
-  --fm-loader-muted: #607887;
+  --fm-loader-muted: #8a9aa4;
 
   display: flex;
   align-items: center;
