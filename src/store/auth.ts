@@ -88,9 +88,10 @@ const resolveDisplayName = (perfil: SetPerfilParams) => {
         nested.apellidos,
         nested.apellido
     )
-    const combinedName = [givenNames, surnames].filter(Boolean).join(' ').trim()
 
-    if (combinedName) return combinedName
+    if (givenNames) {
+        return [givenNames, surnames].filter(Boolean).join(' ').trim()
+    }
 
     const simpleName = firstText(perfil.nombre, nested.nombre)
     if (simpleName && simpleName.toLowerCase() !== legajo.toLowerCase()) {
@@ -99,6 +100,8 @@ const resolveDisplayName = (perfil: SetPerfilParams) => {
         }
         return simpleName
     }
+
+    if (surnames) return surnames
 
     const email = firstText(perfil.email, nested.email)
     return nameFromEmail(email) || simpleName || legajo
