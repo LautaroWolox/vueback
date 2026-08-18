@@ -46,7 +46,9 @@ import OtFallidasCT from '@/modules/otFallidasCT/OtFallidasCT.vue'
 const primeStubs = {
   Accordion: { template: '<div class="p-accordion"><slot /></div>' },
   AccordionPanel: { template: '<section class="p-accordionpanel"><slot /></section>' },
-  AccordionHeader: { template: '<header class="p-accordionheader"><slot /></header>' },
+  AccordionHeader: {
+    template: '<header class="p-accordionheader"><slot class="p-accordionheader" /></header>',
+  },
   AccordionContent: { template: '<div class="p-accordioncontent"><slot /></div>' },
 }
 
