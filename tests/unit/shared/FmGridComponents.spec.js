@@ -3,7 +3,6 @@ import { nextTick } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 import FmGridShell from '@/components/shared/FmGridShell.vue'
 import FmGridPaginator from '@/components/shared/FmGridPaginator.vue'
-import FmTypingLoader from '@/components/shared/FmTypingLoader.vue'
 
 describe('FmGridShell', () => {
   it('mantiene las clases compartidas requeridas por fm-global.css', () => {
@@ -31,11 +30,26 @@ describe('FmGridShell', () => {
 
     expect(wrapper.classes()).toContain('fm-grid-shell--loading')
     expect(wrapper.find('.contenido').exists()).toBe(true)
-    const loader = wrapper.findComponent(FmTypingLoader)
-    expect(loader.exists()).toBe(true)
-    expect(loader.props('overlay')).toBe(true)
+
+    const loader = wrapper.get('[role="status"]')
+    expect(loader.classes()).toContain('fm-loader')
+    expect(loader.classes()).toContain('fm-loader--overlay')
+    expect(loader.attributes('aria-live')).toBe('polite')
     expect(loader.text()).toContain('Cargando Información')
     expect(loader.text()).toContain('Preparando Grilla')
+    expect(loader.text()).not.toContain('Texto particular')
+    expect(loader.text()).not.toContain('Mensaje particular')
+  })
+
+  it('no agrega overlay cuando loading está desactivado', () => {
+    const wrapper = mount(FmGridShell, {
+      props: { loading: false },
+      slots: { default: '<div class="contenido">Grilla</div>' },
+    })
+
+    expect(wrapper.find('[role="status"]').exists()).toBe(false)
+    expect(wrapper.classes()).not.toContain('fm-grid-shell--loading')
+    expect(wrapper.find('.contenido').exists()).toBe(true)
   })
 })
 
