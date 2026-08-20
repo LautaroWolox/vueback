@@ -6,10 +6,10 @@
     v-model:selection="selectionModel"
     v-model:first="firstModel"
     v-model:rows="rowsModel"
-    class="abm-materiales-grid fm-pass-grid fm-pt-datatable"
+    class="fm-pass-grid abm-materiales-grid"
     :value="materiales"
     dataKey="codigoMaterial"
-    tableStyle="table-layout: fixed; width: 100%; min-width: 1120px"
+    tableStyle="table-layout: fixed; min-width: 100%; width: max-content"
     scrollable
     scrollHeight="flex"
     removableSort
@@ -18,9 +18,10 @@
     selectionMode="single"
     :metaKeySelection="false"
     :rowClass="rowClass"
+    :isDataSelectable="({ data }) => isDataSelectable(data)"
     paginator
-    :rowsPerPageOptions="[50, 100, 250, 500]"
-    :resizableColumns="true"
+    :rowsPerPageOptions="[100, 250, 500]"
+    resizableColumns
     columnResizeMode="fit"
     showGridlines
     @row-click="onRowClick"
@@ -43,13 +44,14 @@
       }"
     >
       <FmGridPaginator
+        class="abm-materiales-custom-paginator"
         :first="first"
         :last="last"
         :page="page"
         :page-count="pageCount"
         :rows="rows"
         :total-records="totalRecords"
-        :rows-options="[50, 100, 250, 500]"
+        :rows-options="[100, 250, 500]"
         :show-rows-select="true"
         :show-counter="true"
         :counter-text="totalRecords === 0 ? 'No hay resultados' : ''"
@@ -62,6 +64,7 @@
       >
         <template #actions>
           <FmGridActions
+            size="large"
             :show-delete="false"
             :show-refresh="false"
             :show-edit="true"
@@ -90,33 +93,35 @@
       :sortable="column.sort"
       :filter="column.filter"
       :showFilterMenu="false"
-      :style="{ width: column.width }"
-      :headerStyle="{ width: column.width }"
-      :bodyStyle="{ width: column.width }"
+      :style="{ width: column.width, minWidth: '70px' }"
+      :headerStyle="{ width: column.width, minWidth: '70px' }"
+      :bodyStyle="{ width: column.width, minWidth: '70px' }"
       :exportable="column.exportable"
     >
       <template #filter="{ filterModel, filterCallback }">
-        <div class="abm-materiales-filter-cell fm-filter-cell">
-          <span class="abm-materiales-filter-symbol">~</span>
+        <div class="fm-filter-cell">
+          <span class="fm-filter-prefix">~</span>
           <InputText
             v-model="filterModel.value"
-            class="abm-materiales-filter-input"
+            class="fm-column-filter"
             type="text"
             @input="filterCallback()"
           />
           <button
             type="button"
-            class="abm-materiales-filter-clear"
+            class="fm-icon-button"
             title="Limpiar filtro"
             aria-label="Limpiar filtro"
-            @click="clearFilter(filterModel, filterCallback)"
-          >×</button>
+            @click.stop="clearFilter(filterModel, filterCallback)"
+          >
+            <span aria-hidden="true">×</span>
+          </button>
         </div>
       </template>
 
       <template #body="{ data }">
         <span
-          class="abm-materiales-cell-text fm-cell-text"
+          class="fm-cell-text"
           :title="String(data[column.field] ?? '')"
         >
           {{ data[column.field] ?? '' }}
@@ -125,9 +130,7 @@
     </Column>
 
     <template #empty>
-      <div class="fm-grid-empty abm-materiales-empty-state">
-        No hay materiales para mostrar.
-      </div>
+      <div class="fm-grid-empty">No hay resultados</div>
     </template>
   </DataTable>
 </template>
@@ -147,7 +150,7 @@ const props = defineProps({
   filters: { type: Object, required: true },
   selectedRow: { type: Object, default: null },
   first: { type: Number, default: 0 },
-  rows: { type: Number, default: 100 }
+  rows: { type: Number, default: 500 }
 })
 
 const emit = defineEmits([
@@ -185,7 +188,11 @@ const rowsModel = computed({
 
 const canEdit = computed(() => props.selectedRow?.activo === 'S')
 const isDataSelectable = (row) => row?.activo === 'S'
-const rowClass = (row) => row?.activo === 'S' ? '' : 'abm-materiales-row--inactive'
+const rowClass = (row) => (
+  row?.activo === 'S'
+    ? 'fm-enabled-row'
+    : 'fm-disabled-row abm-materiales-row--inactive'
+)
 
 const onRowClick = ({ data }) => {
   emit('update:selectedRow', isDataSelectable(data) ? data : null)
