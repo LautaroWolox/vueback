@@ -1,86 +1,93 @@
 /*
  * ABM Materiales
- * Estilos aislados del módulo reincorporado sobre la versión final sin Buscador OTs.
- * No modifica reglas globales, menú, iframe ni otras pantallas migradas.
+ * La pantalla reutiliza la misma estructura visual de las pantallas migradas:
+ * Accordion PrimeVue + FmGridShell + fm-pass-grid + paginador y acciones compartidas.
+ * Los selectores quedan acotados al módulo para no modificar otras vistas.
  */
-.abm-materiales-page {
+
+html body #app .abm-materiales-page {
   position: relative;
   width: 100%;
   height: 100%;
+  min-width: 0;
   min-height: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  margin: 4px 0 0 !important;
-  padding: 0 6px 5px !important;
+  margin: 0 !important;
+  padding: 0 6px 4px !important;
   overflow: hidden;
   background: #fff;
   box-sizing: border-box;
 }
 
-.abm-materiales-panel {
+html body #app .abm-materiales-accordion {
   width: 100%;
+  height: 100%;
   min-width: 0;
-  flex: 0 0 auto;
-  border: 1px solid #d6dde2;
-  border-left: 3px solid #00a9bd;
-  border-radius: 0;
-  background: #fff;
-  box-shadow: 0 2px 6px rgba(22, 54, 67, .06);
-  overflow: hidden;
-}
-
-.abm-materiales-panel--results.is-expanded {
   min-height: 0;
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
 }
 
-.abm-materiales-panel__header {
-  width: 100%;
-  height: 30px;
-  min-height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 4px 10px;
-  border: 0;
-  border-bottom: 1px solid #dfe4e8;
-  background: #f7f7f7;
-  color: #101820;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 20px;
-  text-align: left;
-  cursor: pointer;
-  box-shadow: none;
+html body #app .abm-materiales-accordion > .p-accordionpanel {
+  margin: 0 !important;
+  border: 1px solid #d6dde2 !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+  overflow: visible !important;
 }
 
-.abm-materiales-panel__header:hover,
-.abm-materiales-panel__header:focus-visible {
-  background: #eef9fa;
-  color: #007e8e;
-  outline: none;
+html body #app .abm-materiales-accordion > .p-accordionpanel:first-child {
+  position: relative;
+  z-index: 20;
+  flex: 0 0 auto;
 }
 
-.abm-materiales-panel__toggle {
-  width: 20px;
-  height: 20px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #007f90;
-  font-size: 17px;
-  font-weight: 500;
-  line-height: 1;
+html body #app .abm-materiales-accordion > .p-accordionpanel:last-child {
+  position: relative;
+  z-index: 10;
+  min-height: 0;
 }
 
-.abm-materiales-panel__body {
-  padding: 10px 12px;
-  background: #fff;
+html body #app .abm-materiales-page--grid-expanded .abm-materiales-results-panel {
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+html body #app .abm-materiales-accordion .p-accordionheader {
+  min-height: 28px !important;
+  height: 28px !important;
+  padding: 5px 10px !important;
+  border: 0 !important;
+  border-bottom: 1px solid #dfe4e8 !important;
+  border-radius: 0 !important;
+  background: #f7f7f7 !important;
+  color: #000 !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  line-height: 18px !important;
+  box-shadow: none !important;
+}
+
+html body #app .abm-materiales-accordion .p-accordioncontent,
+html body #app .abm-materiales-accordion .p-accordioncontent-content {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: #fff !important;
+}
+
+html body #app .abm-materiales-page--grid-expanded .abm-materiales-results-panel .p-accordioncontent,
+html body #app .abm-materiales-page--grid-expanded .abm-materiales-results-panel .p-accordioncontent-content {
+  height: auto !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
 }
 
 .abm-materiales-search-body {
@@ -88,200 +95,292 @@
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.abm-materiales-results-body,
-.abm-materiales-grid-shell {
-  width: 100%;
-  min-width: 0;
-  min-height: 0;
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  padding: 0;
-  overflow: hidden;
+  padding: 10px 12px;
   background: #fff;
 }
 
-.abm-materiales-grid-shell.fm-grid-shell {
-  border-left: 0;
+html body #app .abm-materiales-grid-shell {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  border-left-width: 3px !important;
+  background: #fff !important;
+  overflow: hidden !important;
 }
 
-.abm-materiales-grid,
-#tabla-abm-materiales.p-datatable {
-  width: 100%;
-  height: 100%;
-  min-width: 0;
-  min-height: 0;
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: #fff;
+html body #app #tabla-abm-materiales,
+html body #app #tabla-abm-materiales.p-datatable {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  border-left: 0 !important;
+  background: #fff !important;
 }
 
-#tabla-abm-materiales .p-datatable-table-container,
-#tabla-abm-materiales .p-datatable-wrapper,
-#tabla-abm-materiales [data-pc-section="tablecontainer"] {
-  min-width: 0;
-  min-height: 0;
-  flex: 1 1 auto;
+html body #app #tabla-abm-materiales .p-datatable-table-container,
+html body #app #tabla-abm-materiales .p-datatable-wrapper,
+html body #app #tabla-abm-materiales [data-pc-section='tablecontainer'] {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 1 1 auto !important;
   overflow: auto !important;
+  border: 1px solid #d1d1d1 !important;
+  border-left: 0 !important;
+  background: #fff !important;
 }
 
-#tabla-abm-materiales .p-datatable-table {
-  width: 100%;
-  min-width: 1120px;
-  border-collapse: collapse;
+html body #app #tabla-abm-materiales .p-datatable-table {
+  width: max-content !important;
+  min-width: 100% !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+  font-size: 12px !important;
 }
 
-#tabla-abm-materiales .p-datatable-thead > tr > th {
+html body #app #tabla-abm-materiales .p-datatable-thead > tr > th,
+html body #app #tabla-abm-materiales .p-datatable-tbody > tr > td {
+  box-sizing: border-box !important;
+  border-right: 1px solid #c9d3da !important;
+  border-bottom: 1px solid #dce3e8 !important;
+  vertical-align: middle !important;
+}
+
+html body #app #tabla-abm-materiales .p-datatable-thead > tr > th {
+  position: relative !important;
   height: 34px !important;
   min-height: 34px !important;
   padding: 4px 7px !important;
-  border: 1px solid #cfd8dd !important;
-  background: #eef2f4 !important;
-  color: #263640 !important;
-  font-size: 11px !important;
-  font-weight: 700 !important;
-  line-height: 1.15 !important;
-  text-align: left !important;
-  white-space: normal !important;
-  vertical-align: middle !important;
-}
-
-#tabla-abm-materiales .p-datatable-thead > tr.p-datatable-filter-row > th,
-#tabla-abm-materiales .p-datatable-thead > tr.p-filter-row > th {
-  height: 34px !important;
-  min-height: 34px !important;
-  padding: 3px 4px !important;
-  background: #fff !important;
-}
-
-#tabla-abm-materiales .p-datatable-tbody > tr > td {
-  height: 31px !important;
-  min-height: 31px !important;
-  padding: 3px 7px !important;
-  border: 1px solid #d5dde1 !important;
-  background: #fff !important;
-  color: #263238 !important;
+  overflow: visible !important;
+  background: #f4f7f9 !important;
+  color: #263f50 !important;
   font-size: 12px !important;
-  line-height: 1.2 !important;
-  vertical-align: middle !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
 }
 
-#tabla-abm-materiales .p-datatable-tbody > tr:not(.abm-materiales-row--inactive) {
+html body #app #tabla-abm-materiales .p-column-header-content,
+html body #app #tabla-abm-materiales .p-datatable-column-title {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+html body #app #tabla-abm-materiales .p-datatable-thead > tr.p-datatable-filter-row > th,
+html body #app #tabla-abm-materiales .p-datatable-thead > tr.p-filter-row > th {
+  height: 33px !important;
+  min-height: 33px !important;
+  padding: 3px 5px !important;
+  overflow: visible !important;
+  background: #fff !important;
+}
+
+html body #app #tabla-abm-materiales .p-datatable-tbody > tr > td {
+  height: 35px !important;
+  min-height: 35px !important;
+  padding: 5px 8px !important;
+  overflow: hidden !important;
+  color: #263238 !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+html body #app #tabla-abm-materiales .p-datatable-tbody > tr.fm-enabled-row {
   cursor: pointer;
 }
 
-#tabla-abm-materiales .p-datatable-tbody > tr:not(.abm-materiales-row--inactive):hover > td {
-  background: #eaf9fb !important;
+html body #app #tabla-abm-materiales .p-datatable-tbody > tr.fm-enabled-row:hover > td {
+  background: #edfafd !important;
 }
 
-#tabla-abm-materiales .p-datatable-tbody > tr.p-highlight > td,
-#tabla-abm-materiales .p-datatable-tbody > tr.p-datatable-row-selected > td {
-  border-color: #78c5cf !important;
-  background: #a9e0e7 !important;
-  color: #143d45 !important;
-  font-weight: 700 !important;
+html body #app #tabla-abm-materiales .p-datatable-tbody > tr.p-datatable-row-selected > td,
+html body #app #tabla-abm-materiales .p-datatable-tbody > tr.p-highlight > td,
+html body #app #tabla-abm-materiales .p-datatable-tbody > tr[data-p-selected='true'] > td,
+html body #app #tabla-abm-materiales .p-datatable-tbody > tr[aria-selected='true'] > td {
+  background: #d9f8fa !important;
+  color: #111 !important;
+  font-weight: 600 !important;
 }
 
-#tabla-abm-materiales .p-datatable-tbody > tr.p-highlight .abm-materiales-cell-text,
-#tabla-abm-materiales .p-datatable-tbody > tr.p-datatable-row-selected .abm-materiales-cell-text {
-  color: #143d45 !important;
-  font-weight: 700 !important;
-}
-
-#tabla-abm-materiales .p-datatable-tbody > tr.abm-materiales-row--inactive,
-#tabla-abm-materiales .p-datatable-tbody > tr.abm-materiales-row--inactive > td,
-#tabla-abm-materiales .p-datatable-tbody > tr.abm-materiales-row--inactive:hover > td {
-  background: #eceff1 !important;
-  color: #8a979e !important;
+html body #app #tabla-abm-materiales .p-datatable-tbody > tr.fm-disabled-row > td,
+html body #app #tabla-abm-materiales .p-datatable-tbody > tr.fm-disabled-row:hover > td,
+html body #app #tabla-abm-materiales .p-datatable-tbody > tr.abm-materiales-row--inactive > td {
+  background: #edf0f2 !important;
+  color: #65737b !important;
+  font-weight: 400 !important;
   cursor: not-allowed !important;
-  user-select: none;
 }
 
-.abm-materiales-filter-cell {
-  width: 100%;
-  min-width: 0;
-  display: grid;
-  grid-template-columns: 10px minmax(0, 1fr) 17px;
-  align-items: center;
-  gap: 2px;
-}
-
-.abm-materiales-filter-symbol {
-  color: #687b84;
-  font-size: 12px;
-  line-height: 1;
-  text-align: center;
-}
-
-.abm-materiales-filter-input,
-.abm-materiales-filter-input.p-inputtext {
+html body #app #tabla-abm-materiales .fm-filter-cell {
   width: 100% !important;
   min-width: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 3px !important;
+}
+
+html body #app #tabla-abm-materiales .fm-filter-prefix,
+html body #app #tabla-abm-materiales .fm-filter-more {
+  flex: 0 0 auto !important;
+  color: #000 !important;
+  font-size: 12px !important;
+}
+
+html body #app #tabla-abm-materiales .fm-column-filter {
+  width: 100% !important;
+  min-width: 20px !important;
   height: 25px !important;
   min-height: 25px !important;
-  padding: 2px 5px !important;
-  border: 1px solid #cbd5da !important;
+  padding: 3px 5px !important;
+  border: 1px solid #c7d1d8 !important;
   border-radius: 3px !important;
   background: #fff !important;
-  color: #263640 !important;
-  font-size: 11px !important;
+  font-size: 12px !important;
+  box-sizing: border-box !important;
+}
+
+html body #app #tabla-abm-materiales .fm-column-filter:focus {
+  outline: none !important;
+  border-color: #00a9bd !important;
+  box-shadow: 0 0 0 2px rgba(0, 188, 212, .14) !important;
+}
+
+html body #app #tabla-abm-materiales .fm-cell-text {
+  width: 100% !important;
+  min-width: 0 !important;
+  display: block !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+html body #app #tabla-abm-materiales .p-paginator {
+  height: 38px !important;
+  min-height: 38px !important;
+  flex: 0 0 38px !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  border: 1px solid #d1d1d1 !important;
+  border-top: 0 !important;
+  border-left: 0 !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+}
+
+html body #app #tabla-abm-materiales .abm-materiales-custom-paginator {
+  width: 100% !important;
+  min-height: 38px !important;
+  display: grid !important;
+  grid-template-columns: minmax(110px, 1fr) auto minmax(160px, 1fr) !important;
+  align-items: center !important;
+  padding: 3px 8px !important;
+  color: #111 !important;
+  font-size: 13px !important;
+  box-sizing: border-box !important;
+}
+
+html body #app #tabla-abm-materiales .abm-materiales-custom-paginator .fm-custom-paginator__actions {
+  justify-self: start !important;
+}
+
+html body #app #tabla-abm-materiales .abm-materiales-custom-paginator .fm-custom-paginator__navigation {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  color: #111 !important;
+  font-size: 13px !important;
+  white-space: nowrap !important;
+}
+
+html body #app #tabla-abm-materiales .abm-materiales-custom-paginator .fm-page-button {
+  width: 22px !important;
+  min-width: 22px !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #111 !important;
+  font-size: 15px !important;
+  font-weight: 400 !important;
   box-shadow: none !important;
 }
 
-.abm-materiales-filter-input:focus,
-.abm-materiales-filter-input.p-inputtext:focus {
-  border-color: #00a9bd !important;
-  box-shadow: 0 0 0 1px rgba(0, 169, 189, .15) !important;
+html body #app #tabla-abm-materiales .abm-materiales-custom-paginator .fm-page-button:hover:not(:disabled) {
+  color: #00a9bd !important;
 }
 
-.abm-materiales-filter-clear {
-  width: 17px;
-  min-width: 17px;
-  height: 23px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: #263640;
-  font-size: 15px;
-  line-height: 1;
-  cursor: pointer;
+html body #app #tabla-abm-materiales .abm-materiales-custom-paginator .fm-page-button:disabled {
+  color: #b7c0c4 !important;
 }
 
-.abm-materiales-filter-clear:hover {
-  color: #00a9bd;
+html body #app #tabla-abm-materiales .abm-materiales-custom-paginator .fm-page-label,
+html body #app #tabla-abm-materiales .abm-materiales-custom-paginator .fm-page-total,
+html body #app #tabla-abm-materiales .abm-materiales-custom-paginator .fm-custom-paginator__counter {
+  color: #111 !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  white-space: nowrap !important;
 }
 
-.abm-materiales-cell-text {
-  display: block;
-  width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+html body #app #tabla-abm-materiales .abm-materiales-custom-paginator .fm-page-input {
+  width: 46px !important;
+  min-width: 46px !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  padding: 2px 6px !important;
+  border: 1px solid #cbd4db !important;
+  border-radius: 4px !important;
+  background: #fff !important;
+  color: #111 !important;
+  font-size: 13px !important;
+  text-align: center !important;
 }
 
-.abm-materiales-empty-state {
-  min-height: 35px !important;
+html body #app #tabla-abm-materiales .abm-materiales-custom-paginator .fm-rows-select {
+  width: 58px !important;
+  min-width: 58px !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  margin-left: 2px !important;
+  padding: 0 6px !important;
+  border: 1px solid #cbd4db !important;
+  border-radius: 4px !important;
+  background: #fff !important;
+  color: #111 !important;
+  font-size: 13px !important;
 }
 
-#tabla-abm-materiales .p-datatable-paginator-bottom,
-#tabla-abm-materiales > .p-paginator {
-  width: 100%;
-  min-height: 40px;
-  flex: 0 0 40px;
-  padding: 0 !important;
-  border-top: 1px solid #d5dde1 !important;
-  border-radius: 0 !important;
-  overflow: hidden;
+html body #app #tabla-abm-materiales .abm-materiales-custom-paginator .fm-custom-paginator__counter {
+  justify-self: end !important;
 }
 
+html body #app #tabla-abm-materiales .fm-grid-actions-final {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+}
+
+/* Diálogos de ABM: se mantienen aislados, usando la misma paleta y botones compartidos. */
 .abm-materiales-dialog.p-dialog {
   overflow: hidden !important;
   border: 1px solid #b7c4ca !important;
@@ -493,25 +592,31 @@
   border-radius: 7px !important;
 }
 
-@media (max-width: 1024px) {
-  .abm-materiales-page {
-    margin-top: 0 !important;
+@media (max-width: 900px) {
+  html body #app #tabla-abm-materiales .abm-materiales-custom-paginator {
+    min-height: 86px !important;
+    grid-template-columns: 1fr !important;
+    gap: 4px !important;
+  }
+
+  html body #app #tabla-abm-materiales .abm-materiales-custom-paginator .fm-custom-paginator__actions,
+  html body #app #tabla-abm-materiales .abm-materiales-custom-paginator .fm-custom-paginator__navigation,
+  html body #app #tabla-abm-materiales .abm-materiales-custom-paginator .fm-custom-paginator__counter {
+    justify-self: center !important;
   }
 }
 
 @media (max-width: 700px) {
-  .abm-materiales-page {
+  html body #app .abm-materiales-page {
     height: auto;
     min-height: calc(100dvh - 60px);
     overflow: visible;
   }
 
-  .abm-materiales-panel--results.is-expanded,
-  .abm-materiales-results-body,
-  .abm-materiales-grid-shell,
-  .abm-materiales-grid,
-  #tabla-abm-materiales.p-datatable {
-    min-height: 520px;
+  html body #app .abm-materiales-page--grid-expanded .abm-materiales-results-panel,
+  html body #app .abm-materiales-page--grid-expanded .abm-materiales-grid-shell,
+  html body #app .abm-materiales-page--grid-expanded #tabla-abm-materiales.p-datatable {
+    min-height: 520px !important;
   }
 
   .abm-materiales-dialog__form,
