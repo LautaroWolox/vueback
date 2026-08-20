@@ -1,0 +1,540 @@
+/*
+ * ABM Materiales
+ * Estilos aislados del módulo reincorporado sobre la versión final sin Buscador OTs.
+ * No modifica reglas globales, menú, iframe ni otras pantallas migradas.
+ */
+.abm-materiales-page {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 4px 0 0 !important;
+  padding: 0 6px 5px !important;
+  overflow: hidden;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.abm-materiales-panel {
+  width: 100%;
+  min-width: 0;
+  flex: 0 0 auto;
+  border: 1px solid #d6dde2;
+  border-left: 3px solid #00a9bd;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(22, 54, 67, .06);
+  overflow: hidden;
+}
+
+.abm-materiales-panel--results.is-expanded {
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.abm-materiales-panel__header {
+  width: 100%;
+  height: 30px;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 10px;
+  border: 0;
+  border-bottom: 1px solid #dfe4e8;
+  background: #f7f7f7;
+  color: #101820;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+.abm-materiales-panel__header:hover,
+.abm-materiales-panel__header:focus-visible {
+  background: #eef9fa;
+  color: #007e8e;
+  outline: none;
+}
+
+.abm-materiales-panel__toggle {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #007f90;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.abm-materiales-panel__body {
+  padding: 10px 12px;
+  background: #fff;
+}
+
+.abm-materiales-search-body {
+  min-height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.abm-materiales-results-body,
+.abm-materiales-grid-shell {
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  background: #fff;
+}
+
+.abm-materiales-grid-shell.fm-grid-shell {
+  border-left: 0;
+}
+
+.abm-materiales-grid,
+#tabla-abm-materiales.p-datatable {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #fff;
+}
+
+#tabla-abm-materiales .p-datatable-table-container,
+#tabla-abm-materiales .p-datatable-wrapper,
+#tabla-abm-materiales [data-pc-section="tablecontainer"] {
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: auto !important;
+}
+
+#tabla-abm-materiales .p-datatable-table {
+  width: 100%;
+  min-width: 1120px;
+  border-collapse: collapse;
+}
+
+#tabla-abm-materiales .p-datatable-thead > tr > th {
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 4px 7px !important;
+  border: 1px solid #cfd8dd !important;
+  background: #eef2f4 !important;
+  color: #263640 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+  text-align: left !important;
+  white-space: normal !important;
+  vertical-align: middle !important;
+}
+
+#tabla-abm-materiales .p-datatable-thead > tr.p-datatable-filter-row > th,
+#tabla-abm-materiales .p-datatable-thead > tr.p-filter-row > th {
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 3px 4px !important;
+  background: #fff !important;
+}
+
+#tabla-abm-materiales .p-datatable-tbody > tr > td {
+  height: 31px !important;
+  min-height: 31px !important;
+  padding: 3px 7px !important;
+  border: 1px solid #d5dde1 !important;
+  background: #fff !important;
+  color: #263238 !important;
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+  vertical-align: middle !important;
+}
+
+#tabla-abm-materiales .p-datatable-tbody > tr:not(.abm-materiales-row--inactive) {
+  cursor: pointer;
+}
+
+#tabla-abm-materiales .p-datatable-tbody > tr:not(.abm-materiales-row--inactive):hover > td {
+  background: #eaf9fb !important;
+}
+
+#tabla-abm-materiales .p-datatable-tbody > tr.p-highlight > td,
+#tabla-abm-materiales .p-datatable-tbody > tr.p-datatable-row-selected > td {
+  border-color: #78c5cf !important;
+  background: #a9e0e7 !important;
+  color: #143d45 !important;
+  font-weight: 700 !important;
+}
+
+#tabla-abm-materiales .p-datatable-tbody > tr.p-highlight .abm-materiales-cell-text,
+#tabla-abm-materiales .p-datatable-tbody > tr.p-datatable-row-selected .abm-materiales-cell-text {
+  color: #143d45 !important;
+  font-weight: 700 !important;
+}
+
+#tabla-abm-materiales .p-datatable-tbody > tr.abm-materiales-row--inactive,
+#tabla-abm-materiales .p-datatable-tbody > tr.abm-materiales-row--inactive > td,
+#tabla-abm-materiales .p-datatable-tbody > tr.abm-materiales-row--inactive:hover > td {
+  background: #eceff1 !important;
+  color: #8a979e !important;
+  cursor: not-allowed !important;
+  user-select: none;
+}
+
+.abm-materiales-filter-cell {
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) 17px;
+  align-items: center;
+  gap: 2px;
+}
+
+.abm-materiales-filter-symbol {
+  color: #687b84;
+  font-size: 12px;
+  line-height: 1;
+  text-align: center;
+}
+
+.abm-materiales-filter-input,
+.abm-materiales-filter-input.p-inputtext {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 25px !important;
+  min-height: 25px !important;
+  padding: 2px 5px !important;
+  border: 1px solid #cbd5da !important;
+  border-radius: 3px !important;
+  background: #fff !important;
+  color: #263640 !important;
+  font-size: 11px !important;
+  box-shadow: none !important;
+}
+
+.abm-materiales-filter-input:focus,
+.abm-materiales-filter-input.p-inputtext:focus {
+  border-color: #00a9bd !important;
+  box-shadow: 0 0 0 1px rgba(0, 169, 189, .15) !important;
+}
+
+.abm-materiales-filter-clear {
+  width: 17px;
+  min-width: 17px;
+  height: 23px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #263640;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.abm-materiales-filter-clear:hover {
+  color: #00a9bd;
+}
+
+.abm-materiales-cell-text {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.abm-materiales-empty-state {
+  min-height: 35px !important;
+}
+
+#tabla-abm-materiales .p-datatable-paginator-bottom,
+#tabla-abm-materiales > .p-paginator {
+  width: 100%;
+  min-height: 40px;
+  flex: 0 0 40px;
+  padding: 0 !important;
+  border-top: 1px solid #d5dde1 !important;
+  border-radius: 0 !important;
+  overflow: hidden;
+}
+
+.abm-materiales-dialog.p-dialog {
+  overflow: hidden !important;
+  border: 1px solid #b7c4ca !important;
+  border-top: 3px solid #00a9bd !important;
+  border-radius: 9px !important;
+  background: #fff !important;
+  box-shadow: 0 18px 42px rgba(22, 47, 59, .22) !important;
+}
+
+.abm-materiales-dialog .p-dialog-header {
+  min-height: 56px !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 20px !important;
+  border-bottom: 1px solid #d9e0e4 !important;
+  background: #fff !important;
+}
+
+.abm-materiales-dialog .p-dialog-title,
+.abm-materiales-dialog__header {
+  color: #1f2e36 !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+}
+
+.abm-materiales-dialog .p-dialog-header-actions {
+  width: auto !important;
+  min-width: 0 !important;
+  margin-left: auto !important;
+  padding: 0 !important;
+}
+
+.abm-materiales-dialog .p-dialog-close-button,
+.abm-materiales-dialog .p-dialog-header-close-button {
+  position: relative !important;
+  width: 32px !important;
+  min-width: 32px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 1px solid #d7e0e4 !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  color: #111820 !important;
+  box-shadow: 0 4px 12px rgba(18, 48, 60, .08) !important;
+}
+
+.abm-materiales-dialog .p-dialog-close-button:hover,
+.abm-materiales-dialog .p-dialog-header-close-button:hover {
+  border-color: #00a9bd !important;
+  color: #00a9bd !important;
+}
+
+.abm-materiales-dialog-close-icon {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  width: 14px !important;
+  height: 14px !important;
+  display: block !important;
+  color: #111820 !important;
+  font-size: 0 !important;
+  transform: translate(-50%, -50%) !important;
+  pointer-events: none !important;
+}
+
+.abm-materiales-dialog-close-icon::before,
+.abm-materiales-dialog-close-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+  transform-origin: center;
+}
+
+.abm-materiales-dialog-close-icon::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.abm-materiales-dialog-close-icon::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.abm-materiales-dialog .p-dialog-content {
+  padding: 0 !important;
+  background: #fff !important;
+}
+
+.abm-materiales-dialog__form {
+  display: grid;
+  gap: 15px !important;
+  padding: 22px 22px 24px !important;
+}
+
+.abm-materiales-dialog__form--add {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 16px 14px !important;
+}
+
+.abm-materiales-dialog__form--edit {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  column-gap: 14px !important;
+  row-gap: 24px !important;
+  padding: 22px 22px 16px !important;
+}
+
+.abm-materiales-dialog__field--code,
+.abm-materiales-dialog__field--full,
+.abm-materiales-edit-dialog .abm-materiales-dialog__form--edit > .abm-materiales-dialog__field:first-child {
+  grid-column: 1 / -1 !important;
+}
+
+.abm-materiales-edit-dialog .abm-materiales-dialog__form--edit > .abm-materiales-dialog__field:nth-child(2),
+.abm-materiales-edit-dialog .abm-materiales-dialog__form--edit > .abm-materiales-dialog__field:nth-child(3),
+.abm-materiales-edit-dialog .abm-materiales-dialog__form--edit > .abm-materiales-dialog__field:nth-child(4) {
+  grid-column: auto !important;
+}
+
+.abm-materiales-dialog__field {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px !important;
+}
+
+.abm-materiales-dialog__field label {
+  color: #3d5059;
+  font-size: 11px !important;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.abm-materiales-dialog__field > .p-inputtext,
+.abm-materiales-dialog__field > .p-inputnumber,
+.abm-materiales-dialog__field > .p-inputnumber .p-inputnumber-input {
+  width: 100% !important;
+}
+
+.abm-materiales-dialog__field > .p-inputtext,
+.abm-materiales-dialog__field .p-inputnumber-input {
+  height: 40px !important;
+  min-height: 40px !important;
+  padding: 0 12px !important;
+  border: 1px solid #c9d3d8 !important;
+  border-radius: 6px !important;
+  background: #fff !important;
+  color: #334750 !important;
+  font-size: 13px !important;
+  box-shadow: none !important;
+}
+
+.abm-materiales-dialog__field > .p-inputtext:focus,
+.abm-materiales-dialog__field .p-inputnumber-input:focus {
+  border-color: #00a9bd !important;
+  box-shadow: 0 0 0 2px rgba(0, 169, 189, .13) !important;
+}
+
+.abm-materiales-dialog__field > .p-inputtext:disabled,
+.abm-materiales-dialog__field .p-inputnumber-input:disabled {
+  border-color: #d6dde1 !important;
+  background: #eef1f3 !important;
+  color: #697981 !important;
+  opacity: 1 !important;
+}
+
+.abm-materiales-field-error {
+  display: block;
+  color: #c92d3a;
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.abm-materiales-dialog .p-dialog-footer {
+  min-height: 68px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  padding: 12px 20px !important;
+  border-top: 1px solid #d9e0e4 !important;
+  background: #f9fbfc !important;
+}
+
+.abm-materiales-edit-dialog .p-dialog-footer {
+  min-height: 58px !important;
+  padding: 10px 20px 12px !important;
+}
+
+.abm-materiales-dialog__footer {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.abm-materiales-dialog__footer .fm-action-button,
+.abm-materiales-dialog__footer .fm-ui-button {
+  min-width: 120px !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0 18px !important;
+  border-radius: 7px !important;
+}
+
+@media (max-width: 1024px) {
+  .abm-materiales-page {
+    margin-top: 0 !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .abm-materiales-page {
+    height: auto;
+    min-height: calc(100dvh - 60px);
+    overflow: visible;
+  }
+
+  .abm-materiales-panel--results.is-expanded,
+  .abm-materiales-results-body,
+  .abm-materiales-grid-shell,
+  .abm-materiales-grid,
+  #tabla-abm-materiales.p-datatable {
+    min-height: 520px;
+  }
+
+  .abm-materiales-dialog__form,
+  .abm-materiales-dialog__form--add,
+  .abm-materiales-dialog__form--edit {
+    grid-template-columns: 1fr !important;
+  }
+
+  .abm-materiales-dialog__field--code,
+  .abm-materiales-dialog__field--full,
+  .abm-materiales-edit-dialog .abm-materiales-dialog__form--edit > .abm-materiales-dialog__field {
+    grid-column: auto !important;
+  }
+
+  .abm-materiales-dialog .p-dialog-header,
+  .abm-materiales-dialog .p-dialog-footer {
+    padding-right: 18px !important;
+    padding-left: 18px !important;
+  }
+
+  .abm-materiales-dialog__form,
+  .abm-materiales-edit-dialog .abm-materiales-dialog__form--edit {
+    row-gap: 16px !important;
+    padding: 20px 18px 18px !important;
+  }
+}

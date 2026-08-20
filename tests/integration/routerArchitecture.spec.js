@@ -39,6 +39,7 @@ describe('Arquitectura de rutas FMR-22776', () => {
 
   it.each([
     ['EMUL', 'emulacion', 'Emulacion.vue'],
+    ['ABMM', 'gestionMateriales/abmMateriales', 'AbmMateriales.vue'],
     ['EXDA', 'reporteSas', 'ReporteSAS.vue'],
     ['ROTF', 'otFallidasCT', 'OtFallidasCT.vue'],
   ])('mantiene %s como pantalla Vue migrada', (name, moduleName, fileName) => {
@@ -65,8 +66,10 @@ describe('Arquitectura de rutas FMR-22776', () => {
     expect(props.titleParam).toBe(titleParam)
   })
 
-  it('no publica una ruta ABM Materiales en esta versión', () => {
-    expect(router.getRoutes().some((route) => route.name === 'ABMM')).toBe(false)
+  it('publica ABM Materiales únicamente como pantalla Vue', () => {
+    const route = routeByName('ABMM')
+    expect(defaultComponentSource(route)).toContain('AbmMateriales.vue')
+    expect(defaultComponentSource(route)).not.toContain('IframeView')
   })
 
   it('no publica las rutas retiradas de Monitoreo y Ordenes Trabajo', () => {
@@ -79,6 +82,11 @@ describe('Arquitectura de rutas FMR-22776', () => {
 
   it('autoriza una ruta cuando el perfil contiene el permiso exacto', () => {
     const next = runBeforeEnter('ROTF', ['ROTF'])
+    expect(next).toHaveBeenCalledWith()
+  })
+
+  it('autoriza ABM Materiales con permiso ABMM', () => {
+    const next = runBeforeEnter('ABMM', ['ABMM'])
     expect(next).toHaveBeenCalledWith()
   })
 
