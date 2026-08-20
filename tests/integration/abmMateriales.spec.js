@@ -1,6 +1,10 @@
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import Accordion from 'primevue/accordion'
+import AccordionPanel from 'primevue/accordionpanel'
+import AccordionHeader from 'primevue/accordionheader'
+import AccordionContent from 'primevue/accordioncontent'
 
 vi.mock('@/composables/useExportExcel', () => ({
   useExcelExport: () => ({
@@ -56,6 +60,17 @@ vi.mock('@/modules/gestionMateriales/abmMateriales/components/AltaMaterialDialog
 import AbmMateriales from '@/modules/gestionMateriales/abmMateriales/AbmMateriales.vue'
 import { useAbmMaterialesStore } from '@/modules/gestionMateriales/abmMateriales/store/abmMaterialesStore.js'
 
+const mountScreen = () => mount(AbmMateriales, {
+  global: {
+    components: {
+      Accordion,
+      AccordionPanel,
+      AccordionHeader,
+      AccordionContent,
+    },
+  },
+})
+
 describe('ABM Materiales - integración de pantalla', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
@@ -67,24 +82,30 @@ describe('ABM Materiales - integración de pantalla', () => {
     vi.useRealTimers()
   })
 
-  it('muestra filtros al entrar y mantiene resultados cerrados hasta buscar', () => {
-    const wrapper = mount(AbmMateriales)
+  it('entra con filtros abiertos, resultados cerrados y sin expandir la grilla', () => {
+    const wrapper = mountScreen()
+    const headers = wrapper.findAll('.p-accordionheader')
 
     expect(wrapper.text()).toContain('FILTROS DE BÚSQUEDA')
     expect(wrapper.text()).toContain('MATERIALES')
     expect(wrapper.get('[data-test="fm-button"]').text()).toBe('BUSCAR')
-    expect(wrapper.get('.abm-materiales-panel--filters').find('.abm-materiales-panel__body').isVisible()).toBe(true)
-    expect(wrapper.get('.abm-materiales-results-body').isVisible()).toBe(false)
+    expect(headers).toHaveLength(2)
+    expect(headers[0].attributes('aria-expanded')).toBe('true')
+    expect(headers[1].attributes('aria-expanded')).toBe('false')
+    expect(wrapper.classes()).not.toContain('abm-materiales-page--grid-expanded')
   })
 
-  it('al buscar abre resultados, activa el spinner compartido y carga materiales', async () => {
-    const wrapper = mount(AbmMateriales)
+  it('al buscar cierra filtros, abre resultados, expande la grilla y activa el spinner compartido', async () => {
+    const wrapper = mountScreen()
     const store = useAbmMaterialesStore()
 
     await wrapper.get('[data-test="fm-button"]').trigger('click')
     await wrapper.vm.$nextTick()
 
-    expect(wrapper.get('.abm-materiales-results-body').isVisible()).toBe(true)
+    const headers = wrapper.findAll('.p-accordionheader')
+    expect(headers[0].attributes('aria-expanded')).toBe('false')
+    expect(headers[1].attributes('aria-expanded')).toBe('true')
+    expect(wrapper.classes()).toContain('abm-materiales-page--grid-expanded')
     expect(wrapper.get('[data-test="grid-shell"]').attributes('data-loading')).toBe('true')
     expect(wrapper.text()).toContain('Cargando Información - Preparando Grilla')
 
@@ -95,14 +116,22 @@ describe('ABM Materiales - integración de pantalla', () => {
     expect(wrapper.get('[data-test="grid-shell"]').attributes('data-loading')).toBe('false')
   })
 
-  it('permite contraer y volver a abrir los filtros sin perder la pantalla de resultados', async () => {
-    const wrapper = mount(AbmMateriales)
-    const headers = wrapper.findAll('.abm-materiales-panel__header')
+  it('permite volver a abrir los filtros manualmente sin cerrar el acordeón de resultados', async () => {
+    const wrapper = mountScreen()
+
+    await wrapper.get('[data-test="fm-button"]').trigger('click')
+    await wrapper.vm.$nextTick()
+
+    let headers = wrapper.findAll('.p-accordionheader')
+    expect(headers[0].attributes('aria-expanded')).toBe('false')
+    expect(headers[1].attributes('aria-expanded')).toBe('true')
 
     await headers[0].trigger('click')
-    expect(wrapper.get('.abm-materiales-panel--filters').find('.abm-materiales-panel__body').isVisible()).toBe(false)
+    await wrapper.vm.$nextTick()
 
-    await headers[1].trigger('click')
-    expect(wrapper.get('.abm-materiales-results-body').isVisible()).toBe(true)
+    headers = wrapper.findAll('.p-accordionheader')
+    expect(headers[0].attributes('aria-expanded')).toBe('true')
+    expect(headers[1].attributes('aria-expanded')).toBe('true')
+    expect(wrapper.classes()).toContain('abm-materiales-page--grid-expanded')
   })
 })
