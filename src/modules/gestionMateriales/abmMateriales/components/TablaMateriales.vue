@@ -18,7 +18,7 @@
     selectionMode="single"
     :metaKeySelection="false"
     :rowClass="rowClass"
-    :isDataSelectable="({ data }) => isDataSelectable(data)"
+    :isDataSelectable="isRowSelectable"
     paginator
     :rowsPerPageOptions="[100, 250, 500]"
     resizableColumns
@@ -188,6 +188,7 @@ const rowsModel = computed({
 
 const canEdit = computed(() => props.selectedRow?.activo === 'S')
 const isDataSelectable = (row) => row?.activo === 'S'
+const isRowSelectable = (event) => isDataSelectable(event?.data)
 const rowClass = (row) => (
   row?.activo === 'S'
     ? 'fm-enabled-row'
