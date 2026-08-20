@@ -116,14 +116,15 @@ describe('abmMaterialesStore', () => {
     const store = useAbmMaterialesStore()
     await resolveTimers(store.fetchMateriales())
 
-    const pending = store.actualizarMaterial({
+    const rejection = expect(store.actualizarMaterial({
       codigoMaterial: '1000102815',
       umbralMedio: 9,
       umbralMaximo: 18,
-    })
-    await vi.runAllTimersAsync()
+    })).rejects.toThrow('Los materiales desactivados no pueden editarse.')
 
-    await expect(pending).rejects.toThrow('Los materiales desactivados no pueden editarse.')
+    await vi.runAllTimersAsync()
+    await rejection
+
     expect(store.loading).toBe(false)
     expect(store.error).toBe('Los materiales desactivados no pueden editarse.')
   })
