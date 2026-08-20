@@ -96,7 +96,6 @@ describe('Arquitectura de migración de Field Manager', () => {
     const forbiddenDirectories = [
       'buscadorOts',
       'parametrizaciones',
-      'gestionMateriales',
     ]
 
     forbiddenDirectories.forEach((directory) => {
@@ -104,9 +103,16 @@ describe('Arquitectura de migración de Field Manager', () => {
     })
   })
 
-  it('no reintroduce ABM Materiales en router ni módulos', () => {
-    expect(routerSource).not.toContain("name: 'ABMM'")
-    expect(routerSource).not.toContain('abmMateriales')
+  it('reincorpora únicamente ABM Materiales dentro de Gestión de Materiales', () => {
+    const gestionMaterialesPath = path.join(modulesDirectory, 'gestionMateriales')
+    const children = fs.readdirSync(gestionMaterialesPath, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name)
+      .sort()
+
+    expect(children).toEqual(['abmMateriales'])
+    expect(routerSource).toContain("name: 'ABMM'")
+    expect(routerSource).toContain('gestionMateriales/abmMateriales/AbmMateriales.vue')
   })
 
   it.each(migratedScreens)('$routeName conserva una clase raíz documentada para aislar estilos', (screen) => {

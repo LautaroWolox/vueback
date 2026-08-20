@@ -9,6 +9,15 @@ export const migratedScreens = [
     integrationSpecs: ['tests/integration/migratedScreens.spec.js'],
   },
   {
+    routeName: 'ABMM',
+    routePath: '/FM/abmMateriales.html',
+    moduleDirectory: 'gestionMateriales',
+    componentFile: 'AbmMateriales.vue',
+    rootClass: 'abm-materiales-page',
+    unitSpecs: ['tests/unit/modules/abmMaterialesStore.spec.js'],
+    integrationSpecs: ['tests/integration/abmMateriales.spec.js'],
+  },
+  {
     routeName: 'EXDA',
     routePath: '/FM/extraccionDatosGM.html',
     moduleDirectory: 'reporteSas',

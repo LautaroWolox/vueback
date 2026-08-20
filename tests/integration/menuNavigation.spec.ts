@@ -20,12 +20,22 @@ describe('Menú principal - contrato de navegación', () => {
     mocks.push.mockReset()
   })
 
-  it('mantiene visibles las tres pantallas migradas con sus permisos', () => {
-    const menu = getRutas(['ABMV', 'EMUL', 'REPO', 'EXDA', 'CECO', 'ROTF'])
+  it('mantiene visibles las cuatro pantallas migradas con sus permisos', () => {
+    const menu = getRutas(['ABMV', 'EMUL', 'GEMA', 'ABMM', 'REPO', 'EXDA', 'CECO', 'ROTF'])
 
     expect(findByLabel(menu, 'Emulación')?.visible).toBe(true)
+    expect(findByLabel(menu, 'ABM MATERIALES')?.visible).toBe(true)
     expect(findByLabel(menu, 'Extracción de Datos GM')?.visible).toBe(true)
     expect(findAllByLabel(menu, 'Registro OTs Fallidas').some((item) => item.visible === true)).toBe(true)
+  })
+
+  it('navega ABM Materiales a ABMM', () => {
+    const menu = getRutas(['GEMA', 'ABMM'])
+    const abm = findByLabel(menu, 'ABM MATERIALES')
+
+    abm.command()
+
+    expect(mocks.push).toHaveBeenCalledWith({ name: 'ABMM' })
   })
 
   it('mantiene Búsqueda de OTs y Parametrizaciones como entradas de menú legacy', () => {
@@ -48,14 +58,6 @@ describe('Menú principal - contrato de navegación', () => {
   it('permite mostrar CMO con permiso JOCO por compatibilidad', () => {
     const menu = getRutas(['CECO', 'PARA', 'JOCO'])
     expect(findByLabel(menu, 'Configuración CMO-Actividad')?.visible).toBe(true)
-  })
-
-  it('no contiene ABM Materiales', () => {
-    const menu = getRutas(['GEMA', 'ABMM'])
-    const labels = flatten(menu).map((item) => item.label)
-
-    expect(labels).not.toContain('ABM MATERIALES')
-    expect(labels).not.toContain('ABM Materiales')
   })
 
   it('elimina definitivamente Monitoreo y Ordenes Trabajo del menú principal', () => {
