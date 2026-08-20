@@ -1,65 +1,46 @@
 <template>
   <div
     class="fm-screen fm-screen--pad abm-materiales-page"
-    :class="{
-      'abm-materiales-page--grid-expanded': !filtersExpanded && resultsExpanded
-    }"
+    :class="{ 'abm-materiales-page--grid-expanded': resultsExpanded }"
   >
-    <section class="abm-materiales-panel abm-materiales-panel--filters">
-      <button
-        type="button"
-        class="abm-materiales-panel__header"
-        :aria-expanded="filtersExpanded"
-        @click="filtersExpanded = !filtersExpanded"
-      >
-        <span>FILTROS DE BÚSQUEDA</span>
-        <span class="abm-materiales-panel__toggle" aria-hidden="true">
-          {{ filtersExpanded ? '−' : '+' }}
-        </span>
-      </button>
-
-      <div v-show="filtersExpanded" class="abm-materiales-panel__body abm-materiales-search-body">
-        <FmButton label="BUSCAR" @click="buscar" />
-      </div>
-    </section>
-
-    <section
-      class="abm-materiales-panel abm-materiales-panel--results"
-      :class="{ 'is-expanded': resultsExpanded }"
+    <Accordion
+      v-model:value="activePanels"
+      multiple
+      class="fm-accordion abm-materiales-accordion"
     >
-      <button
-        type="button"
-        class="abm-materiales-panel__header"
-        :aria-expanded="resultsExpanded"
-        @click="resultsExpanded = !resultsExpanded"
-      >
-        <span>MATERIALES</span>
-        <span class="abm-materiales-panel__toggle" aria-hidden="true">
-          {{ resultsExpanded ? '−' : '+' }}
-        </span>
-      </button>
+      <AccordionPanel value="0" class="abm-materiales-filters-panel">
+        <AccordionHeader>FILTROS DE BÚSQUEDA</AccordionHeader>
+        <AccordionContent>
+          <div class="abm-materiales-search-body">
+            <FmButton label="BUSCAR" @click="buscar" />
+          </div>
+        </AccordionContent>
+      </AccordionPanel>
 
-      <div v-show="resultsExpanded" class="abm-materiales-results-body">
-        <FmGridShell
-          class="abm-materiales-grid-shell"
-          :loading="store.loading"
-          loading-title="Cargando Información"
-          loading-message="Preparando Grilla"
-        >
-          <TablaMateriales
-            v-model:filters="filters"
-            v-model:selected-row="selectedRow"
-            v-model:first="first"
-            v-model:rows="pageRows"
-            :materiales="store.materiales"
-            :columns="materialColumns"
-            @export="exportar"
-            @edit="abrirEdicion"
-            @add="showAddDialog = true"
-          />
-        </FmGridShell>
-      </div>
-    </section>
+      <AccordionPanel value="1" class="abm-materiales-results-panel">
+        <AccordionHeader>MATERIALES</AccordionHeader>
+        <AccordionContent>
+          <FmGridShell
+            class="abm-materiales-grid-shell"
+            :loading="store.loading"
+            loading-title="Cargando Información"
+            loading-message="Preparando Grilla"
+          >
+            <TablaMateriales
+              v-model:filters="filters"
+              v-model:selected-row="selectedRow"
+              v-model:first="first"
+              v-model:rows="pageRows"
+              :materiales="store.materiales"
+              :columns="materialColumns"
+              @export="exportar"
+              @edit="abrirEdicion"
+              @add="showAddDialog = true"
+            />
+          </FmGridShell>
+        </AccordionContent>
+      </AccordionPanel>
+    </Accordion>
 
     <EditarMaterialDialog
       v-model:visible="showEditDialog"
@@ -81,7 +62,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { FilterMatchMode } from '@primevue/core/api'
 import FmButton from '@/components/shared/FmButton.vue'
 import FmGridShell from '@/components/shared/FmGridShell.vue'
@@ -97,15 +78,22 @@ import './abm-materiales.css'
 const store = useAbmMaterialesStore()
 const { exportToExcel } = useExcelExport()
 
-const filtersExpanded = ref(true)
-const resultsExpanded = ref(false)
+const activePanels = ref(['0'])
 const selectedRow = ref(null)
 const first = ref(0)
-const pageRows = ref(100)
+const pageRows = ref(500)
 const showEditDialog = ref(false)
 const showAddDialog = ref(false)
 const alertVisible = ref(false)
 const alertMessage = ref('')
+
+const resultsExpanded = computed(() => {
+  const values = Array.isArray(activePanels.value)
+    ? activePanels.value
+    : [activePanels.value]
+
+  return values.map(String).includes('1')
+})
 
 const filters = ref(
   Object.fromEntries(
@@ -117,7 +105,9 @@ const filters = ref(
 )
 
 const buscar = async () => {
-  resultsExpanded.value = true
+  // Mismo flujo visual que el resto de las pantallas migradas:
+  // al consultar se contraen los filtros y la grilla toma todo el alto disponible.
+  activePanels.value = ['1']
   first.value = 0
   selectedRow.value = null
 
