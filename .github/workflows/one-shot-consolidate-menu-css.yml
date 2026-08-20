@@ -1,0 +1,62 @@
+name: One-shot consolidate menu css
+
+on:
+  push:
+    branches:
+      - feature/abm-materiales-sobre-final-v1
+
+permissions:
+  contents: write
+
+jobs:
+  consolidate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/abm-materiales-sobre-final-v1
+          fetch-depth: 0
+
+      - name: Consolidate menu CSS into fm-global.css
+        shell: python
+        run: |
+          from pathlib import Path
+
+          global_path = Path('src/assets/css/fm-global.css')
+          menu_path = Path('src/assets/css/fm-menu-video.css')
+          main_path = Path('src/main.js')
+          workflow_path = Path('.github/workflows/one-shot-consolidate-menu-css.yml')
+
+          global_css = global_path.read_text(encoding='utf-8')
+          menu_css = menu_path.read_text(encoding='utf-8').rstrip()
+          marker = '/* ===== INICIO: fm-menu-video.css ===== */'
+
+          if marker not in global_css:
+              block = (
+                  '\n\n' + marker + '\n'
+                  + '/*\n'
+                  + ' * CLASIFICACIÓN: [GLOBAL CRÍTICO - MENÚ]\n'
+                  + ' * ORIGEN: contenido consolidado desde fm-menu-video.css.\n'
+                  + ' * ALCANCE: Menubar principal y submenús.\n'
+                  + ' * ADVERTENCIA: conservar al final de fm-global.css para mantener la cascada aprobada.\n'
+                  + ' */\n'
+                  + menu_css + '\n'
+                  + '/* ===== FIN: fm-menu-video.css ===== */\n'
+              )
+              global_path.write_text(global_css.rstrip() + block, encoding='utf-8')
+
+          main_source = main_path.read_text(encoding='utf-8')
+          main_source = main_source.replace("import './assets/css/fm-menu-video.css'\n", '')
+          main_path.write_text(main_source, encoding='utf-8')
+
+          menu_path.unlink(missing_ok=True)
+          workflow_path.unlink(missing_ok=True)
+
+      - name: Commit consolidated files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "refactor(FMR-22776): consolidar estilos del menú en fm-global"
+          git push origin HEAD:feature/abm-materiales-sobre-final-v1
