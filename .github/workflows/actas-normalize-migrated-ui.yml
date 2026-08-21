@@ -1,0 +1,640 @@
+name: Normalize Gestion Actas migrated UI
+
+on:
+  push:
+    branches:
+      - feat-actas-stepper-multiseleccion
+    paths:
+      - '.github/workflows/actas-normalize-migrated-ui.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat-actas-stepper-multiseleccion
+          fetch-depth: 0
+
+      - name: Normalize Gestion de Actas
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+
+          root = Path('.')
+          consulta_path = root / 'src/modules/gestionActas/views/GestionActasConsulta.vue'
+          nota_path = root / 'src/modules/gestionActas/views/NotaDcWorkspace.vue'
+          demo_path = root / 'src/modules/gestionActas/components/ActasWorkspaceDemo.vue'
+          css_path = root / 'src/assets/css/fm-global.css'
+
+          def replace_once(text, old, new, label):
+              count = text.count(old)
+              if count != 1:
+                  raise RuntimeError(f'{label}: se esperaba 1 coincidencia y se encontraron {count}')
+              return text.replace(old, new, 1)
+
+          # ------------------------------------------------------------
+          # Consulta principal: mismos botones compartidos que OTs Fallidas
+          # y footer estable al expandir la grilla.
+          # ------------------------------------------------------------
+          text = consulta_path.read_text(encoding='utf-8')
+          text = replace_once(
+              text,
+              '''            <div class="gestion-filter-actions">\n              <Button label="BUSCAR" icon="pi pi-search" class="gestion-actas-btn gestion-actas-btn--primary" :loading="searchLoading" @click="requestSearch" />\n              <Button label="LIMPIAR" icon="pi pi-eraser" outlined class="gestion-actas-btn gestion-actas-btn--secondary" @click="clearFilters" />\n            </div>''',
+              '''            <div class="fm-actions fm-filter-actions gestion-filter-actions">\n              <FmButton label="BUSCAR" :loading="searchLoading" @click="requestSearch" />\n              <FmButton label="LIMPIAR" variant="outline" :disabled="searchLoading" @click="clearFilters" />\n            </div>''',
+              'botones buscar/limpiar'
+          )
+          text = replace_once(
+              text,
+              '''              <Button\n                :label="selectedRows.length ? `CONTINUAR CON ${selectedRows.length} ACTA${selectedRows.length === 1 ? '' : 'S'}` : 'CONTINUAR'"\n                icon="pi pi-arrow-right"\n                iconPos="right"\n                class="gestion-actas-btn gestion-actas-btn--primary"\n                :disabled="!selectedRows.length"\n                @click="openWorkspace"\n              />''',
+              '''              <FmButton\n                label="CONTINUAR"\n                icon="pi-arrow-right"\n                :disabled="!selectedRows.length"\n                @click="openWorkspace"\n              />''',
+              'boton continuar'
+          )
+          text = text.replace(
+              'class="gestion-actas-dialog">',
+              'class="fm-dialog gestion-actas-dialog" :style="{ \'--fm-dialog-width\': \'32rem\' }">'
+          )
+          text = replace_once(
+              text,
+              '''      <template #footer>\n        <Button label="CANCELAR" outlined class="gestion-actas-btn gestion-actas-btn--secondary" @click="confirmNoFilters = false" />\n        <Button label="CONTINUAR" icon="pi pi-check" class="gestion-actas-btn gestion-actas-btn--primary" @click="confirmAndSearch" />\n      </template>''',
+              '''      <template #footer>\n        <FmButton label="CANCELAR" variant="outline" @click="confirmNoFilters = false" />\n        <FmButton label="CONTINUAR" icon="pi-check" @click="confirmAndSearch" />\n      </template>''',
+              'footer confirmar busqueda'
+          )
+          text = text.replace("import Button from 'primevue/button'\n", '')
+          text = replace_once(
+              text,
+              "import Dialog from 'primevue/dialog'\n",
+              "import Dialog from 'primevue/dialog'\nimport FmButton from '@/components/shared/FmButton.vue'\n",
+              'import FmButton consulta'
+          )
+          consulta_path.write_text(text, encoding='utf-8')
+
+          # ------------------------------------------------------------
+          # Nota DC: botones compartidos + varias OTs abiertas en pestañas.
+          # ------------------------------------------------------------
+          text = nota_path.read_text(encoding='utf-8')
+          text = replace_once(
+              text,
+              '''      <Button\n        label="VOLVER A NOTAS"\n        icon="pi pi-arrow-left"\n        outlined\n        class="gestion-actas-btn gestion-actas-btn--secondary"\n        @click="$emit('back')"\n      />''',
+              '''      <FmButton\n        label="VOLVER A NOTAS"\n        icon="pi-arrow-left"\n        variant="outline"\n        @click="$emit('back')"\n      />''',
+              'volver notas'
+          )
+          text = replace_once(
+              text,
+              '''            <Button\n              label="VOLVER A OTs"\n              icon="pi pi-arrow-left"\n              text\n              class="gestion-actas-btn gestion-actas-btn--link"\n              @click="closeOt"\n            />''',
+              '''            <FmButton\n              label="VOLVER A OTs"\n              icon="pi-arrow-left"\n              variant="outline"\n              @click="closeOt"\n            />''',
+              'volver ots nota'
+          )
+          ot_header_end = '''          </div>\n\n          <nav class="gestion-ot-tabs" aria-label="Detalle de Orden de Trabajo">'''
+          ot_header_with_tabs = '''          </div>\n\n          <div class="gestion-open-ots" role="tablist" aria-label="OTs abiertas">\n            <div\n              v-for="ot in openedOts"\n              :key="otNumber(ot)"\n              class="gestion-open-ot"\n              :class="{ 'is-active': selectedOtNumber === otNumber(ot) }"\n            >\n              <button type="button" class="gestion-open-ot__select" @click="activateOpenedOt(ot)">\n                <i class="pi pi-briefcase" />\n                <span>OT {{ otNumber(ot) }}</span>\n              </button>\n              <button type="button" class="gestion-open-ot__close" :aria-label="`Cerrar OT ${otNumber(ot)}`" @click.stop="closeOpenedOt(ot)">×</button>\n            </div>\n          </div>\n\n          <nav class="gestion-ot-tabs" aria-label="Detalle de Orden de Trabajo">'''
+          text = replace_once(text, ot_header_end, ot_header_with_tabs, 'tabs OTs nota')
+          text = replace_once(
+              text,
+              '''          <Button\n            label="EXPORTAR EXCEL"\n            icon="pi pi-download"\n            outlined\n            class="gestion-actas-btn gestion-actas-btn--secondary"\n            :loading="exportLoading"\n            @click="exportNote"\n          />''',
+              '''          <FmButton\n            label="EXPORTAR EXCEL"\n            icon="pi-download"\n            variant="outline"\n            :loading="exportLoading"\n            @click="exportNote"\n          />''',
+              'exportar nota'
+          )
+          text = replace_once(
+              text,
+              '''          <Button\n            :label="closed ? 'NOTA CERRADA' : `CERRAR ${isDebit ? 'NOTA DE DÉBITO' : 'NOTA DE CRÉDITO'}`"\n            icon="pi pi-check-circle"\n            class="gestion-actas-btn gestion-actas-btn--primary"\n            :disabled="closed"\n            :loading="actionLoading"\n            @click="confirmClose = true"\n          />''',
+              '''          <FmButton\n            :label="closed ? 'NOTA CERRADA' : `CERRAR ${isDebit ? 'NOTA DE DÉBITO' : 'NOTA DE CRÉDITO'}`"\n            icon="pi-check-circle"\n            :disabled="closed"\n            :loading="actionLoading"\n            @click="confirmClose = true"\n          />''',
+              'cerrar nota'
+          )
+          text = text.replace(
+              'class="gestion-actas-dialog"\n    >',
+              'class="fm-dialog gestion-actas-dialog"\n      :style="{ \'--fm-dialog-width\': \'32rem\' }"\n    >'
+          )
+          text = replace_once(
+              text,
+              '''      <template #footer>\n        <Button label="CANCELAR" outlined class="gestion-actas-btn gestion-actas-btn--secondary" @click="confirmClose = false" />\n        <Button label="CONFIRMAR" icon="pi pi-check" class="gestion-actas-btn gestion-actas-btn--primary" :loading="actionLoading" @click="closeNote" />\n      </template>''',
+              '''      <template #footer>\n        <FmButton label="CANCELAR" variant="outline" @click="confirmClose = false" />\n        <FmButton label="CONFIRMAR" icon="pi-check" :loading="actionLoading" @click="closeNote" />\n      </template>''',
+              'footer cierre nota'
+          )
+          text = text.replace("import Button from 'primevue/button'\n", '')
+          text = replace_once(
+              text,
+              "import Dialog from 'primevue/dialog'\n",
+              "import Dialog from 'primevue/dialog'\nimport FmButton from '@/components/shared/FmButton.vue'\n",
+              'import FmButton nota'
+          )
+          text = replace_once(
+              text,
+              "const selectedOt = ref(null)\nconst otTab = ref('resumen')\n",
+              "const selectedOt = ref(null)\nconst openedOts = ref([])\nconst otTabByKey = ref({})\n",
+              'estado multi OT nota'
+          )
+          text = replace_once(
+              text,
+              "const otDetailKey = computed(() => `${props.type}::${noteNumber.value}::${selectedOtNumber.value}`)\n",
+              "const otDetailKey = computed(() => `${props.type}::${noteNumber.value}::${selectedOtNumber.value}`)\nconst otTab = computed({\n  get: () => otTabByKey.value[otDetailKey.value] || 'resumen',\n  set: (value) => { if (otDetailKey.value) otTabByKey.value[otDetailKey.value] = value },\n})\n",
+              'tab por OT nota'
+          )
+          text = replace_once(
+              text,
+              '''const openOt = async (row) => {\n  selectedOt.value = row\n  otTab.value = 'resumen'\n  otLoading.value = true\n  try {\n    await store.loadNoteOtDetail({ type: props.type, nroNota: noteNumber.value, nroOt: String(row.numeroOT || row.nroOT || '') })\n  } finally { otLoading.value = false }\n}\nconst closeOt = () => { selectedOt.value = null; otTab.value = 'resumen' }''',
+              '''const otNumber = (row) => String(row?.numeroOT || row?.nroOT || '')\nconst activateOpenedOt = async (row) => {\n  selectedOt.value = row\n  const key = `${props.type}::${noteNumber.value}::${otNumber(row)}`\n  if (!store.noteOtDetails[key]) {\n    otLoading.value = true\n    try { await store.loadNoteOtDetail({ type: props.type, nroNota: noteNumber.value, nroOt: otNumber(row) }) }\n    finally { otLoading.value = false }\n  }\n}\nconst openOt = async (row) => {\n  if (!openedOts.value.some((item) => otNumber(item) === otNumber(row))) openedOts.value.push(row)\n  await activateOpenedOt(row)\n}\nconst closeOpenedOt = (row) => {\n  const key = otNumber(row)\n  const index = openedOts.value.findIndex((item) => otNumber(item) === key)\n  if (index < 0) return\n  const wasActive = selectedOtNumber.value === key\n  openedOts.value.splice(index, 1)\n  if (wasActive) selectedOt.value = openedOts.value[index] || openedOts.value[index - 1] || null\n}\nconst closeOt = () => { selectedOt.value = null }''',
+              'funciones multi OT nota'
+          )
+          text = replace_once(
+              text,
+              '''watch(() => props.note, () => {\n  tab.value = 'resumen'\n  selectedOt.value = null\n  localClosed.value = false\n}, { deep: true })''',
+              '''watch(() => props.note, () => {\n  tab.value = 'resumen'\n  selectedOt.value = null\n  openedOts.value = []\n  otTabByKey.value = {}\n  localClosed.value = false\n}, { deep: true })''',
+              'reset multi OT nota'
+          )
+          nota_path.write_text(text, encoding='utf-8')
+
+          # ------------------------------------------------------------
+          # Workspace de Actas: store directo, botones compartidos y
+          # varias OTs abiertas con estado de UI independiente por OT.
+          # ------------------------------------------------------------
+          text = demo_path.read_text(encoding='utf-8')
+          text = replace_once(
+              text,
+              '''      <Button\n        label="VOLVER A LA GRILLA"\n        icon="pi pi-arrow-left"\n        severity="secondary"\n        outlined\n        class="actas-demo-back"\n        @click="$emit('back')"\n      />''',
+              '''      <FmButton\n        label="VOLVER A LA GRILLA"\n        icon="pi-arrow-left"\n        variant="outline"\n        class="actas-demo-back"\n        @click="$emit('back')"\n      />''',
+              'volver grilla actas'
+          )
+          text = replace_once(
+              text,
+              '''                <Button label="VALIDAR / VERIFICAR" icon="pi pi-check-circle" size="small" :disabled="!selectedOts.length || certified" @click="confirmRuleValidation" />''',
+              '''                <FmButton label="VALIDAR / VERIFICAR" icon="pi-check-circle" :disabled="!selectedOts.length || certified" @click="confirmRuleValidation" />''',
+              'validar sectionbar actas'
+          )
+          demo_header_end = '''            </div>\n\n            <nav class="actas-demo-ot-stepper" aria-label="Detalle de Orden de Trabajo">'''
+          demo_header_tabs = '''            </div>\n\n            <div class="gestion-open-ots" role="tablist" aria-label="OTs abiertas">\n              <div\n                v-for="ot in openedOts"\n                :key="String(ot.numeroOT)"\n                class="gestion-open-ot"\n                :class="{ 'is-active': String(selectedOt?.numeroOT || '') === String(ot.numeroOT) }"\n              >\n                <button type="button" class="gestion-open-ot__select" @click="activateOpenedOt(ot)">\n                  <i class="pi pi-briefcase" />\n                  <span>OT {{ ot.numeroOT }}</span>\n                </button>\n                <button type="button" class="gestion-open-ot__close" :aria-label="`Cerrar OT ${ot.numeroOT}`" @click.stop="closeOpenedOt(ot)">×</button>\n              </div>\n            </div>\n\n            <nav class="actas-demo-ot-stepper" aria-label="Detalle de Orden de Trabajo">'''
+          text = replace_once(text, demo_header_end, demo_header_tabs, 'tabs OTs acta')
+          text = replace_once(
+              text,
+              '<Button label="VOLVER A OTs" icon="pi pi-arrow-left" text size="small" @click="closeOt" />',
+              '<FmButton label="VOLVER A OTs" icon="pi-arrow-left" variant="outline" @click="closeOt" />',
+              'volver OTs acta'
+          )
+          text = text.replace(
+              '<Button icon="pi pi-plus" text rounded title="Nueva actividad"',
+              '<Button icon="pi pi-plus" text rounded class="fm-icon-button" title="Nueva actividad"'
+          ).replace(
+              '<Button icon="pi pi-pen-to-square" text rounded title="Modificar actividad"',
+              '<Button icon="pi pi-pen-to-square" text rounded class="fm-icon-button" title="Modificar actividad"'
+          ).replace(
+              '<Button icon="pi pi-trash" text rounded title="Dar de baja"',
+              '<Button icon="pi pi-trash" text rounded class="fm-icon-button" title="Dar de baja"'
+          ).replace(
+              '<Button icon="pi pi-check-circle" text rounded title="Validar / Verificar OT"',
+              '<Button icon="pi pi-check-circle" text rounded class="fm-icon-button" title="Validar / Verificar OT"'
+          ).replace(
+              '                          text\n                          rounded\n                          title="Ejecutar reglas del domicilio"',
+              '                          text\n                          rounded\n                          class="fm-icon-button"\n                          title="Ejecutar reglas del domicilio"'
+          )
+          text = replace_once(
+              text,
+              '<Button label="EXPORTAR HISTORIAL COMPLETO" icon="pi pi-download" size="small" outlined @click="exportFullHistory" />',
+              '<FmButton label="EXPORTAR HISTORIAL COMPLETO" icon="pi-download" variant="outline" @click="exportFullHistory" />',
+              'exportar historial'
+          )
+          text = replace_once(
+              text,
+              '<Button label="VALIDAR / VERIFICAR" icon="pi pi-check-circle" :disabled="!selectedOts.length || certified" @click="confirmRuleValidation" />',
+              '<FmButton label="VALIDAR / VERIFICAR" icon="pi-check-circle" :disabled="!selectedOts.length || certified" @click="confirmRuleValidation" />',
+              'validar reglas acta'
+          )
+
+          wizard_replacements = {
+              '<Button label="CANCELAR" severity="secondary" outlined @click="cancelTransfer" />': '<FmButton label="CANCELAR" variant="outline" @click="cancelTransfer" />',
+              '<Button label="SIGUIENTE" icon="pi pi-arrow-right" icon-pos="right" @click="transfer.step = 2" />': '<FmButton label="SIGUIENTE" icon="pi-arrow-right" @click="transfer.step = 2" />',
+              '<Button label="ATRÁS" severity="secondary" outlined @click="transfer.step = 1" />': '<FmButton label="ATRÁS" variant="outline" @click="transfer.step = 1" />',
+              '<Button label="VALIDAR DESTINO" icon="pi pi-shield" :disabled="!canValidateTransfer" @click="runTransferValidation" />': '<FmButton label="VALIDAR DESTINO" icon="pi-shield" :disabled="!canValidateTransfer" @click="runTransferValidation" />',
+              '<Button label="ATRÁS" severity="secondary" outlined @click="transfer.step = 2" />': '<FmButton label="ATRÁS" variant="outline" @click="transfer.step = 2" />',
+              '<Button label="CONTINUAR" icon="pi pi-arrow-right" icon-pos="right" @click="transfer.step = 4" />': '<FmButton label="CONTINUAR" icon="pi-arrow-right" @click="transfer.step = 4" />',
+              '<Button label="ATRÁS" severity="secondary" outlined @click="transfer.step = 3" />': '<FmButton label="ATRÁS" variant="outline" @click="transfer.step = 3" />',
+              '<Button label="CONFIRMAR TRASPASO" icon="pi pi-check" :loading="actionLoading" @click="confirmTransfer" />': '<FmButton label="CONFIRMAR TRASPASO" icon="pi-check" :loading="actionLoading" @click="confirmTransfer" />',
+              '<Button label="CALIFICAR" icon="pi pi-star-fill" :disabled="certified || !rating" :loading="actionLoading" @click="confirmRating" />': '<FmButton label="CALIFICAR" icon="pi-star-fill" :disabled="certified || !rating" :loading="actionLoading" @click="confirmRating" />',
+              '<Button label="EXPORTAR EXCEL" icon="pi pi-download" outlined :loading="exportLoading" @click="exportActa" />': '<FmButton label="EXPORTAR EXCEL" icon="pi-download" variant="outline" :loading="exportLoading" @click="exportActa" />',
+              '<Button label="CERTIFICAR ACTA" icon="pi pi-check-circle" :disabled="certified" :loading="actionLoading" @click="prepareCertification" />': '<FmButton label="CERTIFICAR ACTA" icon="pi-check-circle" :disabled="certified" :loading="actionLoading" @click="prepareCertification" />',
+          }
+          for old, new in wizard_replacements.items():
+              if old not in text:
+                  raise RuntimeError(f'No se encontró botón esperado: {old[:50]}')
+              text = text.replace(old, new)
+
+          text = text.replace(
+              '<Dialog v-model:visible="activityDialog.visible" modal :header="activityDialogTitle" :style="{ width: \'520px\' }" :draggable="false">',
+              '<Dialog v-model:visible="activityDialog.visible" modal :header="activityDialogTitle" :style="{ \'--fm-dialog-width\': \'32rem\' }" :draggable="false" class="fm-dialog gestion-actas-dialog">'
+          ).replace(
+              '<Dialog v-model:visible="managementDialog.visible" modal :header="managementDialog.mode === \'exclude\' ? \'Excluir OTs\' : \'Incluir OT\'" :style="{ width: \'520px\' }" :draggable="false">',
+              '<Dialog v-model:visible="managementDialog.visible" modal :header="managementDialog.mode === \'exclude\' ? \'Excluir OTs\' : \'Incluir OT\'" :style="{ \'--fm-dialog-width\': \'32rem\' }" :draggable="false" class="fm-dialog gestion-actas-dialog">'
+          ).replace(
+              '<Dialog v-model:visible="confirmDialog.visible" modal :header="confirmDialog.title" :style="{ width: \'500px\' }" :draggable="false">',
+              '<Dialog v-model:visible="confirmDialog.visible" modal :header="confirmDialog.title" :style="{ \'--fm-dialog-width\': \'31rem\' }" :draggable="false" class="fm-dialog gestion-actas-dialog">'
+          )
+          text = text.replace(
+              '<template #footer><Button label="CANCELAR" severity="secondary" outlined @click="activityDialog.visible = false" /><Button :label="activityDialogConfirmLabel" icon="pi pi-check" :loading="actionLoading" @click="submitActivityAction" /></template>',
+              '<template #footer><FmButton label="CANCELAR" variant="outline" @click="activityDialog.visible = false" /><FmButton :label="activityDialogConfirmLabel" icon="pi-check" :loading="actionLoading" @click="submitActivityAction" /></template>'
+          ).replace(
+              '<template #footer><Button label="CANCELAR" severity="secondary" outlined @click="managementDialog.visible = false" /><Button label="CONFIRMAR" icon="pi pi-check" :loading="actionLoading" :disabled="!managementForm.motivo" @click="submitManagement" /></template>',
+              '<template #footer><FmButton label="CANCELAR" variant="outline" @click="managementDialog.visible = false" /><FmButton label="CONFIRMAR" icon="pi-check" :loading="actionLoading" :disabled="!managementForm.motivo" @click="submitManagement" /></template>'
+          ).replace(
+              '<template #footer><Button label="CANCELAR" severity="secondary" outlined @click="confirmDialog.visible = false" /><Button label="CONFIRMAR" icon="pi pi-check" :loading="actionLoading" @click="runConfirmedAction" /></template>',
+              '<template #footer><FmButton label="CANCELAR" variant="outline" @click="confirmDialog.visible = false" /><FmButton label="CONFIRMAR" icon="pi-check" :loading="actionLoading" @click="runConfirmedAction" /></template>'
+          )
+
+          text = replace_once(
+              text,
+              "import FmTypingLoader from '@/components/shared/FmTypingLoader.vue'\n",
+              "import FmTypingLoader from '@/components/shared/FmTypingLoader.vue'\nimport FmButton from '@/components/shared/FmButton.vue'\n",
+              'import FmButton demo'
+          )
+          # Elimina fachadas HTTP y usa Pinia directamente.
+          start = "import { loadActaDetail, loadOtDetail, loadOtMaterials } from '../services/gestionActasLegacyApi'\n"
+          end = "} from '../services/gestionActasOperationsApi'\n"
+          start_i = text.find(start)
+          end_i = text.find(end, start_i)
+          if start_i < 0 or end_i < 0:
+              raise RuntimeError('No se encontraron imports de fachadas de Actas')
+          end_i += len(end)
+          text = text[:start_i] + "import { useGestionActasStore } from '@/store/gestionActas'\n" + text[end_i:]
+          text = replace_once(
+              text,
+              "const { exportToExcel } = useExcelExport()\n",
+              "const store = useGestionActasStore()\nconst { exportToExcel } = useExcelExport()\n",
+              'instancia store demo'
+          )
+          store_methods = [
+              'loadActaDetail','loadOtDetail','loadOtMaterials','certifyActa','checkFailedOts','createActivity',
+              'deleteActivity','executeDomicileRules','executeTransfer','includeOt','loadActaExportRows','loadMotivos',
+              'loadSubregions','loadTransferOptions','rateActa','saveResultingActivities','validateOtRules','validateTransfer','excludeOts'
+          ]
+          for name in store_methods:
+              text = text.replace(f'await {name}(', f'await store.{name}(')
+
+          text = replace_once(
+              text,
+              "const selectedOts = ref([])\nconst selectedOt = ref(null)\nconst otTab = ref('resumen')\nconst otLoading = ref(false)\nconst otDetails = reactive({})\nconst selectedActivities = ref([])\nconst expandedHistoryRows = ref({})\n",
+              "const selectedOts = ref([])\nconst selectedOt = ref(null)\nconst openedOts = ref([])\nconst otLoading = ref(false)\nconst otDetails = reactive({})\nconst otUiState = reactive({})\n",
+              'estado multi OT acta'
+          )
+          text = replace_once(
+              text,
+              "const currentOtKey = computed(() => selectedOt.value ? `${currentActaKey.value}::${selectedOt.value.numeroOT}` : '')\n",
+              "const currentOtKey = computed(() => selectedOt.value ? `${currentActaKey.value}::${selectedOt.value.numeroOT}` : '')\nconst currentOtUi = computed(() => {\n  const key = currentOtKey.value\n  if (!key) return { tab: 'resumen', selectedActivities: [], expandedHistoryRows: {} }\n  if (!otUiState[key]) otUiState[key] = { tab: 'resumen', selectedActivities: [], expandedHistoryRows: {} }\n  return otUiState[key]\n})\nconst otTab = computed({\n  get: () => currentOtUi.value.tab,\n  set: (value) => { if (currentOtKey.value) currentOtUi.value.tab = value },\n})\nconst selectedActivities = computed({\n  get: () => currentOtUi.value.selectedActivities,\n  set: (value) => { if (currentOtKey.value) currentOtUi.value.selectedActivities = value },\n})\nconst expandedHistoryRows = computed({\n  get: () => currentOtUi.value.expandedHistoryRows,\n  set: (value) => { if (currentOtKey.value) currentOtUi.value.expandedHistoryRows = value },\n})\n",
+              'ui state por OT acta'
+          )
+          text = replace_once(
+              text,
+              "const selectActa = async (acta) => { activeActaNumber.value = acta.nroActa; detailStep.value = 'resumen'; selectedOts.value = []; closeOt(); await loadCurrentActa() }\nconst reloadActa = async () => { await loadCurrentActa(true); if (selectedOt.value) await reloadOt() }\nconst openOt = async (row) => { selectedOt.value = row; otTab.value = 'resumen'; selectedActivities.value = []; expandedHistoryRows.value = {}; await loadCurrentOt() }\nconst openOtFromStep = async (row) => { detailStep.value = 'ots'; await openOt(row) }\nconst closeOt = () => { selectedOt.value = null; otTab.value = 'resumen'; selectedActivities.value = []; expandedHistoryRows.value = {} }\n",
+              "const selectActa = async (acta) => { activeActaNumber.value = acta.nroActa; detailStep.value = 'resumen'; selectedOts.value = []; openedOts.value = []; closeOt(); await loadCurrentActa() }\nconst reloadActa = async () => { await loadCurrentActa(true); if (selectedOt.value) await reloadOt() }\nconst activateOpenedOt = async (row) => { selectedOt.value = row; await loadCurrentOt() }\nconst openOt = async (row) => {\n  if (!openedOts.value.some((item) => String(item.numeroOT) === String(row.numeroOT))) openedOts.value.push(row)\n  await activateOpenedOt(row)\n}\nconst closeOpenedOt = (row) => {\n  const key = String(row.numeroOT)\n  const index = openedOts.value.findIndex((item) => String(item.numeroOT) === key)\n  if (index < 0) return\n  const wasActive = String(selectedOt.value?.numeroOT || '') === key\n  openedOts.value.splice(index, 1)\n  if (wasActive) selectedOt.value = openedOts.value[index] || openedOts.value[index - 1] || null\n}\nconst openOtFromStep = async (row) => { detailStep.value = 'ots'; await openOt(row) }\nconst closeOt = () => { selectedOt.value = null }\n",
+              'funciones multi OT acta'
+          )
+          demo_path.write_text(text, encoding='utf-8')
+
+          # ------------------------------------------------------------
+          # CSS final: grilla realmente a alto completo, footer estable,
+          # pestañas multi OT y Dialog exactamente sobre fm-dialog global.
+          # ------------------------------------------------------------
+          css = css_path.read_text(encoding='utf-8').rstrip()
+          css += r'''
+
+/* ================================================================
+   GESTIÓN DE ACTAS - NORMALIZACIÓN FINAL CONTRA PANTALLAS MIGRADAS
+   ================================================================ */
+
+/* Al mostrar resultados, se replica el comportamiento de OTs Fallidas:
+   filtros colapsados + grilla ocupando todo el alto restante. */
+.gestion-actas-consulta.is-results-only {
+  height: calc(100dvh - 82px) !important;
+  min-height: 0 !important;
+  padding: 0 6px 4px !important;
+  gap: 4px !important;
+  overflow: hidden !important;
+}
+
+.gestion-actas-consulta.is-results-only .gestion-actas-heading,
+.gestion-actas-consulta.is-results-only .gestion-main-stepper {
+  display: none !important;
+}
+
+.gestion-actas-consulta.is-results-only .gestion-actas-accordion {
+  flex: 1 1 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+.gestion-actas-consulta.is-results-only .gestion-results-panel {
+  flex: 1 1 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
+
+.gestion-actas-consulta.is-results-only .gestion-results-panel > .p-accordioncontent,
+.gestion-actas-consulta.is-results-only .gestion-results-panel > .p-accordioncontent > .p-accordioncontent-content,
+.gestion-actas-consulta.is-results-only .gestion-results-body,
+.gestion-actas-consulta.is-results-only .gestion-results-body > .actas-work-grid-shell {
+  flex: 1 1 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: hidden !important;
+}
+
+.gestion-actas-consulta.is-results-only .actas-work-grid,
+.gestion-actas-consulta.is-results-only .actas-work-grid.p-datatable {
+  flex: 1 1 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
+
+.gestion-actas-consulta.is-results-only .actas-work-grid .p-datatable-table-container,
+.gestion-actas-consulta.is-results-only .actas-work-grid .p-datatable-wrapper,
+.gestion-actas-consulta.is-results-only .actas-work-grid [data-pc-section='tablecontainer'] {
+  flex: 1 1 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: auto !important;
+}
+
+/* CONTINUAR nunca crece por el texto ni empuja el paginador/grilla. */
+.gestion-actas-footer {
+  min-height: 42px !important;
+  height: 42px !important;
+  max-height: 42px !important;
+  flex: 0 0 42px !important;
+  min-width: 0 !important;
+  padding: 3px 8px !important;
+  overflow: hidden !important;
+  flex-wrap: nowrap !important;
+}
+
+.gestion-actas-footer > span {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.gestion-actas-footer .fm-action-button,
+.gestion-actas-footer .fm-ui-button {
+  width: 120px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
+  flex: 0 0 120px !important;
+}
+
+/* BUSCAR / LIMPIAR exactamente con el componente compartido. */
+.gestion-filter-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 9px !important;
+  margin: 8px 0 0 !important;
+  padding: 9px 0 1px !important;
+  border-top: 1px solid #e4e8eb !important;
+  background: transparent !important;
+}
+
+/* Pestañas de OTs abiertas: el usuario puede mantener varias y alternar. */
+.gestion-open-ots {
+  width: 100%;
+  min-height: 34px;
+  flex: 0 0 34px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 6px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border: 1px solid #d7e1e5;
+  border-bottom: 0;
+  background: #f5f8f9;
+  scrollbar-width: thin;
+}
+
+.gestion-open-ot {
+  height: 27px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: stretch;
+  border: 1px solid #cbd7dc;
+  border-radius: 4px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.gestion-open-ot.is-active {
+  border-color: #00a9bd;
+  background: #e8f9fb;
+  box-shadow: inset 3px 0 0 #00a9bd;
+}
+
+.gestion-open-ot__select,
+.gestion-open-ot__close {
+  border: 0;
+  background: transparent;
+  color: #405962;
+  cursor: pointer;
+}
+
+.gestion-open-ot__select {
+  min-width: 105px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 5px;
+  padding: 0 8px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.gestion-open-ot.is-active .gestion-open-ot__select {
+  color: #007f90;
+}
+
+.gestion-open-ot__close {
+  width: 26px;
+  min-width: 26px;
+  padding: 0;
+  border-left: 1px solid #e0e6e9;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.gestion-open-ot__close:hover {
+  background: #fff0f1;
+  color: #be3740;
+}
+
+/* Iconos de acciones internas usan el mismo patrón global de icon-button. */
+.actas-demo-inline-actions .fm-icon-button.p-button {
+  width: 27px !important;
+  min-width: 27px !important;
+  max-width: 27px !important;
+  height: 27px !important;
+  min-height: 27px !important;
+  max-height: 27px !important;
+  flex: 0 0 27px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 5px !important;
+  background: transparent !important;
+  color: #27404f !important;
+  box-shadow: none !important;
+}
+
+.actas-demo-inline-actions .fm-icon-button.p-button:hover:not(:disabled) {
+  background: #e4f9fc !important;
+  color: #006f7d !important;
+}
+
+/* Gestión de Actas deja de inventar un popup distinto: estos valores son
+   exactamente los de .fm-dialog / .fm-alert-dialog globales. */
+body .p-dialog.gestion-actas-dialog {
+  max-width: calc(100vw - 24px) !important;
+  border: 1px solid #d7e0e5 !important;
+  border-top: 1px solid #d7e0e5 !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+  box-shadow: 0 20px 55px rgba(20, 48, 59, .24) !important;
+  overflow: hidden !important;
+}
+
+body .p-dialog.gestion-actas-dialog .p-dialog-header {
+  min-height: 52px !important;
+  height: auto !important;
+  padding: 12px 18px !important;
+  border-bottom: 1px solid #d4dde2 !important;
+  background: #fff !important;
+  color: #263746 !important;
+}
+
+body .p-dialog.gestion-actas-dialog .p-dialog-title {
+  font-size: 20px !important;
+  font-weight: 400 !important;
+  line-height: normal !important;
+}
+
+body .p-dialog.gestion-actas-dialog .p-dialog-header-actions {
+  width: auto !important;
+  height: auto !important;
+  margin-left: auto !important;
+}
+
+body .p-dialog.gestion-actas-dialog .p-dialog-close-button,
+body .p-dialog.gestion-actas-dialog .p-dialog-header-close-button {
+  width: 30px !important;
+  min-width: 30px !important;
+  max-width: 30px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  max-height: 30px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 5px !important;
+  background: transparent !important;
+  color: #56707e !important;
+  box-shadow: none !important;
+}
+
+body .p-dialog.gestion-actas-dialog .p-dialog-close-button:hover,
+body .p-dialog.gestion-actas-dialog .p-dialog-header-close-button:hover {
+  background: #e4f9fc !important;
+  color: #006f7d !important;
+}
+
+body .p-dialog.gestion-actas-dialog .p-dialog-content {
+  padding: 16px 18px !important;
+  background: #fff !important;
+  color: #263746 !important;
+}
+
+body .p-dialog.gestion-actas-dialog .p-dialog-footer {
+  min-height: 0 !important;
+  height: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  padding: 12px 18px !important;
+  border-top: 1px solid #d4dde2 !important;
+  background: #fff !important;
+}
+
+body .p-dialog.gestion-actas-dialog .p-dialog-footer .fm-action-button,
+body .p-dialog.gestion-actas-dialog .p-dialog-footer .fm-ui-button {
+  width: auto !important;
+  min-width: 120px !important;
+  max-width: none !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+}
+
+@media (max-width: 620px) {
+  .gestion-actas-footer > span {
+    display: none !important;
+  }
+  .gestion-actas-footer .fm-action-button,
+  .gestion-actas-footer .fm-ui-button {
+    width: 100% !important;
+    max-width: none !important;
+    flex: 1 1 auto !important;
+  }
+}
+
+/* ================== FIN NORMALIZACIÓN FINAL ================== */
+'''
+          css_path.write_text(css + '\n', encoding='utf-8')
+
+          # Fachadas antiguas se eliminan sólo si ya no son referenciadas.
+          for path in [
+              root / 'src/modules/gestionActas/services/gestionActasLegacyApi.js',
+              root / 'src/modules/gestionActas/services/gestionActasOperationsApi.js',
+          ]:
+              if path.exists():
+                  name = path.name
+                  refs = []
+                  for candidate in (root / 'src').rglob('*'):
+                      if not candidate.is_file() or candidate == path:
+                          continue
+                      if candidate.suffix not in {'.vue', '.js', '.ts'}:
+                          continue
+                      try:
+                          if name.replace('.js', '') in candidate.read_text(encoding='utf-8'):
+                              refs.append(str(candidate))
+                      except UnicodeDecodeError:
+                          pass
+                  if not refs:
+                      path.unlink()
+          PY
+
+      - name: Verify no HTTP facade imports remain
+        run: |
+          ! grep -R "gestionActasLegacyApi\|gestionActasOperationsApi" src/modules/gestionActas --include='*.vue' --include='*.js' --include='*.ts'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Remove temporary workflow
+        run: rm -f .github/workflows/actas-normalize-migrated-ui.yml
+
+      - name: Commit normalized module
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix(actas): unificar UI migrada, full grid y multi OT"
+          git push origin HEAD:feat-actas-stepper-multiseleccion
