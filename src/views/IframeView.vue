@@ -19,10 +19,12 @@
 </template>
 
 <script setup>
-import { computed, onUnmounted, ref, watch, watchEffect } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue'
 import router from '@/router'
 import FmTypingLoader from '@/components/shared/FmTypingLoader.vue'
 import ConsultarActasStepper from '@/modules/gestionActas/ConsultarActasStepperV2.vue'
+import { installActasPrototypeEnhancements } from '@/modules/gestionActas/actasPrototypeEnhancements'
+import '@/modules/gestionActas/actasPrototypeEnhancements.css'
 import { useLegacyIframeLayout } from '@/composables/useLegacyIframeLayout'
 
 const MIN_LOADER_VISIBLE_MS = 450
@@ -39,6 +41,7 @@ const titulo = computed(() => props.titleParam || sessionStorage.getItem('titleP
 let loadingStartedAt = performance.now()
 let loadingGeneration = 0
 let hideLoaderTimer = null
+let cleanupActasPrototypeEnhancements = null
 
 watchEffect(() => {
   sessionStorage.setItem('urlParam', props.urlParam)
@@ -54,6 +57,16 @@ const clearHideLoaderTimer = () => {
   }
 }
 
+const syncActasPrototypeEnhancements = async () => {
+  cleanupActasPrototypeEnhancements?.()
+  cleanupActasPrototypeEnhancements = null
+
+  if (!isActasPrototype.value) return
+
+  await nextTick()
+  cleanupActasPrototypeEnhancements = installActasPrototypeEnhancements()
+}
+
 watch(iframeSrc, () => {
   if (isActasPrototype.value) {
     iframeLoading.value = false
@@ -65,6 +78,9 @@ watch(iframeSrc, () => {
   clearHideLoaderTimer()
   iframeLoading.value = true
 }, { immediate: true })
+
+watch(isActasPrototype, syncActasPrototypeEnhancements)
+onMounted(syncActasPrototypeEnhancements)
 
 const onIframeLoad = () => {
   let loadedHref = ''
@@ -102,6 +118,8 @@ function handleRedirect(event) {
 
 window.addEventListener('message', handleRedirect)
 onUnmounted(() => {
+  cleanupActasPrototypeEnhancements?.()
+  cleanupActasPrototypeEnhancements = null
   clearHideLoaderTimer()
   window.removeEventListener('message', handleRedirect)
 })
