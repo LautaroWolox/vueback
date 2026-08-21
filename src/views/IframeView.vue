@@ -26,6 +26,7 @@ import ConsultarActasStepper from '@/modules/gestionActas/ConsultarActasStepperV
 import { installActasPrototypeEnhancements } from '@/modules/gestionActas/actasPrototypeEnhancements'
 import '@/modules/gestionActas/actasPrototypeEnhancements.css'
 import '@/modules/gestionActas/actasPrototypeGridFullscreenFix.css'
+import '@/modules/gestionActas/actasPrototypeGridViewportFill.css'
 import { useLegacyIframeLayout } from '@/composables/useLegacyIframeLayout'
 
 const MIN_LOADER_VISIBLE_MS = 450
