@@ -164,12 +164,7 @@
 
             <footer v-if="isActa" class="gestion-actas-footer">
               <span>{{ selectedRows.length ? `${selectedRows.length} acta${selectedRows.length === 1 ? '' : 's'} seleccionada${selectedRows.length === 1 ? '' : 's'}` : 'Seleccioná una o más filas para continuar.' }}</span>
-              <FmButton
-                label="CONTINUAR"
-                icon="pi-arrow-right"
-                :disabled="!selectedRows.length"
-                @click="openWorkspace"
-              />
+              <FmButton label="CONTINUAR" icon="pi-arrow-right" :disabled="!selectedRows.length" @click="openWorkspace" />
             </footer>
           </div>
         </AccordionContent>
@@ -181,7 +176,7 @@
       modal
       header="Confirmar búsqueda"
       :draggable="false"
-      class="fm-dialog gestion-actas-dialog"
+      class="fm-dialog"
       :style="{ '--fm-dialog-width': '32rem' }"
     >
       <div class="gestion-actas-confirm">
