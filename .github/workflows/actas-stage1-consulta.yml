@@ -1,0 +1,169 @@
+name: Actas stage1 consulta
+
+on:
+  push:
+    branches:
+      - feat-actas-stepper-multiseleccion
+    paths:
+      - '.github/workflows/actas-stage1-consulta.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat-actas-stepper-multiseleccion
+          fetch-depth: 0
+
+      - name: Patch consulta
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          p=Path('src/modules/gestionActas/views/GestionActasConsulta.vue')
+          t=p.read_text(encoding='utf-8')
+          old='''            <div class="gestion-filter-actions">
+              <Button label="BUSCAR" icon="pi pi-search" class="gestion-actas-btn gestion-actas-btn--primary" :loading="searchLoading" @click="requestSearch" />
+              <Button label="LIMPIAR" icon="pi pi-eraser" outlined class="gestion-actas-btn gestion-actas-btn--secondary" @click="clearFilters" />
+            </div>'''
+          new='''            <div class="fm-actions fm-filter-actions gestion-filter-actions">
+              <FmButton label="BUSCAR" :loading="searchLoading" @click="requestSearch" />
+              <FmButton label="LIMPIAR" variant="outline" :disabled="searchLoading" @click="clearFilters" />
+            </div>'''
+          if old not in t: raise SystemExit('No encontro BUSCAR/LIMPIAR')
+          t=t.replace(old,new,1)
+          old='''              <Button
+                :label="selectedRows.length ? `CONTINUAR CON ${selectedRows.length} ACTA${selectedRows.length === 1 ? '' : 'S'}` : 'CONTINUAR'"
+                icon="pi pi-arrow-right"
+                iconPos="right"
+                class="gestion-actas-btn gestion-actas-btn--primary"
+                :disabled="!selectedRows.length"
+                @click="openWorkspace"
+              />'''
+          new='''              <FmButton
+                label="CONTINUAR"
+                icon="pi-arrow-right"
+                :disabled="!selectedRows.length"
+                @click="openWorkspace"
+              />'''
+          if old not in t: raise SystemExit('No encontro CONTINUAR')
+          t=t.replace(old,new,1)
+          old='''    <Dialog v-model:visible="confirmNoFilters" modal header="Confirmar búsqueda" :draggable="false" class="gestion-actas-dialog">'''
+          new='''    <Dialog v-model:visible="confirmNoFilters" modal header="Confirmar búsqueda" :draggable="false" class="fm-dialog gestion-actas-dialog" :style="{ '--fm-dialog-width': '32rem' }">'''
+          if old not in t: raise SystemExit('No encontro Dialog consulta')
+          t=t.replace(old,new,1)
+          old='''      <template #footer>
+        <Button label="CANCELAR" outlined class="gestion-actas-btn gestion-actas-btn--secondary" @click="confirmNoFilters = false" />
+        <Button label="CONTINUAR" icon="pi pi-check" class="gestion-actas-btn gestion-actas-btn--primary" @click="confirmAndSearch" />
+      </template>'''
+          new='''      <template #footer>
+        <FmButton label="CANCELAR" variant="outline" @click="confirmNoFilters = false" />
+        <FmButton label="CONTINUAR" icon="pi-check" @click="confirmAndSearch" />
+      </template>'''
+          if old not in t: raise SystemExit('No encontro footer Dialog')
+          t=t.replace(old,new,1)
+          t=t.replace("import Button from 'primevue/button'\n",'',1)
+          t=t.replace("import Dialog from 'primevue/dialog'\n","import Dialog from 'primevue/dialog'\nimport FmButton from '@/components/shared/FmButton.vue'\n",1)
+          p.write_text(t,encoding='utf-8')
+
+          css=Path('src/assets/css/fm-global.css')
+          c=css.read_text(encoding='utf-8').rstrip()
+          marker='GESTIÓN DE ACTAS - FULLSCREEN CONSULTA FINAL'
+          if marker not in c:
+            c+='''
+
+/* ================================================================
+   GESTIÓN DE ACTAS - FULLSCREEN CONSULTA FINAL
+   ================================================================ */
+.gestion-actas-consulta.is-results-only {
+  height: calc(100dvh - 82px) !important;
+  min-height: 0 !important;
+  padding: 0 6px 4px !important;
+  gap: 4px !important;
+  overflow: hidden !important;
+}
+.gestion-actas-consulta.is-results-only .gestion-actas-heading,
+.gestion-actas-consulta.is-results-only .gestion-main-stepper { display: none !important; }
+.gestion-actas-consulta.is-results-only .gestion-actas-accordion,
+.gestion-actas-consulta.is-results-only .gestion-results-panel,
+.gestion-actas-consulta.is-results-only .gestion-results-panel > .p-accordioncontent,
+.gestion-actas-consulta.is-results-only .gestion-results-panel > .p-accordioncontent > .p-accordioncontent-content,
+.gestion-actas-consulta.is-results-only .gestion-results-body,
+.gestion-actas-consulta.is-results-only .gestion-results-body > .actas-work-grid-shell,
+.gestion-actas-consulta.is-results-only .actas-work-grid.p-datatable {
+  flex: 1 1 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: hidden !important;
+}
+.gestion-actas-consulta.is-results-only .actas-work-grid .p-datatable-table-container,
+.gestion-actas-consulta.is-results-only .actas-work-grid .p-datatable-wrapper,
+.gestion-actas-consulta.is-results-only .actas-work-grid [data-pc-section='tablecontainer'] {
+  flex: 1 1 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: auto !important;
+}
+.gestion-actas-footer {
+  height: 42px !important;
+  min-height: 42px !important;
+  max-height: 42px !important;
+  flex: 0 0 42px !important;
+  min-width: 0 !important;
+  padding: 3px 8px !important;
+  overflow: hidden !important;
+  flex-wrap: nowrap !important;
+}
+.gestion-actas-footer > span {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+.gestion-actas-footer .fm-action-button,
+.gestion-actas-footer .fm-ui-button {
+  width: 120px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
+  flex: 0 0 120px !important;
+}
+.gestion-filter-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 9px !important;
+  margin: 8px 0 0 !important;
+  padding: 9px 0 1px !important;
+  border-top: 1px solid #e4e8eb !important;
+  background: transparent !important;
+}
+/* ===== FIN FULLSCREEN CONSULTA FINAL ===== */
+'''
+          css.write_text(c+'\n',encoding='utf-8')
+          PY
+
+      - name: Verify
+        run: |
+          grep -q 'FmButton label="BUSCAR"' src/modules/gestionActas/views/GestionActasConsulta.vue
+          grep -q 'label="CONTINUAR"' src/modules/gestionActas/views/GestionActasConsulta.vue
+          grep -q 'FULLSCREEN CONSULTA FINAL' src/assets/css/fm-global.css
+
+      - name: Cleanup and commit
+        shell: bash
+        run: |
+          rm -f .github/workflows/actas-stage1-consulta.yml .github/workflows/actas-normalize-v2.yml .github/workflows/actas-normalize-migrated-ui.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'fix(actas): igualar consulta migrada y expandir grilla'
+          git push origin HEAD:feat-actas-stepper-multiseleccion
