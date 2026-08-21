@@ -3,16 +3,14 @@ import { defineStore } from 'pinia'
 /**
  * Gestión de Actas - única puerta de acceso HTTP del frontend.
  *
- * Contratos backend relevados contra los tags:
+ * Contratos backend relevados contra los tags vigentes:
  * - FM: FM-VUE-0.4.1
  * - CT/GCC: CT-VUE-0.1.0
  * - GM: GM-2.7.0-4
  *
- * El navegador consume siempre la fachada /pc de FM. CT/GCC contiene la
- * lógica de dominio y GM alimenta el circuito de OTs hacia CT; el frontend
- * no llama CT ni GM de forma directa.
+ * El navegador consume siempre la fachada /pc de FM. El frontend Vue no
+ * consume CT/GCC ni GM de forma directa.
  */
-
 export const GESTION_ACTAS_BACKEND_TAGS = Object.freeze({
   FM: 'FM-VUE-0.4.1',
   CT: 'CT-VUE-0.1.0',
@@ -29,13 +27,13 @@ export const DOCUMENT_TYPES = Object.freeze({
 type LoadStatus = 'idle' | 'loading' | 'loaded' | 'error'
 type GenericRecord = Record<string, any>
 
-interface CatalogOption {
+type CatalogOption = {
   label: string
   value: string
   year?: string
 }
 
-interface ActasCatalogs {
+type ActasCatalogs = {
   provincia: CatalogOption[]
   contratista: CatalogOption[]
   sociedad: CatalogOption[]
@@ -45,7 +43,14 @@ interface ActasCatalogs {
   estadoActa: CatalogOption[]
 }
 
-const emptyCatalogs = (): ActasCatalogs => ({
+type OtsSinActaCatalogs = {
+  region: CatalogOption[]
+  contratista: CatalogOption[]
+  sociedad: CatalogOption[]
+  tipoContrato: CatalogOption[]
+}
+
+const emptyActasCatalogs = (): ActasCatalogs => ({
   provincia: [],
   contratista: [],
   sociedad: [],
@@ -55,8 +60,17 @@ const emptyCatalogs = (): ActasCatalogs => ({
   estadoActa: [],
 })
 
+const emptyOtsSinActaCatalogs = (): OtsSinActaCatalogs => ({
+  region: [],
+  contratista: [],
+  sociedad: [],
+  tipoContrato: [],
+})
+
 const HTML_CONTENT = /text\/html/i
 const JSON_CONTENT = /application\/json/i
+
+const errorMessage = (error: unknown) => error instanceof Error ? error.message : String(error)
 
 const ensureOk = async (response: Response, label: string) => {
   if (!response.ok) throw new Error(`${label}: HTTP ${response.status}`)
@@ -89,7 +103,6 @@ const readFlexible = async (response: Response, label: string) => {
   if (JSON_CONTENT.test(contentType) || /^[\[{]/.test(text.trim())) {
     try { return JSON.parse(text) } catch {}
   }
-
   return text
 }
 
@@ -151,6 +164,17 @@ const extractOptions = (document: Document, selector: string): CatalogOption[] =
     })
 }
 
+const fetchLegacyDocument = async (url: string, label: string) => {
+  const response = await fetch(url, {
+    method: 'GET',
+    credentials: 'include',
+    cache: 'no-store',
+    headers: { Accept: 'text/html,application/xhtml+xml' },
+  })
+  await ensureOk(response, label)
+  return new DOMParser().parseFromString(await response.text(), 'text/html')
+}
+
 const buildCommonDocumentParams = (filters: GenericRecord, page = 0, size = 500) => {
   const params = new URLSearchParams()
   appendIfPresent(params, 'provincia', filters.provincia)
@@ -162,6 +186,7 @@ const buildCommonDocumentParams = (filters: GenericRecord, page = 0, size = 500)
   appendIfPresent(params, 'estadoActa', filters.estadoActa)
   appendIfPresent(params, 'nroActa', filters.nroActa)
   appendIfPresent(params, 'nroOt', filters.nroOt)
+  appendIfPresent(params, 'nroActaAsoc', filters.nroActaAsoc)
   appendIfPresent(params, 'tipoActaDC', filters.tipoActaDC)
   params.set('page', String(page))
   params.set('size', String(size))
@@ -172,9 +197,15 @@ export const useGestionActasStore = defineStore('gestionActas', {
   state: () => ({
     backendTags: GESTION_ACTAS_BACKEND_TAGS,
     documentType: DOCUMENT_TYPES.ACTA as string,
-    catalogs: emptyCatalogs(),
+
+    catalogs: emptyActasCatalogs(),
     catalogStatus: 'idle' as LoadStatus,
     catalogError: '',
+
+    otsSinActaCatalogs: emptyOtsSinActaCatalogs(),
+    otsSinActaCatalogStatus: 'idle' as LoadStatus,
+    otsSinActaCatalogError: '',
+
     actas: [] as GenericRecord[],
     totalActas: 0,
     selectedActas: [] as GenericRecord[],
@@ -182,19 +213,25 @@ export const useGestionActasStore = defineStore('gestionActas', {
     actaDetails: {} as Record<string, GenericRecord>,
     otDetails: {} as Record<string, GenericRecord>,
     materialsByOt: {} as Record<string, GenericRecord[]>,
+
     notesDebit: [] as GenericRecord[],
     notesCredit: [] as GenericRecord[],
     totalNotesDebit: 0,
     totalNotesCredit: 0,
+    noteOts: {} as Record<string, GenericRecord[]>,
+    noteOtDetails: {} as Record<string, GenericRecord>,
+
     otsSinActa: [] as GenericRecord[],
     motivos: [] as GenericRecord[],
     transferOptions: null as GenericRecord | null,
+
     status: {
       search: 'idle' as LoadStatus,
       detail: 'idle' as LoadStatus,
       ot: 'idle' as LoadStatus,
       materials: 'idle' as LoadStatus,
       notes: 'idle' as LoadStatus,
+      noteDetail: 'idle' as LoadStatus,
       sinActa: 'idle' as LoadStatus,
       operation: 'idle' as LoadStatus,
     },
@@ -232,18 +269,9 @@ export const useGestionActasStore = defineStore('gestionActas', {
       this.catalogError = ''
 
       try {
-        // FM-VUE-0.4.1 todavía arma estos combos al renderizar el JSP.
-        // Se reutiliza el HTML únicamente como catálogo; todas las búsquedas/detalles son JSON.
-        const response = await fetch('/pc/consultarActas.html', {
-          method: 'GET',
-          credentials: 'include',
-          cache: 'no-store',
-          headers: { Accept: 'text/html,application/xhtml+xml' },
-        })
-        await ensureOk(response, 'Carga de filtros de Actas')
-        const html = await response.text()
-        const document = new DOMParser().parseFromString(html, 'text/html')
-
+        // FM-VUE-0.4.1 todavía entrega estos catálogos al renderizar el JSP.
+        // Solo se lee ese HTML para las opciones; búsquedas y detalles son JSON.
+        const document = await fetchLegacyDocument('/pc/consultarActas.html', 'Carga de filtros de Gestión de Actas')
         const catalogs: ActasCatalogs = {
           provincia: extractOptions(document, '#provinciaInputID'),
           contratista: extractOptions(document, '#contratistaInputID'),
@@ -256,15 +284,38 @@ export const useGestionActasStore = defineStore('gestionActas', {
 
         const required: (keyof ActasCatalogs)[] = ['provincia', 'contratista', 'sociedad', 'tipoContrato', 'periodoAnio', 'estadoActa']
         if (required.every((key) => catalogs[key].length === 0)) {
-          throw new Error('No se pudieron leer los combos reales de Consultar Actas. Verificá backend y sesión de FM.')
+          throw new Error('No se pudieron leer los combos reales de Gestión de Actas. Verificá backend y sesión de FM.')
         }
 
         this.catalogs = catalogs
         this.catalogStatus = 'loaded'
         return catalogs
-      } catch (error: any) {
+      } catch (error) {
         this.catalogStatus = 'error'
-        this.catalogError = error?.message || String(error)
+        this.catalogError = errorMessage(error)
+        throw error
+      }
+    },
+
+    async loadOtsSinActaCatalogs(force = false) {
+      if (!force && (this.otsSinActaCatalogStatus === 'loading' || this.otsSinActaCatalogStatus === 'loaded')) return this.otsSinActaCatalogs
+      this.otsSinActaCatalogStatus = 'loading'
+      this.otsSinActaCatalogError = ''
+
+      try {
+        const document = await fetchLegacyDocument('/pc/consultarOtSinACTA.html', 'Carga de filtros de OTs sin Acta')
+        const catalogs: OtsSinActaCatalogs = {
+          region: extractOptions(document, '#regionInputID'),
+          contratista: extractOptions(document, '#contratistaInputID'),
+          sociedad: extractOptions(document, '#sociedadInputID'),
+          tipoContrato: extractOptions(document, '#tipoContratoInputID'),
+        }
+        this.otsSinActaCatalogs = catalogs
+        this.otsSinActaCatalogStatus = 'loaded'
+        return catalogs
+      } catch (error) {
+        this.otsSinActaCatalogStatus = 'error'
+        this.otsSinActaCatalogError = errorMessage(error)
         throw error
       }
     },
@@ -286,9 +337,9 @@ export const useGestionActasStore = defineStore('gestionActas', {
         this.totalActas = result.totalElements
         this.status.search = 'loaded'
         return result
-      } catch (error: any) {
+      } catch (error) {
         this.status.search = 'error'
-        this.errors.search = error?.message || String(error)
+        this.errors.search = errorMessage(error)
         throw error
       }
     },
@@ -310,9 +361,9 @@ export const useGestionActasStore = defineStore('gestionActas', {
         this.actaDetails[key] = result
         this.status.detail = 'loaded'
         return result
-      } catch (error: any) {
+      } catch (error) {
         this.status.detail = 'error'
-        this.errors.detail = error?.message || String(error)
+        this.errors.detail = errorMessage(error)
         throw error
       }
     },
@@ -358,9 +409,11 @@ export const useGestionActasStore = defineStore('gestionActas', {
 
     async searchNotes(type: 'NODE' | 'NOCR', filters: GenericRecord, options: { page?: number; size?: number } = {}) {
       this.status.notes = 'loading'
+      delete this.errors.notes
       const isDebit = type === DOCUMENT_TYPES.NOTA_DEBITO
       const params = buildCommonDocumentParams({ ...filters, tipoActaDC: type }, options.page ?? 0, options.size ?? 500)
       const url = isDebit ? '/pc/consultarNotaDebito/buscarND.html' : '/pc/consultarNotaCredito/buscarNC.html'
+
       try {
         const response = await fetch(`${url}?${params.toString()}`, {
           method: 'GET', credentials: 'include', cache: 'no-store', headers: { Accept: 'application/json' },
@@ -368,31 +421,94 @@ export const useGestionActasStore = defineStore('gestionActas', {
         const payload = await readJsonResponse(response, isDebit ? 'Búsqueda de Notas de Débito' : 'Búsqueda de Notas de Crédito')
         const rows = Array.isArray(payload?.elements) ? payload.elements : (Array.isArray(payload) ? payload : [])
         const total = Number(payload?.totalElements ?? rows.length)
-        if (isDebit) { this.notesDebit = rows; this.totalNotesDebit = total }
-        else { this.notesCredit = rows; this.totalNotesCredit = total }
+        if (isDebit) {
+          this.notesDebit = rows
+          this.totalNotesDebit = total
+        } else {
+          this.notesCredit = rows
+          this.totalNotesCredit = total
+        }
         this.status.notes = 'loaded'
         return { elements: rows, totalElements: total }
       } catch (error) {
         this.status.notes = 'error'
+        this.errors.notes = errorMessage(error)
         throw error
       }
     },
 
-    async loadNoteDetail(type: 'NODE' | 'NOCR', nroNota: string) {
+    async loadNoteOts(type: 'NODE' | 'NOCR', note: GenericRecord) {
       const isDebit = type === DOCUMENT_TYPES.NOTA_DEBITO
-      const base = isDebit ? '/pc/detalleActaDebito' : '/pc/detalleActaCredito'
-      const params = new URLSearchParams({ nroActa: String(nroNota ?? '').trim() })
-      const response = await fetch(`${base}/getOtsAndActaDetallebynroActa.html?${params.toString()}`, {
+      const nroNota = String(note?.nroActaDC ?? note?.nroNota ?? '').trim()
+      const nroActa = String(note?.nroActa ?? '').trim()
+      const base = isDebit ? '/pc/detalleActaDebito/buscarActasDebito.html' : '/pc/detalleActaCredito/buscarActasCredito.html'
+      const params = new URLSearchParams()
+      appendIfPresent(params, 'nroActa', nroActa)
+      appendIfPresent(params, 'nroActaDC', nroNota)
+      params.set('sinFiltros', 'false')
+      this.status.noteDetail = 'loading'
+
+      try {
+        const response = await fetch(`${base}?${params.toString()}`, {
+          method: 'GET', credentials: 'include', cache: 'no-store', headers: { Accept: 'application/json' },
+        })
+        const payload = await readJsonResponse(response, `OTs de ${isDebit ? 'Nota de Débito' : 'Nota de Crédito'} ${nroNota}`)
+        const rows = Array.isArray(payload) ? payload : []
+        this.noteOts[`${type}::${nroNota}`] = rows
+        this.status.noteDetail = 'loaded'
+        return rows
+      } catch (error) {
+        this.status.noteDetail = 'error'
+        throw error
+      }
+    },
+
+    async loadNoteOtDetail({ type, nroNota, nroOt }: { type: 'NODE' | 'NOCR'; nroNota: string; nroOt: string }) {
+      // En FM-VUE-0.4.1 NC reutiliza expresamente el endpoint de detalle de ND.
+      const params = new URLSearchParams({
+        nroNotaDebito: String(nroNota ?? '').trim(),
+        nroOt: String(nroOt ?? '').trim(),
+      })
+      this.status.ot = 'loading'
+      try {
+        const response = await fetch(`/pc/consultarNotaDebito/obtenerDetalleActividades.html?${params.toString()}`, {
+          method: 'GET', credentials: 'include', cache: 'no-store', headers: { Accept: 'application/json' },
+        })
+        const payload = await readJsonResponse(response, `Detalle de la OT ${nroOt}`)
+        const key = `${type}::${nroNota}::${nroOt}`
+        this.noteOtDetails[key] = payload || {}
+        this.status.ot = 'loaded'
+        return payload
+      } catch (error) {
+        this.status.ot = 'error'
+        throw error
+      }
+    },
+
+    async loadNoteExportRows(nroNota: string) {
+      // El backend vigente comparte este servicio para ND y NC.
+      const params = new URLSearchParams({ nroNotaDC: String(nroNota ?? '').trim() })
+      const response = await fetch(`/pc/detalleActaDebito/getOtsDetalleByNroActa_ActivitiesView.html?${params.toString()}`, {
         method: 'GET', credentials: 'include', cache: 'no-store', headers: { Accept: 'application/json' },
       })
-      return readJsonResponse(response, `Detalle de ${isDebit ? 'Nota de Débito' : 'Nota de Crédito'} ${nroNota}`)
+      const payload = await readFlexible(response, `Exportación de Nota ${nroNota}`)
+      return Array.isArray(payload) ? payload : []
+    },
+
+    closeNote(type: 'NODE' | 'NOCR', nroNota: string) {
+      const isDebit = type === DOCUMENT_TYPES.NOTA_DEBITO
+      const url = isDebit ? '/pc/detalleActaDebito/cerrarActaDebito.html' : '/pc/detalleActaCredito/cerrarActaCredito.html'
+      const field = isDebit ? 'nroNotaDebito' : 'nroNotaCredito'
+      return formRequest(url, { [field]: nroNota }, `Cierre de ${isDebit ? 'Nota de Débito' : 'Nota de Crédito'} ${nroNota}`)
     },
 
     async searchOtsSinActa(filters: GenericRecord) {
       this.status.sinActa = 'loading'
+      delete this.errors.sinActa
       const params = new URLSearchParams()
       ;['region', 'contratista', 'sociedad', 'tipoContrato', 'fechaCierreDesde', 'fechaCierreHasta'].forEach((key) => appendIfPresent(params, key, filters[key]))
       params.set('sinFiltros', String(Boolean(filters.sinFiltros)))
+
       try {
         const response = await fetch(`/pc/consultarOtSinACTA/buscarOrdenes.html?${params.toString()}`, {
           method: 'GET', credentials: 'include', cache: 'no-store', headers: { Accept: 'application/json' },
@@ -404,13 +520,14 @@ export const useGestionActasStore = defineStore('gestionActas', {
         return rows
       } catch (error) {
         this.status.sinActa = 'error'
+        this.errors.sinActa = errorMessage(error)
         throw error
       }
     },
 
-    // Operaciones del detalle de Acta. Se mantienen en el store para que ningún
-    // componente tenga conocimiento directo de URLs de backend.
-    loadActaExportRows: async function (nroActa: string) {
+    // Operaciones de Acta. Se mantienen en el store para que ningún componente
+    // tenga conocimiento directo de URLs de backend.
+    async loadActaExportRows(nroActa: string) {
       const params = new URLSearchParams({ nroActa: String(nroActa ?? '').trim() })
       const response = await fetch(`/pc/detalleActa/getOtsDetalleByNroActa_ActivitiesView.html?${params.toString()}`, {
         credentials: 'include', cache: 'no-store', headers: { Accept: 'application/json' },
@@ -528,6 +645,8 @@ export const useGestionActasStore = defineStore('gestionActas', {
       this.notesCredit = []
       this.totalNotesDebit = 0
       this.totalNotesCredit = 0
+      this.noteOts = {}
+      this.noteOtDetails = {}
       this.otsSinActa = []
       this.errors = {}
     },
