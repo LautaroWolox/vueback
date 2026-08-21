@@ -1,11 +1,10 @@
 <template>
   <div class="gestion-actas-module gestion-nota-workspace">
     <header class="gestion-document-header">
-      <Button
+      <FmButton
         label="VOLVER A NOTAS"
-        icon="pi pi-arrow-left"
-        outlined
-        class="gestion-actas-btn gestion-actas-btn--secondary"
+        icon="pi-arrow-left"
+        variant="outline"
         @click="$emit('back')"
       />
       <div class="gestion-document-title">
@@ -47,7 +46,7 @@
           <div class="gestion-sectionbar">
             <div>
               <h3>Órdenes de Trabajo</h3>
-              <p>Seleccioná el número de OT para consultar su detalle sin salir de Vue.</p>
+              <p>Podés abrir varias OTs y alternar entre ellas sin perder el detalle consultado.</p>
             </div>
           </div>
 
@@ -68,11 +67,10 @@
 
         <template v-else>
           <div class="gestion-ot-header">
-            <Button
+            <FmButton
               label="VOLVER A OTs"
-              icon="pi pi-arrow-left"
-              text
-              class="gestion-actas-btn gestion-actas-btn--link"
+              icon="pi-arrow-left"
+              variant="outline"
               @click="closeOt"
             />
             <div>
@@ -82,6 +80,26 @@
             <div class="gestion-ot-header__meta">
               <span>{{ selectedOt.tarea || selectedOt.codigoTarea || 'Sin tarea' }}</span>
               <span>{{ selectedOt.direccion || 'Sin domicilio' }}</span>
+            </div>
+          </div>
+
+          <div class="gestion-open-ots" role="tablist" aria-label="OTs abiertas">
+            <div
+              v-for="ot in openedOts"
+              :key="otNumber(ot)"
+              class="gestion-open-ot"
+              :class="{ 'is-active': selectedOtNumber === otNumber(ot) }"
+            >
+              <button type="button" class="gestion-open-ot__select" @click="activateOpenedOt(ot)">
+                <i class="pi pi-briefcase" />
+                <span>OT {{ otNumber(ot) }}</span>
+              </button>
+              <button
+                type="button"
+                class="gestion-open-ot__close"
+                :aria-label="`Cerrar OT ${otNumber(ot)}`"
+                @click.stop="closeOpenedOt(ot)"
+              >×</button>
             </div>
           </div>
 
@@ -178,11 +196,10 @@
             <h3>Exportar {{ isDebit ? 'Nota de Débito' : 'Nota de Crédito' }}</h3>
             <p>Genera el Excel desde los datos reales del backend usando el exportador común del proyecto.</p>
           </div>
-          <Button
+          <FmButton
             label="EXPORTAR EXCEL"
-            icon="pi pi-download"
-            outlined
-            class="gestion-actas-btn gestion-actas-btn--secondary"
+            icon="pi-download"
+            variant="outline"
             :loading="exportLoading"
             @click="exportNote"
           />
@@ -194,10 +211,9 @@
             <h3>Cierre</h3>
             <p>El cierre utiliza el endpoint correspondiente de {{ isDebit ? 'Nota de Débito' : 'Nota de Crédito' }}.</p>
           </div>
-          <Button
+          <FmButton
             :label="closed ? 'NOTA CERRADA' : `CERRAR ${isDebit ? 'NOTA DE DÉBITO' : 'NOTA DE CRÉDITO'}`"
-            icon="pi pi-check-circle"
-            class="gestion-actas-btn gestion-actas-btn--primary"
+            icon="pi-check-circle"
             :disabled="closed"
             :loading="actionLoading"
             @click="confirmClose = true"
@@ -211,15 +227,16 @@
       modal
       header="Confirmar cierre"
       :draggable="false"
-      class="gestion-actas-dialog"
+      class="fm-dialog gestion-actas-dialog"
+      :style="{ '--fm-dialog-width': '32rem' }"
     >
       <div class="gestion-actas-confirm">
         <i class="pi pi-exclamation-triangle" />
         <p>Se cerrará {{ isDebit ? 'la Nota de Débito' : 'la Nota de Crédito' }} <strong>{{ noteNumber }}</strong>. ¿Desea continuar?</p>
       </div>
       <template #footer>
-        <Button label="CANCELAR" outlined class="gestion-actas-btn gestion-actas-btn--secondary" @click="confirmClose = false" />
-        <Button label="CONFIRMAR" icon="pi pi-check" class="gestion-actas-btn gestion-actas-btn--primary" :loading="actionLoading" @click="closeNote" />
+        <FmButton label="CANCELAR" variant="outline" @click="confirmClose = false" />
+        <FmButton label="CONFIRMAR" icon="pi-check" :loading="actionLoading" @click="closeNote" />
       </template>
     </Dialog>
   </div>
@@ -227,8 +244,8 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
-import Button from 'primevue/button'
 import Dialog from 'primevue/dialog'
+import FmButton from '@/components/shared/FmButton.vue'
 import FmTypingLoader from '@/components/shared/FmTypingLoader.vue'
 import ActasWorkspaceGrid from '../components/ActasWorkspaceGrid.vue'
 import { useExcelExport } from '@/composables/useExportExcel'
@@ -245,7 +262,8 @@ const { exportToExcel } = useExcelExport()
 const tab = ref('resumen')
 const loading = ref(false)
 const selectedOt = ref(null)
-const otTab = ref('resumen')
+const openedOts = ref([])
+const otTabByKey = ref({})
 const otLoading = ref(false)
 const materialsLoading = ref(false)
 const exportLoading = ref(false)
@@ -259,6 +277,12 @@ const noteKey = computed(() => `${props.type}::${noteNumber.value}`)
 const noteOts = computed(() => store.noteOts[noteKey.value] || [])
 const selectedOtNumber = computed(() => String(selectedOt.value?.numeroOT || selectedOt.value?.nroOT || ''))
 const otDetailKey = computed(() => `${props.type}::${noteNumber.value}::${selectedOtNumber.value}`)
+const otTab = computed({
+  get: () => otTabByKey.value[otDetailKey.value] || 'resumen',
+  set: (value) => {
+    if (otDetailKey.value) otTabByKey.value[otDetailKey.value] = value
+  },
+})
 const currentOtDetail = computed(() => store.noteOtDetails[otDetailKey.value] || {})
 const materials = computed(() => store.materialsByOt[selectedOtNumber.value] || [])
 const closed = computed(() => localClosed.value || String(props.note?.estadoNota || '').toUpperCase().includes('CERR'))
@@ -376,15 +400,30 @@ const openOtsTab = async () => {
   tab.value = 'ots'
   if (!noteOts.value.length) await loadOts()
 }
-const openOt = async (row) => {
+const otNumber = (row) => String(row?.numeroOT || row?.nroOT || '')
+const activateOpenedOt = async (row) => {
   selectedOt.value = row
-  otTab.value = 'resumen'
-  otLoading.value = true
-  try {
-    await store.loadNoteOtDetail({ type: props.type, nroNota: noteNumber.value, nroOt: String(row.numeroOT || row.nroOT || '') })
-  } finally { otLoading.value = false }
+  const key = `${props.type}::${noteNumber.value}::${otNumber(row)}`
+  if (!store.noteOtDetails[key]) {
+    otLoading.value = true
+    try {
+      await store.loadNoteOtDetail({ type: props.type, nroNota: noteNumber.value, nroOt: otNumber(row) })
+    } finally { otLoading.value = false }
+  }
 }
-const closeOt = () => { selectedOt.value = null; otTab.value = 'resumen' }
+const openOt = async (row) => {
+  if (!openedOts.value.some((item) => otNumber(item) === otNumber(row))) openedOts.value.push(row)
+  await activateOpenedOt(row)
+}
+const closeOpenedOt = (row) => {
+  const key = otNumber(row)
+  const index = openedOts.value.findIndex((item) => otNumber(item) === key)
+  if (index < 0) return
+  const wasActive = selectedOtNumber.value === key
+  openedOts.value.splice(index, 1)
+  if (wasActive) selectedOt.value = openedOts.value[index] || openedOts.value[index - 1] || null
+}
+const closeOt = () => { selectedOt.value = null }
 const selectOtTab = async (key) => {
   otTab.value = key
   if (key === 'materiales' && selectedOtNumber.value && !materials.value.length) await refreshMaterials()
@@ -417,6 +456,8 @@ const closeNote = async () => {
 watch(() => props.note, () => {
   tab.value = 'resumen'
   selectedOt.value = null
+  openedOts.value = []
+  otTabByKey.value = {}
   localClosed.value = false
 }, { deep: true })
 
