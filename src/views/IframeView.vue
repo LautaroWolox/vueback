@@ -28,6 +28,7 @@ import '@/modules/gestionActas/actasPrototypeEnhancements.css'
 import '@/modules/gestionActas/actasPrototypeGridFullscreenFix.css'
 import '@/modules/gestionActas/actasPrototypeGridViewportFill.css'
 import '@/modules/gestionActas/actasPrototypeGridStickyFinal.css'
+import '@/modules/gestionActas/actasWorkspaceDemoMount.css'
 import { useLegacyIframeLayout } from '@/composables/useLegacyIframeLayout'
 
 const MIN_LOADER_VISIBLE_MS = 450
