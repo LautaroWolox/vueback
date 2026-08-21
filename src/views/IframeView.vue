@@ -1,5 +1,7 @@
 <template>
-  <div class="legacy-iframe-stage">
+  <ConsultarActasStepper v-if="isActasPrototype" />
+
+  <div v-else class="legacy-iframe-stage">
     <FmTypingLoader v-if="iframeLoading" overlay title="Cargando Información" message="Preparando pantalla" />
     <iframe
       :key="iframeSrc"
@@ -20,6 +22,7 @@
 import { computed, onUnmounted, ref, watch, watchEffect } from 'vue'
 import router from '@/router'
 import FmTypingLoader from '@/components/shared/FmTypingLoader.vue'
+import ConsultarActasStepper from '@/modules/gestionActas/ConsultarActasStepper.vue'
 import { useLegacyIframeLayout } from '@/composables/useLegacyIframeLayout'
 
 const MIN_LOADER_VISIBLE_MS = 450
@@ -28,6 +31,7 @@ const props = defineProps({
   titleParam: { type: String, required: true }
 })
 
+const isActasPrototype = computed(() => props.urlParam === '/consultarActas.html')
 const iframeRef = ref(null)
 const iframeLoading = ref(true)
 const { onIframeLoad: applyLegacyLayout } = useLegacyIframeLayout(iframeRef)
@@ -51,6 +55,11 @@ const clearHideLoaderTimer = () => {
 }
 
 watch(iframeSrc, () => {
+  if (isActasPrototype.value) {
+    iframeLoading.value = false
+    return
+  }
+
   loadingGeneration += 1
   loadingStartedAt = performance.now()
   clearHideLoaderTimer()
