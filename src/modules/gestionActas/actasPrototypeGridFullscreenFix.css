@@ -1,0 +1,158 @@
+/*
+ * Ajuste final del Paso 1 de Consultar Actas.
+ * Alcance deliberadamente acotado al prototipo Vue de Gestión de Actas.
+ * Evita modificar los contratos globales de FmGridShell/DataTable que usan otras pantallas.
+ */
+
+/* Cuando la búsqueda abre ACTAS, la pantalla se convierte en un layout flex real. */
+.actas-v2-page.actas-v2-page--grid-expanded {
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  padding-bottom: 4px !important;
+}
+
+.actas-v2-page--grid-expanded .actas-main-stepper {
+  flex: 0 0 auto !important;
+}
+
+.actas-v2-page--grid-expanded .actas-selection-page {
+  flex: 1 1 0 !important;
+  width: 100% !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  gap: 0 !important;
+  overflow: hidden !important;
+}
+
+.actas-v2-page--grid-expanded .actas-accordion-header--grid {
+  width: 100% !important;
+  flex: 0 0 31px !important;
+  margin: 0 !important;
+}
+
+/* El acordeón ACTAS ocupa todo el espacio restante. */
+.actas-v2-page--grid-expanded .actas-grid-card {
+  flex: 1 1 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+/* FmGridShell debe crecer; height:0 + flex evita el hueco blanco debajo del paginator. */
+.actas-v2-page--grid-expanded .actas-grid-shell,
+.actas-v2-page--grid-expanded section.actas-grid-shell.fm-grid-shell {
+  flex: 1 1 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  overflow: hidden !important;
+}
+
+/* DataTable ocupa todo el ancho del shell, no solamente el ancho de sus columnas. */
+.actas-v2-page--grid-expanded .actas-grid-shell > .actas-main-grid.p-datatable,
+.actas-v2-page--grid-expanded .actas-grid-shell .actas-main-grid.p-datatable {
+  flex: 1 1 0 !important;
+  align-self: stretch !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+/*
+ * PrimeVue cambia el nombre del wrapper entre versiones. Cubrimos ambos nombres.
+ * Este es el cuerpo scrollable que debe consumir todo el alto antes del paginator.
+ */
+.actas-v2-page--grid-expanded .actas-main-grid .p-datatable-table-container,
+.actas-v2-page--grid-expanded .actas-main-grid .p-datatable-wrapper {
+  flex: 1 1 0 !important;
+  align-self: stretch !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 !important;
+  overflow: auto !important;
+}
+
+/* La tabla llega, como mínimo, hasta el borde derecho del acordeón. */
+.actas-v2-page--grid-expanded .actas-main-grid .p-datatable-table {
+  min-width: 100% !important;
+  margin: 0 !important;
+}
+
+/* Paginador pegado al final de la grilla; nunca debe quedar a mitad del panel. */
+.actas-v2-page--grid-expanded .actas-main-grid .p-paginator,
+.actas-v2-page--grid-expanded .actas-main-grid .fm-custom-paginator {
+  flex: 0 0 34px !important;
+  width: 100% !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
+  margin: 0 !important;
+  padding-top: 1px !important;
+  padding-bottom: 1px !important;
+}
+
+/* Footer muy compacto: texto a la izquierda y acción discreta a la derecha. */
+.actas-v2-page--grid-expanded .actas-grid-footer {
+  flex: 0 0 34px !important;
+  width: 100% !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
+  margin: 0 !important;
+  padding: 2px 7px !important;
+  box-sizing: border-box !important;
+}
+
+.actas-v2-page--grid-expanded .actas-grid-footer .actas-primary-button.p-button {
+  width: auto !important;
+  min-width: 132px !important;
+  max-width: 190px !important;
+  height: 27px !important;
+  min-height: 27px !important;
+  max-height: 27px !important;
+  padding: 0 10px !important;
+  border-radius: 4px !important;
+  font-size: 10px !important;
+  line-height: 1 !important;
+  box-shadow: none !important;
+}
+
+.actas-v2-page--grid-expanded .actas-grid-footer .actas-primary-button.p-button .p-button-icon {
+  font-size: 10px !important;
+}
+
+/* Filtros: BUSCAR y LIMPIAR pertenecen visualmente al contenido del primer acordeón. */
+.actas-accordion-enhanced .actas-search-actions {
+  margin: 0 !important;
+  padding: 9px 12px 10px !important;
+  border-bottom: 1px solid #dbe5e8 !important;
+}
+
+/* Sin hueco extra entre el final de filtros y el siguiente acordeón. */
+.actas-accordion-enhanced .actas-accordion-header--grid {
+  margin-top: 4px !important;
+}
