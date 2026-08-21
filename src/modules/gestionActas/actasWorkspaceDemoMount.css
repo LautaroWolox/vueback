@@ -1,0 +1,51 @@
+.actas-v2-page.actas-workspace-demo-active {
+  width: 100% !important;
+  height: calc(100dvh - 82px) !important;
+  min-height: 0 !important;
+  max-height: calc(100dvh - 82px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: #f4f7f9 !important;
+}
+
+.actas-workspace-demo-active > .actas-v2-heading {
+  display: none !important;
+}
+
+.actas-workspace-demo-active > .actas-main-stepper {
+  width: 100% !important;
+  min-height: 58px !important;
+  height: 58px !important;
+  flex: 0 0 58px !important;
+  margin: 0 !important;
+  padding: 5px 18px !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.actas-workspace-demo-active > .actas-workspace-page.actas-workspace-demo-hosted {
+  width: 100% !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 1 1 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.actas-workspace-demo-active .actas-workspace-demo-mount,
+.actas-workspace-demo-active .actas-workspace-demo-mount > .actas-demo-workspace {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
