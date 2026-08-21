@@ -22,7 +22,7 @@
 import { computed, onUnmounted, ref, watch, watchEffect } from 'vue'
 import router from '@/router'
 import FmTypingLoader from '@/components/shared/FmTypingLoader.vue'
-import ConsultarActasStepper from '@/modules/gestionActas/ConsultarActasStepper.vue'
+import ConsultarActasStepper from '@/modules/gestionActas/ConsultarActasStepperV2.vue'
 import { useLegacyIframeLayout } from '@/composables/useLegacyIframeLayout'
 
 const MIN_LOADER_VISIBLE_MS = 450
