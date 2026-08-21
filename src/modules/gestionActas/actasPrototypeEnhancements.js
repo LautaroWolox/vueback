@@ -53,7 +53,7 @@ const getGridNode = (page) => page.querySelector('.actas-grid-card')
 
 const setNodesHidden = (nodes, hidden) => {
   nodes.filter(Boolean).forEach((node) => {
-    node.hidden = hidden
+    if (node.hidden !== hidden) node.hidden = hidden
   })
 }
 
@@ -72,8 +72,9 @@ const applyStateBadges = (page) => {
       if (!cell) return
 
       const target = cell.querySelector('.actas-cell-text') || cell.querySelector('span') || cell
+      const stateClass = resolveStateClass(target.textContent)
       STATE_CLASSES.forEach((className) => target.classList.remove(className))
-      target.classList.add('actas-state-badge', resolveStateClass(target.textContent))
+      target.classList.add('actas-state-badge', stateClass)
     })
   })
 }
@@ -98,22 +99,29 @@ export const installActasPrototypeEnhancements = () => {
     const grid = getGridNode(selectionPage)
 
     setNodesHidden(getFilterNodes(selectionPage), !filtersOpen)
-    if (grid) grid.hidden = !gridOpen
+    if (grid && grid.hidden !== !gridOpen) grid.hidden = !gridOpen
 
     filtersHeader?.classList.toggle('is-open', filtersOpen)
     gridHeader?.classList.toggle('is-open', gridOpen)
-    filtersHeader?.setAttribute('aria-expanded', String(filtersOpen))
-    gridHeader?.setAttribute('aria-expanded', String(gridOpen))
+
+    const filtersExpanded = String(filtersOpen)
+    const gridExpanded = String(gridOpen)
+    if (filtersHeader?.getAttribute('aria-expanded') !== filtersExpanded) {
+      filtersHeader?.setAttribute('aria-expanded', filtersExpanded)
+    }
+    if (gridHeader?.getAttribute('aria-expanded') !== gridExpanded) {
+      gridHeader?.setAttribute('aria-expanded', gridExpanded)
+    }
 
     root.classList.toggle('actas-v2-page--grid-expanded', gridOpen && !filtersOpen)
 
     const resultText = selectionPage.querySelector('.actas-grid-card__heading small')?.textContent?.trim()
-    const selectionText = selectionPage.querySelector('.actas-selection-count')?.textContent?.replace(/\s+/g, ' ')?.trim()
+    const selectionText = selectionPage.querySelector('.actas-selection-count')?.textContent?.replace(/\s+/g, ' ')?.trim() || ''
     const gridMeta = gridHeader?.querySelector('.actas-accordion-header__copy small')
     const trailing = gridHeader?.querySelector('.actas-accordion-header__trailing')
 
-    if (gridMeta && resultText) gridMeta.textContent = resultText
-    if (trailing) trailing.textContent = selectionText || ''
+    if (gridMeta && resultText && gridMeta.textContent !== resultText) gridMeta.textContent = resultText
+    if (trailing && trailing.textContent !== selectionText) trailing.textContent = selectionText
 
     applyStateBadges(selectionPage)
   }
