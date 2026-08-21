@@ -50,9 +50,50 @@ const setNodesHidden = (nodes, hidden) => {
   })
 }
 
+const normalizeGridStructure = (page) => {
+  const table = page.querySelector('.actas-main-grid .p-datatable-table')
+  const thead = table?.querySelector('thead')
+  if (!thead) return
+
+  const rows = [...thead.querySelectorAll(':scope > tr')]
+  const filterRow = rows.find((row) => (
+    row.classList.contains('p-datatable-filter-row') ||
+    row.classList.contains('p-filter-row') ||
+    row.querySelector('.actas-column-filter')
+  ))
+
+  const titleRow = rows.find((row) => row !== filterRow && [...row.children].some((cell) => {
+    const text = normalizeState(cell.textContent)
+    return text.includes('NRO_ACTA') || text.includes('ESTADO_ACTA') || text.includes('CONTRATISTA')
+  }))
+
+  if (filterRow) {
+    filterRow.classList.add('actas-filter-row--top')
+    if (thead.firstElementChild !== filterRow) thead.insertBefore(filterRow, thead.firstElementChild)
+  }
+
+  if (titleRow) titleRow.classList.add('actas-title-row--below')
+
+  page.querySelectorAll('.actas-main-grid .p-datatable-frozen-column').forEach((cell) => {
+    cell.classList.remove('p-datatable-frozen-column')
+    cell.style.removeProperty('left')
+    cell.style.removeProperty('right')
+    cell.style.removeProperty('position')
+    cell.style.removeProperty('z-index')
+  })
+}
+
 const applyStateBadges = (page) => {
   page.querySelectorAll('.actas-main-grid table').forEach((table) => {
-    const headers = [...table.querySelectorAll('thead tr:first-child th')]
+    const thead = table.querySelector('thead')
+    if (!thead) return
+
+    const headerRow = [...thead.querySelectorAll(':scope > tr')].find((row) => (
+      [...row.children].some((cell) => normalizeState(cell.textContent).includes('ESTADO_ACTA'))
+    ))
+    if (!headerRow) return
+
+    const headers = [...headerRow.children]
     const stateIndex = headers.findIndex((header) => {
       const text = normalizeState(header.textContent)
       return text === 'ESTADO_ACTA' || text === 'ESTADO ACTA' || text.includes('ESTADO_ACTA')
@@ -100,6 +141,7 @@ export const installActasPrototypeEnhancements = () => {
     gridHeader?.setAttribute('aria-expanded', String(gridOpen))
 
     root.classList.toggle('actas-v2-page--grid-expanded', gridOpen && !filtersOpen)
+    normalizeGridStructure(selectionPage)
     applyStateBadges(selectionPage)
   }
 
