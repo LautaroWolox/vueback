@@ -1,15 +1,8 @@
 /*
- * Consultar Actas
- * Mismo contrato visual aprobado en OTs Fallidas / Reporte SAS:
- * - THEAD completo sticky como una sola unidad
- * - filtros pegados a los titulos y 100% opacos
- * - tbody siempre por debajo del THEAD
- * - DataTable ocupa todo el alto util hasta paginator/footer
+ * Consultar Actas - grilla alineada al patrón FM aprobado.
+ * Títulos -> filtros -> datos, sin reordenar el DOM de PrimeVue.
+ * Títulos y filtros quedan sticky como dos filas pegadas.
  */
-
-/* -------------------------------------------------------------------------- */
-/* FULLSCREEN REAL DEL PASO DE RESULTADOS                                     */
-/* -------------------------------------------------------------------------- */
 
 .actas-v2-page.actas-v2-page--grid-expanded {
   width: 100% !important;
@@ -41,35 +34,31 @@
 }
 
 .actas-v2-page--grid-expanded .actas-accordion-header--grid {
-  flex: 0 0 31px !important;
   width: 100% !important;
-  height: 31px !important;
-  min-height: 31px !important;
+  flex: 0 0 31px !important;
   margin: 0 !important;
 }
 
 .actas-v2-page--grid-expanded .actas-grid-card {
   flex: 1 1 0 !important;
   width: 100% !important;
+  max-width: 100% !important;
   height: 0 !important;
   min-height: 0 !important;
-  max-width: 100% !important;
   max-height: none !important;
   margin: 0 !important;
   display: flex !important;
   flex-direction: column !important;
   overflow: hidden !important;
-  border-radius: 0 !important;
 }
 
 .actas-v2-page--grid-expanded .actas-grid-shell,
 .actas-v2-page--grid-expanded section.actas-grid-shell.fm-grid-shell {
   flex: 1 1 0 !important;
   width: 100% !important;
-  height: 0 !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
   max-width: 100% !important;
+  height: 0 !important;
+  min-height: 0 !important;
   max-height: none !important;
   display: flex !important;
   flex-direction: column !important;
@@ -78,13 +67,14 @@
   background: #fff !important;
 }
 
-.actas-v2-page--grid-expanded .actas-main-grid.p-datatable {
+.actas-v2-page--grid-expanded .actas-grid-shell > .actas-main-grid.p-datatable,
+.actas-v2-page--grid-expanded .actas-grid-shell .actas-main-grid.p-datatable {
   flex: 1 1 0 !important;
   width: 100% !important;
-  height: 0 !important;
   min-width: 0 !important;
-  min-height: 0 !important;
   max-width: 100% !important;
+  height: 0 !important;
+  min-height: 0 !important;
   max-height: none !important;
   display: flex !important;
   flex-direction: column !important;
@@ -93,214 +83,145 @@
   background: #fff !important;
 }
 
-html body #app .actas-v2-page--grid-expanded .actas-main-grid.p-datatable .p-datatable-table-container,
-html body #app .actas-v2-page--grid-expanded .actas-main-grid.p-datatable .p-datatable-wrapper,
-html body #app .actas-v2-page--grid-expanded .actas-main-grid.p-datatable [data-pc-section='tablecontainer'] {
+.actas-v2-page--grid-expanded .actas-main-grid .p-datatable-table-container,
+.actas-v2-page--grid-expanded .actas-main-grid .p-datatable-wrapper,
+.actas-v2-page--grid-expanded .actas-main-grid [data-pc-section='tablecontainer'] {
   position: relative !important;
   isolation: isolate !important;
   flex: 1 1 0 !important;
   width: 100% !important;
-  height: 0 !important;
   min-width: 0 !important;
-  min-height: 0 !important;
   max-width: 100% !important;
+  height: 0 !important;
+  min-height: 0 !important;
   max-height: none !important;
   margin: 0 !important;
-  padding: 0 !important;
-  overflow-x: auto !important;
-  overflow-y: auto !important;
+  overflow: auto !important;
   border: 1px solid #d1d1d1 !important;
   border-left: 0 !important;
   background: #fff !important;
 }
 
-html body #app .actas-main-grid.p-datatable .p-datatable-table,
-html body #app .actas-main-grid.p-datatable table {
+.actas-main-grid .p-datatable-table {
   width: max-content !important;
   min-width: 100% !important;
-  margin: 0 !important;
   table-layout: fixed !important;
   border-collapse: separate !important;
   border-spacing: 0 !important;
-  background: #fff !important;
+  margin: 0 !important;
   font-size: 12px !important;
+  background: #fff !important;
 }
 
-/* -------------------------------------------------------------------------- */
-/* STICKY EXACTO DEL PATRON OTs FALLIDAS                                      */
-/* -------------------------------------------------------------------------- */
-
-html body #app .actas-main-grid.p-datatable .p-datatable-thead {
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 120 !important;
+/* PrimeVue conserva sus dos filas normales del THEAD. */
+.actas-v2-page--grid-expanded .actas-main-grid .p-datatable-thead {
+  position: static !important;
   margin: 0 !important;
   padding: 0 !important;
   background: #fff !important;
-  background-color: #fff !important;
-  opacity: 1 !important;
-  isolation: isolate !important;
-  transform: translateZ(0) !important;
 }
 
-/* Igual que OTs Fallidas: las celdas son relative, NO sticky individuales. */
-html body #app .actas-main-grid.p-datatable .p-datatable-thead > tr > th {
-  position: relative !important;
-  top: auto !important;
-  inset: auto !important;
-  z-index: auto !important;
+.actas-main-grid .p-datatable-thead > tr,
+.actas-main-grid .p-datatable-thead > tr.p-datatable-filter-row,
+.actas-main-grid .p-datatable-thead > tr.p-filter-row {
   margin: 0 !important;
-  opacity: 1 !important;
-  background-clip: border-box !important;
+  padding: 0 !important;
+}
+
+.actas-main-grid .p-datatable-thead > tr > th,
+.actas-main-grid .p-datatable-tbody > tr > td {
   box-sizing: border-box !important;
+  border-right: 1px solid #c9d3da !important;
+  border-bottom: 1px solid #dce3e8 !important;
   vertical-align: middle !important;
 }
 
-/* Si algun estilo viejo/PrimeVue inyecta una fila espaciadora, no participa. */
-html body #app .actas-main-grid.p-datatable .p-datatable-thead > tr:not(:first-child):not(.p-datatable-filter-row):not(.p-filter-row) {
-  display: none !important;
-  height: 0 !important;
-  min-height: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
-}
-
-/* Primera fila: nombres de columnas. */
-html body #app .actas-main-grid.p-datatable .p-datatable-thead > tr:first-child,
-html body #app .actas-main-grid.p-datatable .p-datatable-thead > tr:first-child > th {
+/* Nombres de columnas: sticky en top 0. */
+.actas-main-grid .p-datatable-thead > tr:not(.p-datatable-filter-row):not(.p-filter-row) > th {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 60 !important;
   height: 34px !important;
   min-height: 34px !important;
-  margin: 0 !important;
-  background: #f4f7f9 !important;
-  background-color: #f4f7f9 !important;
-}
-
-html body #app .actas-main-grid.p-datatable .p-datatable-thead > tr:first-child > th {
+  max-height: 34px !important;
   padding: 4px 7px !important;
-  border-right: 1px solid #c9d3da !important;
-  border-bottom: 1px solid #c9d3da !important;
-  box-shadow: inset 0 -1px 0 #c9d3da !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  background: #f4f7f9 !important;
+  background-clip: padding-box !important;
   color: #263f50 !important;
   font-size: 11px !important;
   font-weight: 700 !important;
   white-space: nowrap !important;
-  overflow: hidden !important;
   text-overflow: ellipsis !important;
 }
 
-/* Segunda fila: filtros, pegada DIRECTAMENTE al titulo. */
-html body #app .actas-main-grid.p-datatable .p-datatable-thead > tr.p-datatable-filter-row,
-html body #app .actas-main-grid.p-datatable .p-datatable-thead > tr.p-filter-row,
-html body #app .actas-main-grid.p-datatable .p-datatable-thead > tr:nth-child(2),
-html body #app .actas-main-grid.p-datatable .p-datatable-thead > tr.p-datatable-filter-row > th,
-html body #app .actas-main-grid.p-datatable .p-datatable-thead > tr.p-filter-row > th,
-html body #app .actas-main-grid.p-datatable .p-datatable-thead > tr:nth-child(2) > th {
-  margin: 0 !important;
-  background: #fff !important;
-  background-color: #fff !important;
-  opacity: 1 !important;
-}
-
-html body #app .actas-main-grid.p-datatable .p-datatable-thead > tr.p-datatable-filter-row,
-html body #app .actas-main-grid.p-datatable .p-datatable-thead > tr.p-filter-row,
-html body #app .actas-main-grid.p-datatable .p-datatable-thead > tr:nth-child(2) {
+/* Filtros: visibles, pegados al título y sticky justo debajo. */
+.actas-main-grid .p-datatable-thead > tr.p-datatable-filter-row,
+.actas-main-grid .p-datatable-thead > tr.p-filter-row {
+  display: table-row !important;
+  visibility: visible !important;
   height: 33px !important;
   min-height: 33px !important;
-  padding: 0 !important;
-  border: 0 !important;
-  transform: none !important;
+  max-height: 33px !important;
 }
 
-html body #app .actas-main-grid.p-datatable .p-datatable-thead > tr.p-datatable-filter-row > th,
-html body #app .actas-main-grid.p-datatable .p-datatable-thead > tr.p-filter-row > th,
-html body #app .actas-main-grid.p-datatable .p-datatable-thead > tr:nth-child(2) > th {
+.actas-main-grid .p-datatable-thead > tr.p-datatable-filter-row > th,
+.actas-main-grid .p-datatable-thead > tr.p-filter-row > th {
+  position: sticky !important;
+  top: 34px !important;
+  z-index: 59 !important;
+  display: table-cell !important;
+  visibility: visible !important;
   height: 33px !important;
   min-height: 33px !important;
+  max-height: 33px !important;
   padding: 3px 5px !important;
-  border-top: 0 !important;
-  border-right: 1px solid #c9d3da !important;
-  border-bottom: 1px solid #c9d3da !important;
+  margin: 0 !important;
   overflow: visible !important;
-  box-shadow: inset 0 -1px 0 #c9d3da !important;
+  border-top: 0 !important;
+  background: #fff !important;
+  background-clip: padding-box !important;
+  box-shadow: 0 1px 0 #dce3e8 !important;
 }
 
-/* Capa blanca opaca: las letras del tbody nunca se ven por detras. */
-html body #app .actas-main-grid.p-datatable .p-datatable-thead > tr.p-datatable-filter-row > th::before,
-html body #app .actas-main-grid.p-datatable .p-datatable-thead > tr.p-filter-row > th::before,
-html body #app .actas-main-grid.p-datatable .p-datatable-thead > tr:nth-child(2) > th::before {
-  content: '' !important;
-  position: absolute !important;
-  inset: 0 !important;
+.actas-main-grid .p-datatable-tbody {
+  position: relative !important;
   z-index: 0 !important;
-  pointer-events: none !important;
-  background: #fff !important;
-  background-color: #fff !important;
-  opacity: 1 !important;
-}
-
-html body #app .actas-main-grid.p-datatable .p-datatable-thead > tr.p-datatable-filter-row > th > *,
-html body #app .actas-main-grid.p-datatable .p-datatable-thead > tr.p-filter-row > th > *,
-html body #app .actas-main-grid.p-datatable .p-datatable-thead > tr:nth-child(2) > th > * {
-  position: relative !important;
-  z-index: 2 !important;
-}
-
-html body #app .actas-main-grid.p-datatable .p-datatable-thead .fm-filter-cell,
-html body #app .actas-main-grid.p-datatable .p-datatable-thead .actas-filter-cell,
-html body #app .actas-main-grid.p-datatable .p-datatable-thead .fm-column-filter,
-html body #app .actas-main-grid.p-datatable .p-datatable-thead .actas-column-filter,
-html body #app .actas-main-grid.p-datatable .p-datatable-thead .p-inputtext {
-  background: #fff !important;
-  background-color: #fff !important;
-  opacity: 1 !important;
-}
-
-/* Tbody siempre debajo del THEAD. */
-html body #app .actas-main-grid.p-datatable .p-datatable-tbody {
-  position: relative !important;
-  z-index: 1 !important;
   background: #fff !important;
 }
 
-html body #app .actas-main-grid.p-datatable .p-datatable-tbody > tr,
-html body #app .actas-main-grid.p-datatable .p-datatable-tbody > tr > td {
+.actas-main-grid .p-datatable-tbody > tr > td {
   position: relative !important;
-  z-index: 1 !important;
-}
-
-html body #app .actas-main-grid.p-datatable .p-datatable-tbody > tr > td {
+  z-index: 0 !important;
   height: 35px !important;
   min-height: 35px !important;
   padding: 5px 8px !important;
-  border-right: 1px solid #c9d3da !important;
-  border-bottom: 1px solid #dce3e8 !important;
-  background: #fff !important;
+  overflow: hidden !important;
   color: #263238 !important;
   font-size: 12px !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
   text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  background: #fff !important;
 }
 
-html body #app .actas-main-grid.p-datatable .p-datatable-tbody > tr:nth-child(even) > td {
+.actas-main-grid .p-datatable-tbody > tr:nth-child(even) > td {
   background: #fbfcfd !important;
 }
 
-html body #app .actas-main-grid.p-datatable .p-datatable-tbody > tr:hover > td {
+.actas-main-grid .p-datatable-tbody > tr:hover > td {
   background: #edfafd !important;
 }
 
-html body #app .actas-main-grid.p-datatable .p-datatable-row-selected > td,
-html body #app .actas-main-grid.p-datatable .p-highlight > td,
-html body #app .actas-main-grid.p-datatable .p-datatable-tbody > tr[data-p-selected='true'] > td {
+.actas-main-grid .p-datatable-row-selected > td,
+.actas-main-grid .p-highlight > td,
+.actas-main-grid .p-datatable-tbody > tr[data-p-selected='true'] > td {
   background: #dff7fa !important;
   color: #263238 !important;
 }
 
-/* Seleccion compacta; cualquier frozen residual queda neutralizado. */
-html body #app .actas-main-grid.p-datatable .p-datatable-thead > tr > th:first-child,
-html body #app .actas-main-grid.p-datatable .p-datatable-tbody > tr > td:first-child {
+.actas-main-grid .p-datatable-thead > tr > th:first-child,
+.actas-main-grid .p-datatable-tbody > tr > td:first-child {
   width: 44px !important;
   min-width: 44px !important;
   max-width: 44px !important;
@@ -308,26 +229,36 @@ html body #app .actas-main-grid.p-datatable .p-datatable-tbody > tr > td:first-c
   padding-right: 7px !important;
 }
 
-html body #app .actas-main-grid.p-datatable .p-datatable-frozen-column {
-  position: relative !important;
+.actas-main-grid .p-datatable-frozen-column {
+  position: static !important;
   left: auto !important;
   right: auto !important;
   z-index: auto !important;
   box-shadow: none !important;
 }
 
-html body #app .actas-main-grid.p-datatable .fm-filter-cell,
-html body #app .actas-main-grid.p-datatable .actas-filter-cell {
+.actas-main-grid .fm-filter-cell,
+.actas-main-grid .actas-filter-cell {
   width: 100% !important;
   min-width: 0 !important;
+  height: 27px !important;
+  min-height: 27px !important;
   display: flex !important;
   align-items: center !important;
   gap: 3px !important;
+  margin: 0 !important;
+  padding: 0 !important;
   background: #fff !important;
 }
 
-html body #app .actas-main-grid.p-datatable .fm-column-filter,
-html body #app .actas-main-grid.p-datatable .actas-column-filter {
+.actas-main-grid .fm-filter-prefix {
+  flex: 0 0 auto !important;
+  color: #000 !important;
+  font-size: 11px !important;
+}
+
+.actas-main-grid .fm-column-filter,
+.actas-main-grid .actas-column-filter {
   width: 100% !important;
   min-width: 20px !important;
   height: 25px !important;
@@ -340,7 +271,7 @@ html body #app .actas-main-grid.p-datatable .actas-column-filter {
   box-sizing: border-box !important;
 }
 
-html body #app .actas-main-grid.p-datatable .actas-filter-clear {
+.actas-main-grid .actas-filter-clear {
   width: 18px !important;
   min-width: 18px !important;
   height: 24px !important;
@@ -349,20 +280,17 @@ html body #app .actas-main-grid.p-datatable .actas-filter-clear {
   border: 0 !important;
   background: #fff !important;
   color: #111 !important;
+  cursor: pointer !important;
 }
-
-/* -------------------------------------------------------------------------- */
-/* PAGINADOR + FOOTER AL FONDO                                                */
-/* -------------------------------------------------------------------------- */
 
 .actas-v2-page--grid-expanded .actas-main-grid .p-datatable-paginator-bottom,
 .actas-v2-page--grid-expanded .actas-main-grid > .p-paginator,
 .actas-v2-page--grid-expanded .actas-main-grid .p-paginator {
-  flex: 0 0 40px !important;
   width: 100% !important;
-  height: 40px !important;
-  min-height: 40px !important;
-  max-height: 40px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+  flex: 0 0 38px !important;
   margin: 0 !important;
   padding: 0 !important;
   overflow: hidden !important;
@@ -375,7 +303,6 @@ html body #app .actas-main-grid.p-datatable .actas-filter-clear {
 .actas-v2-page--grid-expanded .actas-grid-footer {
   flex: 0 0 34px !important;
   width: 100% !important;
-  height: 34px !important;
   min-height: 34px !important;
   max-height: 34px !important;
   margin: 0 !important;
@@ -398,7 +325,6 @@ html body #app .actas-main-grid.p-datatable .actas-filter-clear {
   box-shadow: none !important;
 }
 
-/* BUSCAR / LIMPIAR siguen formando parte visual del acordeon de filtros. */
 .actas-accordion-enhanced .actas-search-actions {
   margin: 0 !important;
   padding: 9px 12px 10px !important;
