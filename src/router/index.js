@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '@/store/auth';
+import { DOCUMENT_TYPES } from '@/store/gestionActas';
 
 const rutasLibres = ['login', '401', 'login2FA'];
 
@@ -214,41 +215,29 @@ const routes = [
         path: 'consultarActas.html',
         name: 'COAC',
         beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/consultarActas.html',
-          titleParam: 'consultarActas'
-        }
+        component: () => import('../modules/gestionActas/views/GestionActasConsulta.vue'),
+        props: { documentType: DOCUMENT_TYPES.ACTA }
       },
       {
         path: 'ordenTrabajoSinActa.html',
         name: 'COSA',
         beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/consultarOtSinACTA.html',
-          titleParam: 'consultar ots sin acta'
-        }
+        component: () => import('../modules/gestionActas/views/GestionActasConsulta.vue'),
+        props: { documentType: DOCUMENT_TYPES.OT_SIN_ACTA }
       },
       {
         path: 'consultarNotaDebito.html',
         name: 'NODE',
         beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/consultarNotaDebito.html',
-          titleParam: 'consultar notas debito'
-        }
+        component: () => import('../modules/gestionActas/views/GestionActasConsulta.vue'),
+        props: { documentType: DOCUMENT_TYPES.NOTA_DEBITO }
       },
       {
         path: 'consultarNotaCredito.html',
         name: 'NOCR',
         beforeEnter: allowed,
-        component: () => import('../views/IframeView.vue'),
-        props: {
-          urlParam: '/consultarNotaCredito.html',
-          titleParam: 'consultar notas credito'
-        }
+        component: () => import('../modules/gestionActas/views/GestionActasConsulta.vue'),
+        props: { documentType: DOCUMENT_TYPES.NOTA_CREDITO }
       },
       {
         path: 'consultarReglas.html',
