@@ -80,10 +80,6 @@
   overflow: hidden !important;
 }
 
-/*
- * PrimeVue cambia el nombre del wrapper entre versiones. Cubrimos ambos nombres.
- * Este es el cuerpo scrollable que debe consumir todo el alto antes del paginator.
- */
 .actas-v2-page--grid-expanded .actas-main-grid .p-datatable-table-container,
 .actas-v2-page--grid-expanded .actas-main-grid .p-datatable-wrapper {
   flex: 1 1 0 !important;
@@ -155,4 +151,50 @@
 /* Sin hueco extra entre el final de filtros y el siguiente acordeón. */
 .actas-accordion-enhanced .actas-accordion-header--grid {
   margin-top: 4px !important;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Orden correcto de la cabecera: filtros ARRIBA, títulos debajo.             */
+/* -------------------------------------------------------------------------- */
+.actas-main-grid .p-datatable-thead > tr.actas-filter-row--top > th {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 8 !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  background: #ffffff !important;
+}
+
+.actas-main-grid .p-datatable-thead > tr.actas-title-row--below > th {
+  position: sticky !important;
+  top: 34px !important;
+  z-index: 7 !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  background: #f2f5f6 !important;
+}
+
+/* El filtro de selección queda como una única celda compacta, sin bloque doble. */
+.actas-main-grid .p-datatable-thead > tr > th:first-child,
+.actas-main-grid .p-datatable-tbody > tr > td:first-child {
+  width: 34px !important;
+  min-width: 34px !important;
+  max-width: 34px !important;
+  padding-left: 4px !important;
+  padding-right: 4px !important;
+}
+
+/* Neutraliza cualquier frozen residual que PrimeVue vuelva a pintar. */
+.actas-main-grid .p-datatable-frozen-column {
+  position: static !important;
+  left: auto !important;
+  right: auto !important;
+  z-index: auto !important;
+  box-shadow: none !important;
+}
+
+/* No debe existir una franja vacía entre checkbox y NRO_ACTA. */
+.actas-main-grid .p-datatable-thead > tr > th:nth-child(2),
+.actas-main-grid .p-datatable-tbody > tr > td:nth-child(2) {
+  border-left: 0 !important;
 }
