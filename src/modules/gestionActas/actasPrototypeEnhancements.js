@@ -1,3 +1,6 @@
+import { h, render as renderVue } from 'vue'
+import ActasWorkspaceDemo from './components/ActasWorkspaceDemo.vue'
+
 const STATE_CLASSES = [
   'actas-state--success',
   'actas-state--info',
@@ -15,7 +18,6 @@ const normalizeState = (value) => String(value || '')
 const resolveStateClass = (value) => {
   const state = normalizeState(value)
   if (!state) return 'actas-state--neutral'
-
   if (state.includes('CERTIFIC') || state.includes('CERRAD')) return 'actas-state--success'
   if (state.includes('CURSO') || state.includes('PROCES') || state.includes('EJECUC')) return 'actas-state--info'
   if (state.includes('ABIERT') || state.includes('PENDIENT') || state.includes('INICI')) return 'actas-state--warning'
@@ -62,13 +64,11 @@ const applyStateBadges = (page) => {
       const text = normalizeState(header.textContent)
       return text === 'ESTADO_ACTA' || text === 'ESTADO ACTA' || text.includes('ESTADO_ACTA')
     })
-
     if (stateIndex < 0) return
 
     table.querySelectorAll('tbody tr').forEach((row) => {
       const cell = row.children[stateIndex]
       if (!cell) return
-
       const target = cell.querySelector('.actas-cell-text') || cell.querySelector('span') || cell
       const stateClass = resolveStateClass(target.textContent)
       STATE_CLASSES.forEach((className) => target.classList.remove(className))
@@ -76,6 +76,14 @@ const applyStateBadges = (page) => {
     })
   })
 }
+
+const readWorkspaceActas = (workspace) => [...workspace.querySelectorAll('.actas-document-tab')]
+  .map((tab) => ({
+    nroActa: String(tab.querySelector('strong')?.textContent || '').trim(),
+    estadoActa: String(tab.querySelector('small')?.textContent || '').trim(),
+    active: tab.classList.contains('is-active'),
+  }))
+  .filter((item) => item.nroActa)
 
 export const installActasPrototypeEnhancements = () => {
   let disposed = false
@@ -85,27 +93,81 @@ export const installActasPrototypeEnhancements = () => {
   let filtersOpen = true
   let gridOpen = false
   let gridWasOpened = false
+  let workspaceHost = null
+  let workspaceSource = null
+
+  const unmountWorkspace = () => {
+    if (workspaceHost) {
+      renderVue(null, workspaceHost)
+      workspaceHost.remove()
+      workspaceHost = null
+    }
+    workspaceSource?.classList.remove('actas-workspace-demo-hosted')
+    workspaceSource = null
+  }
+
+  const mountWorkspace = () => {
+    if (!root || disposed) return
+    const workspace = root.querySelector('.actas-workspace-page')
+
+    if (!workspace) {
+      if (workspaceHost) unmountWorkspace()
+      return
+    }
+
+    if (workspaceSource === workspace && workspaceHost?.isConnected) return
+    unmountWorkspace()
+
+    const actas = readWorkspaceActas(workspace)
+    if (!actas.length) return
+
+    const originalBack = [...workspace.querySelectorAll('button')].find((button) => (
+      normalizeState(button.textContent).includes('VOLVER A LA GRILLA')
+    ))
+
+    workspaceSource = workspace
+    workspace.classList.add('actas-workspace-demo-hosted')
+
+    workspaceHost = document.createElement('div')
+    workspaceHost.className = 'actas-workspace-demo-mount'
+    workspace.append(workspaceHost)
+
+    const initialActa = actas.find((item) => item.active)?.nroActa || actas[0].nroActa
+    const vnode = h(ActasWorkspaceDemo, {
+      actas: actas.map(({ active, ...item }) => item),
+      initialActa,
+      onBack: () => originalBack?.click(),
+    })
+
+    const appContext = document.querySelector('#app')?.__vue_app__?._context
+    if (appContext) vnode.appContext = appContext
+    renderVue(vnode, workspaceHost)
+  }
 
   const render = () => {
     if (!root || disposed) return
 
     const selectionPage = root.querySelector('.actas-selection-page')
-    if (!selectionPage) return
+    if (selectionPage) {
+      const filtersHeader = selectionPage.querySelector('[data-actas-accordion="filters"]')
+      const gridHeader = selectionPage.querySelector('[data-actas-accordion="grid"]')
+      const grid = getGridNode(selectionPage)
 
-    const filtersHeader = selectionPage.querySelector('[data-actas-accordion="filters"]')
-    const gridHeader = selectionPage.querySelector('[data-actas-accordion="grid"]')
-    const grid = getGridNode(selectionPage)
+      setNodesHidden(getFilterNodes(selectionPage), !filtersOpen)
+      if (grid && grid.hidden !== !gridOpen) grid.hidden = !gridOpen
 
-    setNodesHidden(getFilterNodes(selectionPage), !filtersOpen)
-    if (grid && grid.hidden !== !gridOpen) grid.hidden = !gridOpen
+      filtersHeader?.classList.toggle('is-open', filtersOpen)
+      gridHeader?.classList.toggle('is-open', gridOpen)
+      filtersHeader?.setAttribute('aria-expanded', String(filtersOpen))
+      gridHeader?.setAttribute('aria-expanded', String(gridOpen))
 
-    filtersHeader?.classList.toggle('is-open', filtersOpen)
-    gridHeader?.classList.toggle('is-open', gridOpen)
-    filtersHeader?.setAttribute('aria-expanded', String(filtersOpen))
-    gridHeader?.setAttribute('aria-expanded', String(gridOpen))
+      root.classList.toggle('actas-v2-page--grid-expanded', gridOpen && !filtersOpen)
+      applyStateBadges(selectionPage)
+    } else {
+      root.classList.remove('actas-v2-page--grid-expanded')
+    }
 
-    root.classList.toggle('actas-v2-page--grid-expanded', gridOpen && !filtersOpen)
-    applyStateBadges(selectionPage)
+    mountWorkspace()
   }
 
   const scheduleRender = () => {
@@ -135,7 +197,6 @@ export const installActasPrototypeEnhancements = () => {
   const onSelectionPageClick = (event) => {
     const searchButton = event.target.closest('.actas-search-actions button')
     if (!searchButton) return
-
     const label = normalizeState(searchButton.textContent)
     if (!label.includes('BUSCAR')) return
 
@@ -157,20 +218,14 @@ export const installActasPrototypeEnhancements = () => {
 
     const firstFilter = selectionPage.querySelector('.actas-filter-card')
     if (firstFilter && !selectionPage.querySelector('[data-actas-accordion="filters"]')) {
-      const filtersHeader = createAccordionHeader({
-        kind: 'filters',
-        title: 'FILTROS DE BÚSQUEDA',
-      })
+      const filtersHeader = createAccordionHeader({ kind: 'filters', title: 'FILTROS DE BÚSQUEDA' })
       filtersHeader.addEventListener('click', onFiltersClick)
       firstFilter.before(filtersHeader)
     }
 
     const grid = getGridNode(selectionPage)
     if (grid && !selectionPage.querySelector('[data-actas-accordion="grid"]')) {
-      const gridHeader = createAccordionHeader({
-        kind: 'grid',
-        title: 'ACTAS',
-      })
+      const gridHeader = createAccordionHeader({ kind: 'grid', title: 'ACTAS' })
       gridHeader.addEventListener('click', onGridClick)
       grid.before(gridHeader)
 
@@ -203,6 +258,7 @@ export const installActasPrototypeEnhancements = () => {
     disposed = true
     if (animationFrame) window.cancelAnimationFrame(animationFrame)
     observer?.disconnect()
+    unmountWorkspace()
 
     if (root) {
       root.classList.remove('actas-accordion-enhanced', 'actas-v2-page--grid-expanded')
