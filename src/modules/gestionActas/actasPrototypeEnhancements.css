@@ -1,6 +1,7 @@
 .actas-accordion-enhanced .actas-selection-page {
   display: flex;
   flex-direction: column;
+  gap: 0 !important;
   min-height: 0;
 }
 
@@ -23,6 +24,10 @@
   cursor: pointer;
   text-align: left;
   box-sizing: border-box;
+}
+
+.actas-accordion-header--grid {
+  margin-top: 5px;
 }
 
 .actas-accordion-header:hover {
@@ -59,7 +64,7 @@
   transform: rotate(180deg);
 }
 
-/* Se conserva tal cual la disposición de filtros aprobada. */
+/* Todo el bloque de filtros queda visualmente dentro del primer acordeón. */
 .actas-accordion-enhanced .actas-filter-card {
   width: 100%;
   margin: 0 !important;
@@ -73,10 +78,26 @@
   border-top: 1px solid #edf2f4 !important;
 }
 
+.actas-accordion-enhanced .actas-feedback:not(.actas-feedback--inside) {
+  width: 100%;
+  margin: 0 !important;
+  border-left: 1px solid #dbe5e8 !important;
+  border-right: 1px solid #dbe5e8 !important;
+  border-top: 0 !important;
+  border-bottom: 0 !important;
+  border-radius: 0 !important;
+  box-sizing: border-box;
+}
+
 .actas-accordion-enhanced .actas-search-actions {
   width: 100%;
-  margin: 0 0 4px !important;
-  padding: 12px 16px 14px !important;
+  min-height: 46px;
+  margin: 0 !important;
+  padding: 6px 12px 8px !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px !important;
   border: 1px solid #dbe5e8;
   border-top: 0;
   border-radius: 0;
@@ -84,21 +105,30 @@
   box-sizing: border-box;
 }
 
-.actas-accordion-enhanced .actas-feedback:not(.actas-feedback--inside) {
-  width: 100%;
-  margin: 0 !important;
-  border-radius: 0 !important;
-  box-sizing: border-box;
+.actas-accordion-enhanced .actas-search-actions .actas-primary-button.p-button,
+.actas-accordion-enhanced .actas-search-actions .actas-secondary-button.p-button {
+  width: auto !important;
+  min-width: 108px !important;
+  max-width: 132px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 14px !important;
+  border-radius: 5px !important;
+  font-size: 10px !important;
+  box-shadow: none !important;
 }
 
+/* Segundo acordeón: la grilla ocupa todo el contenido disponible. */
 .actas-accordion-enhanced .actas-grid-card {
   width: 100%;
-  margin: 0 0 4px !important;
+  max-width: none !important;
+  margin: 0 !important;
   border: 1px solid #dbe5e8 !important;
   border-top: 0 !important;
   border-radius: 0 !important;
   box-shadow: none !important;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .actas-accordion-enhanced .actas-grid-card__heading {
@@ -119,12 +149,14 @@
 .actas-v2-page--grid-expanded .actas-grid-card {
   flex: 1 1 auto;
   min-height: 0;
-  height: calc(100vh - 182px);
+  height: calc(100vh - 176px);
   display: flex;
   flex-direction: column;
 }
 
 .actas-v2-page--grid-expanded .actas-grid-shell {
+  width: 100% !important;
+  max-width: none !important;
   flex: 1 1 auto !important;
   min-height: 0 !important;
   height: auto !important;
@@ -135,6 +167,8 @@
 .actas-v2-page--grid-expanded .actas-grid-shell .p-datatable,
 .actas-v2-page--grid-expanded .actas-grid-shell .p-datatable-wrapper,
 .actas-v2-page--grid-expanded .actas-grid-shell .p-datatable-table-container {
+  width: 100% !important;
+  max-width: none !important;
   min-height: 0 !important;
 }
 
@@ -152,8 +186,35 @@
   overflow: auto !important;
 }
 
+/* Evita la franja vacía a la derecha: la tabla siempre llena el acordeón. */
+.actas-accordion-enhanced .actas-main-grid .p-datatable-table,
+.actas-accordion-enhanced .actas-main-grid table {
+  width: 100% !important;
+  min-width: 100% !important;
+}
+
 .actas-v2-page--grid-expanded .actas-grid-footer {
-  flex: 0 0 auto;
+  min-height: 38px !important;
+  height: 38px !important;
+  flex: 0 0 38px;
+  padding: 3px 8px !important;
+}
+
+/* Continuar queda como acción secundaria del footer, no como CTA gigante. */
+.actas-accordion-enhanced .actas-grid-footer .actas-primary-button.p-button {
+  width: auto !important;
+  min-width: 150px !important;
+  max-width: 190px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 11px !important;
+  border-radius: 5px !important;
+  font-size: 10px !important;
+  box-shadow: none !important;
+}
+
+.actas-accordion-enhanced .actas-grid-footer .actas-primary-button .p-button-icon {
+  font-size: 10px !important;
 }
 
 /* Grilla alineada al patrón FM aprobado. */
@@ -254,5 +315,16 @@
   .actas-accordion-header {
     padding-left: 7px;
     padding-right: 7px;
+  }
+
+  .actas-accordion-enhanced .actas-grid-footer {
+    gap: 6px;
+  }
+
+  .actas-accordion-enhanced .actas-grid-footer .actas-primary-button.p-button {
+    min-width: 132px !important;
+    max-width: 160px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
   }
 }
