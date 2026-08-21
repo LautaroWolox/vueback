@@ -14,7 +14,7 @@
   />
 
   <div v-else class="fm-screen gestion-actas-module gestion-actas-consulta" :class="{ 'is-results-only': resultsOnly }">
-    <header class="gestion-actas-heading">
+    <header v-if="!resultsOnly" class="gestion-actas-heading">
       <div>
         <span>Gestión de Actas</span>
         <h1>{{ pageTitle }}</h1>
@@ -25,7 +25,7 @@
       </div>
     </header>
 
-    <nav v-if="isActa" class="gestion-main-stepper" aria-label="Flujo de Gestión de Actas">
+    <nav v-if="isActa && !resultsOnly" class="gestion-main-stepper" aria-label="Flujo de Gestión de Actas">
       <button type="button" class="gestion-main-step is-active">
         <span>1</span>
         <div><strong>Seleccionar actas</strong><small>Buscar y elegir una o varias</small></div>
@@ -124,9 +124,9 @@
               <span>{{ feedback }}</span>
             </div>
 
-            <div class="gestion-filter-actions">
-              <Button label="BUSCAR" icon="pi pi-search" class="gestion-actas-btn gestion-actas-btn--primary" :loading="searchLoading" @click="requestSearch" />
-              <Button label="LIMPIAR" icon="pi pi-eraser" outlined class="gestion-actas-btn gestion-actas-btn--secondary" @click="clearFilters" />
+            <div class="fm-actions fm-filter-actions gestion-filter-actions">
+              <FmButton label="BUSCAR" :loading="searchLoading" @click="requestSearch" />
+              <FmButton label="LIMPIAR" variant="outline" :disabled="searchLoading" @click="clearFilters" />
             </div>
           </div>
         </AccordionContent>
@@ -164,11 +164,9 @@
 
             <footer v-if="isActa" class="gestion-actas-footer">
               <span>{{ selectedRows.length ? `${selectedRows.length} acta${selectedRows.length === 1 ? '' : 's'} seleccionada${selectedRows.length === 1 ? '' : 's'}` : 'Seleccioná una o más filas para continuar.' }}</span>
-              <Button
-                :label="selectedRows.length ? `CONTINUAR CON ${selectedRows.length} ACTA${selectedRows.length === 1 ? '' : 'S'}` : 'CONTINUAR'"
-                icon="pi pi-arrow-right"
-                iconPos="right"
-                class="gestion-actas-btn gestion-actas-btn--primary"
+              <FmButton
+                label="CONTINUAR"
+                icon="pi-arrow-right"
                 :disabled="!selectedRows.length"
                 @click="openWorkspace"
               />
@@ -178,14 +176,21 @@
       </AccordionPanel>
     </Accordion>
 
-    <Dialog v-model:visible="confirmNoFilters" modal header="Confirmar búsqueda" :draggable="false" class="gestion-actas-dialog">
+    <Dialog
+      v-model:visible="confirmNoFilters"
+      modal
+      header="Confirmar búsqueda"
+      :draggable="false"
+      class="fm-dialog gestion-actas-dialog"
+      :style="{ '--fm-dialog-width': '32rem' }"
+    >
       <div class="gestion-actas-confirm">
         <i class="pi pi-exclamation-triangle" />
         <p>Está a punto de realizar una búsqueda sin filtros. ¿Desea continuar?</p>
       </div>
       <template #footer>
-        <Button label="CANCELAR" outlined class="gestion-actas-btn gestion-actas-btn--secondary" @click="confirmNoFilters = false" />
-        <Button label="CONTINUAR" icon="pi pi-check" class="gestion-actas-btn gestion-actas-btn--primary" @click="confirmAndSearch" />
+        <FmButton label="CANCELAR" variant="outline" @click="confirmNoFilters = false" />
+        <FmButton label="CONTINUAR" icon="pi-check" @click="confirmAndSearch" />
       </template>
     </Dialog>
   </div>
@@ -193,10 +198,10 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
-import Button from 'primevue/button'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
+import FmButton from '@/components/shared/FmButton.vue'
 import ActasWorkspaceDemo from '../components/ActasWorkspaceDemo.vue'
 import ActasWorkspaceGrid from '../components/ActasWorkspaceGrid.vue'
 import NotaDcWorkspace from './NotaDcWorkspace.vue'
