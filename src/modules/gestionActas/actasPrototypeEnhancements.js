@@ -23,21 +23,14 @@ const resolveStateClass = (value) => {
   return 'actas-state--neutral'
 }
 
-const createAccordionHeader = ({ kind, title, subtitle, icon }) => {
+const createAccordionHeader = ({ kind, title }) => {
   const button = document.createElement('button')
   button.type = 'button'
   button.className = `actas-accordion-header actas-accordion-header--${kind}`
   button.dataset.actasAccordion = kind
   button.setAttribute('aria-expanded', 'false')
   button.innerHTML = `
-    <span class="actas-accordion-header__leading">
-      <span class="actas-accordion-header__icon"><i class="pi ${icon}" aria-hidden="true"></i></span>
-      <span class="actas-accordion-header__copy">
-        <strong>${title}</strong>
-        <small>${subtitle}</small>
-      </span>
-    </span>
-    <span class="actas-accordion-header__trailing"></span>
+    <span class="actas-accordion-header__title">${title}</span>
     <i class="pi pi-chevron-down actas-accordion-header__chevron" aria-hidden="true"></i>
   `
   return button
@@ -103,26 +96,10 @@ export const installActasPrototypeEnhancements = () => {
 
     filtersHeader?.classList.toggle('is-open', filtersOpen)
     gridHeader?.classList.toggle('is-open', gridOpen)
-
-    const filtersExpanded = String(filtersOpen)
-    const gridExpanded = String(gridOpen)
-    if (filtersHeader?.getAttribute('aria-expanded') !== filtersExpanded) {
-      filtersHeader?.setAttribute('aria-expanded', filtersExpanded)
-    }
-    if (gridHeader?.getAttribute('aria-expanded') !== gridExpanded) {
-      gridHeader?.setAttribute('aria-expanded', gridExpanded)
-    }
+    filtersHeader?.setAttribute('aria-expanded', String(filtersOpen))
+    gridHeader?.setAttribute('aria-expanded', String(gridOpen))
 
     root.classList.toggle('actas-v2-page--grid-expanded', gridOpen && !filtersOpen)
-
-    const resultText = selectionPage.querySelector('.actas-grid-card__heading small')?.textContent?.trim()
-    const selectionText = selectionPage.querySelector('.actas-selection-count')?.textContent?.replace(/\s+/g, ' ')?.trim() || ''
-    const gridMeta = gridHeader?.querySelector('.actas-accordion-header__copy small')
-    const trailing = gridHeader?.querySelector('.actas-accordion-header__trailing')
-
-    if (gridMeta && resultText && gridMeta.textContent !== resultText) gridMeta.textContent = resultText
-    if (trailing && trailing.textContent !== selectionText) trailing.textContent = selectionText
-
     applyStateBadges(selectionPage)
   }
 
@@ -177,9 +154,7 @@ export const installActasPrototypeEnhancements = () => {
     if (firstFilter && !selectionPage.querySelector('[data-actas-accordion="filters"]')) {
       const filtersHeader = createAccordionHeader({
         kind: 'filters',
-        title: 'Filtros de búsqueda',
-        subtitle: 'Datos generales y referencias',
-        icon: 'pi-filter',
+        title: 'FILTROS DE BÚSQUEDA',
       })
       filtersHeader.addEventListener('click', onFiltersClick)
       firstFilter.before(filtersHeader)
@@ -189,9 +164,7 @@ export const installActasPrototypeEnhancements = () => {
     if (grid && !selectionPage.querySelector('[data-actas-accordion="grid"]')) {
       const gridHeader = createAccordionHeader({
         kind: 'grid',
-        title: 'Actas',
-        subtitle: 'Grilla de resultados',
-        icon: 'pi-table',
+        title: 'ACTAS',
       })
       gridHeader.addEventListener('click', onGridClick)
       grid.before(gridHeader)
