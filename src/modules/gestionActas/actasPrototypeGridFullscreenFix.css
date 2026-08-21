@@ -1,10 +1,8 @@
 /*
- * Ajuste final del Paso 1 de Consultar Actas.
- * Alcance deliberadamente acotado al prototipo Vue de Gestión de Actas.
- * Evita modificar los contratos globales de FmGridShell/DataTable que usan otras pantallas.
+ * Grilla de Consultar Actas alineada al patrón aprobado de OTs Fallidas / Reporte SAS.
+ * Sin reordenar el DOM de PrimeVue: títulos -> filtros -> datos.
  */
 
-/* Cuando la búsqueda abre ACTAS, la pantalla se convierte en un layout flex real. */
 .actas-v2-page.actas-v2-page--grid-expanded {
   height: 100% !important;
   min-height: 0 !important;
@@ -35,7 +33,6 @@
   margin: 0 !important;
 }
 
-/* El acordeón ACTAS ocupa todo el espacio restante. */
 .actas-v2-page--grid-expanded .actas-grid-card {
   flex: 1 1 0 !important;
   width: 100% !important;
@@ -49,7 +46,6 @@
   overflow: hidden !important;
 }
 
-/* FmGridShell debe crecer; height:0 + flex evita el hueco blanco debajo del paginator. */
 .actas-v2-page--grid-expanded .actas-grid-shell,
 .actas-v2-page--grid-expanded section.actas-grid-shell.fm-grid-shell {
   flex: 1 1 0 !important;
@@ -62,57 +58,193 @@
   flex-direction: column !important;
   align-items: stretch !important;
   overflow: hidden !important;
+  background: #fff !important;
 }
 
-/* DataTable ocupa todo el ancho del shell, no solamente el ancho de sus columnas. */
 .actas-v2-page--grid-expanded .actas-grid-shell > .actas-main-grid.p-datatable,
 .actas-v2-page--grid-expanded .actas-grid-shell .actas-main-grid.p-datatable {
   flex: 1 1 0 !important;
-  align-self: stretch !important;
   width: 100% !important;
-  min-width: 100% !important;
+  min-width: 0 !important;
   max-width: 100% !important;
   height: 0 !important;
   min-height: 0 !important;
-  max-height: none !important;
   display: flex !important;
   flex-direction: column !important;
   overflow: hidden !important;
+  border: 0 !important;
+  background: #fff !important;
 }
 
 .actas-v2-page--grid-expanded .actas-main-grid .p-datatable-table-container,
-.actas-v2-page--grid-expanded .actas-main-grid .p-datatable-wrapper {
+.actas-v2-page--grid-expanded .actas-main-grid .p-datatable-wrapper,
+.actas-v2-page--grid-expanded .actas-main-grid [data-pc-section='tablecontainer'] {
   flex: 1 1 0 !important;
-  align-self: stretch !important;
   width: 100% !important;
-  min-width: 100% !important;
+  min-width: 0 !important;
   max-width: 100% !important;
   height: 0 !important;
   min-height: 0 !important;
-  max-height: none !important;
   margin: 0 !important;
   overflow: auto !important;
+  border: 1px solid #d1d1d1 !important;
+  border-left: 0 !important;
+  background: #fff !important;
 }
 
-/* La tabla llega, como mínimo, hasta el borde derecho del acordeón. */
-.actas-v2-page--grid-expanded .actas-main-grid .p-datatable-table {
+/* Mismo contrato de ancho que OTs Fallidas: llena la pantalla y crece si las columnas lo requieren. */
+.actas-main-grid .p-datatable-table {
+  width: max-content !important;
   min-width: 100% !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
   margin: 0 !important;
+  font-size: 12px !important;
 }
 
-/* Paginador pegado al final de la grilla; nunca debe quedar a mitad del panel. */
-.actas-v2-page--grid-expanded .actas-main-grid .p-paginator,
-.actas-v2-page--grid-expanded .actas-main-grid .fm-custom-paginator {
-  flex: 0 0 34px !important;
-  width: 100% !important;
+.actas-main-grid .p-datatable-thead > tr > th,
+.actas-main-grid .p-datatable-tbody > tr > td {
+  box-sizing: border-box !important;
+  border-right: 1px solid #c9d3da !important;
+  border-bottom: 1px solid #dce3e8 !important;
+  vertical-align: middle !important;
+}
+
+/* Cabecera normal de PrimeVue: títulos arriba. */
+.actas-main-grid .p-datatable-thead > tr:not(.p-datatable-filter-row):not(.p-filter-row) > th {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 8 !important;
+  height: 34px !important;
   min-height: 34px !important;
-  max-height: 34px !important;
-  margin: 0 !important;
-  padding-top: 1px !important;
-  padding-bottom: 1px !important;
+  padding: 4px 7px !important;
+  overflow: hidden !important;
+  background: #f4f7f9 !important;
+  color: #263f50 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
 }
 
-/* Footer muy compacto: texto a la izquierda y acción discreta a la derecha. */
+/* Filtros pegados inmediatamente debajo, igual a OTs Fallidas / Reporte SAS. */
+.actas-main-grid .p-datatable-thead > tr.p-datatable-filter-row > th,
+.actas-main-grid .p-datatable-thead > tr.p-filter-row > th {
+  position: sticky !important;
+  top: 34px !important;
+  z-index: 7 !important;
+  height: 33px !important;
+  min-height: 33px !important;
+  padding: 3px 5px !important;
+  overflow: visible !important;
+  border-top: 0 !important;
+  background: #fff !important;
+}
+
+.actas-main-grid .p-datatable-tbody > tr > td {
+  height: 35px !important;
+  min-height: 35px !important;
+  padding: 5px 8px !important;
+  overflow: hidden !important;
+  color: #263238 !important;
+  font-size: 12px !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  background: #fff !important;
+}
+
+.actas-main-grid .p-datatable-tbody > tr:nth-child(even) > td {
+  background: #fbfcfd !important;
+}
+
+.actas-main-grid .p-datatable-tbody > tr:hover > td {
+  background: #edfafd !important;
+}
+
+.actas-main-grid .p-datatable-row-selected > td,
+.actas-main-grid .p-highlight > td,
+.actas-main-grid .p-datatable-tbody > tr[data-p-selected='true'] > td {
+  background: #dff7fa !important;
+  color: #263238 !important;
+}
+
+/* Una única columna compacta para selección, sin frozen ni franja fantasma. */
+.actas-main-grid .p-datatable-thead > tr > th:first-child,
+.actas-main-grid .p-datatable-tbody > tr > td:first-child {
+  width: 44px !important;
+  min-width: 44px !important;
+  max-width: 44px !important;
+  padding-left: 7px !important;
+  padding-right: 7px !important;
+}
+
+.actas-main-grid .p-datatable-frozen-column {
+  position: static !important;
+  left: auto !important;
+  right: auto !important;
+  z-index: auto !important;
+  box-shadow: none !important;
+}
+
+.actas-main-grid .fm-filter-cell,
+.actas-main-grid .actas-filter-cell {
+  width: 100% !important;
+  min-width: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 3px !important;
+}
+
+.actas-main-grid .fm-filter-prefix {
+  flex: 0 0 auto !important;
+  color: #000 !important;
+  font-size: 11px !important;
+}
+
+.actas-main-grid .fm-column-filter,
+.actas-main-grid .actas-column-filter {
+  width: 100% !important;
+  min-width: 20px !important;
+  height: 25px !important;
+  min-height: 25px !important;
+  padding: 3px 5px !important;
+  border: 1px solid #c7d1d8 !important;
+  border-radius: 3px !important;
+  background: #fff !important;
+  font-size: 11px !important;
+  box-sizing: border-box !important;
+}
+
+.actas-main-grid .actas-filter-clear {
+  width: 18px !important;
+  min-width: 18px !important;
+  height: 24px !important;
+  flex: 0 0 18px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #111 !important;
+  cursor: pointer !important;
+}
+
+/* Paginador siempre al fondo del DataTable. */
+.actas-v2-page--grid-expanded .actas-main-grid .p-datatable-paginator-bottom,
+.actas-v2-page--grid-expanded .actas-main-grid > .p-paginator,
+.actas-v2-page--grid-expanded .actas-main-grid .p-paginator {
+  width: 100% !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+  flex: 0 0 38px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 1px solid #d1d1d1 !important;
+  border-top: 0 !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+}
+
 .actas-v2-page--grid-expanded .actas-grid-footer {
   flex: 0 0 34px !important;
   width: 100% !important;
@@ -125,76 +257,24 @@
 
 .actas-v2-page--grid-expanded .actas-grid-footer .actas-primary-button.p-button {
   width: auto !important;
-  min-width: 132px !important;
-  max-width: 190px !important;
+  min-width: 120px !important;
+  max-width: 176px !important;
   height: 27px !important;
   min-height: 27px !important;
   max-height: 27px !important;
-  padding: 0 10px !important;
+  padding: 0 9px !important;
   border-radius: 4px !important;
   font-size: 10px !important;
   line-height: 1 !important;
   box-shadow: none !important;
 }
 
-.actas-v2-page--grid-expanded .actas-grid-footer .actas-primary-button.p-button .p-button-icon {
-  font-size: 10px !important;
-}
-
-/* Filtros: BUSCAR y LIMPIAR pertenecen visualmente al contenido del primer acordeón. */
 .actas-accordion-enhanced .actas-search-actions {
   margin: 0 !important;
   padding: 9px 12px 10px !important;
   border-bottom: 1px solid #dbe5e8 !important;
 }
 
-/* Sin hueco extra entre el final de filtros y el siguiente acordeón. */
 .actas-accordion-enhanced .actas-accordion-header--grid {
   margin-top: 4px !important;
-}
-
-/* -------------------------------------------------------------------------- */
-/* Orden correcto de la cabecera: filtros ARRIBA, títulos debajo.             */
-/* -------------------------------------------------------------------------- */
-.actas-main-grid .p-datatable-thead > tr.actas-filter-row--top > th {
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 8 !important;
-  height: 34px !important;
-  min-height: 34px !important;
-  background: #ffffff !important;
-}
-
-.actas-main-grid .p-datatable-thead > tr.actas-title-row--below > th {
-  position: sticky !important;
-  top: 34px !important;
-  z-index: 7 !important;
-  height: 32px !important;
-  min-height: 32px !important;
-  background: #f2f5f6 !important;
-}
-
-/* El filtro de selección queda como una única celda compacta, sin bloque doble. */
-.actas-main-grid .p-datatable-thead > tr > th:first-child,
-.actas-main-grid .p-datatable-tbody > tr > td:first-child {
-  width: 34px !important;
-  min-width: 34px !important;
-  max-width: 34px !important;
-  padding-left: 4px !important;
-  padding-right: 4px !important;
-}
-
-/* Neutraliza cualquier frozen residual que PrimeVue vuelva a pintar. */
-.actas-main-grid .p-datatable-frozen-column {
-  position: static !important;
-  left: auto !important;
-  right: auto !important;
-  z-index: auto !important;
-  box-shadow: none !important;
-}
-
-/* No debe existir una franja vacía entre checkbox y NRO_ACTA. */
-.actas-main-grid .p-datatable-thead > tr > th:nth-child(2),
-.actas-main-grid .p-datatable-tbody > tr > td:nth-child(2) {
-  border-left: 0 !important;
 }
