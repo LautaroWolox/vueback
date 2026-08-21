@@ -1,0 +1,316 @@
+name: Normalize grid CSS into fm-global
+
+on:
+  push:
+    branches:
+      - fix-grids-unificadas-fm-vue-041
+    paths:
+      - '.github/workflows/normalize-grid-css.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix-grids-unificadas-fm-vue-041
+          fetch-depth: 0
+
+      - name: Consolidate grid styles
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          root = Path('.')
+          global_css = root / 'src/assets/css/fm-global.css'
+          main_js = root / 'src/main.js'
+          sas_vue = root / 'src/modules/reporteSas/components/Tabla.vue'
+          otf_vue = root / 'src/modules/otFallidasCT/components/Table.vue'
+          otf_css = root / 'src/modules/otFallidasCT/components/otf-table.css'
+          extra_css = root / 'src/assets/css/fm-grid-unified-041.css'
+
+          css = global_css.read_text(encoding='utf-8')
+
+          # Remove any previous run of this block.
+          start_marker = '/* ===== INICIO: fm-grid-unified-sticky-final ===== */'
+          end_marker = '/* ===== FIN: fm-grid-unified-sticky-final ===== */'
+          if start_marker in css and end_marker in css:
+              before = css.split(start_marker, 1)[0].rstrip()
+              after = css.split(end_marker, 1)[1].lstrip()
+              css = before + '\n\n' + after
+
+          # Move Reporte SAS scoped styles into fm-global.css.
+          sas_text = sas_vue.read_text(encoding='utf-8')
+          sas_match = re.search(r'\n<style\s+scoped>\s*(.*?)\s*</style>\s*$', sas_text, flags=re.S)
+          sas_css = ''
+          if sas_match:
+              sas_css = sas_match.group(1).strip()
+              sas_css = re.sub(r':deep\(([^()]*)\)', r'\1', sas_css)
+              sas_vue.write_text(sas_text[:sas_match.start()].rstrip() + '\n', encoding='utf-8')
+
+          # Move OTs Fallidas CSS into fm-global.css and remove the style src.
+          otf_text = otf_vue.read_text(encoding='utf-8')
+          otf_text = re.sub(r'\n<style\s+scoped\s+src=["\']\.\/otf-table\.css["\']\s*></style>\s*$', '\n', otf_text, flags=re.S)
+          otf_vue.write_text(otf_text.rstrip() + '\n', encoding='utf-8')
+
+          otf_styles = ''
+          if otf_css.exists():
+              otf_styles = otf_css.read_text(encoding='utf-8').strip()
+              otf_styles = re.sub(r':deep\(([^()]*)\)', r'\1', otf_styles)
+              otf_css.unlink()
+
+          # Remove temporary import/file from the earlier attempt.
+          main_text = main_js.read_text(encoding='utf-8')
+          main_text = main_text.replace("import './assets/css/fm-grid-unified-041.css'\n", '')
+          main_js.write_text(main_text, encoding='utf-8')
+          if extra_css.exists():
+              extra_css.unlink()
+
+          unified = r'''
+/* ===== INICIO: fm-grid-unified-sticky-final ===== */
+/*
+ * PATRÓN ÚNICO DE GRILLA FM
+ * Referencia visual/funcional: Registro OTs Fallidas.
+ * Aplica a Registro OTs Fallidas y Reporte SAS.
+ * Títulos y filtros sticky, opacos y con z-index independiente para impedir
+ * que las filas sean visibles por detrás durante el scroll vertical.
+ */
+
+/* --- Estilos previamente scoped de Registro OTs Fallidas --- */
+''' + otf_styles + r'''
+
+/* --- Estilos previamente scoped de Reporte SAS --- */
+''' + sas_css + r'''
+
+/* --- Normalización final compartida: ambas grillas calcadas --- */
+html body #app #tabla.otf-grid,
+html body #app #tabla-reporte-sas.reporte-sas-main-grid {
+  --fm-grid-header-height: 34px;
+  --fm-grid-filter-height: 33px;
+  --fm-grid-row-height: 35px;
+}
+
+html body #app #tabla.otf-grid .p-datatable-table-container,
+html body #app #tabla.otf-grid .p-datatable-wrapper,
+html body #app #tabla.otf-grid [data-pc-section='tablecontainer'],
+html body #app #tabla-reporte-sas.reporte-sas-main-grid .p-datatable-table-container,
+html body #app #tabla-reporte-sas.reporte-sas-main-grid .p-datatable-wrapper,
+html body #app #tabla-reporte-sas.reporte-sas-main-grid [data-pc-section='tablecontainer'] {
+  position: relative !important;
+  overflow: auto !important;
+  border: 1px solid #d1d1d1 !important;
+  background: #fff !important;
+  isolation: isolate !important;
+}
+
+html body #app #tabla.otf-grid .p-datatable-table,
+html body #app #tabla-reporte-sas.reporte-sas-main-grid .p-datatable-table {
+  width: max-content !important;
+  min-width: 100% !important;
+  table-layout: fixed !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  background: #fff !important;
+  font-size: 12px !important;
+}
+
+/* Sticky real del encabezado. */
+html body #app #tabla.otf-grid .p-datatable-thead > tr:first-child > th,
+html body #app #tabla-reporte-sas.reporte-sas-main-grid .p-datatable-thead > tr:first-child > th {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 40 !important;
+  height: var(--fm-grid-header-height) !important;
+  min-height: var(--fm-grid-header-height) !important;
+  padding: 4px 7px !important;
+  border-top: 0 !important;
+  border-left: 0 !important;
+  border-right: 1px solid #c9d3da !important;
+  border-bottom: 1px solid #dce3e8 !important;
+  background: #f4f7f9 !important;
+  background-clip: padding-box !important;
+  color: #263f50 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+  overflow: visible !important;
+  box-shadow: 0 1px 0 #dce3e8 !important;
+}
+
+/* Sticky real de la fila de filtros, inmediatamente debajo del header. */
+html body #app #tabla.otf-grid .p-datatable-thead > tr.p-datatable-filter-row > th,
+html body #app #tabla.otf-grid .p-datatable-thead > tr.p-filter-row > th,
+html body #app #tabla-reporte-sas.reporte-sas-main-grid .p-datatable-thead > tr.p-datatable-filter-row > th,
+html body #app #tabla-reporte-sas.reporte-sas-main-grid .p-datatable-thead > tr.p-filter-row > th {
+  position: sticky !important;
+  top: var(--fm-grid-header-height) !important;
+  z-index: 41 !important;
+  height: var(--fm-grid-filter-height) !important;
+  min-height: var(--fm-grid-filter-height) !important;
+  padding: 3px 5px !important;
+  border-top: 0 !important;
+  border-left: 0 !important;
+  border-right: 1px solid #c9d3da !important;
+  border-bottom: 1px solid #cfd9de !important;
+  background: #fff !important;
+  background-clip: padding-box !important;
+  overflow: visible !important;
+  box-shadow: 0 2px 2px rgba(31, 59, 70, .10) !important;
+}
+
+/* Garantiza que el thead completo permanezca por encima del body. */
+html body #app #tabla.otf-grid .p-datatable-thead,
+html body #app #tabla-reporte-sas.reporte-sas-main-grid .p-datatable-thead {
+  position: relative !important;
+  z-index: 39 !important;
+  background: #fff !important;
+}
+
+html body #app #tabla.otf-grid .p-datatable-tbody,
+html body #app #tabla-reporte-sas.reporte-sas-main-grid .p-datatable-tbody {
+  position: relative !important;
+  z-index: 1 !important;
+  background: #fff !important;
+}
+
+html body #app #tabla.otf-grid .p-datatable-tbody > tr > td,
+html body #app #tabla-reporte-sas.reporte-sas-main-grid .p-datatable-tbody > tr > td {
+  height: var(--fm-grid-row-height) !important;
+  min-height: var(--fm-grid-row-height) !important;
+  padding: 5px 8px !important;
+  border-top: 0 !important;
+  border-left: 0 !important;
+  border-right: 1px solid #c9d3da !important;
+  border-bottom: 1px solid #dce3e8 !important;
+  background: #fff !important;
+  color: #263238 !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 1.2 !important;
+  vertical-align: middle !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+html body #app #tabla.otf-grid .fm-filter-cell,
+html body #app #tabla-reporte-sas.reporte-sas-main-grid .fm-filter-cell,
+html body #app #tabla-reporte-sas.reporte-sas-main-grid .reporte-sas-filter-cell {
+  width: 100% !important;
+  min-width: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 3px !important;
+  background: #fff !important;
+}
+
+html body #app #tabla.otf-grid .fm-column-filter,
+html body #app #tabla-reporte-sas.reporte-sas-main-grid .fm-column-filter,
+html body #app #tabla-reporte-sas.reporte-sas-main-grid .reporte-sas-filter-input,
+html body #app #tabla-reporte-sas.reporte-sas-main-grid .reporte-sas-filter-input.p-inputtext {
+  width: 100% !important;
+  min-width: 20px !important;
+  height: 25px !important;
+  min-height: 25px !important;
+  padding: 3px 5px !important;
+  border: 1px solid #c7d1d8 !important;
+  border-radius: 3px !important;
+  background: #fff !important;
+  color: #263238 !important;
+  font-size: 11px !important;
+  box-shadow: none !important;
+  box-sizing: border-box !important;
+}
+
+html body #app #tabla.otf-grid .fm-column-filter:focus,
+html body #app #tabla-reporte-sas.reporte-sas-main-grid .fm-column-filter:focus,
+html body #app #tabla-reporte-sas.reporte-sas-main-grid .reporte-sas-filter-input:focus {
+  outline: 0 !important;
+  border-color: #00a9bd !important;
+  box-shadow: 0 0 0 2px rgba(0, 188, 212, .14) !important;
+}
+
+html body #app #tabla-reporte-sas.reporte-sas-main-grid .reporte-sas-filter-clear,
+html body #app #tabla.otf-grid .fm-icon-button {
+  background: #fff !important;
+}
+
+html body #app #tabla.otf-grid .p-datatable-tbody > tr:hover > td,
+html body #app #tabla-reporte-sas.reporte-sas-main-grid .p-datatable-tbody > tr:hover > td {
+  background: #edfafd !important;
+}
+
+html body #app #tabla.otf-grid .fm-selected-row > td,
+html body #app #tabla.otf-grid .p-datatable-row-selected > td,
+html body #app #tabla.otf-grid .p-highlight > td,
+html body #app #tabla-reporte-sas.reporte-sas-main-grid .fm-selected-row > td,
+html body #app #tabla-reporte-sas.reporte-sas-main-grid .p-datatable-row-selected > td,
+html body #app #tabla-reporte-sas.reporte-sas-main-grid .p-highlight > td,
+html body #app #tabla-reporte-sas.reporte-sas-main-grid .p-datatable-tbody > tr[data-p-selected='true'] > td {
+  background: #d9f8fa !important;
+  color: #111 !important;
+}
+
+html body #app #tabla.otf-grid .p-paginator,
+html body #app #tabla-reporte-sas.reporte-sas-main-grid .p-paginator,
+html body #app #tabla-reporte-sas.reporte-sas-main-grid .p-datatable-paginator-bottom {
+  width: 100% !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+  flex: 0 0 38px !important;
+  padding: 0 !important;
+  border: 1px solid #d1d1d1 !important;
+  border-top: 0 !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+  overflow: visible !important;
+}
+
+html body #app #tabla.otf-grid .p-column-resizer,
+html body #app #tabla.otf-grid .p-datatable-column-resizer,
+html body #app #tabla-reporte-sas.reporte-sas-main-grid .p-column-resizer,
+html body #app #tabla-reporte-sas.reporte-sas-main-grid .p-datatable-column-resizer {
+  z-index: 60 !important;
+}
+
+/* En tamaños chicos conserva el scroll de tabla sin desactivar sticky. */
+@media (max-width: 900px) {
+  html body #app #tabla.otf-grid .p-datatable-table-container,
+  html body #app #tabla.otf-grid .p-datatable-wrapper,
+  html body #app #tabla-reporte-sas.reporte-sas-main-grid .p-datatable-table-container,
+  html body #app #tabla-reporte-sas.reporte-sas-main-grid .p-datatable-wrapper {
+    overflow: auto !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+}
+/* ===== FIN: fm-grid-unified-sticky-final ===== */
+'''
+
+          css = css.rstrip() + '\n\n' + unified.strip() + '\n'
+          global_css.write_text(css, encoding='utf-8')
+
+          workflow = root / '.github/workflows/normalize-grid-css.yml'
+          if workflow.exists():
+              workflow.unlink()
+          PY
+
+      - name: Build
+        run: |
+          npm ci
+          npm run build
+
+      - name: Commit normalized result
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix(grid): unificar SAS y OTs Fallidas con sticky real"
+          git push origin HEAD:fix-grids-unificadas-fm-vue-041
